@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Visão do Dia</title>
+
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="header">
+            <p class="eyebrow">PLANEJAMENTO</p>
+            <h1>☀️ Visão do Dia</h1>
+            <p class="subtitle">
+                Entenda como está o seu dia antes de começar.
+            </p>
+        </header>
+
+        <section class="modules">
+
+            <div class="module-card">
+                <span class="icon">📅</span>
+                <div>
+                    <h2>Data</h2>
+                    <p id="data"></p>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <span class="icon">🌅</span>
+                <div>
+                    <h2>Como estou hoje?</h2>
+                    <textarea
+                        placeholder="Como você está se sentindo hoje?"
+                        rows="4"
+                    ></textarea>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <span class="icon">📌</span>
+                <div>
+                    <h2>Compromissos</h2>
+                    <textarea
+                        placeholder="Horários, compromissos ou acontecimentos fixos..."
+                        rows="4"
+                    ></textarea>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <span class="icon">🎯</span>
+                <div>
+                    <h2>Intenção do dia</h2>
+                    <textarea
+                        placeholder="Como você quer agir hoje?"
+                        rows="4"
+                    ></textarea>
+                </div>
+            </div>
+
+        </section>
+
+        <a href="index.html" class="back-button">
+            ← Voltar para Planejamento
+        </a>
+
+    </main>
+
+    <script>
+        const hoje = new Date();
+
+        const dataFormatada = hoje.toLocaleDateString('pt-BR', {
+            weekday: 'long',
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
+
+        document.getElementById('data').textContent = dataFormatada;
+    </script>
+
+</body>
+</html>
