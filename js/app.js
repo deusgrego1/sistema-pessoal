@@ -4,39 +4,34 @@ document.addEventListener("DOMContentLoaded", () => {
 
     campos.forEach((campo, indice) => {
 
-        const chave = `planejamento_${window.location.pathname}_${indice}`;
+        const chave = "teste_campo_" + indice;
 
-        const valorSalvo = localStorage.getItem(chave);
+        const salvo = localStorage.getItem(chave);
 
-        if (valorSalvo !== null) {
+        if (salvo !== null) {
             if (campo.type === "checkbox") {
-                campo.checked = valorSalvo === "true";
+                campo.checked = salvo === "true";
             } else {
-                campo.value = valorSalvo;
+                campo.value = salvo;
             }
         }
 
         campo.addEventListener("input", () => {
-            if (campo.type === "checkbox") {
-                localStorage.setItem(chave, campo.checked);
-            } else {
-                localStorage.setItem(chave, campo.value);
-            }
+            const valor = campo.type === "checkbox"
+                ? campo.checked
+                : campo.value;
+
+            localStorage.setItem(chave, valor);
         });
 
         campo.addEventListener("change", () => {
-            if (campo.type === "checkbox") {
-                localStorage.setItem(chave, campo.checked);
-            } else {
-                localStorage.setItem(chave, campo.value);
-            }
+            const valor = campo.type === "checkbox"
+                ? campo.checked
+                : campo.value;
+
+            localStorage.setItem(chave, valor);
         });
 
     });
 
-});
-
-    });
-
-});
 });
