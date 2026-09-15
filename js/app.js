@@ -1,7 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    const campos = document.querySelectorAll("input, textarea, select");
+    const campo = document.querySelector("textarea");
 
-    alert("Campos encontrados: " + campos.length);
+    campo.addEventListener("input", () => {
+        localStorage.setItem("prioridade_teste", campo.value);
+    });
 
 });
