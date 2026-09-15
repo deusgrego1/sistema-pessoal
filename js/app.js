@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  document.addEventListener("DOMContentLoaded", () => {
 
     const campos = document.querySelectorAll("input, textarea, select");
 
@@ -32,6 +31,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 localStorage.setItem(chave, campo.value);
             }
         });
+
+    });
+
+});
 
     });
 
