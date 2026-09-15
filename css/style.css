@@ -96,6 +96,40 @@ h1 {
     .container {
         padding: 25px 16px 30px;
     }
+    input,
+textarea,
+select {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    background: #222225;
+    color: #f5f5f5;
+    border: 1px solid #333338;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #888;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #55555c;
+    background: #262629;
+}
+
+textarea {
+    resize: vertical;
+}
+
+select {
+    appearance: auto;
+}
 
     h1 {
         font-size: 28px;
