@@ -127,32 +127,26 @@ document.addEventListener("DOMContentLoaded", () => {
             datas.forEach(data => {
 
                 const card = document.createElement("div");
+const card = document.createElement("a");
 
-                card.className = "module-card";
+card.className = "module-card";
 
-                card.innerHTML = `
-                    <span class="icon">📅</span>
+card.href = `historico.html?data=${data}`;
 
-                    <div>
-                        <h2>${formatarData(data)}</h2>
-                        <p>
-                            Planejamento salvo
-                        </p>
-                    </div>
+card.innerHTML = `
+    <span class="icon">📅</span>
 
-                    <span class="arrow">›</span>
-                `;
+    <div>
+        <h2>${formatarData(data)}</h2>
+        <p>
+            Planejamento salvo
+        </p>
+    </div>
 
-                card.style.cursor = "pointer";
+    <span class="arrow">›</span>
+`;
 
-                card.addEventListener("click", () => {
-
-                    window.location.href =
-                        `historico.html?data=${data}`;
-
-                });
-
-                listaDatas.appendChild(card);
+listaDatas.appendChild(card);
 
             });
 
