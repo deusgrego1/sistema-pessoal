@@ -15,13 +15,13 @@
 
         <header class="header">
             <p class="eyebrow">PLANEJAMENTO</p>
-            <h1>📅 Histórico</h1>
-            <p class="subtitle">
+            <h1 id="tituloHistorico">📅 Histórico</h1>
+            <p class="subtitle" id="subtituloHistorico">
                 Consulte seus planejamentos anteriores.
             </p>
         </header>
 
-        <section class="modules">
+        <section id="listaHistorico" class="modules">
 
             <div class="module-card">
                 <span class="icon">🔎</span>
@@ -36,6 +36,66 @@
             </div>
 
             <div id="listaDatas"></div>
+
+        </section>
+
+        <section id="visualizacaoDia" class="modules" style="display:none;">
+
+            <div class="module-card">
+                <span class="icon">☀️</span>
+                <div>
+                    <h2>Visão do Dia</h2>
+                    <div id="visaoHistorico"></div>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <span class="icon">🎯</span>
+                <div>
+                    <h2>Prioridades</h2>
+                    <div id="prioridadesHistorico"></div>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <span class="icon">💼</span>
+                <div>
+                    <h2>Trabalho</h2>
+                    <div id="trabalhoHistorico"></div>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <span class="icon">📚</span>
+                <div>
+                    <h2>Estudo</h2>
+                    <div id="estudoHistorico"></div>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <span class="icon">🏋️</span>
+                <div>
+                    <h2>Corpo</h2>
+                    <div id="corpoHistorico"></div>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <span class="icon">🙏</span>
+                <div>
+                    <h2>Espiritualidade</h2>
+                    <div id="espiritualidadeHistorico"></div>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <span class="icon">🧠</span>
+                <div>
+                    <h2>Notas / Ideias</h2>
+                    <div id="notasHistorico"></div>
+                </div>
+            </div>
 
         </section>
 
