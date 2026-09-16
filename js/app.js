@@ -1,10 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+    const hoje = new Date();
+
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+    const dia = String(hoje.getDate()).padStart(2, "0");
+
+    const dataAtual = `${ano}-${mes}-${dia}`;
+
     const campos = document.querySelectorAll("input, textarea, select");
 
     campos.forEach((campo, indice) => {
 
-        const chave = "prioridade_" + indice;
+        const chave = `planejamento_${dataAtual}_prioridades_${indice}`;
 
         const salvo = localStorage.getItem(chave);
 
@@ -17,19 +25,23 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         campo.addEventListener("input", () => {
-            if (campo.type === "checkbox") {
-                localStorage.setItem(chave, campo.checked);
-            } else {
-                localStorage.setItem(chave, campo.value);
-            }
+
+            const valor = campo.type === "checkbox"
+                ? campo.checked
+                : campo.value;
+
+            localStorage.setItem(chave, valor);
+
         });
 
         campo.addEventListener("change", () => {
-            if (campo.type === "checkbox") {
-                localStorage.setItem(chave, campo.checked);
-            } else {
-                localStorage.setItem(chave, campo.value);
-            }
+
+            const valor = campo.type === "checkbox"
+                ? campo.checked
+                : campo.value;
+
+            localStorage.setItem(chave, valor);
+
         });
 
     });
