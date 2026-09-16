@@ -9,54 +9,167 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const dataAtual = `${ano}-${mes}-${dia}`;
 
-    // Descobre automaticamente qual página está aberta
+    // Identifica a página atual
     const pagina = window.location.pathname
         .split("/")
         .pop()
         .replace(".html", "");
 
-    // Todos os campos da página
-    const campos = document.querySelectorAll("input, textarea, select");
+    // ==================================================
+    // SALVAMENTO NORMAL DAS PÁGINAS
+    // ==================================================
 
-    campos.forEach((campo, indice) => {
+    if (pagina !== "historico") {
 
-        const chave = `planejamento_${dataAtual}_${pagina}_${indice}`;
+        const campos = document.querySelectorAll(
+            "input, textarea, select"
+        );
 
-        // Carregar informação salva
-        const salvo = localStorage.getItem(chave);
+        campos.forEach((campo, indice) => {
 
-        if (salvo !== null) {
+            const chave =
+                `planejamento_${dataAtual}_${pagina}_${indice}`;
 
-            if (campo.type === "checkbox") {
-                campo.checked = salvo === "true";
-            } else {
-                campo.value = salvo;
+            const salvo = localStorage.getItem(chave);
+
+            if (salvo !== null) {
+
+                if (campo.type === "checkbox") {
+                    campo.checked = salvo === "true";
+                } else {
+                    campo.value = salvo;
+                }
+
             }
+
+            campo.addEventListener("input", () => {
+
+                const valor = campo.type === "checkbox"
+                    ? campo.checked
+                    : campo.value;
+
+                localStorage.setItem(chave, valor);
+
+            });
+
+            campo.addEventListener("change", () => {
+
+                const valor = campo.type === "checkbox"
+                    ? campo.checked
+                    : campo.value;
+
+                localStorage.setItem(chave, valor);
+
+            });
+
+        });
+
+    }
+
+    // ==================================================
+    // HISTÓRICO
+    // ==================================================
+
+    if (pagina === "historico") {
+
+        const listaDatas = document.getElementById("listaDatas");
+        const buscarData = document.getElementById("buscarData");
+
+        function obterDatas() {
+
+            const datas = new Set();
+
+            Object.keys(localStorage).forEach(chave => {
+
+                const resultado = chave.match(
+                    /^planejamento_(\d{4}-\d{2}-\d{2})_/
+                );
+
+                if (resultado) {
+                    datas.add(resultado[1]);
+                }
+
+            });
+
+            return Array.from(datas).sort().reverse();
+        }
+
+        function formatarData(data) {
+
+            const [ano, mes, dia] = data.split("-");
+
+            return `${dia}/${mes}/${ano}`;
+        }
+
+        function mostrarDatas(filtro = "") {
+
+            listaDatas.innerHTML = "";
+
+            const datas = obterDatas()
+                .filter(data => data.includes(filtro));
+
+            if (datas.length === 0) {
+
+                listaDatas.innerHTML = `
+                    <div class="module-card">
+                        <div>
+                            <h2>Nenhum planejamento encontrado</h2>
+                            <p>
+                                Ainda não existem dados salvos para essa data.
+                            </p>
+                        </div>
+                    </div>
+                `;
+
+                return;
+            }
+
+            datas.forEach(data => {
+
+                const card = document.createElement("div");
+
+                card.className = "module-card";
+
+                card.innerHTML = `
+                    <span class="icon">📅</span>
+
+                    <div>
+                        <h2>${formatarData(data)}</h2>
+                        <p>
+                            Planejamento salvo
+                        </p>
+                    </div>
+
+                    <span class="arrow">›</span>
+                `;
+
+                card.style.cursor = "pointer";
+
+                card.addEventListener("click", () => {
+
+                    window.location.href =
+                        `historico.html?data=${data}`;
+
+                });
+
+                listaDatas.appendChild(card);
+
+            });
 
         }
 
-        // Salvar enquanto digita
-        campo.addEventListener("input", () => {
+        mostrarDatas();
 
-            const valor = campo.type === "checkbox"
-                ? campo.checked
-                : campo.value;
+        buscarData.addEventListener("change", () => {
 
-            localStorage.setItem(chave, valor);
-
-        });
-
-        // Salvar alterações
-        campo.addEventListener("change", () => {
-
-            const valor = campo.type === "checkbox"
-                ? campo.checked
-                : campo.value;
-
-            localStorage.setItem(chave, valor);
+            if (buscarData.value) {
+                mostrarDatas(buscarData.value);
+            } else {
+                mostrarDatas();
+            }
 
         });
 
-    });
+    }
 
 });
