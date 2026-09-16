@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
 
+    // Data atual
     const hoje = new Date();
 
     const ano = hoje.getFullYear();
@@ -8,22 +9,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const dataAtual = `${ano}-${mes}-${dia}`;
 
+    // Descobre automaticamente qual página está aberta
+    const pagina = window.location.pathname
+        .split("/")
+        .pop()
+        .replace(".html", "");
+
+    // Todos os campos da página
     const campos = document.querySelectorAll("input, textarea, select");
 
     campos.forEach((campo, indice) => {
 
-        const chave = `planejamento_${dataAtual}_prioridades_${indice}`;
+        const chave = `planejamento_${dataAtual}_${pagina}_${indice}`;
 
+        // Carregar informação salva
         const salvo = localStorage.getItem(chave);
 
         if (salvo !== null) {
+
             if (campo.type === "checkbox") {
                 campo.checked = salvo === "true";
             } else {
                 campo.value = salvo;
             }
+
         }
 
+        // Salvar enquanto digita
         campo.addEventListener("input", () => {
 
             const valor = campo.type === "checkbox"
@@ -34,6 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         });
 
+        // Salvar alterações
         campo.addEventListener("change", () => {
 
             const valor = campo.type === "checkbox"
