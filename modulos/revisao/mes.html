@@ -9,9 +9,87 @@
     <link rel="stylesheet" href="../../css/style.css">
 
     <style>
+        .toggle-modo {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .toggle-modo button {
+            padding: 8px 18px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #333338;
+            background: #17171a;
+            color: #aaa;
+            border-radius: 20px;
+            transition: 0.15s;
+        }
+
+        .toggle-modo button.ativo {
+            background: #333;
+            color: #fff;
+            border-color: #55555c;
+        }
+
+        .secao-titulo {
+            color: #777;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 18px 0 4px;
+            text-align: center;
+        }
+
+        .rating-bloco {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .rating-titulo {
+            color: #999;
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .rating-opcoes {
+            display: flex;
+            gap: 14px;
+        }
+
+        .rating-emoji {
+            font-size: 32px;
+            background: transparent;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 6px 10px;
+            cursor: pointer;
+            transition: 0.15s;
+            filter: grayscale(60%);
+            opacity: 0.5;
+        }
+
+        .rating-emoji:hover {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+
+        .rating-emoji.selecionado {
+            border-color: #55555c;
+            background: #222225;
+            filter: grayscale(0%);
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
         .panorama-linha {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             padding: 8px 0;
             border-bottom: 1px solid #252529;
             font-size: 14px;
@@ -28,6 +106,149 @@
         .panorama-valor {
             color: #f5f5f5;
             font-weight: 600;
+            text-align: right;
+        }
+
+        .delta-sobe {
+            color: #4caf50;
+            font-size: 12px;
+            margin-left: 6px;
+            font-weight: 500;
+        }
+
+        .delta-desce {
+            color: #e57373;
+            font-size: 12px;
+            margin-left: 6px;
+            font-weight: 500;
+        }
+
+        .delta-igual {
+            color: #666;
+            font-size: 12px;
+            margin-left: 6px;
+            font-weight: 500;
+        }
+
+        details.bloco-expansivel {
+            background: #17171a;
+            border: 1px solid #252529;
+            border-radius: 16px;
+            padding: 18px;
+        }
+
+        details.bloco-expansivel summary {
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            outline: none;
+        }
+
+        details.bloco-expansivel summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details.bloco-expansivel summary::after {
+            content: "▼";
+            margin-left: auto;
+            color: #777;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+
+        details.bloco-expansivel[open] summary::after {
+            transform: rotate(180deg);
+        }
+
+        details.bloco-expansivel summary h2 {
+            font-size: 17px;
+            color: #f5f5f5;
+        }
+
+        .lista-simples {
+            list-style: none;
+            padding: 0;
+            margin-top: 14px;
+        }
+
+        .lista-simples li {
+            padding: 8px 0;
+            border-bottom: 1px solid #252529;
+            font-size: 14px;
+            color: #d0d0d0;
+            line-height: 1.5;
+        }
+
+        .lista-simples li:last-child {
+            border-bottom: none;
+        }
+
+        .lista-simples .tag {
+            color: #777;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            min-width: 90px;
+        }
+
+        body.modo-rapida .modo-completo {
+            display: none;
+        }
+
+        .link-subpagina {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 18px;
+            background: #17171a;
+            border: 1px solid #252529;
+            border-radius: 16px;
+            color: inherit;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .link-subpagina:hover {
+            background: #1e1e22;
+            border-color: #3a3a40;
+        }
+
+        .link-subpagina h2 {
+            font-size: 17px;
+            margin-bottom: 5px;
+        }
+
+        .link-subpagina p {
+            color: #999;
+            font-size: 13px;
+        }
+
+        .grafico-linha {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0;
+            font-size: 13px;
+            color: #bbb;
+        }
+
+        .grafico-barra {
+            font-family: monospace;
+            color: #888;
+            letter-spacing: -1px;
+        }
+
+        .grafico-barra .cheio {
+            color: #4caf50;
+        }
+
+        .grafico-pct {
+            color: #888;
+            font-size: 12px;
+            min-width: 38px;
+            text-align: right;
         }
     </style>
 </head>
@@ -46,99 +267,213 @@
 
         <section class="modules">
 
-            <!-- 1. PANORAMA DO MÊS -->
+            <!-- TOGGLE -->
 
-            <div class="module-card">
-                <span class="icon">📊</span>
-                <div style="width:100%;">
-                    <h2>Panorama do mês</h2>
-                    <div id="panorama" style="margin-top:12px;">
-                        <p style="color:#777;">Carregando…</p>
+            <div class="toggle-modo" id="toggleModo">
+                <button type="button" data-modo="rapida">Rápida</button>
+                <button type="button" data-modo="completa">Completa</button>
+            </div>
+
+
+            <!-- ================================================== -->
+            <!-- 📊 O QUE ACONTECEU                                   -->
+            <!-- ================================================== -->
+
+            <p class="secao-titulo">📊 O que aconteceu</p>
+
+
+            <!-- FRASE + RATING -->
+
+            <div class="module-card" style="flex-direction: column; gap: 16px;">
+                <div style="width: 100%;">
+                    <h2 style="margin-bottom: 8px;">Se eu resumisse o mês em uma frase…</h2>
+                    <input
+                        type="text"
+                        id="fraseMes"
+                        placeholder="Ex.: Mês de aprender a vender o que eu já sei fazer."
+                    >
+                </div>
+
+                <div class="rating-bloco" style="margin-top: 6px;">
+                    <span class="rating-titulo">Como foi o mês?</span>
+
+                    <div class="rating-opcoes" id="ratingOpcoes">
+                        <button type="button" class="rating-emoji" data-valor="20">😞</button>
+                        <button type="button" class="rating-emoji" data-valor="40">😕</button>
+                        <button type="button" class="rating-emoji" data-valor="60">😐</button>
+                        <button type="button" class="rating-emoji" data-valor="80">🙂</button>
+                        <button type="button" class="rating-emoji" data-valor="100">😄</button>
                     </div>
                 </div>
             </div>
 
 
-            <!-- 2. CONQUISTAS -->
+            <!-- PANORAMA COMPARATIVO -->
 
             <div class="module-card">
+                <div style="width: 100%;">
+                    <h2>Panorama do mês</h2>
+                    <div id="panorama" style="margin-top: 12px;">
+                        <p style="color: #777;">Carregando…</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- GRÁFICO POR SEMANA -->
+
+            <div class="module-card modo-completo">
+                <div style="width: 100%;">
+                    <h2>Evolução por semana</h2>
+                    <div id="graficoSemanas" style="margin-top: 12px;">
+                        <p style="color: #777;">Carregando…</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- CONQUISTAS -->
+
+            <div class="module-card modo-completo">
                 <span class="icon">🏆</span>
                 <div>
                     <h2>Principais conquistas</h2>
                     <textarea id="conquistas" rows="4"
-                        placeholder="O que realmente avançou neste mês?"></textarea>
+                        placeholder="Ex.: consegui os primeiros clientes; mantive rotina de treino o mês inteiro; terminei o projeto X."></textarea>
                 </div>
             </div>
 
 
-            <!-- 3. ONDE EVOLUÍ -->
+            <!-- EVOLUÇÃO POR ÁREA -->
 
-            <div class="module-card">
+            <div class="module-card modo-completo">
+                <div style="width: 100%;">
+                    <h2>Onde evoluí (por área)</h2>
+                    <p style="color:#888; font-size:13px; margin-top:6px;">
+                        Dias de cada módulo preenchidos neste mês, comparado ao anterior.
+                    </p>
+                    <div id="areas" style="margin-top: 12px;">
+                        <p style="color: #777;">Carregando…</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="module-card modo-completo">
                 <span class="icon">📈</span>
                 <div>
-                    <h2>Onde evoluí</h2>
+                    <h2>Onde evoluí (reflexão)</h2>
                     <textarea id="evolucao" rows="5"
-                        placeholder="Trabalho, estudos, corpo, mente, projetos, relacionamentos..."></textarea>
+                        placeholder="Ex.: em agosto eu travava pra cobrar; agora consigo passar o orçamento sem hesitar."></textarea>
                 </div>
             </div>
 
 
-            <!-- 4. DIFICULDADES -->
+            <!-- SEMANAS DO MÊS (integração) -->
 
-            <div class="module-card">
+            <details class="bloco-expansivel modo-completo">
+                <summary>
+                    <span class="icon">📅</span>
+                    <h2>Semanas do mês</h2>
+                </summary>
+                <div id="semanasDoMes" style="margin-top: 14px;"></div>
+            </details>
+
+
+            <!-- ONDE PAREI (compilado do mês) -->
+
+            <details class="bloco-expansivel modo-completo">
+                <summary>
+                    <span class="icon">📍</span>
+                    <h2>Onde parei / loops abertos do mês</h2>
+                </summary>
+                <ul class="lista-simples" id="ondePareiLista"></ul>
+            </details>
+
+
+            <!-- DIAS SEM REVISÃO -->
+
+            <details class="bloco-expansivel modo-completo">
+                <summary>
+                    <span class="icon">⚠️</span>
+                    <h2>Dias sem revisão</h2>
+                </summary>
+                <div id="diasSemRevisao" style="margin-top: 14px;"></div>
+            </details>
+
+
+            <!-- SESSÕES DE FOCO — SUBPÁGINA -->
+
+            <a href="mes-foco.html" class="link-subpagina modo-completo" id="linkFocoMes">
+                <span class="icon">⏱️</span>
+                <div style="flex: 1;">
+                    <h2>Sessões de foco do mês</h2>
+                    <p id="linkFocoResumo">Ver as sessões registradas no mês.</p>
+                </div>
+                <span class="arrow">›</span>
+            </a>
+
+
+            <!-- ================================================== -->
+            <!-- 🧠 O QUE ISSO SIGNIFICA                              -->
+            <!-- ================================================== -->
+
+            <p class="secao-titulo modo-completo">🧠 O que isso significa</p>
+
+
+            <div class="module-card modo-completo">
                 <span class="icon">🚧</span>
                 <div>
                     <h2>Principais dificuldades</h2>
                     <textarea id="dificuldades" rows="4"
-                        placeholder="O que persistiu como obstáculo durante o mês?"></textarea>
+                        placeholder="Ex.: dificuldade de manter consistência nos dias sem tarefa clara; procrastinação em tarefas de gravação."></textarea>
                 </div>
             </div>
 
 
-            <!-- 5. PADRÕES -->
-
-            <div class="module-card">
+            <div class="module-card modo-completo">
                 <span class="icon">🔁</span>
                 <div>
                     <h2>Padrões percebidos</h2>
                     <textarea id="padroes" rows="4"
-                        placeholder="O que se repetiu ao longo das semanas?"></textarea>
+                        placeholder="Ex.: quando tenho muitas tarefas abertas, minha execução cai."></textarea>
                 </div>
             </div>
 
 
-            <!-- 6. APRENDIZADOS -->
-
-            <div class="module-card">
+            <div class="module-card modo-completo">
                 <span class="icon">🧠</span>
                 <div>
                     <h2>Principais aprendizados</h2>
                     <textarea id="aprendizados" rows="4"
-                        placeholder="Se pudesse levar só 3 aprendizados deste mês para o próximo, quais seriam?"></textarea>
+                        placeholder="Ex.: execução rápida vale mais que planejamento perfeito."></textarea>
                 </div>
             </div>
 
 
-            <!-- 7. NÃO FUNCIONOU -->
-
-            <div class="module-card">
+            <div class="module-card modo-completo">
                 <span class="icon">❌</span>
                 <div>
                     <h2>O que não funcionou</h2>
                     <textarea id="naoFuncionou" rows="4"
-                        placeholder="Estratégias, hábitos ou decisões que não deram o resultado esperado."></textarea>
+                        placeholder="Ex.: tentar estudar 4 assuntos simultaneamente; planejar mais tarefas do que consigo executar."></textarea>
                 </div>
             </div>
 
 
-            <!-- 8. O QUE DEVE MUDAR -->
+            <!-- ================================================== -->
+            <!-- ➡️ PARA ONDE IR                                       -->
+            <!-- ================================================== -->
+
+            <p class="secao-titulo">➡️ Para onde ir</p>
+
 
             <div class="module-card">
                 <span class="icon">🔧</span>
                 <div>
                     <h2>O que deve mudar</h2>
                     <textarea id="mudar" rows="4"
-                        placeholder="O que precisa ser diferente no próximo mês?"></textarea>
+                        placeholder="Ex.: no próximo mês trabalhar com no máximo 2 projetos simultâneos."></textarea>
                 </div>
             </div>
 
@@ -153,15 +488,13 @@
 
     <script>
         // ==================================================
-        // DATA (respeita ?data=, ancora no mês)
+        // DATA E ÂNCORA DO MÊS
         // ==================================================
 
         const hoje = new Date();
-
         const anoHoje = hoje.getFullYear();
         const mesHoje = String(hoje.getMonth() + 1).padStart(2, "0");
         const diaHoje = String(hoje.getDate()).padStart(2, "0");
-
         const dataHoje = `${anoHoje}-${mesHoje}-${diaHoje}`;
 
         const paramsURL = new URLSearchParams(window.location.search);
@@ -172,21 +505,9 @@
                 ? dataParam
                 : dataHoje;
 
-
-        // ----------------------------------------------
-        // ANCORA NO MÊS (AAAA-MM)
-        // ----------------------------------------------
-
         const [anoBase, mesBase] = dataBase.split("-").map(Number);
-
         const mesAncora = `${anoBase}-${String(mesBase).padStart(2, "0")}`;
-
         const mesAtualHoje = `${anoHoje}-${mesHoje}`;
-
-
-        // ----------------------------------------------
-        // LABEL DO MÊS
-        // ----------------------------------------------
 
         const NOMES_MES = [
             "janeiro", "fevereiro", "março", "abril",
@@ -198,11 +519,6 @@
             const [y, m] = mesISO.split("-").map(Number);
             return `${NOMES_MES[m - 1]} de ${y}`;
         }
-
-
-        // ----------------------------------------------
-        // NAVEGAÇÃO
-        // ----------------------------------------------
 
         function mesAnterior(mesISO) {
             let [y, m] = mesISO.split("-").map(Number);
@@ -216,6 +532,51 @@
             m++;
             if (m === 13) { m = 1; y++; }
             return `${y}-${String(m).padStart(2, "0")}`;
+        }
+
+        function formatarISO(dt) {
+            const yy = dt.getFullYear();
+            const mm = String(dt.getMonth() + 1).padStart(2, "0");
+            const dd = String(dt.getDate()).padStart(2, "0");
+            return `${yy}-${mm}-${dd}`;
+        }
+
+        function formatarBR(iso) {
+            const [y, mo, dy] = iso.split("-");
+            return `${dy}/${mo}`;
+        }
+
+        function labelDiaSemana(iso) {
+            const [a, m, d] = iso.split("-").map(Number);
+            const dt = new Date(a, m - 1, d);
+            const nomes = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+            return nomes[dt.getDay()];
+        }
+
+        function obterSegunda(dataISO) {
+            const [a, m, d] = dataISO.split("-").map(Number);
+            const dt = new Date(a, m - 1, d);
+            const dow = dt.getDay();
+            const diff = (dow === 0) ? -6 : (1 - dow);
+            dt.setDate(dt.getDate() + diff);
+            return formatarISO(dt);
+        }
+
+        function formatarTempo(segundos) {
+            if (segundos <= 0) return "—";
+            const h = Math.floor(segundos / 3600);
+            const m = Math.floor((segundos % 3600) / 60);
+            return h > 0 ? `${h}h ${m}min` : `${m}min`;
+        }
+
+        function diasDoMes(mesISO) {
+            const [y, m] = mesISO.split("-").map(Number);
+            const ultimo = new Date(y, m, 0).getDate();
+            const arr = [];
+            for (let i = 1; i <= ultimo; i++) {
+                arr.push(`${y}-${String(m).padStart(2, "0")}-${String(i).padStart(2, "0")}`);
+            }
+            return arr;
         }
 
 
@@ -232,11 +593,7 @@
             const seg = mesSeguinte(mesAncora);
 
             const baseURL = window.location.pathname;
-
-            const urlComData = (mesISO) => {
-                // Passa o dia 01 daquele mês como referência
-                return `${baseURL}?data=${mesISO}-01`;
-            };
+            const urlComData = (mesISO) => `${baseURL}?data=${mesISO}-01`;
 
             const ehMesAtual = (mesAncora === mesAtualHoje);
 
@@ -286,22 +643,32 @@
 
 
         // ==================================================
-        // PANORAMA AUTOMÁTICO DO MÊS
+        // MODO (Rápida / Completa)
         // ==================================================
 
-        (function montarPanorama() {
+        const chaveModo = "planejamento_revisao_modo";
+        const botoesModo = document.querySelectorAll("#toggleModo button");
 
-            const [y, m] = mesAncora.split("-").map(Number);
+        function aplicarModo(modo) {
+            document.body.classList.toggle("modo-rapida", modo === "rapida");
+            botoesModo.forEach(btn => {
+                btn.classList.toggle("ativo", btn.dataset.modo === modo);
+            });
+            localStorage.setItem(chaveModo, modo);
+        }
 
-            const ultimoDia = new Date(y, m, 0).getDate();
+        botoesModo.forEach(btn => {
+            btn.addEventListener("click", () => aplicarModo(btn.dataset.modo));
+        });
 
-            const dias = [];
+        aplicarModo(localStorage.getItem(chaveModo) || "completa");
 
-            for (let i = 1; i <= ultimoDia; i++) {
-                dias.push(
-                    `${y}-${String(m).padStart(2, "0")}-${String(i).padStart(2, "0")}`
-                );
-            }
+
+        // ==================================================
+        // COLETA DE ESTATÍSTICAS
+        // ==================================================
+
+        function coletarEstatisticas(datas) {
 
             let diasPlanejados = 0;
             let diasRevisados = 0;
@@ -311,7 +678,12 @@
             let tempoFocoTotal = 0;
             let distracoesTotais = 0;
 
-            dias.forEach(data => {
+            const porModulo = {
+                visao: 0, prioridades: 0, trabalho: 0, estudo: 0,
+                corpo: 0, espiritualidade: 0, notas: 0
+            };
+
+            datas.forEach(data => {
 
                 const chaves = Object.keys(localStorage);
 
@@ -319,7 +691,8 @@
                     k.startsWith(`planejamento_${data}_`) &&
                     !k.includes(`_revisao_`) &&
                     !k.startsWith(`planejamento_semana_`) &&
-                    !k.startsWith(`planejamento_mes_`)
+                    !k.startsWith(`planejamento_mes_`) &&
+                    !k.startsWith(`planejamento_ano_`)
                 );
                 if (temPlan) diasPlanejados++;
 
@@ -329,40 +702,24 @@
                 if (temRev) diasRevisados++;
 
                 [0, 2, 4].forEach(i => {
-
-                    const texto = localStorage.getItem(
-                        `planejamento_${data}_prioridades_${i}`
-                    );
-
-                    const check = localStorage.getItem(
-                        `planejamento_${data}_prioridades_${i + 1}`
-                    );
-
+                    const texto = localStorage.getItem(`planejamento_${data}_prioridades_${i}`);
+                    const check = localStorage.getItem(`planejamento_${data}_prioridades_${i + 1}`);
                     if (texto && texto.trim()) {
                         totalPrioridades++;
                         if (check === "true") prioridadesConcluidas++;
                     }
-
                 });
 
-                const sessStr = localStorage.getItem(
-                    `planejamento_${data}_foco_sessoes`
-                );
-
+                const sessStr = localStorage.getItem(`planejamento_${data}_foco_sessoes`);
                 if (sessStr) {
                     try {
                         const arr = JSON.parse(sessStr);
                         sessoesFoco += arr.length;
-                        arr.forEach(s => {
-                            tempoFocoTotal += (s.duracao || 0);
-                        });
+                        arr.forEach(s => { tempoFocoTotal += (s.duracao || 0); });
                     } catch (e) {}
                 }
 
-                const distStr = localStorage.getItem(
-                    `planejamento_${data}_foco_distancias`
-                );
-
+                const distStr = localStorage.getItem(`planejamento_${data}_foco_distancias`);
                 if (distStr) {
                     try {
                         const arr = JSON.parse(distStr);
@@ -370,61 +727,395 @@
                     } catch (e) {}
                 }
 
+                Object.keys(porModulo).forEach(mod => {
+                    const temAlgum = chaves.some(k =>
+                        k.startsWith(`planejamento_${data}_${mod}_`)
+                    );
+                    if (temAlgum) porModulo[mod]++;
+                });
+
             });
 
+            return {
+                diasPlanejados, diasRevisados,
+                prioridadesConcluidas, totalPrioridades,
+                sessoesFoco, tempoFocoTotal, distracoesTotais,
+                porModulo
+            };
+        }
 
-            const horas = Math.floor(tempoFocoTotal / 3600);
-            const minutos = Math.floor((tempoFocoTotal % 3600) / 60);
 
-            let tempoTexto = "—";
-            if (tempoFocoTotal > 0) {
-                if (horas > 0) {
-                    tempoTexto = `${horas}h ${minutos}min`;
-                } else {
-                    tempoTexto = `${minutos}min`;
-                }
+        function criarDelta(atual, anterior, inverterBom = false) {
+            if (anterior === 0 && atual === 0) {
+                return '<span class="delta-igual">—</span>';
             }
+            if (anterior === 0) {
+                return `<span class="delta-sobe">novo</span>`;
+            }
+            const diff = atual - anterior;
+            if (diff === 0) return '<span class="delta-igual">=</span>';
+            const subiu = diff > 0;
+            const bom = inverterBom ? !subiu : subiu;
+            const classe = bom ? "delta-sobe" : "delta-desce";
+            const seta = subiu ? "↑" : "↓";
+            return `<span class="${classe}">${seta} ${Math.abs(diff)}</span>`;
+        }
 
 
-            const taxa =
-                totalPrioridades > 0
-                    ? Math.round((prioridadesConcluidas / totalPrioridades) * 100)
-                    : 0;
+        // ==================================================
+        // PANORAMA COMPARATIVO
+        // ==================================================
 
+        (function montarPanorama() {
+
+            const dias = diasDoMes(mesAncora);
+            const diasAnt = diasDoMes(mesAnterior(mesAncora));
+
+            const st = coletarEstatisticas(dias);
+            const stAnt = coletarEstatisticas(diasAnt);
+
+            const taxa = st.totalPrioridades > 0
+                ? Math.round((st.prioridadesConcluidas / st.totalPrioridades) * 100)
+                : 0;
 
             const el = document.getElementById("panorama");
 
             el.innerHTML = `
                 <div class="panorama-linha">
                     <span class="panorama-label">Dias planejados</span>
-                    <span class="panorama-valor">${diasPlanejados} / ${ultimoDia}</span>
+                    <span class="panorama-valor">
+                        ${st.diasPlanejados} / ${dias.length} ${criarDelta(st.diasPlanejados, stAnt.diasPlanejados)}
+                    </span>
                 </div>
 
                 <div class="panorama-linha">
                     <span class="panorama-label">Dias revisados</span>
-                    <span class="panorama-valor">${diasRevisados} / ${ultimoDia}</span>
+                    <span class="panorama-valor">
+                        ${st.diasRevisados} / ${dias.length} ${criarDelta(st.diasRevisados, stAnt.diasRevisados)}
+                    </span>
                 </div>
 
                 <div class="panorama-linha">
                     <span class="panorama-label">Prioridades concluídas</span>
-                    <span class="panorama-valor">${prioridadesConcluidas} / ${totalPrioridades} (${taxa}%)</span>
+                    <span class="panorama-valor">
+                        ${st.prioridadesConcluidas}/${st.totalPrioridades} (${taxa}%)
+                        ${criarDelta(st.prioridadesConcluidas, stAnt.prioridadesConcluidas)}
+                    </span>
                 </div>
 
                 <div class="panorama-linha">
                     <span class="panorama-label">Sessões de foco</span>
-                    <span class="panorama-valor">${sessoesFoco}</span>
+                    <span class="panorama-valor">
+                        ${st.sessoesFoco} ${criarDelta(st.sessoesFoco, stAnt.sessoesFoco)}
+                    </span>
                 </div>
 
                 <div class="panorama-linha">
                     <span class="panorama-label">Tempo total de foco</span>
-                    <span class="panorama-valor">${tempoTexto}</span>
+                    <span class="panorama-valor">
+                        ${formatarTempo(st.tempoFocoTotal)}
+                        ${criarDelta(st.tempoFocoTotal, stAnt.tempoFocoTotal)}
+                    </span>
                 </div>
 
                 <div class="panorama-linha">
-                    <span class="panorama-label">Distrações registradas</span>
-                    <span class="panorama-valor">${distracoesTotais}</span>
+                    <span class="panorama-label">Distrações</span>
+                    <span class="panorama-valor">
+                        ${st.distracoesTotais}
+                        ${criarDelta(st.distracoesTotais, stAnt.distracoesTotais, true)}
+                    </span>
                 </div>
             `;
+
+        })();
+
+
+        // ==================================================
+        // GRÁFICO DE EVOLUÇÃO POR SEMANA
+        // ==================================================
+
+        (function montarGrafico() {
+
+            const dias = diasDoMes(mesAncora);
+
+            const semanas = [];
+            const vistas = new Set();
+
+            dias.forEach(data => {
+                const seg = obterSegunda(data);
+                if (!vistas.has(seg)) {
+                    vistas.add(seg);
+                    semanas.push(seg);
+                }
+            });
+
+            semanas.sort();
+
+            const el = document.getElementById("graficoSemanas");
+
+            let achouAlgum = false;
+            let html = "";
+
+            semanas.forEach(seg => {
+                const v = localStorage.getItem(
+                    `planejamento_semana_${seg}_rating`
+                );
+
+                if (!v) return;
+
+                achouAlgum = true;
+
+                const pct = Number(v);
+                const cheios = Math.round(pct / 10);
+
+                let barra = "";
+                for (let i = 0; i < 10; i++) {
+                    barra += i < cheios
+                        ? '<span class="cheio">▓</span>'
+                        : '░';
+                }
+
+                html += `
+                    <div class="grafico-linha">
+                        <span style="min-width:70px; color:#bbb;">${formatarBR(seg)}</span>
+                        <span class="grafico-barra">${barra}</span>
+                        <span class="grafico-pct">${pct}%</span>
+                    </div>
+                `;
+            });
+
+            if (!achouAlgum) {
+                el.innerHTML = `<p style="color:#777;">Sem ratings de semana registrados neste mês.</p>`;
+                return;
+            }
+
+            el.innerHTML = html;
+
+        })();
+
+
+        // ==================================================
+        // ÁREAS TRABALHADAS (com comparativo)
+        // ==================================================
+
+        (function montarAreas() {
+
+            const st = coletarEstatisticas(diasDoMes(mesAncora));
+            const stAnt = coletarEstatisticas(diasDoMes(mesAnterior(mesAncora)));
+
+            const nomes = {
+                visao: "☀️ Visão do Dia",
+                prioridades: "🎯 Prioridades",
+                trabalho: "💼 Trabalho",
+                estudo: "📚 Estudo",
+                corpo: "🏋️ Corpo",
+                espiritualidade: "🙏 Espiritualidade",
+                notas: "🧠 Notas"
+            };
+
+            const el = document.getElementById("areas");
+
+            let html = "";
+
+            Object.keys(st.porModulo).forEach(mod => {
+                const atual = st.porModulo[mod];
+                const ant = stAnt.porModulo[mod];
+                const cor = atual === 0 ? "#666" : "#f5f5f5";
+                html += `
+                    <div class="panorama-linha">
+                        <span class="panorama-label">${nomes[mod]}</span>
+                        <span class="panorama-valor" style="color:${cor};">
+                            ${atual} dias ${criarDelta(atual, ant)}
+                        </span>
+                    </div>
+                `;
+            });
+
+            el.innerHTML = html;
+
+        })();
+
+
+        // ==================================================
+        // SEMANAS DO MÊS (integração)
+        // ==================================================
+
+        (function montarSemanas() {
+
+            const dias = diasDoMes(mesAncora);
+
+            const semanas = [];
+            const vistas = new Set();
+
+            dias.forEach(data => {
+                const seg = obterSegunda(data);
+                if (!vistas.has(seg)) {
+                    vistas.add(seg);
+                    semanas.push(seg);
+                }
+            });
+
+            semanas.sort();
+
+            const el = document.getElementById("semanasDoMes");
+
+            let html = "";
+
+            semanas.forEach(seg => {
+
+                const rating = localStorage.getItem(
+                    `planejamento_semana_${seg}_rating`
+                );
+
+                const top1 = localStorage.getItem(
+                    `planejamento_semana_${seg}_top1`
+                );
+
+                const mudar = localStorage.getItem(
+                    `planejamento_semana_${seg}_mudar`
+                );
+
+                const emoji = (v) => {
+                    if (!v) return "";
+                    if (Number(v) <= 20) return "😞";
+                    if (Number(v) <= 40) return "😕";
+                    if (Number(v) <= 60) return "😐";
+                    if (Number(v) <= 80) return "🙂";
+                    return "😄";
+                };
+
+                // Calcula intervalo da semana
+                const [a, m, d] = seg.split("-").map(Number);
+                const segObj = new Date(a, m - 1, d);
+                const domObj = new Date(segObj);
+                domObj.setDate(domObj.getDate() + 6);
+                const domISO = formatarISO(domObj);
+
+                html += `
+                    <div style="padding: 12px 0; border-bottom: 1px solid #252529;">
+                        <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 8px;">
+                            <span style="color:#ccc; font-size:14px;">
+                                ${formatarBR(seg)} – ${formatarBR(domISO)}
+                            </span>
+                            <span style="font-size: 18px;">
+                                ${emoji(rating)}
+                            </span>
+                        </div>
+
+                        ${top1 && top1.trim()
+                            ? `<p style="color:#bbb; font-size:13px; line-height:1.5; margin-bottom:6px;">
+                                   <span style="color:#777;">Resumo:</span> ${top1}
+                               </p>`
+                            : ""}
+
+                        ${mudar && mudar.trim()
+                            ? `<p style="color:#bbb; font-size:13px; line-height:1.5;">
+                                   <span style="color:#777;">Mudar:</span> ${mudar}
+                               </p>`
+                            : ""}
+                    </div>
+                `;
+            });
+
+            el.innerHTML = html || `<p style="color:#777;">Nada registrado nas semanas deste mês.</p>`;
+
+        })();
+
+
+        // ==================================================
+        // ONDE PAREI (compilado do mês)
+        // ==================================================
+
+        (function montarOndeParei() {
+
+            const dias = diasDoMes(mesAncora);
+            const el = document.getElementById("ondePareiLista");
+
+            let achou = false;
+
+            dias.forEach(data => {
+                const texto = localStorage.getItem(
+                    `planejamento_${data}_revisao_onde_parei`
+                );
+
+                if (texto && texto.trim()) {
+                    achou = true;
+                    const li = document.createElement("li");
+                    li.innerHTML = `
+                        <span class="tag">${labelDiaSemana(data)} ${formatarBR(data)}</span>
+                        ${texto}
+                    `;
+                    el.appendChild(li);
+                }
+            });
+
+            if (!achou) {
+                el.innerHTML = `<li style="color:#777;">Nada em aberto neste mês.</li>`;
+            }
+
+        })();
+
+
+        // ==================================================
+        // DIAS SEM REVISÃO
+        // ==================================================
+
+        (function montarDiasSemRevisao() {
+
+            const dias = diasDoMes(mesAncora);
+            const el = document.getElementById("diasSemRevisao");
+
+            // Só faz sentido até hoje (se for o mês atual)
+            const limiteHoje = (mesAncora === mesAtualHoje) ? Number(diaHoje) : null;
+
+            const semRev = [];
+
+            dias.forEach(data => {
+                if (limiteHoje !== null) {
+                    const d = Number(data.split("-")[2]);
+                    if (d > limiteHoje) return;
+                }
+                const temRev = Object.keys(localStorage).some(k =>
+                    k.startsWith(`planejamento_${data}_revisao_`)
+                );
+                if (!temRev) semRev.push(data);
+            });
+
+            if (semRev.length === 0) {
+                el.innerHTML = `<p style="color:#777;">Todos os dias tiveram revisão.</p>`;
+                return;
+            }
+
+            const tags = semRev.map(d =>
+                `<span style="display:inline-block; padding: 4px 10px; background: #1c1c20; border: 1px solid #333; border-radius: 6px; margin: 3px 4px 3px 0; font-size: 12px; color: #bbb;">${formatarBR(d)}</span>`
+            ).join("");
+
+            el.innerHTML = `
+                <p style="color:#888; font-size:13px; margin-bottom:10px;">
+                    ${semRev.length} dia(s) sem revisão:
+                </p>
+                <div>${tags}</div>
+            `;
+
+        })();
+
+
+        // ==================================================
+        // LINK PARA SUBPÁGINA DE FOCO — resumo
+        // ==================================================
+
+        (function resumoFoco() {
+
+            const st = coletarEstatisticas(diasDoMes(mesAncora));
+
+            const el = document.getElementById("linkFocoResumo");
+
+            if (st.sessoesFoco === 0) {
+                el.textContent = "Nenhuma sessão registrada neste mês.";
+                return;
+            }
+
+            el.textContent = `${st.sessoesFoco} sessões · ${formatarTempo(st.tempoFocoTotal)} de foco`;
 
         })();
 
@@ -434,6 +1125,7 @@
         // ==================================================
 
         const campos = [
+            { id: "fraseMes",     sufixo: "frase" },
             { id: "conquistas",   sufixo: "conquistas" },
             { id: "evolucao",     sufixo: "evolucao" },
             { id: "dificuldades", sufixo: "dificuldades" },
@@ -458,6 +1150,39 @@
             campo.addEventListener("input", salvar);
             campo.addEventListener("change", salvar);
 
+        });
+
+
+        // ==================================================
+        // RATING DO MÊS
+        // ==================================================
+
+        const chaveRating = `planejamento_mes_${mesAncora}_rating`;
+        const botoesRating = document.querySelectorAll(".rating-emoji");
+
+        function marcarRating(valor) {
+            botoesRating.forEach(btn => {
+                btn.classList.toggle(
+                    "selecionado",
+                    Number(btn.dataset.valor) === Number(valor)
+                );
+            });
+        }
+
+        const ratingSalvo = localStorage.getItem(chaveRating);
+        if (ratingSalvo) marcarRating(ratingSalvo);
+
+        botoesRating.forEach(btn => {
+            btn.addEventListener("click", () => {
+                const valor = btn.dataset.valor;
+                if (btn.classList.contains("selecionado")) {
+                    localStorage.removeItem(chaveRating);
+                    marcarRating(null);
+                    return;
+                }
+                localStorage.setItem(chaveRating, valor);
+                marcarRating(valor);
+            });
         });
     </script>
 
