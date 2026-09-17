@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     // ==================================================
-    // DATA ATUAL
+    // DATA (com suporte a navegação via ?data=YYYY-MM-DD)
     // ==================================================
 
     const hoje = new Date();
@@ -10,17 +10,147 @@ document.addEventListener("DOMContentLoaded", () => {
     const mes = String(hoje.getMonth() + 1).padStart(2, "0");
     const dia = String(hoje.getDate()).padStart(2, "0");
 
-    const dataAtual = `${ano}-${mes}-${dia}`;
+    const dataHoje = `${ano}-${mes}-${dia}`;
+
+    const paramsURL = new URLSearchParams(window.location.search);
+    const dataParam = paramsURL.get("data");
+
+    const dataAtual =
+        (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam))
+            ? dataParam
+            : dataHoje;
 
 
     // ==================================================
     // IDENTIFICA A PÁGINA
     // ==================================================
 
-    const pagina = window.location.pathname
+    const pathname = window.location.pathname;
+
+    const pagina = pathname
         .split("/")
         .pop()
         .replace(".html", "");
+
+
+    // ==================================================
+    // BARRA DE NAVEGAÇÃO DE DATAS
+    // (só no módulo Planejamento, exceto Histórico)
+    // ==================================================
+
+    if (
+        pathname.includes("/modulos/planejamento/") &&
+        pagina !== "historico"
+    ) {
+        inserirBarraDatas(dataAtual, dataHoje);
+    }
+
+
+    function inserirBarraDatas(dataAtual, dataHoje) {
+
+        const container = document.querySelector("main.container");
+        const header = container ? container.querySelector(".header") : null;
+
+        if (!container || !header) return;
+
+
+        // ---------------------------------------------
+        // CÁLCULO DE DATAS
+        // ---------------------------------------------
+
+        const [a, m, d] = dataAtual.split("-").map(Number);
+        const dataObj = new Date(a, m - 1, d);
+
+        const fmtISO = (dt) => {
+            const yy = dt.getFullYear();
+            const mm = String(dt.getMonth() + 1).padStart(2, "0");
+            const dd = String(dt.getDate()).padStart(2, "0");
+            return `${yy}-${mm}-${dd}`;
+        };
+
+        const diaAnterior = new Date(dataObj);
+        diaAnterior.setDate(diaAnterior.getDate() - 1);
+
+        const diaSeguinte = new Date(dataObj);
+        diaSeguinte.setDate(diaSeguinte.getDate() + 1);
+
+        const anterior = fmtISO(diaAnterior);
+        const seguinte = fmtISO(diaSeguinte);
+
+
+        // ---------------------------------------------
+        // RÓTULOS
+        // ---------------------------------------------
+
+        const fmtBR = (iso) => {
+            const [y, mo, dy] = iso.split("-");
+            return `${dy}/${mo}/${y}`;
+        };
+
+        const label = (iso) => {
+            if (iso === dataHoje) return "Hoje";
+            return fmtBR(iso);
+        };
+
+
+        // ---------------------------------------------
+        // URLS
+        // ---------------------------------------------
+
+        const baseURL = window.location.pathname;
+
+        const urlComData = (dataIso) => {
+            if (dataIso === dataHoje) return baseURL;
+            return `${baseURL}?data=${dataIso}`;
+        };
+
+
+        // ---------------------------------------------
+        // MONTAGEM
+        // ---------------------------------------------
+
+        const barra = document.createElement("div");
+
+        barra.style.cssText = `
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 18px;
+            padding: 10px 12px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            background: #fafafa;
+            font-size: 14px;
+        `;
+
+        const linkStyle =
+            "text-decoration:none; color:#333; padding:6px 10px; border-radius:6px;";
+
+        barra.innerHTML = `
+            <a href="${urlComData(anterior)}" style="${linkStyle}">
+                ← ${label(anterior)}
+            </a>
+
+            <div style="text-align:center;">
+                <div style="font-weight:600;">
+                    ${label(dataAtual)}
+                </div>
+
+                ${dataAtual !== dataHoje
+                    ? `<a href="${baseURL}" style="font-size:11px; color:#a66; text-decoration:none;">
+                           voltar para hoje
+                       </a>`
+                    : ""}
+            </div>
+
+            <a href="${urlComData(seguinte)}" style="${linkStyle}">
+                ${label(seguinte)} →
+            </a>
+        `;
+
+        container.insertBefore(barra, header);
+    }
 
 
     // ==================================================
@@ -206,7 +336,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     const indice = Number(indiceTexto);
 
-                    // Ignora chaves de controle (ex.: _blocos)
                     if (Number.isNaN(indice)) return;
 
                     dados.push({
@@ -313,15 +442,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById("subtituloHistorico");
 
 
-            // Esconde lista
             listaHistorico.style.display = "none";
-
-
-            // Mostra planejamento
             visualizacaoDia.style.display = "flex";
 
-
-            // Atualiza título
             tituloHistorico.textContent =
                 `📅 ${formatarData(dataSelecionada)}`;
 
@@ -497,9 +620,6 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
         } else {
-
-            // Sem data selecionada:
-            // mostra a lista normalmente.
 
             mostrarDatas();
 
