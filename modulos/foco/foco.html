@@ -155,7 +155,7 @@
             </div>
 
 
-            <!-- NOTAS DA SESSÃO -->
+            <!-- NOTAS -->
 
             <div class="module-card">
                 <span class="icon">📝</span>
@@ -179,42 +179,59 @@
                     <h2>Pausa</h2>
 
                     <p style="color:#888; font-size:14px; margin-bottom:14px;">
-                        Ideias para descansar sem cair na procrastinação.
+                        Escolha uma categoria e faça algo consciente.
                     </p>
 
-                    <div style="margin-bottom:14px;">
-                        <h3 style="margin-bottom:6px;">☕ Pausa curta (5 min)</h3>
-                        <p style="color:#888; font-size:14px;">
-                            Beber água, respirar fundo, alongar pescoço e ombros.
-                        </p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom:18px;">
+
+                        <button type="button" class="btn-pausa" data-cat="curta">
+                            ⚡ Pausa curta
+                        </button>
+
+                        <button type="button" class="btn-pausa" data-cat="longa">
+                            🌿 Pausa longa
+                        </button>
+
+                        <button type="button" class="btn-pausa" data-cat="tarefas">
+                            🔄 Entre tarefas
+                        </button>
+
+                        <button type="button" class="btn-pausa" data-cat="semNada">
+                            🕳️ Sem fazer nada
+                        </button>
+
                     </div>
 
-                    <div style="margin-bottom:14px;">
-                        <h3 style="margin-bottom:6px;">🚶 Pausa longa (15–30 min)</h3>
-                        <p style="color:#888; font-size:14px;">
-                            Comer algo leve, caminhar, tomar banho, deitar sem tela.
-                        </p>
-                    </div>
+                    <div id="listaPausas"></div>
 
-                    <div style="margin-bottom:14px;">
-                        <h3 style="margin-bottom:6px;">🔄 Entre tarefas (2 min)</h3>
-                        <p style="color:#888; font-size:14px;">
-                            Fechar o que estava fazendo, anotar o próximo passo, respirar antes de começar outra coisa.
-                        </p>
-                    </div>
+                    <button
+                        type="button"
+                        id="btnSorteio"
+                        style="
+                            margin-top: 16px;
+                            padding: 12px;
+                            width: 100%;
+                            font-size: 16px;
+                            cursor: pointer;
+                            border: 1px solid #ccc;
+                            border-radius: 8px;
+                            background: #fff;
+                        "
+                    >
+                        🎲 Escolher por mim
+                    </button>
 
-                    <div>
-                        <h3 style="margin-bottom:6px;">🌱 Sem nada para fazer</h3>
-                        <p style="color:#888; font-size:14px; margin-bottom:6px;">
-                            Para não procrastinar quando o dia está vazio:
-                        </p>
-                        <ul style="color:#888; font-size:14px; padding-left:20px;">
-                            <li>Ler algo leve por 10 min</li>
-                            <li>Organizar a mesa ou uma gaveta</li>
-                            <li>Resolver algo da lista “Pesquisar depois”</li>
-                            <li>Fazer uma caminhada curta</li>
-                        </ul>
-                    </div>
+                    <div
+                        id="resultadoSorteio"
+                        style="
+                            margin-top: 14px;
+                            padding: 14px;
+                            border-radius: 8px;
+                            background: #f5f5f5;
+                            font-size: 16px;
+                            display: none;
+                        "
+                    ></div>
 
                 </div>
             </div>
@@ -227,6 +244,31 @@
         </a>
 
     </main>
+
+
+    <!-- Estilo dos botões de categoria -->
+    <style>
+        .btn-pausa {
+            padding: 8px 14px;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            background: #fff;
+        }
+
+        .btn-pausa.ativo {
+            background: #333;
+            color: #fff;
+            border-color: #333;
+        }
+
+        .item-pausa {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 15px;
+        }
+    </style>
 
 
     <script>
@@ -254,18 +296,122 @@
 
 
         // ==================================================
+        // BIBLIOTECA DE PAUSAS
+        // ==================================================
+
+        const pausas = {
+
+            curta: [
+                "💧 Beber água",
+                "🚶 Caminhar pela casa",
+                "👀 Descansar os olhos",
+                "🧘 Fazer respiração profunda",
+                "🚽 Ir ao banheiro",
+                "🪟 Ir até uma janela e olhar para longe",
+                "🤸 Alongar o corpo",
+                "🧍 Ficar alguns minutos em pé",
+                "🧹 Organizar rapidamente a mesa",
+                "🗑️ Jogar algo fora",
+                "🌿 Ir para uma área externa",
+                "😮‍💨 Fazer uma pausa sem tela",
+                "🧼 Lavar o rosto",
+                "☀️ Tomar um pouco de sol",
+                "🧠 Ficar alguns minutos em silêncio",
+                "📝 Anotar algo que está incomodando",
+                "🎵 Ouvir uma música",
+                "🐕 Interagir rapidamente com um animal de estimação",
+                "👕 Arrumar a roupa/ambiente",
+                "🙏 Fazer uma oração curta"
+            ],
+
+            longa: [
+                "🍽️ Fazer uma refeição",
+                "🚿 Tomar banho",
+                "🚶 Fazer uma caminhada",
+                "🎵 Ouvir música",
+                "📖 Ler algumas páginas",
+                "🧘 Meditar",
+                "🙏 Fazer um momento com Deus",
+                "🏃 Fazer uma atividade física leve",
+                "☕ Preparar e tomar um café",
+                "🌳 Ficar um tempo ao ar livre",
+                "🧹 Organizar o quarto",
+                "🧺 Organizar roupas",
+                "🍳 Preparar alguma comida",
+                "🗣️ Conversar com alguém",
+                "🎨 Fazer uma atividade criativa",
+                "✍️ Escrever livremente",
+                "😴 Tirar um descanso breve",
+                "🧩 Fazer um hobby",
+                "📵 Ficar longe do celular",
+                "🌅 Simplesmente sentar e descansar"
+            ],
+
+            tarefas: [
+                "💾 Salvar o trabalho",
+                "📁 Organizar os arquivos usados",
+                "📝 Registrar onde parou",
+                "🎯 Definir a próxima ação",
+                "🧹 Limpar a mesa",
+                "💧 Beber água",
+                "🚶 Levantar e caminhar",
+                "👀 Descansar os olhos",
+                "🧘 Respirar profundamente",
+                "📋 Conferir o que foi concluído",
+                "🗑️ Fechar arquivos desnecessários",
+                "🖥️ Fechar programas que não serão usados",
+                "📱 Guardar o celular",
+                "🧠 Esvaziar a cabeça por alguns minutos",
+                "📝 Registrar uma ideia que surgiu",
+                "⏱️ Definir o próximo bloco de foco",
+                "🎯 Relembrar o objetivo da próxima tarefa",
+                "🪑 Ajustar o ambiente de trabalho",
+                "🌿 Ir rapidamente para outro ambiente",
+                "▶️ Começar imediatamente a próxima ação"
+            ],
+
+            semNada: [
+                "📖 Ler um capítulo",
+                "🎓 Fazer uma aula",
+                "🧠 Estudar um conceito",
+                "📚 Pesquisar um assunto",
+                "📝 Fazer anotações",
+                "🗣️ Praticar comunicação",
+                "🇺🇸 Estudar inglês",
+                "💼 Estudar vendas",
+                "📈 Estudar marketing",
+                "💻 Aprender uma habilidade",
+                "🚶 Caminhar",
+                "🏃 Fazer cardio",
+                "🤸 Alongar",
+                "🏋️ Fazer um treino",
+                "🧘 Relaxar o corpo",
+                "💡 Desenvolver uma ideia",
+                "🎬 Criar uma ideia de conteúdo",
+                "✍️ Escrever",
+                "🛠️ Trabalhar em um projeto pessoal",
+                "🔬 Fazer uma pesquisa útil"
+            ]
+
+        };
+
+
+        // ==================================================
         // ELEMENTOS
         // ==================================================
 
-        const tarefaFoco     = document.getElementById("tarefaFoco");
-        const tempoFoco      = document.getElementById("tempoFoco");
-        const displayTimer   = document.getElementById("displayTimer");
-        const btnIniciar     = document.getElementById("btnIniciar");
-        const btnReiniciar   = document.getElementById("btnReiniciar");
-        const inputDistracao = document.getElementById("inputDistracao");
+        const tarefaFoco      = document.getElementById("tarefaFoco");
+        const tempoFoco       = document.getElementById("tempoFoco");
+        const displayTimer    = document.getElementById("displayTimer");
+        const btnIniciar      = document.getElementById("btnIniciar");
+        const btnReiniciar    = document.getElementById("btnReiniciar");
+        const inputDistracao  = document.getElementById("inputDistracao");
         const btnAddDistracao = document.getElementById("btnAddDistracao");
         const listaDistracoes = document.getElementById("listaDistracoes");
-        const notasFoco      = document.getElementById("notasFoco");
+        const notasFoco       = document.getElementById("notasFoco");
+        const listaPausas     = document.getElementById("listaPausas");
+        const btnSorteio      = document.getElementById("btnSorteio");
+        const resultadoSorteio = document.getElementById("resultadoSorteio");
 
 
         // ==================================================
@@ -306,7 +452,6 @@
 
         function iniciarTimer() {
 
-            // Já está rodando → pausa
             if (rodando) {
 
                 clearInterval(intervalId);
@@ -316,7 +461,6 @@
             }
 
 
-            // Se já acabou, reinicia do total
             if (segundosRestantes <= 0) {
                 segundosRestantes = Number(tempoFoco.value) * 60;
             }
@@ -500,11 +644,86 @@
 
 
         // ==================================================
+        // PAUSAS — CATEGORIAS
+        // ==================================================
+
+        const botoesPausa = document.querySelectorAll(".btn-pausa");
+
+
+        function renderizarPausas(categoria) {
+
+            listaPausas.innerHTML = "";
+
+            const itens = pausas[categoria] || [];
+
+
+            itens.forEach(item => {
+
+                const div = document.createElement("div");
+
+                div.className = "item-pausa";
+                div.textContent = item;
+
+                listaPausas.appendChild(div);
+
+            });
+
+
+            botoesPausa.forEach(btn => {
+
+                btn.classList.toggle(
+                    "ativo",
+                    btn.dataset.cat === categoria
+                );
+
+            });
+
+        }
+
+
+        botoesPausa.forEach(btn => {
+
+            btn.addEventListener("click", () => {
+
+                renderizarPausas(btn.dataset.cat);
+
+            });
+
+        });
+
+
+        // ==================================================
+        // SORTEIO
+        // ==================================================
+
+        btnSorteio.addEventListener("click", () => {
+
+            // Junta todas as categorias
+            const todas = [
+                ...pausas.curta,
+                ...pausas.longa,
+                ...pausas.tarefas,
+                ...pausas.semNada
+            ];
+
+            const escolhida =
+                todas[Math.floor(Math.random() * todas.length)];
+
+            resultadoSorteio.style.display = "block";
+
+            resultadoSorteio.innerHTML =
+                `🎲 <strong>Faça agora:</strong><br><br>${escolhida}`;
+
+        });
+
+
+        // ==================================================
         // INICIALIZA
         // ==================================================
 
         resetTimer();
         renderizarDistracoes();
+        renderizarPausas("curta");
     </script>
 
 </body>
