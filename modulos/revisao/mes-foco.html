@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sessões de Foco do Mês</title>
+
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .dia-bloco {
+            margin-bottom: 24px;
+        }
+
+        .dia-titulo {
+            color: #888;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .sessao-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: #1c1c20;
+            border: 1px solid #252529;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .sessao-tarefa {
+            flex: 1;
+            color: #e0e0e0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .sessao-meta {
+            color: #888;
+            font-size: 13px;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .vazio {
+            color: #777;
+            font-size: 14px;
+            padding: 14px 0;
+        }
+
+        .distracao-item {
+            padding: 8px 12px;
+            border-left: 3px solid #a33;
+            background: #1c1c20;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #e0e0e0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="header">
+            <p class="eyebrow">REVISÃO</p>
+            <h1>⏱️ Sessões de foco do mês</h1>
+            <p class="subtitle" id="subtitulo">
+                Detalhamento das sessões registradas no mês.
+            </p>
+        </header>
+
+        <section class="modules" id="listaSessoes"></section>
+
+        <a href="mes.html" class="back-button" id="voltarMes">
+            ← Voltar para Revisão do Mês
+        </a>
+
+    </main>
+
+
+    <script>
+        // ==================================================
+        // DATA (respeita ?data=, ancora no mês)
+        // ==================================================
+
+        const hoje = new Date();
+        const anoHoje = hoje.getFullYear();
+        const mesHoje = String(hoje.getMonth() + 1).padStart(2, "0");
+        const diaHoje = String(hoje.getDate()).padStart(2, "0");
+        const dataHoje = `${anoHoje}-${mesHoje}-${diaHoje}`;
+
+        const paramsURL = new URLSearchParams(window.location.search);
+        const dataParam = paramsURL.get("data");
+
+        const dataBase =
+            (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam))
+                ? dataParam
+                : dataHoje;
+
+        const [anoBase, mesBase] = dataBase.split("-").map(Number);
+        const mesAncora = `${anoBase}-${String(mesBase).padStart(2, "0")}`;
+
+        const NOMES_MES = [
+            "janeiro", "fevereiro", "março", "abril",
+            "maio", "junho", "julho", "agosto",
+            "setembro", "outubro", "novembro", "dezembro"
+        ];
+
+        function labelMes(mesISO) {
+            const [y, m] = mesISO.split("-").map(Number);
+            return `${NOMES_MES[m - 1]} de ${y}`;
+        }
+
+        function formatarISO(dt) {
+            const yy = dt.getFullYear();
+            const mm = String(dt.getMonth() + 1).padStart(2, "0");
+            const dd = String(dt.getDate()).padStart(2, "0");
+            return `${yy}-${mm}-${dd}`;
+        }
+
+        function formatarBR(iso) {
+            const [y, mo, dy] = iso.split("-");
+            return `${dy}/${mo}`;
+        }
+
+        function labelDia(iso) {
+            const [a, m, d] = iso.split("-").map(Number);
+            const dt = new Date(a, m - 1, d);
+            const nomes = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+            return nomes[dt.getDay()];
+        }
+
+        function formatarTempo(segundos) {
+            if (segundos <= 0) return "—";
+            const h = Math.floor(segundos / 3600);
+            const m = Math.floor((segundos % 3600) / 60);
+            return h > 0 ? `${h}h ${m}min` : `${m}min`;
+        }
+
+        function formatarHora(iso) {
+            try {
+                const dt = new Date(iso);
+                const hh = String(dt.getHours()).padStart(2, "0");
+                const mm = String(dt.getMinutes()).padStart(2, "0");
+                return `${hh}:${mm}`;
+            } catch (e) {
+                return "";
+            }
+        }
+
+        function diasDoMes(mesISO) {
+            const [y, m] = mesISO.split("-").map(Number);
+            const ultimo = new Date(y, m, 0).getDate();
+            const arr = [];
+            for (let i = 1; i <= ultimo; i++) {
+                arr.push(`${y}-${String(m).padStart(2, "0")}-${String(i).padStart(2, "0")}`);
+            }
+            return arr;
+        }
+
+
+        // Propaga ?data= para o link de voltar
+        const voltar = document.getElementById("voltarMes");
+        if (dataBase !== dataHoje) {
+            voltar.setAttribute("href", `mes.html?data=${dataBase}`);
+        }
+
+
+        // ==================================================
+        // RENDERIZA
+        // ==================================================
+
+        (function renderizar() {
+
+            const dias = diasDoMes(mesAncora);
+
+            const el = document.getElementById("listaSessoes");
+
+            document.getElementById("subtitulo").textContent = labelMes(mesAncora);
+
+            let totalSessoes = 0;
+            let totalTempo = 0;
+            let totalDist = 0;
+
+            let html = "";
+
+            dias.forEach(data => {
+
+                const sessoesStr = localStorage.getItem(
+                    `planejamento_${data}_foco_sessoes`
+                );
+
+                const distStr = localStorage.getItem(
+                    `planejamento_${data}_foco_distancias`
+                );
+
+                let sessoes = [];
+                let distracoes = [];
+
+                try {
+                    if (sessoesStr) sessoes = JSON.parse(sessoesStr);
+                } catch (e) {}
+
+                try {
+                    if (distStr) distracoes = JSON.parse(distStr);
+                } catch (e) {}
+
+                if (sessoes.length === 0 && distracoes.length === 0) return;
+
+                html += `<div class="dia-bloco">`;
+                html += `<div class="dia-titulo">${labelDia(data)} · ${formatarBR(data)}</div>`;
+
+                sessoes.forEach(s => {
+                    totalSessoes++;
+                    totalTempo += (s.duracao || 0);
+
+                    html += `
+                        <div class="sessao-item">
+                            <span class="sessao-tarefa">🎯 ${s.tarefa || "(sem tarefa)"}</span>
+                            <span class="sessao-meta">
+                                ${formatarTempo(s.duracao || 0)}
+                                ${s.hora ? `<br><span style="color:#666;">${formatarHora(s.hora)}</span>` : ""}
+                            </span>
+                        </div>
+                    `;
+                });
+
+                distracoes.forEach(texto => {
+                    totalDist++;
+                    html += `<div class="distracao-item">🚫 ${texto}</div>`;
+                });
+
+                html += `</div>`;
+            });
+
+            if (html === "") {
+                el.innerHTML = `<p class="vazio" style="text-align:center; padding: 30px 0;">Nenhuma sessão ou distração registrada neste mês.</p>`;
+                return;
+            }
+
+            const resumo = `
+                <div class="module-card" style="justify-content: center;">
+                    <div style="display:flex; justify-content: space-around; text-align:center; width: 100%;">
+                        <div>
+                            <div style="font-size: 22px; font-weight: 600;">${totalSessoes}</div>
+                            <div style="font-size: 11px; color:#888; letter-spacing:1px; text-transform: uppercase; margin-top: 4px;">Sessões</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 22px; font-weight: 600;">${formatarTempo(totalTempo)}</div>
+                            <div style="font-size: 11px; color:#888; letter-spacing:1px; text-transform: uppercase; margin-top: 4px;">Total</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 22px; font-weight: 600;">${totalDist}</div>
+                            <div style="font-size: 11px; color:#888; letter-spacing:1px; text-transform: uppercase; margin-top: 4px;">Distrações</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            el.innerHTML = resumo + html;
+
+        })();
+    </script>
+
+</body>
+</html>
