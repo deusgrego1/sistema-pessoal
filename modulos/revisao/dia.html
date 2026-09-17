@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Revisão do Dia</title>
+
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .prioridade-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .prioridade-item input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .prioridade-texto {
+            font-size: 15px;
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .prioridade-texto.vazio {
+            color: #bbb;
+            font-style: italic;
+        }
+
+        .prioridade-item.concluida .prioridade-texto {
+            text-decoration: line-through;
+            color: #999;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="header">
+            <p class="eyebrow">REVISÃO</p>
+            <h1>☀️ Revisão do dia</h1>
+            <p class="subtitle" id="subtituloRevisao">
+                O que foi feito, o que funcionou e o que mudar.
+            </p>
+        </header>
+
+        <section class="modules">
+
+            <!-- 1. O QUE FOI FEITO -->
+
+            <div class="module-card">
+                <span class="icon">📋</span>
+                <div>
+                    <h2>O que foi feito?</h2>
+
+                    <p style="color:#888; font-size:13px; margin-bottom:12px;">
+                        Marque o que foi concluído. Isso atualiza as Prioridades do dia.
+                    </p>
+
+                    <div id="listaPrioridades"></div>
+
+                    <p style="color:#888; font-size:13px; margin:16px 0 8px;">
+                        Outras coisas realizadas:
+                    </p>
+
+                    <textarea
+                        id="outrasRealizadas"
+                        placeholder="Algo importante que não estava nas prioridades."
+                        rows="3"
+                    ></textarea>
+                </div>
+            </div>
+
+
+            <!-- 2. FUNCIONOU / ATRAPALHOU -->
+
+            <div class="module-card">
+                <span class="icon">🧠</span>
+                <div>
+                    <h2>O que funcionou e o que atrapalhou?</h2>
+
+                    <textarea
+                        id="funcionouAtrapalhou"
+                        placeholder="O que ajudou na execução e o que dificultou."
+                        rows="5"
+                    ></textarea>
+                </div>
+            </div>
+
+
+            <!-- 3. APRENDI / MUDAR -->
+
+            <div class="module-card">
+                <span class="icon">💡</span>
+                <div>
+                    <h2>O que aprendi e o que devo mudar?</h2>
+
+                    <textarea
+                        id="aprendiMudar"
+                        placeholder="O que descobri sobre mim ou meu trabalho e o que farei diferente."
+                        rows="5"
+                    ></textarea>
+                </div>
+            </div>
+
+
+            <!-- 4. CONCLUSÃO -->
+
+            <div class="module-card">
+                <span class="icon">🎯</span>
+                <div>
+                    <h2>Principal conclusão do dia</h2>
+
+                    <textarea
+                        id="conclusaoDia"
+                        placeholder="Uma frase ou ideia que resume o dia."
+                        rows="3"
+                    ></textarea>
+                </div>
+            </div>
+
+        </section>
+
+        <a href="index.html" class="back-button">
+            ← Voltar para Revisão
+        </a>
+
+    </main>
+
+
+    <script>
+        // ==================================================
+        // DATA (respeita ?data=)
+        // ==================================================
+
+        const hoje = new Date();
+
+        const anoHoje = hoje.getFullYear();
+        const mesHoje = String(hoje.getMonth() + 1).padStart(2, "0");
+        const diaHoje = String(hoje.getDate()).padStart(2, "0");
+
+        const dataHoje = `${anoHoje}-${mesHoje}-${diaHoje}`;
+
+        const paramsURL = new URLSearchParams(window.location.search);
+        const dataParam = paramsURL.get("data");
+
+        const dataAtual =
+            (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam))
+                ? dataParam
+                : dataHoje;
+
+
+        // ==================================================
+        // BARRA DE NAVEGAÇÃO DE DATAS
+        // ==================================================
+
+        (function inserirBarraDatas() {
+
+            const container = document.querySelector("main.container");
+            const header = container.querySelector(".header");
+
+            const [a, m, d] = dataAtual.split("-").map(Number);
+            const dataObj = new Date(a, m - 1, d);
+
+            const fmtISO = (dt) => {
+                const yy = dt.getFullYear();
+                const mm = String(dt.getMonth() + 1).padStart(2, "0");
+                const dd = String(dt.getDate()).padStart(2, "0");
+                return `${yy}-${mm}-${dd}`;
+            };
+
+            const anterior = new Date(dataObj);
+            anterior.setDate(anterior.getDate() - 1);
+
+            const seguinte = new Date(dataObj);
+            seguinte.setDate(seguinte.getDate() + 1);
+
+            const fmtBR = (iso) => {
+                const [y, mo, dy] = iso.split("-");
+                return `${dy}/${mo}/${y}`;
+            };
+
+            const label = (iso) => iso === dataHoje ? "Hoje" : fmtBR(iso);
+
+            const baseURL = window.location.pathname;
+
+            const urlComData = (iso) =>
+                iso === dataHoje ? baseURL : `${baseURL}?data=${iso}`;
+
+            const barra = document.createElement("div");
+
+            barra.style.cssText = `
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                margin-bottom: 18px;
+                padding: 10px 12px;
+                border: 1px solid #eee;
+                border-radius: 10px;
+                background: #fafafa;
+                font-size: 14px;
+            `;
+
+            const linkStyle =
+                "text-decoration:none; color:#333; padding:6px 10px; border-radius:6px;";
+
+            barra.innerHTML = `
+                <a href="${urlComData(fmtISO(anterior))}" style="${linkStyle}">
+                    ← ${label(fmtISO(anterior))}
+                </a>
+
+                <div style="text-align:center;">
+                    <div style="font-weight:600;">
+                        ${label(dataAtual)}
+                    </div>
+
+                    ${dataAtual !== dataHoje
+                        ? `<a href="${baseURL}" style="font-size:11px; color:#a66; text-decoration:none;">
+                               voltar para hoje
+                           </a>`
+                        : ""}
+                </div>
+
+                <a href="${urlComData(fmtISO(seguinte))}" style="${linkStyle}">
+                    ${label(fmtISO(seguinte))} →
+                </a>
+            `;
+
+            container.insertBefore(barra, header);
+
+        })();
+
+
+        // ==================================================
+        // CHAVES
+        // ==================================================
+
+        const chaveOutras     = `planejamento_${dataAtual}_revisao_outras`;
+        const chaveFuncionou  = `planejamento_${dataAtual}_revisao_funcionou`;
+        const chaveAprendi    = `planejamento_${dataAtual}_revisao_aprendi`;
+        const chaveConclusao  = `planejamento_${dataAtual}_revisao_conclusao`;
+
+
+        // ==================================================
+        // CARREGA CAMPOS DE TEXTO
+        // ==================================================
+
+        document.getElementById("outrasRealizadas").value =
+            localStorage.getItem(chaveOutras) || "";
+
+        document.getElementById("funcionouAtrapalhou").value =
+            localStorage.getItem(chaveFuncionou) || "";
+
+        document.getElementById("aprendiMudar").value =
+            localStorage.getItem(chaveAprendi) || "";
+
+        document.getElementById("conclusaoDia").value =
+            localStorage.getItem(chaveConclusao) || "";
+
+
+        // ==================================================
+        // SALVA CAMPOS DE TEXTO
+        // ==================================================
+
+        function ligarSalvar(id, chave) {
+
+            const campo = document.getElementById(id);
+
+            const salvar = () => {
+                localStorage.setItem(chave, campo.value);
+            };
+
+            campo.addEventListener("input", salvar);
+            campo.addEventListener("change", salvar);
+
+        }
+
+        ligarSalvar("outrasRealizadas", chaveOutras);
+        ligarSalvar("funcionouAtrapalhou", chaveFuncionou);
+        ligarSalvar("aprendiMudar", chaveAprendi);
+        ligarSalvar("conclusaoDia", chaveConclusao);
+
+
+        // ==================================================
+        // PRIORIDADES DO DIA
+        // ==================================================
+
+        const listaPrioridades = document.getElementById("listaPrioridades");
+
+        // Cada prioridade ocupa 2 índices em "prioridades_":
+        //   N   → texto
+        //   N+1 → checkbox
+        const prioridades = [
+            { texto: 0, check: 1 },
+            { texto: 2, check: 3 },
+            { texto: 4, check: 5 }
+        ];
+
+
+        function renderizarPrioridades() {
+
+            listaPrioridades.innerHTML = "";
+
+            prioridades.forEach((par, indice) => {
+
+                const chaveTexto =
+                    `planejamento_${dataAtual}_prioridades_${par.texto}`;
+
+                const chaveCheck =
+                    `planejamento_${dataAtual}_prioridades_${par.check}`;
+
+                const texto = (localStorage.getItem(chaveTexto) || "").trim();
+                const concluida = localStorage.getItem(chaveCheck) === "true";
+
+
+                const item = document.createElement("label");
+
+                item.className = "prioridade-item";
+
+                if (concluida) {
+                    item.classList.add("concluida");
+                }
+
+
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.checked = concluida;
+
+
+                const span = document.createElement("span");
+                span.className = "prioridade-texto";
+
+                if (texto) {
+                    span.textContent = `${indice + 1}. ${texto}`;
+                } else {
+                    span.textContent = `${indice + 1}. (vazia)`;
+                    span.classList.add("vazio");
+                }
+
+
+                checkbox.addEventListener("change", () => {
+
+                    localStorage.setItem(
+                        chaveCheck,
+                        checkbox.checked ? "true" : "false"
+                    );
+
+                    item.classList.toggle("concluida", checkbox.checked);
+
+                });
+
+
+                item.appendChild(checkbox);
+                item.appendChild(span);
+
+                listaPrioridades.appendChild(item);
+
+            });
+
+        }
+
+        renderizarPrioridades();
+    </script>
+
+</body>
+</html>
