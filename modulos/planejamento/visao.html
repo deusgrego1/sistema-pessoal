@@ -64,6 +64,24 @@
                 </div>
             </div>
 
+            <button
+                type="button"
+                id="btnCopiarOntem"
+                style="
+                    display: block;
+                    margin: 0 auto;
+                    padding: 10px 18px;
+                    font-size: 14px;
+                    cursor: pointer;
+                    border: 1px dashed #bbb;
+                    border-radius: 8px;
+                    background: #fff;
+                    color: #666;
+                "
+            >
+                📋 Copiar de ontem
+            </button>
+
         </section>
 
         <a href="index.html" class="back-button">
@@ -72,17 +90,65 @@
 
     </main>
 
-    <script>
-        const hoje = new Date();
+    <script src="../../js/app.js"></script>
 
-        const dataFormatada = hoje.toLocaleDateString('pt-BR', {
-            weekday: 'long',
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric'
+    <script>
+        // ==================================================
+        // DATA VISÍVEL (respeita ?data=)
+        // ==================================================
+
+        const paramsVisao = new URLSearchParams(window.location.search);
+        const dataParamVisao = paramsVisao.get("data");
+
+        const hojeVisao = new Date();
+
+        const dataBaseVisao =
+            (dataParamVisao && /^\d{4}-\d{2}-\d{2}$/.test(dataParamVisao))
+                ? dataParamVisao
+                : (() => {
+                    const y = hojeVisao.getFullYear();
+                    const m = String(hojeVisao.getMonth() + 1).padStart(2, "0");
+                    const d = String(hojeVisao.getDate()).padStart(2, "0");
+                    return `${y}-${m}-${d}`;
+                })();
+
+        const [aV, mV, dV] = dataBaseVisao.split("-").map(Number);
+        const dataObjVisao = new Date(aV, mV - 1, dV);
+
+        const dataFormatada = dataObjVisao.toLocaleDateString("pt-BR", {
+            weekday: "long",
+            day: "2-digit",
+            month: "long",
+            year: "numeric"
         });
 
-        document.getElementById('data').textContent = dataFormatada;
+        document.getElementById("data").textContent = dataFormatada;
+
+
+        // ==================================================
+        // COPIAR DE ONTEM
+        // ==================================================
+
+        document
+            .getElementById("btnCopiarOntem")
+            .addEventListener("click", () => {
+
+                if (!confirm(
+                    "Copiar os dados de ontem para o dia exibido?\n\n" +
+                    "Isso vai sobrescrever o que já estiver preenchido aqui."
+                )) return;
+
+                const copiados =
+                    window.copiarDoDiaAnterior("visao", dataBaseVisao);
+
+                if (copiados === 0) {
+                    alert("Nada encontrado para o dia anterior.");
+                    return;
+                }
+
+                window.location.reload();
+
+            });
     </script>
 
 </body>
