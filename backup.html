@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Backup</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="header">
+            <p class="eyebrow">SISTEMA</p>
+            <h1>💾 Backup</h1>
+            <p class="subtitle">
+                Exporte e importe todos os dados do sistema.
+            </p>
+        </header>
+
+
+        <section class="modules">
+
+            <!-- CONTADOR -->
+
+            <div class="module-card">
+                <span class="icon">📊</span>
+                <div>
+                    <h2>Dados salvos</h2>
+                    <p id="contadorChaves" style="color:#888;">
+                        Contando...
+                    </p>
+                </div>
+            </div>
+
+
+            <!-- EXPORTAR -->
+
+            <div class="module-card">
+                <span class="icon">📤</span>
+                <div>
+                    <h2>Exportar</h2>
+
+                    <p style="color:#888; font-size:14px; margin-bottom:12px;">
+                        Baixa um arquivo <strong>.json</strong> com todos os seus dados.
+                        Guarde esse arquivo em um lugar seguro.
+                    </p>
+
+                    <button
+                        type="button"
+                        id="btnExportar"
+                        style="
+                            width: 100%;
+                            padding: 12px;
+                            font-size: 16px;
+                            cursor: pointer;
+                            border: 1px solid #333;
+                            border-radius: 8px;
+                            background: #333;
+                            color: #fff;
+                        "
+                    >
+                        📥 Baixar backup
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- IMPORTAR -->
+
+            <div class="module-card">
+                <span class="icon">📥</span>
+                <div>
+                    <h2>Importar</h2>
+
+                    <p style="color:#888; font-size:14px; margin-bottom:12px;">
+                        Restaura os dados a partir de um arquivo <strong>.json</strong>
+                        baixado antes.
+                    </p>
+
+                    <input
+                        type="file"
+                        id="inputImportar"
+                        accept=".json,application/json"
+                        style="display:none;"
+                    >
+
+                    <button
+                        type="button"
+                        id="btnEscolherArquivo"
+                        style="
+                            width: 100%;
+                            padding: 12px;
+                            font-size: 16px;
+                            cursor: pointer;
+                            border: 1px solid #ccc;
+                            border-radius: 8px;
+                            background: #fff;
+                        "
+                    >
+                        📂 Escolher arquivo
+                    </button>
+
+                    <p
+                        id="infoArquivo"
+                        style="
+                            color:#555;
+                            font-size:13px;
+                            margin-top:10px;
+                            display:none;
+                        "
+                    ></p>
+
+                    <div
+                        id="acoesImportar"
+                        style="
+                            display:none;
+                            gap:10px;
+                            margin-top:14px;
+                        "
+                    >
+                        <button
+                            type="button"
+                            id="btnImportarMerge"
+                            style="
+                                flex: 1;
+                                padding: 12px;
+                                font-size: 14px;
+                                cursor: pointer;
+                                border: 1px solid #ccc;
+                                border-radius: 8px;
+                                background: #fff;
+                            "
+                        >
+                            ➕ Mesclar
+                        </button>
+
+                        <button
+                            type="button"
+                            id="btnImportarSubstituir"
+                            style="
+                                flex: 1;
+                                padding: 12px;
+                                font-size: 14px;
+                                cursor: pointer;
+                                border: 1px solid #a33;
+                                border-radius: 8px;
+                                background: #fff;
+                                color: #a33;
+                            "
+                        >
+                            ♻️ Substituir tudo
+                        </button>
+                    </div>
+
+                    <p
+                        id="resultadoImportacao"
+                        style="
+                            margin-top:14px;
+                            padding: 12px;
+                            border-radius: 8px;
+                            background: #f5f5f5;
+                            font-size: 14px;
+                            display: none;
+                        "
+                    ></p>
+                </div>
+            </div>
+
+        </section>
+
+
+        <a href="index.html" class="back-button">
+            ← Voltar para o início
+        </a>
+
+    </main>
+
+
+    <script>
+        // ==================================================
+        // PREFIXO DO SISTEMA
+        // ==================================================
+
+        const PREFIXO = "planejamento_";
+
+
+        // ==================================================
+        // ELEMENTOS
+        // ==================================================
+
+        const contadorChaves      = document.getElementById("contadorChaves");
+        const btnExportar         = document.getElementById("btnExportar");
+        const inputImportar       = document.getElementById("inputImportar");
+        const btnEscolherArquivo  = document.getElementById("btnEscolherArquivo");
+        const infoArquivo         = document.getElementById("infoArquivo");
+        const acoesImportar       = document.getElementById("acoesImportar");
+        const btnImportarMerge    = document.getElementById("btnImportarMerge");
+        const btnImportarSubstituir = document.getElementById("btnImportarSubstituir");
+        const resultadoImportacao = document.getElementById("resultadoImportacao");
+
+
+        // ==================================================
+        // CONTAR CHAVES
+        // ==================================================
+
+        function contarChaves() {
+
+            const total = Object.keys(localStorage)
+                .filter(k => k.startsWith(PREFIXO))
+                .length;
+
+            contadorChaves.textContent =
+                total === 1
+                    ? "1 registro salvo"
+                    : `${total} registros salvos`;
+        }
+
+
+        // ==================================================
+        // EXPORTAR
+        // ==================================================
+
+        btnExportar.addEventListener("click", () => {
+
+            const dados = {};
+
+            Object.keys(localStorage).forEach(chave => {
+
+                if (chave.startsWith(PREFIXO)) {
+                    dados[chave] = localStorage.getItem(chave);
+                }
+
+            });
+
+            const conteudo = JSON.stringify({
+                exportadoEm: new Date().toISOString(),
+                prefixo: PREFIXO,
+                dados: dados
+            }, null, 2);
+
+
+            const blob = new Blob([conteudo], {
+                type: "application/json"
+            });
+
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+
+            const agora = new Date();
+
+            const stamp =
+                agora.getFullYear() + "-" +
+                String(agora.getMonth() + 1).padStart(2, "0") + "-" +
+                String(agora.getDate()).padStart(2, "0") + "_" +
+                String(agora.getHours()).padStart(2, "0") + "-" +
+                String(agora.getMinutes()).padStart(2, "0");
+
+            a.href = url;
+            a.download = `meu-sistema-backup_${stamp}.json`;
+
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            URL.revokeObjectURL(url);
+
+        });
+
+
+        // ==================================================
+        // ESCOLHER ARQUIVO
+        // ==================================================
+
+        let dadosImportados = null;
+
+
+        btnEscolherArquivo.addEventListener("click", () => {
+            inputImportar.click();
+        });
+
+
+        inputImportar.addEventListener("change", () => {
+
+            const arquivo = inputImportar.files[0];
+
+            if (!arquivo) return;
+
+            const leitor = new FileReader();
+
+            leitor.onload = (evento) => {
+
+                try {
+
+                    const json = JSON.parse(evento.target.result);
+
+                    if (!json || typeof json !== "object" || !json.dados) {
+                        throw new Error("Formato inválido.");
+                    }
+
+                    dadosImportados = json.dados;
+
+                    const qtd = Object.keys(dadosImportados).length;
+
+                    infoArquivo.style.display = "block";
+                    infoArquivo.textContent =
+                        `📄 ${arquivo.name} — ${qtd} registros encontrados.`;
+
+                    acoesImportar.style.display = "flex";
+                    resultadoImportacao.style.display = "none";
+
+                } catch (erro) {
+
+                    dadosImportados = null;
+
+                    infoArquivo.style.display = "block";
+                    infoArquivo.textContent =
+                        "❌ Arquivo inválido. Escolha um backup gerado por esta página.";
+
+                    acoesImportar.style.display = "none";
+
+                }
+
+            };
+
+            leitor.readAsText(arquivo);
+
+        });
+
+
+        // ==================================================
+        // IMPORTAR — MESCLAR
+        // ==================================================
+
+        btnImportarMerge.addEventListener("click", () => {
+
+            if (!dadosImportados) return;
+
+            let adicionados = 0;
+
+            Object.keys(dadosImportados).forEach(chave => {
+
+                if (chave.startsWith(PREFIXO)) {
+                    localStorage.setItem(chave, dadosImportados[chave]);
+                    adicionados++;
+                }
+
+            });
+
+            finalizarImportacao(
+                `✅ ${adicionados} registros mesclados aos dados atuais.`
+            );
+
+        });
+
+
+        // ==================================================
+        // IMPORTAR — SUBSTITUIR
+        // ==================================================
+
+        btnImportarSubstituir.addEventListener("click", () => {
+
+            if (!dadosImportados) return;
+
+            const confirmar = confirm(
+                "Isso vai apagar TODOS os dados atuais do sistema e substituir pelos do arquivo. Continuar?"
+            );
+
+            if (!confirmar) return;
+
+            // Remove todas as chaves atuais do sistema
+            Object.keys(localStorage).forEach(chave => {
+
+                if (chave.startsWith(PREFIXO)) {
+                    localStorage.removeItem(chave);
+                }
+
+            });
+
+
+            // Adiciona as do arquivo
+            let adicionados = 0;
+
+            Object.keys(dadosImportados).forEach(chave => {
+
+                if (chave.startsWith(PREFIXO)) {
+                    localStorage.setItem(chave, dadosImportados[chave]);
+                    adicionados++;
+                }
+
+            });
+
+
+            finalizarImportacao(
+                `♻️ Dados substituídos: ${adicionados} registros restaurados.`
+            );
+
+        });
+
+
+        // ==================================================
+        // FINALIZAÇÃO
+        // ==================================================
+
+        function finalizarImportacao(mensagem) {
+
+            resultadoImportacao.style.display = "block";
+            resultadoImportacao.textContent = mensagem;
+
+            // Reseta o seletor de arquivo
+            inputImportar.value = "";
+            dadosImportados = null;
+            infoArquivo.style.display = "none";
+            acoesImportar.style.display = "none";
+
+            // Atualiza o contador
+            contarChaves();
+
+        }
+
+
+        // ==================================================
+        // INICIALIZA
+        // ==================================================
+
+        contarChaves();
+    </script>
+
+</body>
+</html>
