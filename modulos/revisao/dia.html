@@ -8,61 +8,18 @@
 
     <link rel="stylesheet" href="../../css/style.css">
 
-.rating-bloco {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-}
-
-.rating-titulo {
-    color: #999;
-    font-size: 13px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-.rating-opcoes {
-    display: flex;
-    gap: 14px;
-}
-
-.rating-emoji {
-    font-size: 32px;
-    background: transparent;
-    border: 2px solid transparent;
-    border-radius: 12px;
-    padding: 6px 10px;
-    cursor: pointer;
-    transition: 0.15s;
-    filter: grayscale(60%);
-    opacity: 0.5;
-}
-
-.rating-emoji:hover {
-    opacity: 0.8;
-    transform: scale(1.05);
-}
-
-.rating-emoji.selecionado {
-    border-color: #55555c;
-    background: #222225;
-    filter: grayscale(0%);
-    opacity: 1;
-    transform: scale(1.1);
-}
-    
     <style>
         .prioridade-item {
             display: flex;
             align-items: flex-start;
             gap: 12px;
             padding: 12px;
-            border: 1px solid #eee;
+            border: 1px solid #252529;
             border-radius: 8px;
             margin-bottom: 10px;
             cursor: pointer;
             user-select: none;
+            background: #1c1c20;
         }
 
         .prioridade-item input[type="checkbox"] {
@@ -77,16 +34,61 @@
             font-size: 15px;
             line-height: 1.4;
             flex: 1;
+            color: #e0e0e0;
         }
 
         .prioridade-texto.vazio {
-            color: #bbb;
+            color: #666;
             font-style: italic;
         }
 
         .prioridade-item.concluida .prioridade-texto {
             text-decoration: line-through;
+            color: #777;
+        }
+
+        .rating-bloco {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .rating-titulo {
             color: #999;
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .rating-opcoes {
+            display: flex;
+            gap: 14px;
+        }
+
+        .rating-emoji {
+            font-size: 32px;
+            background: transparent;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 6px 10px;
+            cursor: pointer;
+            transition: 0.15s;
+            filter: grayscale(60%);
+            opacity: 0.5;
+        }
+
+        .rating-emoji:hover {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+
+        .rating-emoji.selecionado {
+            border-color: #55555c;
+            background: #222225;
+            filter: grayscale(0%);
+            opacity: 1;
+            transform: scale(1.1);
         }
     </style>
 </head>
@@ -103,21 +105,24 @@
             </p>
         </header>
 
-<div class="module-card" style="justify-content: center;">
-    <div class="rating-bloco">
-        <span class="rating-titulo">Como foi o dia?</span>
-
-        <div class="rating-opcoes" id="ratingOpcoes">
-            <button type="button" class="rating-emoji" data-valor="20">😞</button>
-            <button type="button" class="rating-emoji" data-valor="40">😕</button>
-            <button type="button" class="rating-emoji" data-valor="60">😐</button>
-            <button type="button" class="rating-emoji" data-valor="80">🙂</button>
-            <button type="button" class="rating-emoji" data-valor="100">😄</button>
-        </div>
-    </div>
-</div>
-        
         <section class="modules">
+
+            <!-- RATING DO DIA -->
+
+            <div class="module-card" style="justify-content: center;">
+                <div class="rating-bloco">
+                    <span class="rating-titulo">Como foi o dia?</span>
+
+                    <div class="rating-opcoes" id="ratingOpcoes">
+                        <button type="button" class="rating-emoji" data-valor="20">😞</button>
+                        <button type="button" class="rating-emoji" data-valor="40">😕</button>
+                        <button type="button" class="rating-emoji" data-valor="60">😐</button>
+                        <button type="button" class="rating-emoji" data-valor="80">🙂</button>
+                        <button type="button" class="rating-emoji" data-valor="100">😄</button>
+                    </div>
+                </div>
+            </div>
+
 
             <!-- 1. O QUE FOI FEITO -->
 
@@ -269,14 +274,14 @@
                 gap: 8px;
                 margin-bottom: 18px;
                 padding: 10px 12px;
-                border: 1px solid #eee;
+                border: 1px solid #252529;
                 border-radius: 10px;
-                background: #fafafa;
+                background: #17171a;
                 font-size: 14px;
             `;
 
             const linkStyle =
-                "text-decoration:none; color:#333; padding:6px 10px; border-radius:6px;";
+                "text-decoration:none; color:#e0e0e0; padding:6px 10px; border-radius:6px;";
 
             barra.innerHTML = `
                 <a href="${urlComData(fmtISO(anterior))}" style="${linkStyle}">
@@ -284,12 +289,12 @@
                 </a>
 
                 <div style="text-align:center;">
-                    <div style="font-weight:600;">
+                    <div style="font-weight:600; color:#f5f5f5;">
                         ${label(dataAtual)}
                     </div>
 
                     ${dataAtual !== dataHoje
-                        ? `<a href="${baseURL}" style="font-size:11px; color:#a66; text-decoration:none;">
+                        ? `<a href="${baseURL}" style="font-size:11px; color:#c98a8a; text-decoration:none;">
                                voltar para hoje
                            </a>`
                         : ""}
@@ -361,9 +366,6 @@
 
         const listaPrioridades = document.getElementById("listaPrioridades");
 
-        // Cada prioridade ocupa 2 índices em "prioridades_":
-        //   N   → texto
-        //   N+1 → checkbox
         const prioridades = [
             { texto: 0, check: 1 },
             { texto: 2, check: 3 },
@@ -433,53 +435,54 @@
 
         }
 
+        renderizarPrioridades();
+
+
         // ==================================================
-// RATING DO DIA
-// ==================================================
+        // RATING DO DIA
+        // ==================================================
 
-const chaveRating = `planejamento_${dataAtual}_revisao_rating`;
+        const chaveRating = `planejamento_${dataAtual}_revisao_rating`;
 
-const botoesRating = document.querySelectorAll(".rating-emoji");
+        const botoesRating = document.querySelectorAll(".rating-emoji");
 
-function marcarRating(valor) {
+        function marcarRating(valor) {
 
-    botoesRating.forEach(btn => {
-        btn.classList.toggle(
-            "selecionado",
-            Number(btn.dataset.valor) === Number(valor)
-        );
-    });
+            botoesRating.forEach(btn => {
+                btn.classList.toggle(
+                    "selecionado",
+                    Number(btn.dataset.valor) === Number(valor)
+                );
+            });
 
-}
-
-// Carrega salvo
-const ratingSalvo = localStorage.getItem(chaveRating);
-if (ratingSalvo) {
-    marcarRating(ratingSalvo);
-}
-
-// Clique
-botoesRating.forEach(btn => {
-
-    btn.addEventListener("click", () => {
-
-        const valor = btn.dataset.valor;
-
-        // Se clicar de novo no mesmo, desmarca
-        if (btn.classList.contains("selecionado")) {
-            localStorage.removeItem(chaveRating);
-            marcarRating(null);
-            return;
         }
 
-        localStorage.setItem(chaveRating, valor);
-        marcarRating(valor);
+        // Carrega salvo
+        const ratingSalvo = localStorage.getItem(chaveRating);
+        if (ratingSalvo) {
+            marcarRating(ratingSalvo);
+        }
 
-    });
+        // Clique
+        botoesRating.forEach(btn => {
 
-});
-        
-        renderizarPrioridades();
+            btn.addEventListener("click", () => {
+
+                const valor = btn.dataset.valor;
+
+                // Se clicar de novo no mesmo, desmarca
+                if (btn.classList.contains("selecionado")) {
+                    localStorage.removeItem(chaveRating);
+                    marcarRating(null);
+                    return;
+                }
+
+                localStorage.setItem(chaveRating, valor);
+                marcarRating(valor);
+
+            });
+
+        });
     </script>
 
 </body>
