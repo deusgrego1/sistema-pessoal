@@ -196,6 +196,198 @@
     </main>
 
     <script>
+    // ==================================================
+    // DATA ATUAL
+    // ==================================================
+
+    const hoje = new Date();
+
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+    const dia = String(hoje.getDate()).padStart(2, "0");
+
+    const dataAtual = `${ano}-${mes}-${dia}`;
+
+
+    // ==================================================
+    // ELEMENTOS
+    // ==================================================
+
+    const container = document.querySelector(".modules");
+    const botao = document.getElementById("adicionarAprendizado");
+
+
+    // ==================================================
+    // CONFIGURAÇÃO
+    // ==================================================
+
+    const camposPorAprendizado = 7;
+
+    const chaveQuantidade =
+        `planejamento_${dataAtual}_o-que-aprendi_blocos`;
+
+    let numeroAprendizado =
+        Number(localStorage.getItem(chaveQuantidade)) || 3;
+
+
+    // ==================================================
+    // CRIA UM APRENDIZADO
+    // ==================================================
+
+    function criarAprendizado(numero, carregarDados = false) {
+
+        const bloco = document.createElement("div");
+
+        bloco.className = "module-card";
+
+        bloco.innerHTML = `
+            <span class="icon">🧠</span>
+
+            <div>
+                <h2>Aprendizado ${numero}</h2>
+
+                <input
+                    type="text"
+                    placeholder="📌 Assunto"
+                >
+
+                <textarea
+                    placeholder="💡 O que aprendi? Explique com suas próprias palavras."
+                    rows="5"
+                ></textarea>
+
+                <textarea
+                    placeholder="⭐ Principal insight"
+                    rows="3"
+                ></textarea>
+
+                <textarea
+                    placeholder="🔗 Com o que isso se conecta?"
+                    rows="3"
+                ></textarea>
+
+                <textarea
+                    placeholder="🛠️ Como posso aplicar?"
+                    rows="3"
+                ></textarea>
+
+                <textarea
+                    placeholder="❓ O que ainda não entendi?"
+                    rows="3"
+                ></textarea>
+
+                <textarea
+                    placeholder="🎯 Próxima ação"
+                    rows="3"
+                ></textarea>
+            </div>
+        `;
+
+
+        container.insertBefore(bloco, botao);
+
+
+        // ----------------------------------------------
+        // CAMPOS
+        // ----------------------------------------------
+
+        const campos = bloco.querySelectorAll(
+            "input, textarea"
+        );
+
+
+        campos.forEach((campo, indiceCampo) => {
+
+            const indice =
+                (numero - 1) * camposPorAprendizado
+                + indiceCampo;
+
+            const chave =
+                `planejamento_${dataAtual}_o-que-aprendi_${indice}`;
+
+
+            // Carrega dados salvos
+            if (carregarDados) {
+
+                const salvo =
+                    localStorage.getItem(chave);
+
+                if (salvo !== null) {
+                    campo.value = salvo;
+                }
+
+            }
+
+
+            // Salva alterações
+            const salvar = () => {
+
+                localStorage.setItem(
+                    chave,
+                    campo.value
+                );
+
+            };
+
+            campo.addEventListener(
+                "input",
+                salvar
+            );
+
+            campo.addEventListener(
+                "change",
+                salvar
+            );
+
+        });
+
+    }
+
+
+    // ==================================================
+    // RECRIA APRENDIZADOS EXTRAS DO DIA
+    // ==================================================
+
+    if (numeroAprendizado > 3) {
+
+        for (
+            let numero = 4;
+            numero <= numeroAprendizado;
+            numero++
+        ) {
+
+            criarAprendizado(
+                numero,
+                true
+            );
+
+        }
+
+    }
+
+
+    // ==================================================
+    // ADICIONAR NOVO APRENDIZADO
+    // ==================================================
+
+    botao.addEventListener("click", () => {
+
+        numeroAprendizado++;
+
+        criarAprendizado(
+            numeroAprendizado,
+            false
+        );
+
+
+        // Salva quantidade de blocos existentes
+        localStorage.setItem(
+            chaveQuantidade,
+            numeroAprendizado
+        );
+
+    });
+</script>
     const container = document.querySelector(".modules");
     const botao = document.getElementById("adicionarAprendizado");
 
