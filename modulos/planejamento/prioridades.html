@@ -256,21 +256,23 @@
         // EFEITO "CONCLUÍDA" — RISCA A PRIORIDADE
         // ==================================================
 
-        document.querySelectorAll(".module-card[data-prioridade]").forEach(card => {
+       document.querySelectorAll(".module-card[data-prioridade]").forEach(card => {
 
-            const checkbox = card.querySelector("input[type=checkbox]");
+    const checkbox = card.querySelector("input[type=checkbox]");
 
-            if (!checkbox) return;
+    if (!checkbox) return;
 
-            function atualizarVisual() {
-                card.classList.toggle("concluida", checkbox.checked);
-            }
+    function atualizarVisual() {
+        card.classList.toggle("concluida", checkbox.checked);
+    }
 
-            atualizarVisual();
+    // Reaplica após o app.js terminar de restaurar do localStorage
+    window.addEventListener("load", atualizarVisual);
 
-            checkbox.addEventListener("change", atualizarVisual);
+    // Mantém ao vivo quando o usuário clica
+    checkbox.addEventListener("change", atualizarVisual);
 
-        });
+});
 
 
         // ==================================================
