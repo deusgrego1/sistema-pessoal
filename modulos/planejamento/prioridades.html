@@ -36,6 +36,24 @@
                         <input type="checkbox">
                         Concluída
                     </label>
+
+                    <button
+                        type="button"
+                        class="btn-focar"
+                        style="
+                            display: block;
+                            margin-top: 12px;
+                            padding: 8px 14px;
+                            font-size: 14px;
+                            cursor: pointer;
+                            border: 1px solid #333;
+                            border-radius: 8px;
+                            background: #333;
+                            color: #fff;
+                        "
+                    >
+                        🎯 Focar nisso
+                    </button>
                 </div>
             </div>
 
@@ -52,6 +70,24 @@
                         <input type="checkbox">
                         Concluída
                     </label>
+
+                    <button
+                        type="button"
+                        class="btn-focar"
+                        style="
+                            display: block;
+                            margin-top: 12px;
+                            padding: 8px 14px;
+                            font-size: 14px;
+                            cursor: pointer;
+                            border: 1px solid #333;
+                            border-radius: 8px;
+                            background: #333;
+                            color: #fff;
+                        "
+                    >
+                        🎯 Focar nisso
+                    </button>
                 </div>
             </div>
 
@@ -68,6 +104,24 @@
                         <input type="checkbox">
                         Concluída
                     </label>
+
+                    <button
+                        type="button"
+                        class="btn-focar"
+                        style="
+                            display: block;
+                            margin-top: 12px;
+                            padding: 8px 14px;
+                            font-size: 14px;
+                            cursor: pointer;
+                            border: 1px solid #333;
+                            border-radius: 8px;
+                            background: #333;
+                            color: #fff;
+                        "
+                    >
+                        🎯 Focar nisso
+                    </button>
                 </div>
             </div>
 
@@ -79,7 +133,35 @@
 
     </main>
 
-  <script src="../../js/app.js"></script>
-    
+    <script src="../../js/app.js"></script>
+
+    <script>
+        // ==================================================
+        // BOTÃO "FOCAR NISSO"
+        // ==================================================
+
+        document.querySelectorAll(".btn-focar").forEach(botao => {
+
+            botao.addEventListener("click", () => {
+
+                const card = botao.closest(".module-card");
+                const texto = card.querySelector("textarea").value.trim();
+
+                if (!texto) {
+                    alert("Escreva a prioridade antes de focar.");
+                    return;
+                }
+
+                const url =
+                    "../foco/foco.html?tarefa=" +
+                    encodeURIComponent(texto);
+
+                window.location.href = url;
+
+            });
+
+        });
+    </script>
+
 </body>
 </html>
