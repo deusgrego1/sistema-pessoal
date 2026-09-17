@@ -853,22 +853,65 @@
 
         function renderMobilidade() {
 
-            $("conteudoTipo").innerHTML = `
-                <div class="conteudo-tipo">
+    $("conteudoTipo").innerHTML = `
+        <div class="conteudo-tipo">
 
-                    ${cardTexto(
-                        campoTexto("mobQuando", "Quando", "Ex.: Antes do treino · 07h") +
-                        campoTexto("mobTempo", "Quanto tempo", "Ex.: 15min") +
-                        campoTexto("mobFoco", "Qual o foco", "Ex.: Quadril e posterior")
-                    )}
+            ${cardTexto(
+                campoTexto("mobQuando", "Quando", "Ex.: Antes do treino · 07h") +
+                campoTexto("mobTempo", "Quanto tempo", "Ex.: 15min") +
+                campoTexto("mobFoco", "Qual o foco", "Ex.: Quadril e posterior") +
+                `<label class="campo-label" style="margin-top: 14px;">Vídeo de referência (YouTube)</label>
+                 <input type="text" id="mobVideo" placeholder="Cole o link do vídeo">
+                 <div id="mobVideoPreview" style="margin-top: 10px;"></div>`
+            )}
 
-                </div>
-            `;
+        </div>
+    `;
 
-            salvarAuto($("mobQuando"), `planejamento_${dataAtual}_treino_mob_quando`);
-            salvarAuto($("mobTempo"),  `planejamento_${dataAtual}_treino_mob_tempo`);
-            salvarAuto($("mobFoco"),   `planejamento_${dataAtual}_treino_mob_foco`);
+    salvarAuto($("mobQuando"), `planejamento_${dataAtual}_treino_mob_quando`);
+    salvarAuto($("mobTempo"),  `planejamento_${dataAtual}_treino_mob_tempo`);
+    salvarAuto($("mobFoco"),   `planejamento_${dataAtual}_treino_mob_foco`);
+
+
+    // Vídeo — salva e mostra prévia clicável
+    const campoVideo = $("mobVideo");
+    const preview = $("mobVideoPreview");
+    const chaveVideo = `planejamento_${dataAtual}_treino_mob_video`;
+
+    function atualizarPreview() {
+
+        const url = campoVideo.value.trim();
+
+        if (!url) {
+            preview.innerHTML = "";
+            return;
         }
+
+        // Só mostra se parece uma URL
+        if (/^https?:\/\//i.test(url)) {
+            preview.innerHTML = `
+                <a href="${url}" target="_blank" rel="noopener"
+                   style="display:inline-flex; align-items:center; gap:8px;
+                          padding:10px 14px; border:1px solid #2c3a55;
+                          background:linear-gradient(135deg,#1a2235 0%,#232f4a 100%);
+                          color:#dfe8ff; border-radius:10px; text-decoration:none;
+                          font-size:14px; transition:0.15s;">
+                    ▶️ Abrir vídeo
+                </a>
+            `;
+        } else {
+            preview.innerHTML = "";
+        }
+    }
+
+    campoVideo.value = localStorage.getItem(chaveVideo) || "";
+    atualizarPreview();
+
+    campoVideo.addEventListener("input", () => {
+        localStorage.setItem(chaveVideo, campoVideo.value);
+        atualizarPreview();
+    });
+}
 
 
         // ==================================================
