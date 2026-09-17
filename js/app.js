@@ -201,8 +201,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (chave.startsWith(prefixo)) {
 
-                    const indice =
-                        Number(chave.replace(prefixo, ""));
+                    const indiceTexto =
+                        chave.replace(prefixo, "");
+
+                    const indice = Number(indiceTexto);
+
+                    // Ignora chaves de controle (ex.: _blocos)
+                    if (Number.isNaN(indice)) return;
 
                     dados.push({
                         indice: indice,
@@ -391,6 +396,47 @@ document.addEventListener("DOMContentLoaded", () => {
                     "Fonte / material",
                     "Tempo"
                 ]
+            );
+
+
+            // --------------------------------------------
+            // O QUE APRENDI
+            // --------------------------------------------
+
+            const numBlocosAprendi =
+                Number(localStorage.getItem(
+                    `planejamento_${dataSelecionada}_o-que-aprendi_blocos`
+                )) || 3;
+
+            const camposAprendi = [
+                "📌 Assunto",
+                "💡 O que aprendi",
+                "⭐ Principal insight",
+                "🔗 Conexão",
+                "🛠️ Aplicação",
+                "❓ Dúvida",
+                "🎯 Próxima ação"
+            ];
+
+            const rotulosAprendi = [];
+
+            for (let i = 0; i < numBlocosAprendi; i++) {
+
+                camposAprendi.forEach(campo => {
+
+                    rotulosAprendi.push(
+                        `Aprendizado ${i + 1} — ${campo}`
+                    );
+
+                });
+
+            }
+
+            mostrarModulo(
+                dataSelecionada,
+                "o-que-aprendi",
+                document.getElementById("aprendiHistorico"),
+                rotulosAprendi
             );
 
 
