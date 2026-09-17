@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Treino</title>
+
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .tipos-treino {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .tipo-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #333338;
+            background: #17171a;
+            color: #bbb;
+            border-radius: 22px;
+            transition: 0.15s;
+            position: relative;
+        }
+
+        .tipo-btn:hover {
+            background: #1e1e22;
+            color: #e0e0e0;
+        }
+
+        .tipo-btn.ativo {
+            background: #2e2e33;
+            color: #fff;
+            border-color: #55555c;
+            box-shadow: 0 0 0 1px #55555c inset;
+        }
+
+        .tipo-btn .emoji { font-size: 16px; }
+
+        .dot-indicator {
+            display: none;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #2ecc71;
+            margin-left: 2px;
+            box-shadow: 0 0 6px rgba(46, 204, 113, 0.6);
+        }
+
+        .dot-indicator.visivel {
+            display: inline-block;
+        }
+
+        .conteudo-tipo {
+            animation: fadeIn 0.25s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .hevy-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid #2c3a55;
+            background: linear-gradient(135deg, #1a2235 0%, #232f4a 100%);
+            color: #dfe8ff;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: 0.15s;
+        }
+
+        .hevy-btn:hover {
+            border-color: #4a5c85;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(74, 92, 133, 0.2);
+        }
+
+        /* ===== PR ===== */
+
+        .pr-card {
+            background: linear-gradient(135deg, #1a1612 0%, #17171a 100%);
+            border: 1px solid #3a2f1f;
+            border-radius: 16px;
+            padding: 20px;
+            transition: 0.25s;
+        }
+
+        .pr-card.ativo {
+            border-color: #d4a94a;
+            box-shadow: 0 0 24px rgba(212, 169, 74, 0.12),
+                        0 0 0 1px rgba(212, 169, 74, 0.2) inset;
+        }
+
+        .pr-cabecalho {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pr-trofeu {
+            font-size: 30px;
+            filter: grayscale(70%) brightness(0.8);
+            transition: 0.3s;
+        }
+
+        .pr-card.ativo .pr-trofeu {
+            filter: grayscale(0%) brightness(1);
+            transform: scale(1.1);
+            animation: brilho 0.8s ease;
+        }
+
+        @keyframes brilho {
+            0%   { transform: scale(0.9) rotate(-8deg); }
+            40%  { transform: scale(1.2) rotate(6deg); }
+            100% { transform: scale(1.1) rotate(0deg); }
+        }
+
+        .pr-texto { flex: 1; }
+
+        .pr-titulo {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ccc;
+            margin-bottom: 3px;
+            transition: 0.25s;
+        }
+
+        .pr-card.ativo .pr-titulo { color: #e0b851; }
+
+        .pr-sub {
+            font-size: 12px;
+            color: #777;
+        }
+
+        .pr-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid #333338;
+            background: #1a1a1e;
+            cursor: pointer;
+            transition: 0.2s;
+            user-select: none;
+        }
+
+        .pr-toggle:hover { background: #222228; }
+
+        .pr-card.ativo .pr-toggle {
+            background: #2a2318;
+            border-color: #d4a94a;
+        }
+
+        .pr-toggle-pino {
+            width: 34px;
+            height: 18px;
+            border-radius: 10px;
+            background: #333;
+            position: relative;
+            transition: 0.2s;
+        }
+
+        .pr-toggle-pino::after {
+            content: "";
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #888;
+            transition: 0.2s;
+        }
+
+        .pr-card.ativo .pr-toggle-pino { background: #6b5624; }
+
+        .pr-card.ativo .pr-toggle-pino::after {
+            left: 18px;
+            background: #d4a94a;
+        }
+
+        .pr-toggle-label {
+            font-size: 12px;
+            color: #999;
+            font-weight: 500;
+        }
+
+        .pr-card.ativo .pr-toggle-label { color: #e0b851; }
+
+        .pr-campos {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, opacity 0.3s ease;
+            opacity: 0;
+            margin-top: 0;
+        }
+
+        .pr-card.ativo .pr-campos {
+            max-height: 900px;
+            opacity: 1;
+            margin-top: 20px;
+        }
+
+        .pr-grupo { margin-bottom: 16px; }
+        .pr-grupo:last-child { margin-bottom: 0; }
+
+        .campo-label {
+            display: block;
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        /* ===== Chips ===== */
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .chip {
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid #333338;
+            background: #1a1a1e;
+            color: #bbb;
+            border-radius: 16px;
+            transition: 0.15s;
+            user-select: none;
+        }
+
+        .chip:hover {
+            background: #222228;
+            color: #e0e0e0;
+        }
+
+        .chip.selecionado {
+            background: #2a2318;
+            border-color: #d4a94a;
+            color: #e0b851;
+            font-weight: 600;
+        }
+
+        .chip.neutro.selecionado {
+            background: #2e2e33;
+            border-color: #666;
+            color: #fff;
+        }
+
+        .rpe-chips .chip {
+            min-width: 34px;
+            text-align: center;
+        }
+
+        /* RPE colorido — não selecionado */
+
+        .rpe-chips .chip.rpe-baixo { border-color: #2f4a2f; color: #86b886; }
+        .rpe-chips .chip.rpe-medio { border-color: #4a4a2f; color: #c2c286; }
+        .rpe-chips .chip.rpe-alto  { border-color: #4a3f2a; color: #d4a97a; }
+        .rpe-chips .chip.rpe-max   { border-color: #4a2a2a; color: #d48a8a; }
+
+        /* RPE colorido — selecionado */
+
+        .rpe-chips .chip.rpe-baixo.selecionado {
+            background: #1f3320; border-color: #4caf50; color: #a5d6a7;
+        }
+        .rpe-chips .chip.rpe-medio.selecionado {
+            background: #33331f; border-color: #c9a44a; color: #e0d48a;
+        }
+        .rpe-chips .chip.rpe-alto.selecionado {
+            background: #332a1f; border-color: #d4954a; color: #e0b878;
+        }
+        .rpe-chips .chip.rpe-max.selecionado {
+            background: #331f1f; border-color: #d45a5a; color: #e08b8b;
+        }
+
+        /* ===== Campo opcional ===== */
+
+        .campo-opcional-toggle {
+            display: inline-block;
+            margin-top: 12px;
+            font-size: 12px;
+            color: #888;
+            cursor: pointer;
+            padding: 4px 0;
+            user-select: none;
+            border-bottom: 1px dashed #444;
+        }
+
+        .campo-opcional-toggle:hover {
+            color: #ccc;
+            border-bottom-color: #666;
+        }
+
+        .campo-opcional {
+            display: none;
+        }
+
+        .campo-opcional.aberto {
+            display: block;
+        }
+
+        /* ===== Lista de PRs ===== */
+
+        .lista-prs {
+            margin-top: 8px;
+        }
+
+        .pr-linha {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 12px;
+            background: #1a1612;
+            border-left: 3px solid #d4a94a;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        .pr-linha-data {
+            color: #777;
+            font-size: 11px;
+            min-width: 74px;
+        }
+
+        .pr-linha-info {
+            flex: 1;
+            color: #e0e0e0;
+            line-height: 1.4;
+        }
+
+        .pr-linha-info .nome {
+            color: #e0b851;
+            font-weight: 600;
+        }
+
+        .pr-linha-valor {
+            color: #fff;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .pr-vazio {
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+            padding: 12px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="header">
+            <p class="eyebrow">PLANEJAMENTO</p>
+            <h1>🏋️ Treino</h1>
+            <p class="subtitle">
+                Registre o que o app não captura.
+            </p>
+        </header>
+
+        <section class="modules">
+
+            <div class="tipos-treino" id="tiposTreino">
+                <button type="button" class="tipo-btn" data-tipo="musculacao">
+                    <span class="emoji">🏋️</span> Musculação
+                    <span class="dot-indicator" data-dot="musculacao"></span>
+                </button>
+                <button type="button" class="tipo-btn" data-tipo="corrida">
+                    <span class="emoji">🏃</span> Corrida
+                    <span class="dot-indicator" data-dot="corrida"></span>
+                </button>
+                <button type="button" class="tipo-btn" data-tipo="mobilidade">
+                    <span class="emoji">🤸</span> Mobilidade
+                    <span class="dot-indicator" data-dot="mobilidade"></span>
+                </button>
+                <button type="button" class="tipo-btn" data-tipo="ciclismo">
+                    <span class="emoji">🚴</span> Ciclismo
+                    <span class="dot-indicator" data-dot="ciclismo"></span>
+                </button>
+                <button type="button" class="tipo-btn" data-tipo="volei">
+                    <span class="emoji">🏐</span> Vôlei / Basquete
+                    <span class="dot-indicator" data-dot="volei"></span>
+                </button>
+                <button type="button" class="tipo-btn" data-tipo="jiujitsu">
+                    <span class="emoji">🥋</span> Jiu-jitsu
+                    <span class="dot-indicator" data-dot="jiujitsu"></span>
+                </button>
+            </div>
+
+            <div id="conteudoTipo"></div>
+
+        </section>
+
+        <a href="corpo.html" class="back-button">
+            ← Voltar para Corpo
+        </a>
+
+    </main>
+
+
+    <script>
+        // ==================================================
+        // DATA E PREFERÊNCIA POR DIA DA SEMANA
+        // ==================================================
+
+        const hoje = new Date();
+        const anoHoje = hoje.getFullYear();
+        const mesHoje = String(hoje.getMonth() + 1).padStart(2, "0");
+        const diaHoje = String(hoje.getDate()).padStart(2, "0");
+        const dataAtual = `${anoHoje}-${mesHoje}-${diaHoje}`;
+
+        const PREFERENCIA_DIA = {
+            0: "mobilidade",   // Domingo
+            1: "musculacao",   // Segunda
+            2: "corrida",      // Terça
+            3: "musculacao",   // Quarta
+            4: "corrida",      // Quinta
+            5: "musculacao",   // Sexta
+            6: "mobilidade"    // Sábado
+        };
+
+        const chaveTipoAtivo = "planejamento_treino_tipo_ativo";
+        let tipoAtivo = localStorage.getItem(chaveTipoAtivo)
+            || PREFERENCIA_DIA[hoje.getDay()]
+            || "musculacao";
+
+
+        // ==================================================
+        // HELPERS
+        // ==================================================
+
+        function $(id) { return document.getElementById(id); }
+
+        function salvarAuto(campo, chave) {
+            const salvo = localStorage.getItem(chave);
+            if (salvo !== null) campo.value = salvo;
+            const salvar = () => localStorage.setItem(chave, campo.value);
+            campo.addEventListener("input", salvar);
+            campo.addEventListener("change", salvar);
+        }
+
+        // Auto-adiciona "km" se digitar só o número
+        function salvarAutoKm(campo, chave) {
+            const salvo = localStorage.getItem(chave);
+            if (salvo !== null) campo.value = salvo;
+
+            const normalizar = () => {
+                let v = campo.value.trim();
+                if (/^\d+(\.\d+)?$/.test(v)) {
+                    campo.value = v + "km";
+                }
+            };
+
+            campo.addEventListener("input", () => {
+                // Durante digitação, salva cru
+                localStorage.setItem(chave, campo.value);
+            });
+
+            campo.addEventListener("blur", () => {
+                normalizar();
+                localStorage.setItem(chave, campo.value);
+            });
+
+            campo.addEventListener("change", () => {
+                normalizar();
+                localStorage.setItem(chave, campo.value);
+            });
+        }
+
+        function setupChips(container, opcoes, chave, neutro = false) {
+            const salvo = localStorage.getItem(chave);
+
+            opcoes.forEach(op => {
+                const chip = document.createElement("div");
+                chip.className = "chip" + (neutro ? " neutro" : "");
+                chip.textContent = op;
+
+                if (salvo === op) chip.classList.add("selecionado");
+
+                chip.addEventListener("click", () => {
+                    const jaSelecionado = chip.classList.contains("selecionado");
+                    container.querySelectorAll(".chip").forEach(c => {
+                        c.classList.remove("selecionado");
+                    });
+                    if (jaSelecionado) {
+                        localStorage.removeItem(chave);
+                    } else {
+                        chip.classList.add("selecionado");
+                        localStorage.setItem(chave, op);
+                    }
+                });
+
+                container.appendChild(chip);
+            });
+        }
+
+        // RPE com cores
+        function setupRpeChips(container, chave) {
+            const salvo = localStorage.getItem(chave);
+
+            for (let i = 1; i <= 10; i++) {
+                const chip = document.createElement("div");
+                let classe = "chip";
+                if (i <= 3) classe += " rpe-baixo";
+                else if (i <= 6) classe += " rpe-medio";
+                else if (i <= 8) classe += " rpe-alto";
+                else classe += " rpe-max";
+
+                chip.className = classe;
+                chip.textContent = String(i);
+
+                if (salvo === String(i)) chip.classList.add("selecionado");
+
+                chip.addEventListener("click", () => {
+                    const jaSelecionado = chip.classList.contains("selecionado");
+                    container.querySelectorAll(".chip").forEach(c => {
+                        c.classList.remove("selecionado");
+                    });
+                    if (jaSelecionado) {
+                        localStorage.removeItem(chave);
+                    } else {
+                        chip.classList.add("selecionado");
+                        localStorage.setItem(chave, String(i));
+                    }
+                });
+
+                container.appendChild(chip);
+            }
+        }
+
+        // Setup do PR
+        function setupPR(tipoKey, opcoesArea, opcoesTipoPR, tituloPR, labelExercicio) {
+
+            const prefixo = `planejamento_${dataAtual}_treino_${tipoKey}_pr`;
+            const chaveAtivo = `${prefixo}_ativo`;
+
+            const prCard = $("prCard");
+            const prToggle = $("prToggle");
+            const prToggleLabel = prToggle.querySelector(".pr-toggle-label");
+
+            // título específico
+            prCard.querySelector(".pr-titulo").textContent = tituloPR;
+
+            if (localStorage.getItem(chaveAtivo) === "true") {
+                prCard.classList.add("ativo");
+                prToggleLabel.textContent = "Sim";
+            }
+
+            prToggle.addEventListener("click", () => {
+                const ativar = !prCard.classList.contains("ativo");
+                if (ativar) {
+                    prCard.classList.add("ativo");
+                    prToggleLabel.textContent = "Sim";
+                    localStorage.setItem(chaveAtivo, "true");
+                } else {
+                    prCard.classList.remove("ativo");
+                    prToggleLabel.textContent = "Não";
+                    localStorage.removeItem(chaveAtivo);
+                }
+                renderListaPRs(tipoKey);
+            });
+
+            setupChips($("prAreaChips"), opcoesArea, `${prefixo}_area`);
+            setupChips($("prTipoChips"), opcoesTipoPR, `${prefixo}_tipo`);
+
+            const ex = $("prExercicio");
+            ex.placeholder = labelExercicio;
+            salvarAuto(ex, `${prefixo}_exercicio`);
+            salvarAuto($("prValor"), `${prefixo}_valor`);
+            salvarAuto($("prObs"), `${prefixo}_obs`);
+        }
+
+        // Bloco HTML de um card de texto
+        function cardTexto(campos) {
+            return `
+                <div class="module-card" style="align-items: flex-start;">
+                    <span class="icon">🧠</span>
+                    <div style="width: 100%;">
+                        ${campos}
+                    </div>
+                </div>
+            `;
+        }
+
+        function campoTexto(id, label, placeholder, rows = null) {
+            if (rows) {
+                return `
+                    <label class="campo-label" style="margin-top: 14px;">${label}</label>
+                    <textarea id="${id}" rows="${rows}" placeholder="${placeholder}"></textarea>
+                `;
+            }
+            return `
+                <label class="campo-label" style="margin-top: 14px;">${label}</label>
+                <input type="text" id="${id}" placeholder="${placeholder}">
+            `;
+        }
+
+        // Bloco HTML do card de PR
+        function blocoPR() {
+            return `
+                <div class="pr-card" id="prCard">
+                    <div class="pr-cabecalho">
+                        <span class="pr-trofeu">🏆</span>
+                        <div class="pr-texto">
+                            <div class="pr-titulo">Bateu um PR hoje?</div>
+                            <div class="pr-sub">Registre para acompanhar sua evolução.</div>
+                        </div>
+                        <div class="pr-toggle" id="prToggle">
+                            <div class="pr-toggle-pino"></div>
+                            <span class="pr-toggle-label">Não</span>
+                        </div>
+                    </div>
+                    <div class="pr-campos">
+                        <div class="pr-grupo">
+                            <label class="campo-label">Exercício / Nome</label>
+                            <input type="text" id="prExercicio">
+                        </div>
+                        <div class="pr-grupo">
+                            <label class="campo-label">Área</label>
+                            <div class="chips" id="prAreaChips"></div>
+                        </div>
+                        <div class="pr-grupo">
+                            <label class="campo-label">Tipo de PR</label>
+                            <div class="chips" id="prTipoChips"></div>
+                        </div>
+                        <div class="pr-grupo">
+                            <label class="campo-label">Valor</label>
+                            <input type="text" id="prValor" placeholder="Ex.: 75kg · 22min">
+                        </div>
+                        <div class="pr-grupo">
+                            <label class="campo-label">Observação (opcional)</label>
+                            <textarea id="prObs" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="module-card" style="align-items: flex-start;">
+                    <span class="icon">🏆</span>
+                    <div style="width: 100%;">
+                        <h2>Seus PRs registrados</h2>
+                        <p style="color:#888; font-size:13px; margin-top:4px; margin-bottom:12px;">
+                            Todos os PRs deste tipo de treino.
+                        </p>
+                        <div class="lista-prs" id="listaPRs"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+
+        // ==================================================
+        // LISTA DE PRs
+        // ==================================================
+
+        function renderListaPRs(tipoKey) {
+
+            const container = $("listaPRs");
+            if (!container) return;
+
+            const prefixoBusca = `planejamento_`;
+            const sufixoTipo = `_treino_${tipoKey}_pr_`;
+
+            const prs = [];
+
+            Object.keys(localStorage).forEach(chave => {
+
+                if (!chave.includes(sufixoTipo)) return;
+                if (!chave.endsWith("_ativo")) return;
+                if (localStorage.getItem(chave) !== "true") return;
+
+                const match = chave.match(
+                    /^planejamento_(\d{4}-\d{2}-\d{2})_treino_(\w+)_pr_ativo$/
+                );
+
+                if (!match) return;
+
+                const data = match[1];
+                const prefixoData = `planejamento_${data}_treino_${tipoKey}_pr`;
+
+                const exercicio = localStorage.getItem(`${prefixoData}_exercicio`) || "";
+                const area = localStorage.getItem(`${prefixoData}_area`) || "";
+                const tipo = localStorage.getItem(`${prefixoData}_tipo`) || "";
+                const valor = localStorage.getItem(`${prefixoData}_valor`) || "";
+
+                if (!exercicio && !valor) return;
+
+                prs.push({ data, exercicio, area, tipo, valor });
+            });
+
+            prs.sort((a, b) => b.data.localeCompare(a.data));
+
+            if (prs.length === 0) {
+                container.innerHTML = `<p class="pr-vazio">Nenhum PR registrado ainda.</p>`;
+                return;
+            }
+
+            let html = "";
+
+            prs.forEach(pr => {
+                const [y, m, d] = pr.data.split("-");
+                const dataBR = `${d}/${m}/${y}`;
+
+                const partes = [];
+                if (pr.area) partes.push(pr.area);
+                if (pr.tipo) partes.push(pr.tipo);
+
+                html += `
+                    <div class="pr-linha">
+                        <span class="pr-linha-data">${dataBR}</span>
+                        <span class="pr-linha-info">
+                            <span class="nome">${pr.exercicio || "—"}</span>
+                            ${partes.length ? `· ${partes.join(" · ")}` : ""}
+                        </span>
+                        <span class="pr-linha-valor">${pr.valor || ""}</span>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+
+        // ==================================================
+        // MUSCULAÇÃO
+        // ==================================================
+
+        function renderMusculacao() {
+
+            $("conteudoTipo").innerHTML = `
+                <div class="conteudo-tipo">
+
+                    <div class="module-card" style="padding: 14px;">
+                        <a href="https://www.hevy.com" target="_blank" rel="noopener" class="hevy-btn">
+                            <span style="font-size: 18px;">🏋️</span>
+                            Abrir treino no Hevy
+                        </a>
+                    </div>
+
+                    ${cardTexto(
+                        campoTexto("muscSentiu", "Como me senti", "Ex.: Pesado no começo, solto no fim.") +
+                        campoTexto("muscEnergia", "Energia / foco", "Ex.: Foco bom, mas sono ruim.") +
+                        campoTexto("muscDiferente", "Algo diferente hoje?", "Ex.: Troquei supino reto por inclinado.") +
+                        campoTexto("muscObs", "Observações", "Qualquer coisa que não caiba acima.", 3)
+                    )}
+
+                    ${blocoPR()}
+
+                </div>
+            `;
+
+            salvarAuto($("muscSentiu"),    `planejamento_${dataAtual}_treino_musc_sentiu`);
+            salvarAuto($("muscEnergia"),   `planejamento_${dataAtual}_treino_musc_energia`);
+            salvarAuto($("muscDiferente"), `planejamento_${dataAtual}_treino_musc_diferente`);
+            salvarAuto($("muscObs"),       `planejamento_${dataAtual}_treino_musc_obs`);
+
+            setupPR(
+                "musc",
+                ["Peito", "Costas", "Pernas", "Ombros", "Bíceps", "Tríceps", "Core", "Glúteos"],
+                ["Carga", "Reps", "Tempo", "Outro"],
+                "Bateu um PR de carga hoje?",
+                "Ex.: Supino reto"
+            );
+
+            renderListaPRs("musc");
+        }
+
+
+        // ==================================================
+        // CORRIDA
+        // ==================================================
+
+        function renderCorrida() {
+
+            $("conteudoTipo").innerHTML = `
+                <div class="conteudo-tipo">
+
+                    ${cardTexto(
+                        campoTexto("corPercurso", "Percurso", "Ex.: Parque Ibirapuera") +
+                        campoTexto("corDistancia", "Distância (km)", "Ex.: 5 → vira 5km") +
+                        campoTexto("corPace", "Pace médio", "Ex.: 5:30/km") +
+                        `<label class="campo-label" style="margin-top: 14px;">RPE</label>
+                         <div class="chips rpe-chips" id="corRpeChips"></div>` +
+                        `<label class="campo-label" style="margin-top: 14px;">Tipo de treino</label>
+                         <div class="chips" id="corTipoChips"></div>` +
+                        campoTexto("corSentiu", "Como me senti", "Ex.: Pesado nos 2 primeiros km.") +
+                        campoTexto("corDiferente", "Algo diferente hoje?", "Ex.: Testei pace mais lento no início.") +
+                        campoTexto("corObs", "Observações", "Qualquer coisa que não caiba acima.", 3)
+                    )}
+
+                    ${blocoPR()}
+
+                </div>
+            `;
+
+            salvarAuto($("corPercurso"),   `planejamento_${dataAtual}_treino_cor_percurso`);
+            salvarAutoKm($("corDistancia"),`planejamento_${dataAtual}_treino_cor_distancia`);
+            salvarAuto($("corPace"),       `planejamento_${dataAtual}_treino_cor_pace`);
+            salvarAuto($("corSentiu"),     `planejamento_${dataAtual}_treino_cor_sentiu`);
+            salvarAuto($("corDiferente"),  `planejamento_${dataAtual}_treino_cor_diferente`);
+            salvarAuto($("corObs"),        `planejamento_${dataAtual}_treino_cor_obs`);
+
+            setupRpeChips($("corRpeChips"), `planejamento_${dataAtual}_treino_cor_rpe`);
+
+            setupChips(
+                $("corTipoChips"),
+                ["Rodagem", "Intervalado", "Tempo run", "Longão", "Regenerativo", "Progressivo", "Fartlek", "Prova"],
+                `planejamento_${dataAtual}_treino_cor_tipo`,
+                true
+            );
+
+            setupPR(
+                "cor",
+                ["5km", "10km", "21km", "42km", "Pace", "Outro"],
+                ["Tempo", "Distância", "Pace"],
+                "Bateu um PR de corrida hoje?",
+                "Ex.: Corrida de 5km"
+            );
+
+            renderListaPRs("cor");
+        }
+
+
+        // ==================================================
+        // MOBILIDADE
+        // ==================================================
+
+        function renderMobilidade() {
+
+            $("conteudoTipo").innerHTML = `
+                <div class="conteudo-tipo">
+
+                    ${cardTexto(
+                        campoTexto("mobQuando", "Quando", "Ex.: Antes do treino · 07h") +
+                        campoTexto("mobTempo", "Quanto tempo", "Ex.: 15min") +
+                        campoTexto("mobFoco", "Qual o foco", "Ex.: Quadril e posterior")
+                    )}
+
+                </div>
+            `;
+
+            salvarAuto($("mobQuando"), `planejamento_${dataAtual}_treino_mob_quando`);
+            salvarAuto($("mobTempo"),  `planejamento_${dataAtual}_treino_mob_tempo`);
+            salvarAuto($("mobFoco"),   `planejamento_${dataAtual}_treino_mob_foco`);
+        }
+
+
+        // ==================================================
+        // CICLISMO
+        // ==================================================
+
+        function renderCiclismo() {
+
+            $("conteudoTipo").innerHTML = `
+                <div class="conteudo-tipo">
+
+                    ${cardTexto(
+                        campoTexto("cicPercurso", "Percurso", "Ex.: Estrada do Sol") +
+                        campoTexto("cicDistancia", "Distância (km)", "Ex.: 30 → vira 30km") +
+                        campoTexto("cicVelocidade", "Velocidade média", "Ex.: 28km/h") +
+                        `<label class="campo-label" style="margin-top: 14px;">RPE</label>
+                         <div class="chips rpe-chips" id="cicRpeChips"></div>` +
+                        `<label class="campo-label" style="margin-top: 14px;">Tipo</label>
+                         <div class="chips" id="cicTipoChips"></div>` +
+                        campoTexto("cicDiferente", "Algo diferente hoje?", "Ex.: Subi mais forte a Serra.") +
+                        campoTexto("cicObs", "Observações", "Qualquer coisa que não caiba acima.", 3) +
+                        `<div class="campo-opcional-toggle" id="toggleSentiu">+ adicionar "Como me senti"</div>
+                         <div class="campo-opcional" id="campoSentiu">
+                            ${campoTexto("cicSentiu", "Como me senti", "Ex.: Perna pesada no começo.")}
+                         </div>`
+                    )}
+
+                    ${blocoPR()}
+
+                </div>
+            `;
+
+            salvarAuto($("cicPercurso"),   `planejamento_${dataAtual}_treino_cic_percurso`);
+            salvarAutoKm($("cicDistancia"),`planejamento_${dataAtual}_treino_cic_distancia`);
+            salvarAuto($("cicVelocidade"), `planejamento_${dataAtual}_treino_cic_velocidade`);
+            salvarAuto($("cicDiferente"),  `planejamento_${dataAtual}_treino_cic_diferente`);
+            salvarAuto($("cicObs"),        `planejamento_${dataAtual}_treino_cic_obs`);
+
+            setupRpeChips($("cicRpeChips"), `planejamento_${dataAtual}_treino_cic_rpe`);
+
+            setupChips(
+                $("cicTipoChips"),
+                ["Rodagem", "Intervalado", "Subida", "Longão", "Regenerativo"],
+                `planejamento_${dataAtual}_treino_cic_tipo`,
+                true
+            );
+
+            // Campo opcional "Como me senti"
+            const chaveSentiuAberto = "planejamento_treino_cic_sentiu_aberto";
+            const campoSentiu = $("campoSentiu");
+            const toggleSentiu = $("toggleSentiu");
+
+            if (localStorage.getItem(chaveSentiuAberto) === "true") {
+                campoSentiu.classList.add("aberto");
+                toggleSentiu.textContent = "– remover \"Como me senti\"";
+            }
+
+            toggleSentiu.addEventListener("click", () => {
+                const aberto = campoSentiu.classList.toggle("aberto");
+                localStorage.setItem(chaveSentiuAberto, aberto ? "true" : "false");
+                toggleSentiu.textContent = aberto
+                    ? "– remover \"Como me senti\""
+                    : "+ adicionar \"Como me senti\"";
+            });
+
+            salvarAuto($("cicSentiu"), `planejamento_${dataAtual}_treino_cic_sentiu`);
+
+            setupPR(
+                "cic",
+                ["10km", "20km", "40km", "100km", "Velocidade média", "Outro"],
+                ["Tempo", "Distância", "Velocidade"],
+                "Bateu um PR de pedal hoje?",
+                "Ex.: Volta do lago"
+            );
+
+            renderListaPRs("cic");
+        }
+
+
+        // ==================================================
+        // VÔLEI / BASQUETE
+        // ==================================================
+
+        function renderVolei() {
+
+            $("conteudoTipo").innerHTML = `
+                <div class="conteudo-tipo">
+
+                    ${cardTexto(
+                        campoTexto("volQuando", "Quando", "Ex.: 19h") +
+                        campoTexto("volTempo", "Quanto tempo de exercício", "Ex.: 1h30 efetivos") +
+                        campoTexto("volOnde", "Onde / com quem", "Ex.: Quadra do bairro") +
+                        campoTexto("volComoFoi", "Como foi", "Ex.: Jogo corrido, saque bom.", 4)
+                    )}
+
+                </div>
+            `;
+
+            salvarAuto($("volQuando"),  `planejamento_${dataAtual}_treino_vol_quando`);
+            salvarAuto($("volTempo"),   `planejamento_${dataAtual}_treino_vol_tempo`);
+            salvarAuto($("volOnde"),    `planejamento_${dataAtual}_treino_vol_onde`);
+            salvarAuto($("volComoFoi"), `planejamento_${dataAtual}_treino_vol_como_foi`);
+        }
+
+
+        // ==================================================
+        // JIU-JITSU
+        // ==================================================
+
+        function renderJiujitsu() {
+
+            $("conteudoTipo").innerHTML = `
+                <div class="conteudo-tipo">
+
+                    ${cardTexto(
+                        campoTexto("jjQuando", "Quando", "Ex.: Aula das 20h") +
+                        campoTexto("jjTempo", "Quanto tempo", "Ex.: 1h30") +
+                        campoTexto("jjAprendi", "O que aprendi", "Ex.: Passagem de guarda, raspagem nova.", 5) +
+                        campoTexto("jjMovimentos", "Movimentos novos", "Ex.: Armlock da guarda fechada.", 4)
+                    )}
+
+                </div>
+            `;
+
+            salvarAuto($("jjQuando"),     `planejamento_${dataAtual}_treino_jj_quando`);
+            salvarAuto($("jjTempo"),      `planejamento_${dataAtual}_treino_jj_tempo`);
+            salvarAuto($("jjAprendi"),    `planejamento_${dataAtual}_treino_jj_aprendi`);
+            salvarAuto($("jjMovimentos"), `planejamento_${dataAtual}_treino_jj_movimentos`);
+        }
+
+
+        // ==================================================
+        // INDICADORES "JÁ PREENCHEU HOJE"
+        // ==================================================
+
+        function atualizarIndicadores() {
+
+            const tipos = ["musculacao", "corrida", "mobilidade", "ciclismo", "volei", "jiujitsu"];
+
+            tipos.forEach(tipo => {
+
+                const dot = document.querySelector(`[data-dot="${tipo}"]`);
+                if (!dot) return;
+
+                const prefixo = `planejamento_${dataAtual}_treino_`;
+                const algumaChave = Object.keys(localStorage).some(k => {
+                    if (!k.startsWith(prefixo)) return false;
+                    const v = localStorage.getItem(k);
+                    return v !== null && v.trim() !== "" && v !== "false";
+                });
+
+                // Precisa corresponder ao tipo especificamente
+                // Mapeia tipo do botão → prefixo de chave
+                const mapaChaves = {
+                    musculacao: "musc_",
+                    corrida:    "cor_",
+                    mobilidade: "mob_",
+                    ciclismo:   "cic_",
+                    volei:      "vol_",
+                    jiujitsu:   "jj_"
+                };
+
+                const sub = mapaChaves[tipo];
+
+                const preencheu = Object.keys(localStorage).some(k => {
+                    if (!k.startsWith(prefixo)) return false;
+                    if (!k.includes(`_${sub}`)) return false;
+                    const v = localStorage.getItem(k);
+                    return v !== null && v.trim() !== "" && v !== "false";
+                });
+
+                dot.classList.toggle("visivel", preencheu);
+            });
+        }
+
+
+        // ==================================================
+        // RENDER PRINCIPAL
+        // ==================================================
+
+        const RENDERIZADORES = {
+            musculacao: renderMusculacao,
+            corrida:    renderCorrida,
+            mobilidade: renderMobilidade,
+            ciclismo:   renderCiclismo,
+            volei:      renderVolei,
+            jiujitsu:   renderJiujitsu
+        };
+
+        function render() {
+            document.querySelectorAll(".tipo-btn").forEach(btn => {
+                btn.classList.toggle("ativo", btn.dataset.tipo === tipoAtivo);
+            });
+            (RENDERIZADORES[tipoAtivo] || renderMusculacao)();
+            atualizarIndicadores();
+        }
+
+
+        // ==================================================
+        // EVENTOS
+        // ==================================================
+
+        document.querySelectorAll(".tipo-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                tipoAtivo = btn.dataset.tipo;
+                localStorage.setItem(chaveTipoAtivo, tipoAtivo);
+                render();
+            });
+        });
+
+
+        // ==================================================
+        // INICIALIZA
+        // ==================================================
+
+        render();
+    </script>
+
+</body>
+</html>
