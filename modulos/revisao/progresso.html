@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Progresso Específico</title>
+
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .filtro-periodo {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .filtro-periodo button,
+        .abas-area button {
+            padding: 8px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #333338;
+            background: #17171a;
+            color: #aaa;
+            border-radius: 20px;
+            transition: 0.15s;
+        }
+
+        .filtro-periodo button.ativo,
+        .abas-area button.ativo {
+            background: #333;
+            color: #fff;
+            border-color: #55555c;
+        }
+
+        .abas-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .dia-grupo {
+            margin-bottom: 18px;
+        }
+
+        .dia-grupo:last-child {
+            margin-bottom: 0;
+        }
+
+        .dia-cabecalho {
+            color: #888;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .registro-linha {
+            padding: 8px 12px;
+            border-left: 3px solid #333;
+            background: #1c1c20;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #d0d0d0;
+            line-height: 1.5;
+        }
+
+        .registro-rotulo {
+            color: #777;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .vazio-msg {
+            color: #777;
+            font-size: 14px;
+            text-align: center;
+            padding: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="header">
+            <p class="eyebrow">REVISÃO</p>
+            <h1>📈 Progresso Específico</h1>
+            <p class="subtitle">
+                Acompanhe áreas específicas ao longo do tempo.
+            </p>
+        </header>
+
+        <section class="modules">
+
+            <!-- FILTRO DE PERÍODO -->
+
+            <div class="filtro-periodo" id="filtroPeriodo">
+                <button type="button" data-periodo="4s">4 semanas</button>
+                <button type="button" data-periodo="6m">6 meses</button>
+                <button type="button" data-periodo="ano">Este ano</button>
+                <button type="button" data-periodo="tudo" class="ativo">Tudo</button>
+            </div>
+
+
+            <!-- ABAS DE ÁREA -->
+
+            <div class="abas-area" id="abasArea">
+                <button type="button" data-area="trabalho" class="ativo">💼 Trabalho</button>
+                <button type="button" data-area="treino">🏋️ Treino</button>
+                <button type="button" data-area="estudo">📚 Estudo</button>
+                <button type="button" data-area="espiritualidade">🙏 Espiritualidade</button>
+            </div>
+
+
+            <!-- LISTA DE REGISTROS -->
+
+            <div class="module-card" style="align-items: flex-start;">
+                <div style="width: 100%;">
+                    <h2 id="tituloLista" style="margin-bottom: 4px;">Registros do período</h2>
+                    <p id="subtituloLista" style="color: #888; font-size: 13px; margin-bottom: 14px;">
+                        <!-- preenchido via JS -->
+                    </p>
+                    <div id="listaRegistros">
+                        <p class="vazio-msg">Carregando…</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- NOTAS LIVRES -->
+
+            <div class="module-card" style="align-items: flex-start;">
+                <div style="width: 100%;">
+                    <h2 id="tituloNotas">Notas</h2>
+                    <p style="color: #888; font-size: 13px; margin-bottom: 10px;">
+                        Anotações livres sobre essa área. Ficam salvas independentemente do período.
+                    </p>
+                    <textarea id="notasArea" rows="6"
+                        placeholder="Escreva o que quiser sobre essa área."></textarea>
+                </div>
+            </div>
+
+        </section>
+
+        <a href="index.html" class="back-button">
+            ← Voltar para Revisão
+        </a>
+
+    </main>
+
+
+    <script>
+        // ==================================================
+        // CONFIGURAÇÃO
+        // ==================================================
+
+        const PAGINAS = {
+            trabalho: "trabalho",
+            treino: "corpo",
+            estudo: "estudo",
+            espiritualidade: "espiritualidade"
+        };
+
+        const NOMES_AREA = {
+            trabalho: "💼 Trabalho",
+            treino: "🏋️ Treino",
+            estudo: "📚 Estudo",
+            espiritualidade: "🙏 Espiritualidade"
+        };
+
+        // Rótulos por índice de chave
+        const ROTULOS = {
+
+            trabalho: [
+                "Objetivo do trabalho",
+                "Tarefas",
+                "Próxima ação",
+                "Ideias / observações"
+            ],
+
+            corpo: [
+                "Tipo de cardio",
+                "Distância",
+                "Tempo previsto",
+                "Intensidade",
+                "Objetivo do cardio",
+                "Objetivo alimentar",
+                "Refeições",
+                "Atenção alimentar",
+                "Jejum planejado",
+                "Água planejada",
+                "Sono anterior"
+            ],
+
+            estudo: [
+                "Tema",
+                "Objetivo do estudo",
+                "Fonte / material",
+                "Tempo"
+            ],
+
+            espiritualidade: [
+                "Tempo com Deus",
+                "Leitura / Devocional",
+                "Reflexão",
+                "O que aprendi hoje"
+            ]
+        };
+
+
+        // ==================================================
+        // ESTADO
+        // ==================================================
+
+        let periodoAtivo = "tudo";
+        let areaAtiva = "trabalho";
+
+
+        // ==================================================
+        // UTILITÁRIOS
+        // ==================================================
+
+        function formatarISO(dt) {
+            const yy = dt.getFullYear();
+            const mm = String(dt.getMonth() + 1).padStart(2, "0");
+            const dd = String(dt.getDate()).padStart(2, "0");
+            return `${yy}-${mm}-${dd}`;
+        }
+
+        function formatarBRComDia(iso) {
+            const [y, m, d] = iso.split("-").map(Number);
+            const dt = new Date(y, m - 1, d);
+            const nomes = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+            return `${nomes[dt.getDay()]} ${String(d).padStart(2, "0")}/${String(m).padStart(2, "0")}`;
+        }
+
+        function inicioDoPeriodo(periodo) {
+
+            const hoje = new Date();
+
+            if (periodo === "tudo") return null;
+
+            if (periodo === "4s") {
+                const d = new Date(hoje);
+                d.setDate(d.getDate() - 28);
+                return formatarISO(d);
+            }
+
+            if (periodo === "6m") {
+                const d = new Date(hoje);
+                d.setDate(d.getDate() - 180);
+                return formatarISO(d);
+            }
+
+            if (periodo === "ano") {
+                return `${hoje.getFullYear()}-01-01`;
+            }
+
+            return null;
+        }
+
+
+        // ==================================================
+        // COLETA DE DADOS
+        // ==================================================
+
+        function coletarRegistros(pagina, desde) {
+
+            const chaves = Object.keys(localStorage);
+            const prefixoBase = "planejamento_";
+
+            // Agrupa por data
+            const porData = {};
+
+            chaves.forEach(chave => {
+
+                if (!chave.startsWith(prefixoBase)) return;
+
+                const match = chave.match(
+                    /^planejamento_(\d{4}-\d{2}-\d{2})_(.+?)_(\d+)$/
+                );
+
+                if (!match) return;
+
+                const [, data, paginaChave, indice] = match;
+
+                if (paginaChave !== pagina) return;
+
+                if (desde && data < desde) return;
+
+                const valor = localStorage.getItem(chave);
+
+                if (valor === null || valor.trim() === "") return;
+
+                if (!porData[data]) porData[data] = [];
+
+                porData[data].push({
+                    indice: Number(indice),
+                    valor: valor
+                });
+
+            });
+
+            // Ordena
+            const datas = Object.keys(porData).sort().reverse();
+
+            return datas.map(data => ({
+                data,
+                itens: porData[data].sort((a, b) => a.indice - b.indice)
+            }));
+        }
+
+
+        // ==================================================
+        // RENDERIZA
+        // ==================================================
+
+        function renderizar() {
+
+            const pagina = PAGINAS[areaAtiva];
+            const rotulos = ROTULOS[pagina] || [];
+            const desde = inicioDoPeriodo(periodoAtivo);
+
+            const grupos = coletarRegistros(pagina, desde);
+
+            // Atualiza títulos
+            document.getElementById("tituloLista").textContent =
+                `Registros de ${NOMES_AREA[areaAtiva]}`;
+
+            document.getElementById("subtituloLista").textContent =
+                grupos.length === 0
+                    ? "Nenhum registro no período."
+                    : `${grupos.length} dia(s) com registro`;
+
+            document.getElementById("tituloNotas").textContent =
+                `Notas · ${NOMES_AREA[areaAtiva]}`;
+
+
+            // Lista
+            const lista = document.getElementById("listaRegistros");
+
+            if (grupos.length === 0) {
+                lista.innerHTML = `<p class="vazio-msg">Nada registrado neste período.</p>`;
+            } else {
+
+                let html = "";
+
+                grupos.forEach(grupo => {
+
+                    html += `<div class="dia-grupo">`;
+                    html += `<div class="dia-cabecalho">${formatarBRComDia(grupo.data)}</div>`;
+
+                    grupo.itens.forEach(item => {
+
+                        const rotulo =
+                            rotulos[item.indice] ||
+                            `Registro ${item.indice + 1}`;
+
+                        html += `
+                            <div class="registro-linha">
+                                <span class="registro-rotulo">${rotulo}</span>
+                                ${item.valor}
+                            </div>
+                        `;
+                    });
+
+                    html += `</div>`;
+                });
+
+                lista.innerHTML = html;
+            }
+
+
+            // Notas
+            const chaveNotas = `planejamento_progresso_${areaAtiva}_notas`;
+            document.getElementById("notasArea").value =
+                localStorage.getItem(chaveNotas) || "";
+
+        }
+
+
+        // ==================================================
+        // EVENTOS
+        // ==================================================
+
+        // Filtro de período
+        document.querySelectorAll("#filtroPeriodo button").forEach(btn => {
+            btn.addEventListener("click", () => {
+                periodoAtivo = btn.dataset.periodo;
+                document.querySelectorAll("#filtroPeriodo button").forEach(b => {
+                    b.classList.toggle("ativo", b === btn);
+                });
+                renderizar();
+            });
+        });
+
+        // Abas de área
+        document.querySelectorAll("#abasArea button").forEach(btn => {
+            btn.addEventListener("click", () => {
+                areaAtiva = btn.dataset.area;
+                document.querySelectorAll("#abasArea button").forEach(b => {
+                    b.classList.toggle("ativo", b === btn);
+                });
+                renderizar();
+            });
+        });
+
+        // Notas — salva ao digitar
+        document.getElementById("notasArea").addEventListener("input", (e) => {
+            const chave = `planejamento_progresso_${areaAtiva}_notas`;
+            localStorage.setItem(chave, e.target.value);
+        });
+
+
+        // ==================================================
+        // INICIALIZA
+        // ==================================================
+
+        renderizar();
+    </script>
+
+</body>
+</html>
