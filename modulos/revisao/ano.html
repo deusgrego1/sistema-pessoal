@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Revisão do Ano</title>
+
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .panorama-linha {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #252529;
+            font-size: 14px;
+        }
+
+        .panorama-linha:last-child {
+            border-bottom: none;
+        }
+
+        .panorama-label {
+            color: #999;
+        }
+
+        .panorama-valor {
+            color: #f5f5f5;
+            font-weight: 600;
+        }
+
+        .panorama-mes {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 13px;
+            color: #bbb;
+        }
+
+        .panorama-mes .nome-mes {
+            text-transform: capitalize;
+            color: #ccc;
+        }
+
+        .panorama-mes .num-mes {
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="header">
+            <p class="eyebrow">REVISÃO</p>
+            <h1>📆 Revisão do ano</h1>
+            <p class="subtitle">
+                Visão estratégica, evolução e direção.
+            </p>
+        </header>
+
+        <section class="modules">
+
+            <!-- 1. PANORAMA DO ANO -->
+
+            <div class="module-card">
+                <span class="icon">📊</span>
+                <div style="width:100%;">
+                    <h2>Panorama do ano</h2>
+                    <div id="panorama" style="margin-top:12px;">
+                        <p style="color:#777;">Carregando…</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- 2. CONQUISTAS -->
+
+            <div class="module-card">
+                <span class="icon">🏆</span>
+                <div>
+                    <h2>Principais conquistas</h2>
+                    <textarea id="conquistas" rows="5"
+                        placeholder="O que realmente marcou o ano?"></textarea>
+                </div>
+            </div>
+
+
+            <!-- 3. EVOLUÇÃO -->
+
+            <div class="module-card">
+                <span class="icon">📈</span>
+                <div>
+                    <h2>Minha evolução</h2>
+                    <textarea id="evolucao" rows="6"
+                        placeholder="Trabalho, estudos, corpo, mente, espiritualidade, relacionamentos, projetos..."></textarea>
+                </div>
+            </div>
+
+
+            <!-- 4. APRENDIZADOS -->
+
+            <div class="module-card">
+                <span class="icon">🧠</span>
+                <div>
+                    <h2>Grandes aprendizados</h2>
+                    <textarea id="aprendizados" rows="5"
+                        placeholder="Os aprendizados que continuam relevantes."></textarea>
+                </div>
+            </div>
+
+
+            <!-- 5. PADRÕES -->
+
+            <div class="module-card">
+                <span class="icon">🔁</span>
+                <div>
+                    <h2>Padrões que percebi</h2>
+                    <textarea id="padroes" rows="5"
+                        placeholder="O que se repetiu ao longo dos meses?"></textarea>
+                </div>
+            </div>
+
+
+            <!-- 6. DIFICULDADES -->
+
+            <div class="module-card">
+                <span class="icon">🚧</span>
+                <div>
+                    <h2>Principais dificuldades</h2>
+                    <textarea id="dificuldades" rows="5"
+                        placeholder="Os obstáculos que tiveram impacto recorrente."></textarea>
+                </div>
+            </div>
+
+
+            <!-- 7. NÃO FUNCIONOU -->
+
+            <div class="module-card">
+                <span class="icon">❌</span>
+                <div>
+                    <h2>O que não funcionou</h2>
+                    <textarea id="naoFuncionou" rows="5"
+                        placeholder="Abordagens testadas que não deram resultado."></textarea>
+                </div>
+            </div>
+
+
+            <!-- 8. O QUE DESCOBRI SOBRE MIM -->
+
+            <div class="module-card">
+                <span class="icon">💡</span>
+                <div>
+                    <h2>O que descobri sobre mim</h2>
+                    <textarea id="descobri" rows="5"
+                        placeholder="Autoconhecimento adquirido pela experiência."></textarea>
+                </div>
+            </div>
+
+
+            <!-- 9. O QUE DEVE MUDAR -->
+
+            <div class="module-card">
+                <span class="icon">🔧</span>
+                <div>
+                    <h2>O que deve mudar</h2>
+                    <textarea id="mudar" rows="5"
+                        placeholder="O que não pode continuar igual?"></textarea>
+                </div>
+            </div>
+
+        </section>
+
+        <a href="index.html" class="back-button">
+            ← Voltar para Revisão
+        </a>
+
+    </main>
+
+
+    <script>
+        // ==================================================
+        // DATA (respeita ?data=, ancora no ano)
+        // ==================================================
+
+        const hoje = new Date();
+        const anoHoje = hoje.getFullYear();
+
+        const paramsURL = new URLSearchParams(window.location.search);
+        const dataParam = paramsURL.get("data");
+
+        let anoAncora = anoHoje;
+
+        if (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam)) {
+            anoAncora = Number(dataParam.split("-")[0]);
+        }
+
+
+        // ==================================================
+        // BARRA DE NAVEGAÇÃO DE ANOS
+        // ==================================================
+
+        (function inserirBarraAnos() {
+
+            const container = document.querySelector("main.container");
+            const header = container.querySelector(".header");
+
+            const baseURL = window.location.pathname;
+            const urlComData = (ano) => `${baseURL}?data=${ano}-01-01`;
+
+            const ehAnoAtual = (anoAncora === anoHoje);
+
+            const barra = document.createElement("div");
+
+            barra.style.cssText = `
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                margin-bottom: 18px;
+                padding: 10px 12px;
+                border: 1px solid #252529;
+                border-radius: 10px;
+                background: #17171a;
+                font-size: 14px;
+            `;
+
+            const linkStyle =
+                "text-decoration:none; color:#e0e0e0; padding:6px 10px; border-radius:6px;";
+
+            barra.innerHTML = `
+                <a href="${urlComData(anoAncora - 1)}" style="${linkStyle}">
+                    ← ${anoAncora - 1}
+                </a>
+
+                <div style="text-align:center;">
+                    <div style="font-weight:600; color:#f5f5f5;">
+                        ${anoAncora}
+                    </div>
+
+                    ${!ehAnoAtual
+                        ? `<a href="${baseURL}" style="font-size:11px; color:#c98a8a; text-decoration:none;">
+                               voltar para este ano
+                           </a>`
+                        : ""}
+                </div>
+
+                <a href="${urlComData(anoAncora + 1)}" style="${linkStyle}">
+                    ${anoAncora + 1} →
+                </a>
+            `;
+
+            container.insertBefore(barra, header);
+
+        })();
+
+
+        // ==================================================
+        // PANORAMA AUTOMÁTICO DO ANO
+        // ==================================================
+
+        (function montarPanorama() {
+
+            const NOMES_MES = [
+                "janeiro", "fevereiro", "março", "abril",
+                "maio", "junho", "julho", "agosto",
+                "setembro", "outubro", "novembro", "dezembro"
+            ];
+
+            const chaves = Object.keys(localStorage);
+
+            let diasPlanejados = 0;
+            let diasRevisados = 0;
+            let prioridadesConcluidas = 0;
+            let totalPrioridades = 0;
+            let sessoesFoco = 0;
+            let tempoFocoTotal = 0;
+            let distracoesTotais = 0;
+
+            // Mapa de contagem por mês (planejados + revisados)
+            const porMes = {};
+            for (let m = 1; m <= 12; m++) {
+                porMes[m] = { planejados: 0, revisados: 0 };
+            }
+
+            // Varre todas as chaves, filtrando pelo ano
+            const prefixoAno = `planejamento_${anoAncora}-`;
+
+            const datasUnicas = new Set();
+
+            chaves.forEach(k => {
+                if (k.startsWith(prefixoAno)) {
+                    const m = k.match(/^planejamento_(\d{4}-\d{2}-\d{2})_/);
+                    if (m) datasUnicas.add(m[1]);
+                }
+            });
+
+            datasUnicas.forEach(data => {
+
+                const mes = Number(data.split("-")[1]);
+
+                const temPlan = chaves.some(k =>
+                    k.startsWith(`planejamento_${data}_`) &&
+                    !k.includes(`_revisao_`)
+                );
+
+                if (temPlan) {
+                    diasPlanejados++;
+                    porMes[mes].planejados++;
+                }
+
+                const temRev = chaves.some(k =>
+                    k.startsWith(`planejamento_${data}_revisao_`)
+                );
+
+                if (temRev) {
+                    diasRevisados++;
+                    porMes[mes].revisados++;
+                }
+
+                [0, 2, 4].forEach(i => {
+
+                    const texto = localStorage.getItem(
+                        `planejamento_${data}_prioridades_${i}`
+                    );
+
+                    const check = localStorage.getItem(
+                        `planejamento_${data}_prioridades_${i + 1}`
+                    );
+
+                    if (texto && texto.trim()) {
+                        totalPrioridades++;
+                        if (check === "true") prioridadesConcluidas++;
+                    }
+
+                });
+
+                const sessStr = localStorage.getItem(
+                    `planejamento_${data}_foco_sessoes`
+                );
+
+                if (sessStr) {
+                    try {
+                        const arr = JSON.parse(sessStr);
+                        sessoesFoco += arr.length;
+                        arr.forEach(s => {
+                            tempoFocoTotal += (s.duracao || 0);
+                        });
+                    } catch (e) {}
+                }
+
+                const distStr = localStorage.getItem(
+                    `planejamento_${data}_foco_distancias`
+                );
+
+                if (distStr) {
+                    try {
+                        const arr = JSON.parse(distStr);
+                        distracoesTotais += arr.length;
+                    } catch (e) {}
+                }
+
+            });
+
+
+            const horas = Math.floor(tempoFocoTotal / 3600);
+            const minutos = Math.floor((tempoFocoTotal % 3600) / 60);
+
+            let tempoTexto = "—";
+            if (tempoFocoTotal > 0) {
+                if (horas > 0) {
+                    tempoTexto = `${horas}h ${minutos}min`;
+                } else {
+                    tempoTexto = `${minutos}min`;
+                }
+            }
+
+
+            const taxa =
+                totalPrioridades > 0
+                    ? Math.round((prioridadesConcluidas / totalPrioridades) * 100)
+                    : 0;
+
+
+            // Bloco de meses
+            let mesesHTML = `<div style="margin-top:16px; margin-bottom:6px; color:#777; font-size:12px; letter-spacing:1px;">
+                ATIVIDADE POR MÊS
+            </div>`;
+
+            for (let m = 1; m <= 12; m++) {
+
+                const dados = porMes[m];
+
+                mesesHTML += `
+                    <div class="panorama-mes">
+                        <span class="nome-mes">${NOMES_MES[m - 1]}</span>
+                        <span class="num-mes">
+                            ${dados.planejados} planejados · ${dados.revisados} revisados
+                        </span>
+                    </div>
+                `;
+
+            }
+
+
+            const el = document.getElementById("panorama");
+
+            el.innerHTML = `
+                <div class="panorama-linha">
+                    <span class="panorama-label">Dias planejados</span>
+                    <span class="panorama-valor">${diasPlanejados}</span>
+                </div>
+
+                <div class="panorama-linha">
+                    <span class="panorama-label">Dias revisados</span>
+                    <span class="panorama-valor">${diasRevisados}</span>
+                </div>
+
+                <div class="panorama-linha">
+                    <span class="panorama-label">Prioridades concluídas</span>
+                    <span class="panorama-valor">${prioridadesConcluidas} / ${totalPrioridades} (${taxa}%)</span>
+                </div>
+
+                <div class="panorama-linha">
+                    <span class="panorama-label">Sessões de foco</span>
+                    <span class="panorama-valor">${sessoesFoco}</span>
+                </div>
+
+                <div class="panorama-linha">
+                    <span class="panorama-label">Tempo total de foco</span>
+                    <span class="panorama-valor">${tempoTexto}</span>
+                </div>
+
+                <div class="panorama-linha">
+                    <span class="panorama-label">Distrações registradas</span>
+                    <span class="panorama-valor">${distracoesTotais}</span>
+                </div>
+
+                ${mesesHTML}
+            `;
+
+        })();
+
+
+        // ==================================================
+        // CAMPOS DE TEXTO
+        // ==================================================
+
+        const campos = [
+            { id: "conquistas",   sufixo: "conquistas" },
+            { id: "evolucao",     sufixo: "evolucao" },
+            { id: "aprendizados", sufixo: "aprendizados" },
+            { id: "padroes",      sufixo: "padroes" },
+            { id: "dificuldades", sufixo: "dificuldades" },
+            { id: "naoFuncionou", sufixo: "nao_funcionou" },
+            { id: "descobri",     sufixo: "descobri" },
+            { id: "mudar",        sufixo: "mudar" }
+        ];
+
+        campos.forEach(({ id, sufixo }) => {
+
+            const campo = document.getElementById(id);
+            const chave = `planejamento_ano_${anoAncora}_${sufixo}`;
+
+            const salvo = localStorage.getItem(chave);
+            if (salvo !== null) campo.value = salvo;
+
+            const salvar = () => {
+                localStorage.setItem(chave, campo.value);
+            };
+
+            campo.addEventListener("input", salvar);
+            campo.addEventListener("change", salvar);
+
+        });
+    </script>
+
+</body>
+</html>
