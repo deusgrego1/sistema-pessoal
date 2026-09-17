@@ -131,43 +131,43 @@ if (
 
         const barra = document.createElement("div");
 
-        barra.style.cssText = `
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            margin-bottom: 18px;
-            padding: 10px 12px;
-            border: 1px solid #eee;
-            border-radius: 10px;
-            background: #fafafa;
-            font-size: 14px;
-        `;
+       barra.style.cssText = `
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 18px;
+    padding: 10px 12px;
+    border: 1px solid #252529;
+    border-radius: 10px;
+    background: #17171a;
+    font-size: 14px;
+`;
 
-        const linkStyle =
-            "text-decoration:none; color:#333; padding:6px 10px; border-radius:6px;";
+const linkStyle =
+    "text-decoration:none; color:#e0e0e0; padding:6px 10px; border-radius:6px;";
 
-        barra.innerHTML = `
-            <a href="${urlComData(anterior)}" style="${linkStyle}">
-                ← ${label(anterior)}
-            </a>
+barra.innerHTML = `
+    <a href="${urlComData(anterior)}" style="${linkStyle}">
+        ← ${label(anterior)}
+    </a>
 
-            <div style="text-align:center;">
-                <div style="font-weight:600;">
-                    ${label(dataAtual)}
-                </div>
+    <div style="text-align:center;">
+        <div style="font-weight:600; color:#f5f5f5;">
+            ${label(dataAtual)}
+        </div>
 
-                ${dataAtual !== dataHoje
-                    ? `<a href="${baseURL}" style="font-size:11px; color:#a66; text-decoration:none;">
-                           voltar para hoje
-                       </a>`
-                    : ""}
-            </div>
+        ${dataAtual !== dataHoje
+            ? `<a href="${baseURL}" style="font-size:11px; color:#c98a8a; text-decoration:none;">
+                   voltar para hoje
+               </a>`
+            : ""}
+    </div>
 
-            <a href="${urlComData(seguinte)}" style="${linkStyle}">
-                ${label(seguinte)} →
-            </a>
-        `;
+    <a href="${urlComData(seguinte)}" style="${linkStyle}">
+        ${label(seguinte)} →
+    </a>
+`;
 
         container.insertBefore(barra, header);
     }
