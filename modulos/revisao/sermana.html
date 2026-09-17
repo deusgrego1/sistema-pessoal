@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Revisão da Semana</title>
+
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .panorama-linha {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #252529;
+            font-size: 14px;
+        }
+
+        .panorama-linha:last-child {
+            border-bottom: none;
+        }
+
+        .panorama-label {
+            color: #999;
+        }
+
+        .panorama-valor {
+            color: #f5f5f5;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="header">
+            <p class="eyebrow">REVISÃO</p>
+            <h1>📅 Revisão da semana</h1>
+            <p class="subtitle">
+                Olhe a semana de cima: resultado, aprendizado e direção.
+            </p>
+        </header>
+
+        <section class="modules">
+
+            <!-- 1. PANORAMA DA SEMANA -->
+
+            <div class="module-card">
+                <span class="icon">📊</span>
+                <div style="width:100%;">
+                    <h2>Resumo da semana</h2>
+                    <div id="panorama" style="margin-top:12px;">
+                        <p style="color:#777;">Carregando…</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- 2. CONQUISTAS -->
+
+            <div class="module-card">
+                <span class="icon">🏆</span>
+                <div>
+                    <h2>Principais conquistas</h2>
+                    <textarea id="conquistas" rows="4"
+                        placeholder="O que realmente merece ser considerado conquista nesta semana?"></textarea>
+                </div>
+            </div>
+
+
+            <!-- 3. APRENDIZADOS -->
+
+            <div class="module-card">
+                <span class="icon">🧠</span>
+                <div>
+                    <h2>Principais aprendizados</h2>
+                    <textarea id="aprendizados" rows="4"
+                        placeholder="O que a semana te ensinou sobre você, o trabalho ou a execução?"></textarea>
+                </div>
+            </div>
+
+
+            <!-- 4. PROBLEMAS -->
+
+            <div class="module-card">
+                <span class="icon">🚧</span>
+                <div>
+                    <h2>Problemas e dificuldades</h2>
+                    <textarea id="problemas" rows="4"
+                        placeholder="O que dificultou a semana?"></textarea>
+                </div>
+            </div>
+
+
+            <!-- 5. FUNCIONOU / NÃO FUNCIONOU -->
+
+            <div class="module-card">
+                <span class="icon">🔄</span>
+                <div>
+                    <h2>O que funcionou / não funcionou</h2>
+                    <textarea id="funcionou" rows="5"
+                        placeholder="Estratégias que ajudaram e estratégias que não deram certo."></textarea>
+                </div>
+            </div>
+
+
+            <!-- 6. PADRÕES -->
+
+            <div class="module-card">
+                <span class="icon">🔁</span>
+                <div>
+                    <h2>Padrões percebidos</h2>
+                    <textarea id="padroes" rows="4"
+                        placeholder="O que se repetiu durante a semana?"></textarea>
+                </div>
+            </div>
+
+
+            <!-- 7. CONTINUAR -->
+
+            <div class="module-card">
+                <span class="icon">➡️</span>
+                <div>
+                    <h2>O que deve continuar na próxima semana?</h2>
+                    <textarea id="continuar" rows="4"
+                        placeholder="O que funcionou e merece continuidade?"></textarea>
+                </div>
+            </div>
+
+
+            <!-- 8. MUDAR -->
+
+            <div class="module-card">
+                <span class="icon">🔧</span>
+                <div>
+                    <h2>O que deve mudar?</h2>
+                    <textarea id="mudar" rows="4"
+                        placeholder="O que interromper, o que ajustar, o que experimentar."></textarea>
+                </div>
+            </div>
+
+        </section>
+
+        <a href="index.html" class="back-button">
+            ← Voltar para Revisão
+        </a>
+
+    </main>
+
+
+    <script>
+        // ==================================================
+        // DATA (respeita ?data=, e ancora na segunda-feira)
+        // ==================================================
+
+        const hoje = new Date();
+
+        const anoHoje = hoje.getFullYear();
+        const mesHoje = String(hoje.getMonth() + 1).padStart(2, "0");
+        const diaHoje = String(hoje.getDate()).padStart(2, "0");
+
+        const dataHoje = `${anoHoje}-${mesHoje}-${diaHoje}`;
+
+        const paramsURL = new URLSearchParams(window.location.search);
+        const dataParam = paramsURL.get("data");
+
+        const dataBase =
+            (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam))
+                ? dataParam
+                : dataHoje;
+
+
+        // ----------------------------------------------
+        // CALCULA A SEGUNDA-FEIRA DA SEMANA
+        // ----------------------------------------------
+
+        function obterSegunda(dataISO) {
+            const [a, m, d] = dataISO.split("-").map(Number);
+            const dt = new Date(a, m - 1, d);
+            const dow = dt.getDay(); // 0=dom, 1=seg, ..., 6=sab
+
+            const diff = (dow === 0) ? -6 : (1 - dow);
+
+            dt.setDate(dt.getDate() + diff);
+
+            const yy = dt.getFullYear();
+            const mm = String(dt.getMonth() + 1).padStart(2, "0");
+            const dd = String(dt.getDate()).padStart(2, "0");
+
+            return `${yy}-${mm}-${dd}`;
+        }
+
+
+        function formatarISO(dt) {
+            const yy = dt.getFullYear();
+            const mm = String(dt.getMonth() + 1).padStart(2, "0");
+            const dd = String(dt.getDate()).padStart(2, "0");
+            return `${yy}-${mm}-${dd}`;
+        }
+
+
+        function formatarBR(iso) {
+            const [y, mo, dy] = iso.split("-");
+            return `${dy}/${mo}`;
+        }
+
+
+        const segunda = obterSegunda(dataBase);
+
+        const [sa, sm, sd] = segunda.split("-").map(Number);
+        const segundaObj = new Date(sa, sm - 1, sd);
+
+        const domingoObj = new Date(segundaObj);
+        domingoObj.setDate(domingoObj.getDate() + 6);
+
+        const domingoISO = formatarISO(domingoObj);
+
+
+        // ==================================================
+        // BARRA DE NAVEGAÇÃO DE SEMANAS
+        // ==================================================
+
+        (function inserirBarraSemanas() {
+
+            const container = document.querySelector("main.container");
+            const header = container.querySelector(".header");
+
+            const semanaAnterior = new Date(segundaObj);
+            semanaAnterior.setDate(semanaAnterior.getDate() - 7);
+
+            const semanaSeguinte = new Date(segundaObj);
+            semanaSeguinte.setDate(semanaSeguinte.getDate() + 7);
+
+            const segAntISO  = formatarISO(semanaAnterior);
+            const segSegISO  = formatarISO(semanaSeguinte);
+
+            const baseURL = window.location.pathname;
+
+            const urlComData = (iso) => `${baseURL}?data=${iso}`;
+
+            // A semana atual (com base em "hoje")?
+            const segundaHoje = obterSegunda(dataHoje);
+            const ehSemanaAtual = (segunda === segundaHoje);
+
+            const barra = document.createElement("div");
+
+            barra.style.cssText = `
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                margin-bottom: 18px;
+                padding: 10px 12px;
+                border: 1px solid #252529;
+                border-radius: 10px;
+                background: #17171a;
+                font-size: 14px;
+            `;
+
+            const linkStyle =
+                "text-decoration:none; color:#e0e0e0; padding:6px 10px; border-radius:6px;";
+
+            barra.innerHTML = `
+                <a href="${urlComData(segAntISO)}" style="${linkStyle}">
+                    ← ${formatarBR(segAntISO)}
+                </a>
+
+                <div style="text-align:center;">
+                    <div style="font-weight:600; color:#f5f5f5;">
+                        ${formatarBR(segunda)} – ${formatarBR(domingoISO)}
+                    </div>
+
+                    ${!ehSemanaAtual
+                        ? `<a href="${baseURL}" style="font-size:11px; color:#c98a8a; text-decoration:none;">
+                               voltar para esta semana
+                           </a>`
+                        : ""}
+                </div>
+
+                <a href="${urlComData(segSegISO)}" style="${linkStyle}">
+                    ${formatarBR(segSegISO)} →
+                </a>
+            `;
+
+            container.insertBefore(barra, header);
+
+        })();
+
+
+        // ==================================================
+        // PANORAMA AUTOMÁTICO
+        // ==================================================
+
+        (function montarPanorama() {
+
+            const dias = [];
+
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(segundaObj);
+                d.setDate(d.getDate() + i);
+                dias.push(formatarISO(d));
+            }
+
+            let diasPlanejados = 0;
+            let diasRevisados = 0;
+            let prioridadesConcluidas = 0;
+            let totalPrioridades = 0;
+            let sessoesFoco = 0;
+            let tempoFocoTotal = 0;
+            let distracoesTotais = 0;
+
+            dias.forEach(data => {
+
+                const chaves = Object.keys(localStorage);
+
+                // Dias planejados (algum dado de planejamento naquele dia)
+                const temPlan = chaves.some(k =>
+                    k.startsWith(`planejamento_${data}_`) &&
+                    !k.includes(`_revisao_`) &&
+                    !k.startsWith(`planejamento_semana_`)
+                );
+                if (temPlan) diasPlanejados++;
+
+                // Dias revisados
+                const temRev = chaves.some(k =>
+                    k.startsWith(`planejamento_${data}_revisao_`)
+                );
+                if (temRev) diasRevisados++;
+
+                // Prioridades (índices 0/1, 2/3, 4/5)
+                [0, 2, 4].forEach(i => {
+
+                    const texto = localStorage.getItem(
+                        `planejamento_${data}_prioridades_${i}`
+                    );
+
+                    const check = localStorage.getItem(
+                        `planejamento_${data}_prioridades_${i + 1}`
+                    );
+
+                    if (texto && texto.trim()) {
+                        totalPrioridades++;
+                        if (check === "true") prioridadesConcluidas++;
+                    }
+
+                });
+
+                // Sessões de foco
+                const sessStr = localStorage.getItem(
+                    `planejamento_${data}_foco_sessoes`
+                );
+
+                if (sessStr) {
+                    try {
+                        const arr = JSON.parse(sessStr);
+                        sessoesFoco += arr.length;
+                        arr.forEach(s => {
+                            tempoFocoTotal += (s.duracao || 0);
+                        });
+                    } catch (e) {}
+                }
+
+                // Distrações
+                const distStr = localStorage.getItem(
+                    `planejamento_${data}_foco_distancias`
+                );
+
+                if (distStr) {
+                    try {
+                        const arr = JSON.parse(distStr);
+                        distracoesTotais += arr.length;
+                    } catch (e) {}
+                }
+
+            });
+
+
+            // Formata tempo
+            const horas = Math.floor(tempoFocoTotal / 3600);
+            const minutos = Math.floor((tempoFocoTotal % 3600) / 60);
+
+            let tempoTexto = "—";
+            if (tempoFocoTotal > 0) {
+                if (horas > 0) {
+                    tempoTexto = `${horas}h ${minutos}min`;
+                } else {
+                    tempoTexto = `${minutos}min`;
+                }
+            }
+
+
+            const taxa =
+                totalPrioridades > 0
+                    ? Math.round((prioridadesConcluidas / totalPrioridades) * 100)
+                    : 0;
+
+
+            const el = document.getElementById("panorama");
+
+            el.innerHTML = `
+                <div class="panorama-linha">
+                    <span class="panorama-label">Dias planejados</span>
+                    <span class="panorama-valor">${diasPlanejados} / 7</span>
+                </div>
+
+                <div class="panorama-linha">
+                    <span class="panorama-label">Dias revisados</span>
+                    <span class="panorama-valor">${diasRevisados} / 7</span>
+                </div>
+
+                <div class="panorama-linha">
+                    <span class="panorama-label">Prioridades concluídas</span>
+                    <span class="panorama-valor">${prioridadesConcluidas} / ${totalPrioridades} (${taxa}%)</span>
+                </div>
+
+                <div class="panorama-linha">
+                    <span class="panorama-label">Sessões de foco</span>
+                    <span class="panorama-valor">${sessoesFoco}</span>
+                </div>
+
+                <div class="panorama-linha">
+                    <span class="panorama-label">Tempo total de foco</span>
+                    <span class="panorama-valor">${tempoTexto}</span>
+                </div>
+
+                <div class="panorama-linha">
+                    <span class="panorama-label">Distrações registradas</span>
+                    <span class="panorama-valor">${distracoesTotais}</span>
+                </div>
+            `;
+
+        })();
+
+
+        // ==================================================
+        // CAMPOS DE TEXTO
+        // ==================================================
+
+        const campos = [
+            { id: "conquistas",  sufixo: "conquistas" },
+            { id: "aprendizados", sufixo: "aprendizados" },
+            { id: "problemas",   sufixo: "problemas" },
+            { id: "funcionou",   sufixo: "funcionou" },
+            { id: "padroes",     sufixo: "padroes" },
+            { id: "continuar",   sufixo: "continuar" },
+            { id: "mudar",       sufixo: "mudar" }
+        ];
+
+        campos.forEach(({ id, sufixo }) => {
+
+            const campo = document.getElementById(id);
+            const chave = `planejamento_semana_${segunda}_${sufixo}`;
+
+            const salvo = localStorage.getItem(chave);
+            if (salvo !== null) campo.value = salvo;
+
+            const salvar = () => {
+                localStorage.setItem(chave, campo.value);
+            };
+
+            campo.addEventListener("input", salvar);
+            campo.addEventListener("change", salvar);
+
+        });
+    </script>
+
+</body>
+</html>
