@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sessões de Foco do Ano</title>
+
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .mes-bloco {
+            margin-bottom: 24px;
+        }
+
+        .mes-titulo {
+            color: #aaa;
+            font-size: 14px;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #252529;
+        }
+
+        .sessao-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: #1c1c20;
+            border: 1px solid #252529;
+            border-radius: 10px;
+            margin-bottom: 6px;
+        }
+
+        .sessao-tarefa {
+            flex: 1;
+            color: #e0e0e0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .sessao-meta {
+            color: #888;
+            font-size: 12px;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .vazio {
+            color: #777;
+            font-size: 14px;
+            padding: 14px 0;
+        }
+
+        .distracao-item {
+            padding: 6px 12px;
+            border-left: 3px solid #a33;
+            background: #1c1c20;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #d0d0d0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="header">
+            <p class="eyebrow">REVISÃO</p>
+            <h1>⏱️ Sessões de foco do ano</h1>
+            <p class="subtitle" id="subtitulo">
+                Detalhamento por mês.
+            </p>
+        </header>
+
+        <section class="modules" id="lista"></section>
+
+        <a href="ano.html" class="back-button" id="voltarAno">
+            ← Voltar para Revisão do Ano
+        </a>
+
+    </main>
+
+
+    <script>
+        const hoje = new Date();
+        const anoHoje = hoje.getFullYear();
+
+        const paramsURL = new URLSearchParams(window.location.search);
+        const dataParam = paramsURL.get("data");
+
+        let anoAncora = anoHoje;
+        if (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam)) {
+            anoAncora = Number(dataParam.split("-")[0]);
+        }
+
+        const NOMES_MES = [
+            "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+            "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+        ];
+
+        function formatarTempo(segundos) {
+            if (segundos <= 0) return "—";
+            const h = Math.floor(segundos / 3600);
+            const m = Math.floor((segundos % 3600) / 60);
+            return h > 0 ? `${h}h ${m}min` : `${m}min`;
+        }
+
+        function formatarHora(iso) {
+            try {
+                const dt = new Date(iso);
+                const hh = String(dt.getHours()).padStart(2, "0");
+                const mm = String(dt.getMinutes()).padStart(2, "0");
+                return `${hh}:${mm}`;
+            } catch (e) { return ""; }
+        }
+
+        function formatarBR(iso) {
+            const [y, mo, dy] = iso.split("-");
+            return `${dy}/${mo}`;
+        }
+
+        // Propaga ?data= para o link de voltar
+        const voltar = document.getElementById("voltarAno");
+        if (anoAncora !== anoHoje) {
+            voltar.setAttribute("href", `ano.html?data=${anoAncora}-01-01`);
+        }
+
+        document.getElementById("subtitulo").textContent = `Ano ${anoAncora}`;
+
+
+        // ==================================================
+        // RENDERIZA
+        // ==================================================
+
+        (function renderizar() {
+
+            const el = document.getElementById("lista");
+
+            let totalSessoes = 0;
+            let totalTempo = 0;
+            let totalDist = 0;
+
+            let html = "";
+
+            for (let m = 1; m <= 12; m++) {
+
+                const prefixo = `planejamento_${anoAncora}-${String(m).padStart(2, "0")}-`;
+
+                // Varre chaves deste mês
+                const sessoesDoMes = [];
+                const distracoesDoMes = [];
+
+                Object.keys(localStorage).forEach(k => {
+                    if (!k.startsWith(prefixo)) return;
+
+                    if (k.endsWith("_foco_sessoes")) {
+                        try {
+                            const arr = JSON.parse(localStorage.getItem(k));
+                            const data = k.replace("planejamento_", "").replace("_foco_sessoes", "");
+                            arr.forEach(s => {
+                                sessoesDoMes.push({ data, ...s });
+                                totalSessoes++;
+                                totalTempo += (s.duracao || 0);
+                            });
+                        } catch (e) {}
+                    }
+
+                    if (k.endsWith("_foco_distancias")) {
+                        try {
+                            const arr = JSON.parse(localStorage.getItem(k));
+                            const data = k.replace("planejamento_", "").replace("_foco_distancias", "");
+                            arr.forEach(texto => {
+                                distracoesDoMes.push({ data, texto });
+                                totalDist++;
+                            });
+                        } catch (e) {}
+                    }
+                });
+
+                if (sessoesDoMes.length === 0 && distracoesDoMes.length === 0) continue;
+
+                sessoesDoMes.sort((a, b) => a.data.localeCompare(b.data));
+
+                html += `<div class="mes-bloco">`;
+                html += `<div class="mes-titulo">${NOMES_MES[m - 1]}</div>`;
+
+                sessoesDoMes.forEach(s => {
+                    html += `
+                        <div class="sessao-item">
+                            <span class="sessao-tarefa">
+                                <span style="color:#666; font-size:12px; margin-right: 6px;">${formatarBR(s.data)}</span>
+                                🎯 ${s.tarefa || "(sem tarefa)"}
+                            </span>
+                            <span class="sessao-meta">
+                                ${formatarTempo(s.duracao || 0)}
+                                ${s.hora ? `<br><span style="color:#555;">${formatarHora(s.hora)}</span>` : ""}
+                            </span>
+                        </div>
+                    `;
+                });
+
+                if (distracoesDoMes.length > 0) {
+                    html += `<div style="margin-top: 8px;">`;
+                    distracoesDoMes.forEach(d => {
+                        html += `<div class="distracao-item">🚫 <span style="color:#666; font-size:11px; margin-right: 6px;">${formatarBR(d.data)}</span> ${d.texto}</div>`;
+                    });
+                    html += `</div>`;
+                }
+
+                html += `</div>`;
+            }
+
+            if (html === "") {
+                el.innerHTML = `<p class="vazio" style="text-align:center; padding: 30px 0;">Nenhuma sessão ou distração registrada neste ano.</p>`;
+                return;
+            }
+
+            const resumo = `
+                <div class="module-card" style="justify-content: center;">
+                    <div style="display:flex; justify-content: space-around; text-align:center; width: 100%;">
+                        <div>
+                            <div style="font-size: 22px; font-weight: 600;">${totalSessoes}</div>
+                            <div style="font-size: 11px; color:#888; letter-spacing:1px; text-transform: uppercase; margin-top: 4px;">Sessões</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 22px; font-weight: 600;">${formatarTempo(totalTempo)}</div>
+                            <div style="font-size: 11px; color:#888; letter-spacing:1px; text-transform: uppercase; margin-top: 4px;">Total</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 22px; font-weight: 600;">${totalDist}</div>
+                            <div style="font-size: 11px; color:#888; letter-spacing:1px; text-transform: uppercase; margin-top: 4px;">Distrações</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            el.innerHTML = resumo + html;
+
+        })();
+    </script>
+
+</body>
+</html>
