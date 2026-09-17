@@ -9,220 +9,114 @@
     <link rel="stylesheet" href="../../css/style.css">
 
     <style>
-        .toggle-modo {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 4px;
-        }
-
+        .toggle-modo { display: flex; justify-content: center; gap: 8px; margin-bottom: 4px; }
         .toggle-modo button {
-            padding: 8px 18px;
-            font-size: 13px;
-            cursor: pointer;
-            border: 1px solid #333338;
-            background: #17171a;
-            color: #aaa;
-            border-radius: 20px;
-            transition: 0.15s;
+            padding: 8px 18px; font-size: 13px; cursor: pointer;
+            border: 1px solid #333338; background: #17171a; color: #aaa;
+            border-radius: 20px; transition: 0.15s;
         }
-
-        .toggle-modo button.ativo {
-            background: #333;
-            color: #fff;
-            border-color: #55555c;
-        }
+        .toggle-modo button.ativo { background: #333; color: #fff; border-color: #55555c; }
 
         .secao-titulo {
-            color: #777;
-            font-size: 12px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin: 18px 0 4px;
-            text-align: center;
+            color: #777; font-size: 12px; letter-spacing: 2px;
+            text-transform: uppercase; margin: 18px 0 4px; text-align: center;
         }
 
-        .rating-bloco {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .rating-titulo {
-            color: #999;
-            font-size: 13px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        .rating-opcoes {
-            display: flex;
-            gap: 14px;
-        }
-
+        .rating-bloco { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .rating-titulo { color: #999; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; }
+        .rating-opcoes { display: flex; gap: 14px; }
         .rating-emoji {
-            font-size: 32px;
-            background: transparent;
-            border: 2px solid transparent;
-            border-radius: 12px;
-            padding: 6px 10px;
-            cursor: pointer;
-            transition: 0.15s;
-            filter: grayscale(60%);
-            opacity: 0.5;
+            font-size: 32px; background: transparent; border: 2px solid transparent;
+            border-radius: 12px; padding: 6px 10px; cursor: pointer; transition: 0.15s;
+            filter: grayscale(60%); opacity: 0.5;
         }
-
-        .rating-emoji:hover {
-            opacity: 0.8;
-            transform: scale(1.05);
-        }
-
+        .rating-emoji:hover { opacity: 0.8; transform: scale(1.05); }
         .rating-emoji.selecionado {
-            border-color: #55555c;
-            background: #222225;
-            filter: grayscale(0%);
-            opacity: 1;
-            transform: scale(1.1);
+            border-color: #55555c; background: #222225;
+            filter: grayscale(0%); opacity: 1; transform: scale(1.1);
         }
 
         .panorama-linha {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #252529;
-            font-size: 14px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 0; border-bottom: 1px solid #252529; font-size: 14px;
         }
+        .panorama-linha:last-child { border-bottom: none; }
+        .panorama-label { color: #999; }
+        .panorama-valor { color: #f5f5f5; font-weight: 600; text-align: right; }
 
-        .panorama-linha:last-child {
-            border-bottom: none;
-        }
-
-        .panorama-label {
-            color: #999;
-        }
-
-        .panorama-valor {
-            color: #f5f5f5;
-            font-weight: 600;
-            text-align: right;
-        }
-
-        .delta-sobe {
-            color: #4caf50;
-            font-size: 12px;
-            margin-left: 6px;
-            font-weight: 500;
-        }
-
-        .delta-desce {
-            color: #e57373;
-            font-size: 12px;
-            margin-left: 6px;
-            font-weight: 500;
-        }
-
-        .delta-igual {
-            color: #666;
-            font-size: 12px;
-            margin-left: 6px;
-            font-weight: 500;
-        }
+        .delta-sobe { color: #4caf50; font-size: 12px; margin-left: 6px; font-weight: 500; }
+        .delta-desce { color: #e57373; font-size: 12px; margin-left: 6px; font-weight: 500; }
+        .delta-igual { color: #666; font-size: 12px; margin-left: 6px; font-weight: 500; }
 
         details.bloco-expansivel {
-            background: #17171a;
-            border: 1px solid #252529;
-            border-radius: 16px;
-            padding: 18px;
+            background: #17171a; border: 1px solid #252529; border-radius: 16px; padding: 18px;
         }
-
         details.bloco-expansivel summary {
-            cursor: pointer;
-            list-style: none;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            outline: none;
+            cursor: pointer; list-style: none; display: flex; align-items: center;
+            gap: 15px; outline: none;
         }
-
-        details.bloco-expansivel summary::-webkit-details-marker {
-            display: none;
-        }
-
+        details.bloco-expansivel summary::-webkit-details-marker { display: none; }
         details.bloco-expansivel summary::after {
-            content: "▼";
-            margin-left: auto;
-            color: #777;
-            font-size: 12px;
-            transition: 0.2s;
+            content: "▼"; margin-left: auto; color: #777; font-size: 12px; transition: 0.2s;
         }
+        details.bloco-expansivel[open] summary::after { transform: rotate(180deg); }
+        details.bloco-expansivel summary h2 { font-size: 17px; color: #f5f5f5; }
 
-        details.bloco-expansivel[open] summary::after {
-            transform: rotate(180deg);
-        }
-
-        details.bloco-expansivel summary h2 {
-            font-size: 17px;
-            color: #f5f5f5;
-        }
-
-        .lista-simples {
-            list-style: none;
-            padding: 0;
-            margin-top: 14px;
-        }
-
+        .lista-simples { list-style: none; padding: 0; margin-top: 14px; }
         .lista-simples li {
-            padding: 8px 0;
-            border-bottom: 1px solid #252529;
-            font-size: 14px;
-            color: #d0d0d0;
-            line-height: 1.5;
+            padding: 8px 0; border-bottom: 1px solid #252529;
+            font-size: 14px; color: #d0d0d0; line-height: 1.5;
         }
-
-        .lista-simples li:last-child {
-            border-bottom: none;
-        }
-
+        .lista-simples li:last-child { border-bottom: none; }
         .lista-simples .dia-tag {
-            color: #777;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-block;
-            min-width: 90px;
+            color: #777; font-size: 12px; font-weight: 600;
+            display: inline-block; min-width: 90px;
         }
 
-        body.modo-rapida .modo-completo {
-            display: none;
-        }
+        body.modo-rapida .modo-completo { display: none; }
 
         .link-subpagina {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 18px;
-            background: #17171a;
-            border: 1px solid #252529;
-            border-radius: 16px;
-            color: inherit;
-            text-decoration: none;
-            transition: 0.2s;
+            display: flex; align-items: center; gap: 15px; padding: 18px;
+            background: #17171a; border: 1px solid #252529; border-radius: 16px;
+            color: inherit; text-decoration: none; transition: 0.2s;
         }
+        .link-subpagina:hover { background: #1e1e22; border-color: #3a3a40; }
+        .link-subpagina h2 { font-size: 17px; margin-bottom: 5px; }
+        .link-subpagina p { color: #999; font-size: 13px; }
 
-        .link-subpagina:hover {
-            background: #1e1e22;
-            border-color: #3a3a40;
+        /* Frequência de treino */
+
+        .freq-treino-linha {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 0; border-bottom: 1px solid #252529; font-size: 14px;
         }
+        .freq-treino-linha:last-child { border-bottom: none; }
+        .freq-treino-linha .nome { color: #ccc; }
+        .freq-treino-linha .contagem { color: #f5f5f5; font-weight: 600; }
 
-        .link-subpagina h2 {
-            font-size: 17px;
-            margin-bottom: 5px;
-        }
-
-        .link-subpagina p {
-            color: #999;
+        .pr-semana-item {
+            padding: 10px 12px;
+            background: linear-gradient(135deg, #1a1612 0%, #1c1c20 100%);
+            border-left: 3px solid #d4a94a;
+            border-radius: 6px;
+            margin-bottom: 6px;
             font-size: 13px;
+            color: #e0e0e0;
+        }
+
+        .pr-semana-item .nome {
+            color: #e0b851;
+            font-weight: 600;
+        }
+
+        .pr-semana-item .data-tag {
+            color: #777;
+            font-size: 11px;
+            margin-right: 6px;
+        }
+
+        .vazio-mini {
+            color: #777; font-size: 13px; padding: 8px 0;
         }
     </style>
 </head>
@@ -241,36 +135,24 @@
 
         <section class="modules">
 
-            <!-- TOGGLE -->
-
             <div class="toggle-modo" id="toggleModo">
                 <button type="button" data-modo="rapida">Rápida</button>
                 <button type="button" data-modo="completa">Completa</button>
             </div>
 
 
-            <!-- ================================================== -->
-            <!-- 📊 O QUE ACONTECEU                                   -->
-            <!-- ================================================== -->
-
             <p class="secao-titulo">📊 O que aconteceu</p>
 
-
-            <!-- TOP 1 + RATING -->
 
             <div class="module-card" style="flex-direction: column; gap: 16px;">
                 <div style="width: 100%;">
                     <h2 style="margin-bottom: 8px;">Se eu resumisse a semana em uma frase…</h2>
-                    <input
-                        type="text"
-                        id="top1"
-                        placeholder="Ex.: Semana de consolidar o primeiro cliente."
-                    >
+                    <input type="text" id="top1"
+                        placeholder="Ex.: Semana de consolidar o primeiro cliente.">
                 </div>
 
                 <div class="rating-bloco" style="margin-top: 6px;">
                     <span class="rating-titulo">Como foi a semana?</span>
-
                     <div class="rating-opcoes" id="ratingOpcoes">
                         <button type="button" class="rating-emoji" data-valor="20">😞</button>
                         <button type="button" class="rating-emoji" data-valor="40">😕</button>
@@ -282,8 +164,6 @@
             </div>
 
 
-            <!-- PANORAMA COMPARATIVO -->
-
             <div class="module-card">
                 <div style="width: 100%;">
                     <h2>Resumo comparado</h2>
@@ -294,31 +174,47 @@
             </div>
 
 
-            <!-- RATING AGREGADO -->
-
             <div class="module-card modo-completo">
                 <div style="width: 100%;">
                     <h2>Média emocional</h2>
-                    <div id="mediaRating" style="margin-top: 12px;">
-                        <p style="color: #777;">Carregando…</p>
-                    </div>
+                    <div id="mediaRating" style="margin-top: 12px;"></div>
                 </div>
             </div>
 
-
-            <!-- ÁREAS TRABALHADAS -->
 
             <div class="module-card modo-completo">
                 <div style="width: 100%;">
                     <h2>Áreas trabalhadas</h2>
-                    <div id="areas" style="margin-top: 12px;">
-                        <p style="color: #777;">Carregando…</p>
-                    </div>
+                    <div id="areas" style="margin-top: 12px;"></div>
                 </div>
             </div>
 
 
-            <!-- CONCLUSÕES DOS DIAS -->
+            <!-- TREINO NA SEMANA -->
+
+            <div class="module-card modo-completo" style="align-items: flex-start;">
+                <span class="icon">🏋️</span>
+                <div style="width: 100%;">
+                    <h2>Treino na semana</h2>
+
+                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
+                        Frequência por tipo (marcado na Revisão do Dia).
+                    </p>
+
+                    <div id="freqTreino"><p class="vazio-mini">Carregando…</p></div>
+
+                    <p style="color:#888; font-size:13px; margin: 20px 0 12px;">
+                        PRs batidos nesta semana.
+                    </p>
+
+                    <div id="prsSemana"><p class="vazio-mini">Carregando…</p></div>
+
+                    <label class="campo-label" style="margin-top:20px;">Notas de treino da semana</label>
+                    <textarea id="notasTreinoSemana" rows="4"
+                        placeholder="Ex.: Semana boa de treino, subi cargas em 3 exercícios. Perna ainda travada na corrida."></textarea>
+                </div>
+            </div>
+
 
             <details class="bloco-expansivel modo-completo">
                 <summary>
@@ -329,8 +225,6 @@
             </details>
 
 
-            <!-- ONDE PAREI (compilado) -->
-
             <details class="bloco-expansivel modo-completo">
                 <summary>
                     <span class="icon">📍</span>
@@ -340,8 +234,6 @@
             </details>
 
 
-            <!-- MERECE LEMBRADO (compilado) -->
-
             <details class="bloco-expansivel modo-completo">
                 <summary>
                     <span class="icon">🪞</span>
@@ -350,8 +242,6 @@
                 <ul class="lista-simples" id="mereceLista"></ul>
             </details>
 
-
-            <!-- SESSÕES DE FOCO — LINK PARA SUBPÁGINA -->
 
             <a href="semana-foco.html" class="link-subpagina modo-completo" id="linkFocoSemana">
                 <span class="icon">⏱️</span>
@@ -363,21 +253,15 @@
             </a>
 
 
-            <!-- CONQUISTAS -->
-
             <div class="module-card modo-completo">
                 <span class="icon">🏆</span>
                 <div>
                     <h2>Principais conquistas</h2>
                     <textarea id="conquistas" rows="4"
-                        placeholder="Ex.: terminei o primeiro vídeo do projeto; treinei 3x; fiz o primeiro contato com o cliente X."></textarea>
+                        placeholder="Ex.: terminei o primeiro vídeo; treinei 3x; primeiro contato com o cliente X."></textarea>
                 </div>
             </div>
 
-
-            <!-- ================================================== -->
-            <!-- 🧠 O QUE ISSO SIGNIFICA                              -->
-            <!-- ================================================== -->
 
             <p class="secao-titulo modo-completo">🧠 O que isso significa</p>
 
@@ -387,7 +271,7 @@
                 <div>
                     <h2>Principais aprendizados</h2>
                     <textarea id="aprendizados" rows="4"
-                        placeholder="Ex.: percebi que executo melhor quando tenho UMA próxima ação definida antes de dormir."></textarea>
+                        placeholder="Ex.: executo melhor quando defino UMA próxima ação antes de dormir."></textarea>
                 </div>
             </div>
 
@@ -408,7 +292,7 @@
                 <div>
                     <h2>O que funcionou / não funcionou</h2>
                     <textarea id="funcionou" rows="5"
-                        placeholder="✅ Funcionou: celular longe durante o bloco da manhã. · ❌ Não funcionou: tentar trabalhar sem definir a próxima ação."></textarea>
+                        placeholder="✅ Celular longe durante o bloco da manhã · ❌ Trabalhar sem definir próxima ação."></textarea>
                 </div>
             </div>
 
@@ -418,14 +302,10 @@
                 <div>
                     <h2>Problemas e dificuldades</h2>
                     <textarea id="problemas" rows="4"
-                        placeholder="Ex.: procrastinei na tarefa que exigia gravação; perdi 2 dias com algo não prioritário."></textarea>
+                        placeholder="Ex.: procrastinei na tarefa de gravação; perdi 2 dias com algo não prioritário."></textarea>
                 </div>
             </div>
 
-
-            <!-- ================================================== -->
-            <!-- ➡️ PARA ONDE IR                                       -->
-            <!-- ================================================== -->
 
             <p class="secao-titulo">➡️ Para onde ir</p>
 
@@ -435,7 +315,7 @@
                 <div>
                     <h2>O que deve continuar</h2>
                     <textarea id="continuar" rows="4"
-                        placeholder="Ex.: manter o celular longe no primeiro bloco de trabalho."></textarea>
+                        placeholder="Ex.: manter celular longe no primeiro bloco."></textarea>
                 </div>
             </div>
 
@@ -459,26 +339,18 @@
 
 
     <script>
-        // ==================================================
-        // DATA (respeita ?data=, e ancora na segunda-feira)
-        // ==================================================
-
         const hoje = new Date();
-
         const anoHoje = hoje.getFullYear();
         const mesHoje = String(hoje.getMonth() + 1).padStart(2, "0");
         const diaHoje = String(hoje.getDate()).padStart(2, "0");
-
         const dataHoje = `${anoHoje}-${mesHoje}-${diaHoje}`;
 
         const paramsURL = new URLSearchParams(window.location.search);
         const dataParam = paramsURL.get("data");
-
         const dataBase =
             (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam))
                 ? dataParam
                 : dataHoje;
-
 
         function obterSegunda(dataISO) {
             const [a, m, d] = dataISO.split("-").map(Number);
@@ -488,47 +360,50 @@
             dt.setDate(dt.getDate() + diff);
             return formatarISO(dt);
         }
-
         function formatarISO(dt) {
             const yy = dt.getFullYear();
             const mm = String(dt.getMonth() + 1).padStart(2, "0");
             const dd = String(dt.getDate()).padStart(2, "0");
             return `${yy}-${mm}-${dd}`;
         }
-
-        function formatarBR(iso) {
-            const [y, mo, dy] = iso.split("-");
-            return `${dy}/${mo}`;
-        }
-
+        function formatarBR(iso) { const [y, mo, dy] = iso.split("-"); return `${dy}/${mo}`; }
         function labelDiaSemana(iso) {
             const [a, m, d] = iso.split("-").map(Number);
             const dt = new Date(a, m - 1, d);
-            const nomes = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-            return nomes[dt.getDay()];
+            const n = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+            return n[dt.getDay()];
         }
-
+        function formatarTempo(seg) {
+            if (seg <= 0) return "—";
+            const h = Math.floor(seg / 3600);
+            const m = Math.floor((seg % 3600) / 60);
+            return h > 0 ? `${h}h ${m}min` : `${m}min`;
+        }
+        function diasDaSemana(segundaISO) {
+            const [a, m, d] = segundaISO.split("-").map(Number);
+            const base = new Date(a, m - 1, d);
+            const arr = [];
+            for (let i = 0; i < 7; i++) {
+                const dt = new Date(base);
+                dt.setDate(dt.getDate() + i);
+                arr.push(formatarISO(dt));
+            }
+            return arr;
+        }
 
         const segunda = obterSegunda(dataBase);
         const segundaObj = new Date(...segunda.split("-").map((v, i) => i === 1 ? v - 1 : Number(v)));
-
         const domingoObj = new Date(segundaObj);
         domingoObj.setDate(domingoObj.getDate() + 6);
         const domingoISO = formatarISO(domingoObj);
 
-
-        // Semana anterior
         const segundaAnteriorObj = new Date(segundaObj);
         segundaAnteriorObj.setDate(segundaAnteriorObj.getDate() - 7);
         const segundaAnterior = formatarISO(segundaAnteriorObj);
 
 
-        // ==================================================
-        // BARRA DE NAVEGAÇÃO DE SEMANAS
-        // ==================================================
-
-        (function inserirBarraSemanas() {
-
+        // Barra de navegação
+        (function () {
             const container = document.querySelector("main.container");
             const header = container.querySelector(".header");
 
@@ -538,102 +413,48 @@
 
             const baseURL = window.location.pathname;
             const urlComData = (iso) => `${baseURL}?data=${iso}`;
-
             const segundaHoje = obterSegunda(dataHoje);
             const ehSemanaAtual = (segunda === segundaHoje);
 
             const barra = document.createElement("div");
-
             barra.style.cssText = `
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 8px;
-                margin-bottom: 18px;
-                padding: 10px 12px;
-                border: 1px solid #252529;
-                border-radius: 10px;
-                background: #17171a;
-                font-size: 14px;
+                display:flex; align-items:center; justify-content:space-between; gap:8px;
+                margin-bottom:18px; padding:10px 12px; border:1px solid #252529;
+                border-radius:10px; background:#17171a; font-size:14px;
             `;
-
-            const linkStyle =
-                "text-decoration:none; color:#e0e0e0; padding:6px 10px; border-radius:6px;";
+            const linkStyle = "text-decoration:none; color:#e0e0e0; padding:6px 10px; border-radius:6px;";
 
             barra.innerHTML = `
-                <a href="${urlComData(segundaAnterior)}" style="${linkStyle}">
-                    ← ${formatarBR(segundaAnterior)}
-                </a>
-
+                <a href="${urlComData(segundaAnterior)}" style="${linkStyle}">← ${formatarBR(segundaAnterior)}</a>
                 <div style="text-align:center;">
-                    <div style="font-weight:600; color:#f5f5f5;">
-                        ${formatarBR(segunda)} – ${formatarBR(domingoISO)}
-                    </div>
-
+                    <div style="font-weight:600; color:#f5f5f5;">${formatarBR(segunda)} – ${formatarBR(domingoISO)}</div>
                     ${!ehSemanaAtual
-                        ? `<a href="${baseURL}" style="font-size:11px; color:#c98a8a; text-decoration:none;">
-                               voltar para esta semana
-                           </a>`
+                        ? `<a href="${baseURL}" style="font-size:11px; color:#c98a8a; text-decoration:none;">voltar para esta semana</a>`
                         : ""}
                 </div>
-
-                <a href="${urlComData(segSegISO)}" style="${linkStyle}">
-                    ${formatarBR(segSegISO)} →
-                </a>
+                <a href="${urlComData(segSegISO)}" style="${linkStyle}">${formatarBR(segSegISO)} →</a>
             `;
-
             container.insertBefore(barra, header);
-
         })();
 
 
-        // ==================================================
-        // MODO (Rápida / Completa)
-        // ==================================================
-
+        // Modo Rápida/Completa
         const chaveModo = "planejamento_revisao_modo";
         const botoesModo = document.querySelectorAll("#toggleModo button");
-
         function aplicarModo(modo) {
             document.body.classList.toggle("modo-rapida", modo === "rapida");
-            botoesModo.forEach(btn => {
-                btn.classList.toggle("ativo", btn.dataset.modo === modo);
-            });
+            botoesModo.forEach(btn => btn.classList.toggle("ativo", btn.dataset.modo === modo));
             localStorage.setItem(chaveModo, modo);
         }
-
-        botoesModo.forEach(btn => {
-            btn.addEventListener("click", () => aplicarModo(btn.dataset.modo));
-        });
-
+        botoesModo.forEach(btn => btn.addEventListener("click", () => aplicarModo(btn.dataset.modo)));
         aplicarModo(localStorage.getItem(chaveModo) || "completa");
 
 
-        // ==================================================
-        // HELPERS DE COLETA
-        // ==================================================
-
-        function diasDaSemana(segundaISO) {
-            const [a, m, d] = segundaISO.split("-").map(Number);
-            const base = new Date(a, m - 1, d);
-            const dias = [];
-            for (let i = 0; i < 7; i++) {
-                const dt = new Date(base);
-                dt.setDate(dt.getDate() + i);
-                dias.push(formatarISO(dt));
-            }
-            return dias;
-        }
-
-
+        // Helpers de coleta
         function coletarEstatisticas(dias) {
-            let diasPlanejados = 0;
-            let diasRevisados = 0;
-            let prioridadesConcluidas = 0;
-            let totalPrioridades = 0;
-            let sessoesFoco = 0;
-            let tempoFocoTotal = 0;
-            let distracoesTotais = 0;
+            let diasPlanejados = 0, diasRevisados = 0;
+            let prioridadesConcluidas = 0, totalPrioridades = 0;
+            let sessoesFoco = 0, tempoFocoTotal = 0, distracoesTotais = 0;
 
             const porModulo = {
                 visao: 0, prioridades: 0, trabalho: 0, estudo: 0,
@@ -641,7 +462,6 @@
             };
 
             dias.forEach(data => {
-
                 const chaves = Object.keys(localStorage);
 
                 const temPlan = chaves.some(k =>
@@ -653,9 +473,7 @@
                 );
                 if (temPlan) diasPlanejados++;
 
-                const temRev = chaves.some(k =>
-                    k.startsWith(`planejamento_${data}_revisao_`)
-                );
+                const temRev = chaves.some(k => k.startsWith(`planejamento_${data}_revisao_`));
                 if (temRev) diasRevisados++;
 
                 [0, 2, 4].forEach(i => {
@@ -684,62 +502,33 @@
                     } catch (e) {}
                 }
 
-                // Áreas trabalhadas
                 Object.keys(porModulo).forEach(mod => {
-                    const temAlgum = chaves.some(k =>
-                        k.startsWith(`planejamento_${data}_${mod}_`)
-                    );
+                    const temAlgum = chaves.some(k => k.startsWith(`planejamento_${data}_${mod}_`));
                     if (temAlgum) porModulo[mod]++;
                 });
-
             });
 
-            return {
-                diasPlanejados, diasRevisados,
-                prioridadesConcluidas, totalPrioridades,
-                sessoesFoco, tempoFocoTotal, distracoesTotais,
-                porModulo
-            };
+            return { diasPlanejados, diasRevisados, prioridadesConcluidas, totalPrioridades,
+                     sessoesFoco, tempoFocoTotal, distracoesTotais, porModulo };
         }
-
-
-        function formatarTempo(segundos) {
-            if (segundos <= 0) return "—";
-            const h = Math.floor(segundos / 3600);
-            const m = Math.floor((segundos % 3600) / 60);
-            return h > 0 ? `${h}h ${m}min` : `${m}min`;
-        }
-
 
         function criarDelta(atual, anterior, inverterBom = false) {
-            if (anterior === 0 && atual === 0) {
-                return '<span class="delta-igual">—</span>';
-            }
-            if (anterior === 0) {
-                return `<span class="delta-sobe">novo</span>`;
-            }
-
+            if (anterior === 0 && atual === 0) return '<span class="delta-igual">—</span>';
+            if (anterior === 0) return `<span class="delta-sobe">novo</span>`;
             const diff = atual - anterior;
             if (diff === 0) return '<span class="delta-igual">=</span>';
-
             const subiu = diff > 0;
             const bom = inverterBom ? !subiu : subiu;
             const classe = bom ? "delta-sobe" : "delta-desce";
             const seta = subiu ? "↑" : "↓";
-
             return `<span class="${classe}">${seta} ${Math.abs(diff)}</span>`;
         }
 
 
-        // ==================================================
-        // PANORAMA COMPARATIVO
-        // ==================================================
-
-        (function montarPanorama() {
-
+        // Panorama
+        (function () {
             const dias = diasDaSemana(segunda);
             const diasAnt = diasDaSemana(segundaAnterior);
-
             const st = coletarEstatisticas(dias);
             const stAnt = coletarEstatisticas(diasAnt);
 
@@ -747,283 +536,224 @@
                 ? Math.round((st.prioridadesConcluidas / st.totalPrioridades) * 100)
                 : 0;
 
-            const el = document.getElementById("panorama");
-
-            el.innerHTML = `
-                <div class="panorama-linha">
-                    <span class="panorama-label">Dias planejados</span>
-                    <span class="panorama-valor">
-                        ${st.diasPlanejados} / 7 ${criarDelta(st.diasPlanejados, stAnt.diasPlanejados)}
-                    </span>
-                </div>
-
-                <div class="panorama-linha">
-                    <span class="panorama-label">Dias revisados</span>
-                    <span class="panorama-valor">
-                        ${st.diasRevisados} / 7 ${criarDelta(st.diasRevisados, stAnt.diasRevisados)}
-                    </span>
-                </div>
-
-                <div class="panorama-linha">
-                    <span class="panorama-label">Prioridades concluídas</span>
-                    <span class="panorama-valor">
-                        ${st.prioridadesConcluidas}/${st.totalPrioridades} (${taxa}%)
-                        ${criarDelta(st.prioridadesConcluidas, stAnt.prioridadesConcluidas)}
-                    </span>
-                </div>
-
-                <div class="panorama-linha">
-                    <span class="panorama-label">Sessões de foco</span>
-                    <span class="panorama-valor">
-                        ${st.sessoesFoco} ${criarDelta(st.sessoesFoco, stAnt.sessoesFoco)}
-                    </span>
-                </div>
-
-                <div class="panorama-linha">
-                    <span class="panorama-label">Tempo total de foco</span>
-                    <span class="panorama-valor">
-                        ${formatarTempo(st.tempoFocoTotal)}
-                        ${criarDelta(st.tempoFocoTotal, stAnt.tempoFocoTotal)}
-                    </span>
-                </div>
-
-                <div class="panorama-linha">
-                    <span class="panorama-label">Distrações</span>
-                    <span class="panorama-valor">
-                        ${st.distracoesTotais}
-                        ${criarDelta(st.distracoesTotais, stAnt.distracoesTotais, true)}
-                    </span>
-                </div>
+            document.getElementById("panorama").innerHTML = `
+                <div class="panorama-linha"><span class="panorama-label">Dias planejados</span>
+                    <span class="panorama-valor">${st.diasPlanejados} / 7 ${criarDelta(st.diasPlanejados, stAnt.diasPlanejados)}</span></div>
+                <div class="panorama-linha"><span class="panorama-label">Dias revisados</span>
+                    <span class="panorama-valor">${st.diasRevisados} / 7 ${criarDelta(st.diasRevisados, stAnt.diasRevisados)}</span></div>
+                <div class="panorama-linha"><span class="panorama-label">Prioridades concluídas</span>
+                    <span class="panorama-valor">${st.prioridadesConcluidas}/${st.totalPrioridades} (${taxa}%) ${criarDelta(st.prioridadesConcluidas, stAnt.prioridadesConcluidas)}</span></div>
+                <div class="panorama-linha"><span class="panorama-label">Sessões de foco</span>
+                    <span class="panorama-valor">${st.sessoesFoco} ${criarDelta(st.sessoesFoco, stAnt.sessoesFoco)}</span></div>
+                <div class="panorama-linha"><span class="panorama-label">Tempo total de foco</span>
+                    <span class="panorama-valor">${formatarTempo(st.tempoFocoTotal)} ${criarDelta(st.tempoFocoTotal, stAnt.tempoFocoTotal)}</span></div>
+                <div class="panorama-linha"><span class="panorama-label">Distrações</span>
+                    <span class="panorama-valor">${st.distracoesTotais} ${criarDelta(st.distracoesTotais, stAnt.distracoesTotais, true)}</span></div>
             `;
-
         })();
 
 
-        // ==================================================
-        // MÉDIA DE RATING
-        // ==================================================
-
-        (function montarMediaRating() {
-
+        // Média de rating
+        (function () {
             const dias = diasDaSemana(segunda);
             const valores = [];
-
             dias.forEach(data => {
                 const v = localStorage.getItem(`planejamento_${data}_revisao_rating`);
                 if (v) valores.push({ data, valor: Number(v) });
             });
 
             const el = document.getElementById("mediaRating");
-
             if (valores.length === 0) {
                 el.innerHTML = `<p style="color:#777;">Sem ratings registrados nesta semana.</p>`;
                 return;
             }
 
             const media = Math.round(valores.reduce((s, o) => s + o.valor, 0) / valores.length);
-
             const melhor = valores.reduce((a, b) => b.valor > a.valor ? b : a);
             const pior = valores.reduce((a, b) => b.valor < a.valor ? b : a);
 
-            const emoji = (v) => {
-                if (v <= 20) return "😞";
-                if (v <= 40) return "😕";
-                if (v <= 60) return "😐";
-                if (v <= 80) return "🙂";
-                return "😄";
-            };
+            const emoji = (v) => v <= 20 ? "😞" : v <= 40 ? "😕" : v <= 60 ? "😐" : v <= 80 ? "🙂" : "😄";
 
             el.innerHTML = `
-                <div class="panorama-linha">
-                    <span class="panorama-label">Média da semana</span>
-                    <span class="panorama-valor">${emoji(media)} ${media}%</span>
-                </div>
-
-                <div class="panorama-linha">
-                    <span class="panorama-label">Melhor dia</span>
-                    <span class="panorama-valor">${labelDiaSemana(melhor.data)} ${formatarBR(melhor.data)} ${emoji(melhor.valor)}</span>
-                </div>
-
-                <div class="panorama-linha">
-                    <span class="panorama-label">Pior dia</span>
-                    <span class="panorama-valor">${labelDiaSemana(pior.data)} ${formatarBR(pior.data)} ${emoji(pior.valor)}</span>
-                </div>
+                <div class="panorama-linha"><span class="panorama-label">Média da semana</span>
+                    <span class="panorama-valor">${emoji(media)} ${media}%</span></div>
+                <div class="panorama-linha"><span class="panorama-label">Melhor dia</span>
+                    <span class="panorama-valor">${labelDiaSemana(melhor.data)} ${formatarBR(melhor.data)} ${emoji(melhor.valor)}</span></div>
+                <div class="panorama-linha"><span class="panorama-label">Pior dia</span>
+                    <span class="panorama-valor">${labelDiaSemana(pior.data)} ${formatarBR(pior.data)} ${emoji(pior.valor)}</span></div>
             `;
-
         })();
 
 
-        // ==================================================
-        // ÁREAS TRABALHADAS
-        // ==================================================
-
-        (function montarAreas() {
-
+        // Áreas trabalhadas
+        (function () {
             const dias = diasDaSemana(segunda);
             const st = coletarEstatisticas(dias);
-
             const nomes = {
-                visao: "☀️ Visão do Dia",
-                prioridades: "🎯 Prioridades",
-                trabalho: "💼 Trabalho",
-                estudo: "📚 Estudo",
-                corpo: "🏋️ Corpo",
-                espiritualidade: "🙏 Espiritualidade",
-                notas: "🧠 Notas"
+                visao: "☀️ Visão do Dia", prioridades: "🎯 Prioridades",
+                trabalho: "💼 Trabalho", estudo: "📚 Estudo",
+                corpo: "🏋️ Corpo", espiritualidade: "🙏 Espiritualidade", notas: "🧠 Notas"
+            };
+            let html = "";
+            Object.keys(st.porModulo).forEach(mod => {
+                const d = st.porModulo[mod];
+                const cor = d === 0 ? "#666" : "#f5f5f5";
+                html += `<div class="panorama-linha">
+                    <span class="panorama-label">${nomes[mod]}</span>
+                    <span class="panorama-valor" style="color:${cor};">${d}/7</span></div>`;
+            });
+            document.getElementById("areas").innerHTML = html;
+        })();
+
+
+        // Treino na semana — frequência + PRs + notas
+        (function () {
+
+            const dias = diasDaSemana(segunda);
+
+            const NOMES = {
+                musculacao: "🏋️ Musculação",
+                corrida:    "🏃 Corrida",
+                mobilidade: "🤸 Mobilidade",
+                ciclismo:   "🚴 Ciclismo",
+                volei:      "🏐 Vôlei / Basquete",
+                jiujitsu:   "🥋 Jiu-jitsu"
             };
 
-            const el = document.getElementById("areas");
+            const freq = {};
+            Object.keys(NOMES).forEach(k => freq[k] = 0);
 
-            let html = "";
+            const prs = [];
 
-            Object.keys(st.porModulo).forEach(mod => {
-                const diasAtivos = st.porModulo[mod];
-                const cor = diasAtivos === 0 ? "#666" : "#f5f5f5";
-                html += `
-                    <div class="panorama-linha">
-                        <span class="panorama-label">${nomes[mod]}</span>
-                        <span class="panorama-valor" style="color:${cor};">${diasAtivos}/7</span>
-                    </div>
-                `;
+            dias.forEach(data => {
+                const tipo = localStorage.getItem(`planejamento_${data}_revisao_treino_tipo`);
+                const feito = localStorage.getItem(`planejamento_${data}_revisao_treino_feito`);
+                if (feito === "true" && tipo && freq[tipo] !== undefined) {
+                    freq[tipo]++;
+                }
+
+                // PRs de treino.html
+                ["musc", "cor", "cic"].forEach(tipoPr => {
+                    const ativo = localStorage.getItem(`planejamento_${data}_treino_${tipoPr}_pr_ativo`);
+                    if (ativo !== "true") return;
+                    const exercicio = localStorage.getItem(`planejamento_${data}_treino_${tipoPr}_pr_exercicio`) || "";
+                    const valor = localStorage.getItem(`planejamento_${data}_treino_${tipoPr}_pr_valor`) || "";
+                    if (!exercicio && !valor) return;
+                    prs.push({ data, tipoPr, exercicio, valor });
+                });
             });
 
-            el.innerHTML = html;
+            const elFreq = document.getElementById("freqTreino");
+            const ativos = Object.keys(freq).filter(k => freq[k] > 0);
+
+            if (ativos.length === 0) {
+                elFreq.innerHTML = `<p class="vazio-mini">Nenhum treino marcado nesta semana.</p>`;
+            } else {
+                elFreq.innerHTML = ativos.map(k =>
+                    `<div class="freq-treino-linha">
+                        <span class="nome">${NOMES[k]}</span>
+                        <span class="contagem">${freq[k]}x</span>
+                    </div>`
+                ).join("");
+            }
+
+            const elPRs = document.getElementById("prsSemana");
+            if (prs.length === 0) {
+                elPRs.innerHTML = `<p class="vazio-mini">Nenhum PR registrado nesta semana.</p>`;
+            } else {
+                prs.sort((a, b) => a.data.localeCompare(b.data));
+                elPRs.innerHTML = prs.map(pr => {
+                    const [y, m, d] = pr.data.split("-");
+                    return `<div class="pr-semana-item">
+                        <span class="data-tag">${labelDiaSemana(pr.data)} ${d}/${m}</span>
+                        <span class="nome">${pr.exercicio || "—"}</span>
+                        ${pr.valor ? ` · ${pr.valor}` : ""}
+                    </div>`;
+                }).join("");
+            }
+
+            // Notas de treino (semanal)
+            const chaveNotasTreino = `planejamento_semana_${segunda}_treino_notas`;
+            const campo = document.getElementById("notasTreinoSemana");
+            const salvo = localStorage.getItem(chaveNotasTreino);
+            if (salvo !== null) campo.value = salvo;
+            campo.addEventListener("input", () => {
+                localStorage.setItem(chaveNotasTreino, campo.value);
+            });
 
         })();
 
 
-        // ==================================================
-        // CONCLUSÕES DOS DIAS
-        // ==================================================
-
-        (function montarConclusoes() {
-
+        // Conclusões dos dias
+        (function () {
             const dias = diasDaSemana(segunda);
             const el = document.getElementById("conclusoesDias");
-
             let achou = false;
-
             dias.forEach(data => {
-                const texto = localStorage.getItem(
-                    `planejamento_${data}_revisao_conclusao`
-                );
-
-                if (texto && texto.trim()) {
+                const t = localStorage.getItem(`planejamento_${data}_revisao_conclusao`);
+                if (t && t.trim()) {
                     achou = true;
                     const li = document.createElement("li");
-                    li.innerHTML = `
-                        <span class="dia-tag">${labelDiaSemana(data)} ${formatarBR(data)}</span>
-                        ${texto}
-                    `;
+                    li.innerHTML = `<span class="dia-tag">${labelDiaSemana(data)} ${formatarBR(data)}</span>${t}`;
                     el.appendChild(li);
                 }
             });
-
-            if (!achou) {
-                el.innerHTML = `<li style="color:#777;">Nenhuma conclusão registrada nesta semana.</li>`;
-            }
-
+            if (!achou) el.innerHTML = `<li style="color:#777;">Nenhuma conclusão registrada nesta semana.</li>`;
         })();
 
 
-        // ==================================================
-        // ONDE PAREI (compilado)
-        // ==================================================
-
-        (function montarOndeParei() {
-
+        // Onde parei
+        (function () {
             const dias = diasDaSemana(segunda);
             const el = document.getElementById("ondePareiLista");
-
             let achou = false;
-
             dias.forEach(data => {
-                const texto = localStorage.getItem(
-                    `planejamento_${data}_revisao_onde_parei`
-                );
-
-                if (texto && texto.trim()) {
+                const t = localStorage.getItem(`planejamento_${data}_revisao_onde_parei`);
+                if (t && t.trim()) {
                     achou = true;
                     const li = document.createElement("li");
-                    li.innerHTML = `
-                        <span class="dia-tag">${labelDiaSemana(data)} ${formatarBR(data)}</span>
-                        ${texto}
-                    `;
+                    li.innerHTML = `<span class="dia-tag">${labelDiaSemana(data)} ${formatarBR(data)}</span>${t}`;
                     el.appendChild(li);
                 }
             });
-
-            if (!achou) {
-                el.innerHTML = `<li style="color:#777;">Nada em aberto nesta semana.</li>`;
-            }
-
+            if (!achou) el.innerHTML = `<li style="color:#777;">Nada em aberto nesta semana.</li>`;
         })();
 
 
-        // ==================================================
-        // MERECE LEMBRADO (compilado)
-        // ==================================================
-
-        (function montarMerece() {
-
+        // Merece lembrado
+        (function () {
             const dias = diasDaSemana(segunda);
             const el = document.getElementById("mereceLista");
-
             let achou = false;
-
             dias.forEach(data => {
-                const texto = localStorage.getItem(
-                    `planejamento_${data}_revisao_merece_lembrado`
-                );
-
-                if (texto && texto.trim()) {
+                const t = localStorage.getItem(`planejamento_${data}_revisao_merece_lembrado`);
+                if (t && t.trim()) {
                     achou = true;
                     const li = document.createElement("li");
-                    li.innerHTML = `
-                        <span class="dia-tag">${labelDiaSemana(data)} ${formatarBR(data)}</span>
-                        ${texto}
-                    `;
+                    li.innerHTML = `<span class="dia-tag">${labelDiaSemana(data)} ${formatarBR(data)}</span>${t}`;
                     el.appendChild(li);
                 }
             });
-
-            if (!achou) {
-                el.innerHTML = `<li style="color:#777;">Nada registrado nesta semana.</li>`;
-            }
-
+            if (!achou) el.innerHTML = `<li style="color:#777;">Nada registrado nesta semana.</li>`;
         })();
 
 
-        // ==================================================
-        // LINK PARA SUBPÁGINA DE FOCO — resumo
-        // ==================================================
-
-        (function resumoFoco() {
-
-            const dias = diasDaSemana(segunda);
-            const st = coletarEstatisticas(dias);
-
+        // Link foco
+        (function () {
+            const st = coletarEstatisticas(diasDaSemana(segunda));
             const el = document.getElementById("linkFocoResumo");
-
             if (st.sessoesFoco === 0) {
                 el.textContent = "Nenhuma sessão registrada nesta semana.";
                 return;
             }
-
             el.textContent = `${st.sessoesFoco} sessões · ${formatarTempo(st.tempoFocoTotal)} de foco`;
-
         })();
 
 
-        // ==================================================
-        // SUGESTÃO DE PADRÃO (com base nos ratings)
-        // ==================================================
-
-        (function sugestaoPadrao() {
-
+        // Sugestão de padrão
+        (function () {
             const dias = diasDaSemana(segunda);
             const porDow = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
-
             dias.forEach(data => {
                 const v = localStorage.getItem(`planejamento_${data}_revisao_rating`);
                 if (!v) return;
@@ -1031,91 +761,55 @@
                 const dt = new Date(a, m - 1, d);
                 porDow[dt.getDay()].push(Number(v));
             });
-
             const nomes = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
             const medias = [];
-
             Object.keys(porDow).forEach(dow => {
                 const arr = porDow[dow];
                 if (arr.length === 0) return;
                 const m = arr.reduce((s, v) => s + v, 0) / arr.length;
                 medias.push({ dia: nomes[dow], media: Math.round(m), n: arr.length });
             });
-
             const el = document.getElementById("sugestaoPadrao");
-
-            if (medias.length < 2) {
-                el.textContent = "";
-                return;
-            }
-
+            if (medias.length < 2) { el.textContent = ""; return; }
             medias.sort((a, b) => b.media - a.media);
-
             const melhor = medias[0];
             const pior = medias[medias.length - 1];
-
-            if (melhor.media - pior.media < 20) {
-                el.textContent = "";
-                return;
-            }
-
+            if (melhor.media - pior.media < 20) { el.textContent = ""; return; }
             el.textContent = `💡 Sugestão: ${melhor.dia} teve média ${melhor.media}% · ${pior.dia} teve ${pior.media}%. Vale olhar o que difere.`;
-
         })();
 
 
-        // ==================================================
-        // CAMPOS DE TEXTO
-        // ==================================================
-
+        // Campos de texto
         const camposSemana = [
-            { id: "top1",        sufixo: "top1" },
-            { id: "conquistas",  sufixo: "conquistas" },
+            { id: "top1", sufixo: "top1" },
+            { id: "conquistas", sufixo: "conquistas" },
             { id: "aprendizados", sufixo: "aprendizados" },
-            { id: "padroes",     sufixo: "padroes" },
-            { id: "funcionou",   sufixo: "funcionou" },
-            { id: "problemas",   sufixo: "problemas" },
-            { id: "continuar",   sufixo: "continuar" },
-            { id: "mudar",       sufixo: "mudar" }
+            { id: "padroes", sufixo: "padroes" },
+            { id: "funcionou", sufixo: "funcionou" },
+            { id: "problemas", sufixo: "problemas" },
+            { id: "continuar", sufixo: "continuar" },
+            { id: "mudar", sufixo: "mudar" }
         ];
-
         camposSemana.forEach(({ id, sufixo }) => {
-
             const campo = document.getElementById(id);
             const chave = `planejamento_semana_${segunda}_${sufixo}`;
-
             const salvo = localStorage.getItem(chave);
             if (salvo !== null) campo.value = salvo;
-
-            const salvar = () => {
-                localStorage.setItem(chave, campo.value);
-            };
-
-            campo.addEventListener("input", salvar);
-            campo.addEventListener("change", salvar);
-
+            campo.addEventListener("input", () => localStorage.setItem(chave, campo.value));
+            campo.addEventListener("change", () => localStorage.setItem(chave, campo.value));
         });
 
 
-        // ==================================================
-        // RATING DA SEMANA
-        // ==================================================
-
+        // Rating da semana
         const chaveRating = `planejamento_semana_${segunda}_rating`;
         const botoesRating = document.querySelectorAll(".rating-emoji");
-
         function marcarRating(valor) {
             botoesRating.forEach(btn => {
-                btn.classList.toggle(
-                    "selecionado",
-                    Number(btn.dataset.valor) === Number(valor)
-                );
+                btn.classList.toggle("selecionado", Number(btn.dataset.valor) === Number(valor));
             });
         }
-
         const ratingSalvo = localStorage.getItem(chaveRating);
         if (ratingSalvo) marcarRating(ratingSalvo);
-
         botoesRating.forEach(btn => {
             btn.addEventListener("click", () => {
                 const valor = btn.dataset.valor;
