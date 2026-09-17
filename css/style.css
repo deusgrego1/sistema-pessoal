@@ -92,11 +92,12 @@ h1 {
     font-size: 25px;
 }
 
-@media (max-width: 480px) {
-    .container {
-        padding: 25px 16px 30px;
-    }
-    input,
+/* =========================================
+   CAMPOS (input, textarea, select)
+   — agora FORA do @media
+   ========================================= */
+
+input,
 textarea,
 select {
     width: 100%;
@@ -130,6 +131,15 @@ textarea {
 select {
     appearance: auto;
 }
+
+/* =========================================
+   RESPONSIVO
+   ========================================= */
+
+@media (max-width: 480px) {
+    .container {
+        padding: 25px 16px 30px;
+    }
 
     h1 {
         font-size: 28px;
