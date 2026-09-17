@@ -9,43 +9,7 @@
     <link rel="stylesheet" href="../../css/style.css">
 
     <style>
-        .prioridade-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 12px;
-            border: 1px solid #252529;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            user-select: none;
-            background: #1c1c20;
-        }
-
-        .prioridade-item input[type="checkbox"] {
-            width: 22px;
-            height: 22px;
-            cursor: pointer;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .prioridade-texto {
-            font-size: 15px;
-            line-height: 1.4;
-            flex: 1;
-            color: #e0e0e0;
-        }
-
-        .prioridade-texto.vazio {
-            color: #666;
-            font-style: italic;
-        }
-
-        .prioridade-item.concluida .prioridade-texto {
-            text-decoration: line-through;
-            color: #777;
-        }
+        /* ===== Rating ===== */
 
         .rating-bloco {
             display: flex;
@@ -90,6 +54,89 @@
             opacity: 1;
             transform: scale(1.1);
         }
+
+        /* ===== Toggle Rápida/Completa ===== */
+
+        .toggle-modo {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .toggle-modo button {
+            padding: 8px 18px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #333338;
+            background: #17171a;
+            color: #aaa;
+            border-radius: 20px;
+            transition: 0.15s;
+        }
+
+        .toggle-modo button.ativo {
+            background: #333;
+            color: #fff;
+            border-color: #55555c;
+        }
+
+        /* ===== Título de seção ===== */
+
+        .secao-titulo {
+            color: #777;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 18px 0 4px;
+            text-align: center;
+        }
+
+        /* ===== Prioridades ===== */
+
+        .prioridade-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid #252529;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            user-select: none;
+            background: #1c1c20;
+        }
+
+        .prioridade-item input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .prioridade-texto {
+            font-size: 15px;
+            line-height: 1.4;
+            flex: 1;
+            color: #e0e0e0;
+        }
+
+        .prioridade-texto.vazio {
+            color: #666;
+            font-style: italic;
+        }
+
+        .prioridade-item.concluida .prioridade-texto {
+            text-decoration: line-through;
+            color: #777;
+        }
+
+        /* ===== Modo Rápida ===== */
+
+        body.modo-rapida .modo-completo {
+            display: none;
+        }
     </style>
 </head>
 
@@ -100,14 +147,22 @@
         <header class="header">
             <p class="eyebrow">REVISÃO</p>
             <h1>☀️ Revisão do dia</h1>
-            <p class="subtitle" id="subtituloRevisao">
+            <p class="subtitle">
                 O que foi feito, o que funcionou e o que mudar.
             </p>
         </header>
 
         <section class="modules">
 
-            <!-- RATING DO DIA -->
+            <!-- TOGGLE -->
+
+            <div class="toggle-modo" id="toggleModo">
+                <button type="button" data-modo="rapida">Rápida</button>
+                <button type="button" data-modo="completa">Completa</button>
+            </div>
+
+
+            <!-- RATING -->
 
             <div class="module-card" style="justify-content: center;">
                 <div class="rating-bloco">
@@ -124,65 +179,96 @@
             </div>
 
 
-            <!-- 1. O QUE FOI FEITO -->
+            <!-- ================================================== -->
+            <!-- 📋 O QUE ACONTECEU                                    -->
+            <!-- ================================================== -->
+
+            <p class="secao-titulo">📋 O que aconteceu</p>
+
 
             <div class="module-card">
-                <span class="icon">📋</span>
+                <span class="icon">✅</span>
                 <div>
-                    <h2>O que foi feito?</h2>
+                    <h2>Prioridades do dia</h2>
 
                     <p style="color:#888; font-size:13px; margin-bottom:12px;">
-                        Marque o que foi concluído. Isso atualiza as Prioridades do dia.
+                        Marcar aqui atualiza a página Prioridades.
                     </p>
 
                     <div id="listaPrioridades"></div>
+                </div>
+            </div>
 
-                    <p style="color:#888; font-size:13px; margin:16px 0 8px;">
-                        Outras coisas realizadas:
-                    </p>
+
+            <div class="module-card modo-completo">
+                <span class="icon">➕</span>
+                <div>
+                    <h2>Outras coisas realizadas</h2>
 
                     <textarea
                         id="outrasRealizadas"
-                        placeholder="Algo importante que não estava nas prioridades."
+                        placeholder="Ex.: respondi o cliente do vídeo, adiantei o corte do projeto 3, organizei os arquivos do Hevy."
                         rows="3"
                     ></textarea>
                 </div>
             </div>
 
 
-            <!-- 2. FUNCIONOU / ATRAPALHOU -->
-
-            <div class="module-card">
-                <span class="icon">🧠</span>
+            <div class="module-card modo-completo">
+                <span class="icon">📍</span>
                 <div>
-                    <h2>O que funcionou e o que atrapalhou?</h2>
+                    <h2>Onde parei / o que ficou em aberto</h2>
+
+                    <textarea
+                        id="ondeParei"
+                        placeholder="Ex.: faltou exportar o vídeo final; próximo passo é revisar o áudio antes de subir."
+                        rows="3"
+                    ></textarea>
+                </div>
+            </div>
+
+
+            <!-- ================================================== -->
+            <!-- 🧠 O QUE ISSO SIGNIFICA                              -->
+            <!-- ================================================== -->
+
+            <p class="secao-titulo modo-completo">🧠 O que isso significa</p>
+
+
+            <div class="module-card modo-completo">
+                <span class="icon">🔎</span>
+                <div>
+                    <h2>O que funcionou e o que atrapalhou</h2>
 
                     <textarea
                         id="funcionouAtrapalhou"
-                        placeholder="O que ajudou na execução e o que dificultou."
+                        placeholder="✅ Celular longe = 50min sem interrupção · ❌ Abri Instagram 'só 5min' e perdi 40min."
                         rows="5"
                     ></textarea>
                 </div>
             </div>
 
 
-            <!-- 3. APRENDI / MUDAR -->
-
-            <div class="module-card">
+            <div class="module-card modo-completo">
                 <span class="icon">💡</span>
                 <div>
-                    <h2>O que aprendi e o que devo mudar?</h2>
+                    <h2>O que aprendi e o que devo mudar</h2>
 
                     <textarea
                         id="aprendiMudar"
-                        placeholder="O que descobri sobre mim ou meu trabalho e o que farei diferente."
+                        placeholder="Aprendi: começo melhor pela tarefa mais difícil · Mudar: bloquear redes antes do 1º bloco amanhã."
                         rows="5"
                     ></textarea>
                 </div>
             </div>
 
 
-            <!-- 4. CONCLUSÃO -->
+            <!-- ================================================== -->
+            <!-- 🎯 SÍNTESE                                            -->
+            <!-- ================================================== -->
+
+            <p class="secao-titulo">🎯 Síntese</p>
+
 
             <div class="module-card">
                 <span class="icon">🎯</span>
@@ -191,7 +277,35 @@
 
                     <textarea
                         id="conclusaoDia"
-                        placeholder="Uma frase ou ideia que resume o dia."
+                        placeholder="Ex.: hoje percebi que a manhã define meu dia inteiro."
+                        rows="3"
+                    ></textarea>
+                </div>
+            </div>
+
+
+            <div class="module-card modo-completo">
+                <span class="icon">🪞</span>
+                <div>
+                    <h2>O que merece ser lembrado</h2>
+
+                    <textarea
+                        id="mereceLembrado"
+                        placeholder="Ex.: o comentário do cliente sobre a edição; a sensação ao terminar o treino."
+                        rows="3"
+                    ></textarea>
+                </div>
+            </div>
+
+
+            <div class="module-card modo-completo">
+                <span class="icon">↩️</span>
+                <div>
+                    <h2>Se pudesse repetir o dia, mudaria...</h2>
+
+                    <textarea
+                        id="sePudesse"
+                        placeholder="Ex.: não teria aberto o celular ao acordar."
                         rows="3"
                     ></textarea>
                 </div>
@@ -311,39 +425,54 @@
 
 
         // ==================================================
-        // CHAVES
+        // MODO (Rápida / Completa)
         // ==================================================
 
-        const chaveOutras     = `planejamento_${dataAtual}_revisao_outras`;
-        const chaveFuncionou  = `planejamento_${dataAtual}_revisao_funcionou`;
-        const chaveAprendi    = `planejamento_${dataAtual}_revisao_aprendi`;
-        const chaveConclusao  = `planejamento_${dataAtual}_revisao_conclusao`;
+        const chaveModo = "planejamento_revisao_modo";
+
+        const botoesModo = document.querySelectorAll("#toggleModo button");
+
+        function aplicarModo(modo) {
+
+            document.body.classList.toggle("modo-rapida", modo === "rapida");
+
+            botoesModo.forEach(btn => {
+                btn.classList.toggle("ativo", btn.dataset.modo === modo);
+            });
+
+            localStorage.setItem(chaveModo, modo);
+
+        }
+
+        botoesModo.forEach(btn => {
+            btn.addEventListener("click", () => aplicarModo(btn.dataset.modo));
+        });
+
+        // Carrega salvo (padrão: completa)
+        aplicarModo(localStorage.getItem(chaveModo) || "completa");
 
 
         // ==================================================
-        // CARREGA CAMPOS DE TEXTO
+        // CAMPOS DE TEXTO
         // ==================================================
 
-        document.getElementById("outrasRealizadas").value =
-            localStorage.getItem(chaveOutras) || "";
+        const campos = [
+            { id: "outrasRealizadas",    sufixo: "revisao_outras" },
+            { id: "ondeParei",           sufixo: "revisao_onde_parei" },
+            { id: "funcionouAtrapalhou", sufixo: "revisao_funcionou" },
+            { id: "aprendiMudar",        sufixo: "revisao_aprendi" },
+            { id: "conclusaoDia",        sufixo: "revisao_conclusao" },
+            { id: "mereceLembrado",      sufixo: "revisao_merece_lembrado" },
+            { id: "sePudesse",           sufixo: "revisao_se_pudesse" }
+        ];
 
-        document.getElementById("funcionouAtrapalhou").value =
-            localStorage.getItem(chaveFuncionou) || "";
-
-        document.getElementById("aprendiMudar").value =
-            localStorage.getItem(chaveAprendi) || "";
-
-        document.getElementById("conclusaoDia").value =
-            localStorage.getItem(chaveConclusao) || "";
-
-
-        // ==================================================
-        // SALVA CAMPOS DE TEXTO
-        // ==================================================
-
-        function ligarSalvar(id, chave) {
+        campos.forEach(({ id, sufixo }) => {
 
             const campo = document.getElementById(id);
+            const chave = `planejamento_${dataAtual}_${sufixo}`;
+
+            const salvo = localStorage.getItem(chave);
+            if (salvo !== null) campo.value = salvo;
 
             const salvar = () => {
                 localStorage.setItem(chave, campo.value);
@@ -352,12 +481,7 @@
             campo.addEventListener("input", salvar);
             campo.addEventListener("change", salvar);
 
-        }
-
-        ligarSalvar("outrasRealizadas", chaveOutras);
-        ligarSalvar("funcionouAtrapalhou", chaveFuncionou);
-        ligarSalvar("aprendiMudar", chaveAprendi);
-        ligarSalvar("conclusaoDia", chaveConclusao);
+        });
 
 
         // ==================================================
@@ -393,9 +517,7 @@
 
                 item.className = "prioridade-item";
 
-                if (concluida) {
-                    item.classList.add("concluida");
-                }
+                if (concluida) item.classList.add("concluida");
 
 
                 const checkbox = document.createElement("input");
@@ -457,20 +579,15 @@
 
         }
 
-        // Carrega salvo
         const ratingSalvo = localStorage.getItem(chaveRating);
-        if (ratingSalvo) {
-            marcarRating(ratingSalvo);
-        }
+        if (ratingSalvo) marcarRating(ratingSalvo);
 
-        // Clique
         botoesRating.forEach(btn => {
 
             btn.addEventListener("click", () => {
 
                 const valor = btn.dataset.valor;
 
-                // Se clicar de novo no mesmo, desmarca
                 if (btn.classList.contains("selecionado")) {
                     localStorage.removeItem(chaveRating);
                     marcarRating(null);
