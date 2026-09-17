@@ -132,6 +132,45 @@
             color: #777;
         }
 
+        /* ===== Mini-panorama ===== */
+
+        .mini-panorama {
+            display: flex;
+            justify-content: space-around;
+            gap: 8px;
+            text-align: center;
+        }
+
+        .mini-panorama .item {
+            flex: 1;
+        }
+
+        .mini-panorama .valor {
+            font-size: 22px;
+            font-weight: 600;
+            color: #f5f5f5;
+        }
+
+        .mini-panorama .rotulo {
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        /* ===== Distrações ===== */
+
+        .distracao-item {
+            padding: 8px 12px;
+            border-left: 3px solid #a33;
+            background: #1c1c20;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #e0e0e0;
+        }
+
         /* ===== Modo Rápida ===== */
 
         body.modo-rapida .modo-completo {
@@ -159,6 +198,15 @@
             <div class="toggle-modo" id="toggleModo">
                 <button type="button" data-modo="rapida">Rápida</button>
                 <button type="button" data-modo="completa">Completa</button>
+            </div>
+
+
+            <!-- MINI-PANORAMA -->
+
+            <div class="module-card">
+                <div class="mini-panorama" id="miniPanorama" style="width:100%;">
+                    <!-- Preenchido via JS -->
+                </div>
             </div>
 
 
@@ -311,6 +359,37 @@
                 </div>
             </div>
 
+
+            <!-- ================================================== -->
+            <!-- 🚫 DISTRAÇÕES DO FOCO (só aparece se houver)         -->
+            <!-- ================================================== -->
+
+            <div class="module-card modo-completo" id="cardDistracoes" style="display:none;">
+                <span class="icon">🚫</span>
+                <div>
+                    <h2>Distrações registradas no Foco</h2>
+
+                    <p style="color:#888; font-size:13px; margin-bottom:12px;">
+                        Do que você anotou hoje durante as sessões.
+                    </p>
+
+                    <div id="listaDistracoes"></div>
+
+                    <a
+                        href="../foco/foco.html"
+                        style="
+                            display: inline-block;
+                            margin-top: 12px;
+                            font-size: 13px;
+                            color: #c98a8a;
+                            text-decoration: none;
+                        "
+                    >
+                        → Ir para o Foco
+                    </a>
+                </div>
+            </div>
+
         </section>
 
         <a href="index.html" class="back-button">
@@ -425,6 +504,137 @@
 
 
         // ==================================================
+        // MINI-PANORAMA
+        // ==================================================
+
+        (function montarMiniPanorama() {
+
+            const chaves = Object.keys(localStorage);
+
+            // Prioridades
+            let concluidas = 0;
+            let total = 0;
+
+            [0, 2, 4].forEach(i => {
+
+                const texto = localStorage.getItem(
+                    `planejamento_${dataAtual}_prioridades_${i}`
+                );
+                const check = localStorage.getItem(
+                    `planejamento_${dataAtual}_prioridades_${i + 1}`
+                );
+
+                if (texto && texto.trim()) {
+                    total++;
+                    if (check === "true") concluidas++;
+                }
+
+            });
+
+
+            // Sessões de foco
+            let sessoes = 0;
+            let tempoTotal = 0;
+
+            const sessStr = localStorage.getItem(
+                `planejamento_${dataAtual}_foco_sessoes`
+            );
+
+            if (sessStr) {
+                try {
+                    const arr = JSON.parse(sessStr);
+                    sessoes = arr.length;
+                    arr.forEach(s => {
+                        tempoTotal += (s.duracao || 0);
+                    });
+                } catch (e) {}
+            }
+
+            const minutosFoco = Math.floor(tempoTotal / 60);
+
+
+            // Distrações
+            let distracoes = 0;
+
+            const distStr = localStorage.getItem(
+                `planejamento_${dataAtual}_foco_distancias`
+            );
+
+            if (distStr) {
+                try {
+                    const arr = JSON.parse(distStr);
+                    distracoes = arr.length;
+                } catch (e) {}
+            }
+
+
+            const el = document.getElementById("miniPanorama");
+
+            el.innerHTML = `
+                <div class="item">
+                    <div class="valor">${concluidas}/${total}</div>
+                    <div class="rotulo">Prioridades</div>
+                </div>
+
+                <div class="item">
+                    <div class="valor">${minutosFoco}min</div>
+                    <div class="rotulo">Foco</div>
+                </div>
+
+                <div class="item">
+                    <div class="valor">${sessoes}</div>
+                    <div class="rotulo">Sessões</div>
+                </div>
+
+                <div class="item">
+                    <div class="valor">${distracoes}</div>
+                    <div class="rotulo">Distrações</div>
+                </div>
+            `;
+
+        })();
+
+
+        // ==================================================
+        // DISTRAÇÕES DO FOCO
+        // ==================================================
+
+        (function mostrarDistracoes() {
+
+            const chaveDist = `planejamento_${dataAtual}_foco_distancias`;
+
+            let distracoes = [];
+
+            try {
+                const salvas = localStorage.getItem(chaveDist);
+                if (salvas) distracoes = JSON.parse(salvas);
+            } catch (e) {
+                distracoes = [];
+            }
+
+            if (!Array.isArray(distracoes) || distracoes.length === 0) {
+                return;
+            }
+
+            const card = document.getElementById("cardDistracoes");
+            const lista = document.getElementById("listaDistracoes");
+
+            card.style.display = "flex";
+
+            distracoes.forEach(texto => {
+
+                const div = document.createElement("div");
+                div.className = "distracao-item";
+                div.textContent = "🚫 " + texto;
+
+                lista.appendChild(div);
+
+            });
+
+        })();
+
+
+        // ==================================================
         // MODO (Rápida / Completa)
         // ==================================================
 
@@ -448,7 +658,6 @@
             btn.addEventListener("click", () => aplicarModo(btn.dataset.modo));
         });
 
-        // Carrega salvo (padrão: completa)
         aplicarModo(localStorage.getItem(chaveModo) || "completa");
 
 
@@ -545,6 +754,9 @@
 
                     item.classList.toggle("concluida", checkbox.checked);
 
+                    // Atualiza o mini-panorama
+                    atualizarMiniPanorama();
+
                 });
 
 
@@ -556,6 +768,40 @@
             });
 
         }
+
+
+        function atualizarMiniPanorama() {
+
+            // Recalcula prioridades
+            let concluidas = 0;
+            let total = 0;
+
+            [0, 2, 4].forEach(i => {
+
+                const texto = localStorage.getItem(
+                    `planejamento_${dataAtual}_prioridades_${i}`
+                );
+                const check = localStorage.getItem(
+                    `planejamento_${dataAtual}_prioridades_${i + 1}`
+                );
+
+                if (texto && texto.trim()) {
+                    total++;
+                    if (check === "true") concluidas++;
+                }
+
+            });
+
+            // Atualiza só o valor das prioridades no painel
+            const itens = document.querySelectorAll("#miniPanorama .item");
+
+            if (itens[0]) {
+                itens[0].querySelector(".valor").textContent =
+                    `${concluidas}/${total}`;
+            }
+
+        }
+
 
         renderizarPrioridades();
 
