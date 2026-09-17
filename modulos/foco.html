@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Foco</title>
+
+    <link rel="stylesheet" href="../../css/style.css">
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="header">
+            <p class="eyebrow">FOCO</p>
+            <h1>🎯 Foco</h1>
+            <p class="subtitle">
+                Escolha uma ação e execute.
+            </p>
+        </header>
+
+
+        <section class="modules">
+
+            <!-- O QUE VOU FAZER -->
+
+            <div class="module-card">
+                <span class="icon">🎯</span>
+                <div>
+                    <h2>O que vou fazer?</h2>
+
+                    <input
+                        type="text"
+                        id="tarefaFoco"
+                        placeholder="Tarefa ou prioridade do dia"
+                    >
+                </div>
+            </div>
+
+
+            <!-- SESSÃO -->
+
+            <div class="module-card">
+                <span class="icon">⏱️</span>
+                <div>
+                    <h2>Sessão de foco</h2>
+
+                    <select id="tempoFoco">
+                        <option value="25">25 minutos</option>
+                        <option value="30">30 minutos</option>
+                        <option value="50" selected>50 minutos</option>
+                        <option value="90">90 minutos</option>
+                    </select>
+
+                    <p
+                        id="displayTimer"
+                        style="
+                            font-size: 52px;
+                            text-align: center;
+                            margin: 22px 0;
+                            font-variant-numeric: tabular-nums;
+                            letter-spacing: 2px;
+                        "
+                    >
+                        50:00
+                    </p>
+
+                    <div style="display: flex; gap: 10px;">
+
+                        <button
+                            type="button"
+                            id="btnIniciar"
+                            style="
+                                flex: 1;
+                                padding: 12px;
+                                font-size: 16px;
+                                cursor: pointer;
+                                border: 1px solid #ccc;
+                                border-radius: 8px;
+                                background: #fff;
+                            "
+                        >
+                            ▶️ Iniciar
+                        </button>
+
+                        <button
+                            type="button"
+                            id="btnReiniciar"
+                            title="Reiniciar"
+                            style="
+                                padding: 12px 16px;
+                                font-size: 16px;
+                                cursor: pointer;
+                                border: 1px solid #ccc;
+                                border-radius: 8px;
+                                background: #fff;
+                            "
+                        >
+                            🔄
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- DISTRAÇÕES -->
+
+            <div class="module-card">
+                <span class="icon">🚫</span>
+                <div>
+                    <h2>Distrações</h2>
+
+                    <p style="color:#888; font-size:14px; margin-bottom:10px;">
+                        Anote o que apareceu na cabeça e continue.
+                    </p>
+
+                    <div style="display: flex; gap: 8px;">
+
+                        <input
+                            type="text"
+                            id="inputDistracao"
+                            placeholder="Ex.: pesquisar câmera para celular"
+                            style="flex: 1;"
+                        >
+
+                        <button
+                            type="button"
+                            id="btnAddDistracao"
+                            style="
+                                padding: 8px 16px;
+                                font-size: 18px;
+                                cursor: pointer;
+                                border: 1px solid #ccc;
+                                border-radius: 8px;
+                                background: #fff;
+                            "
+                        >
+                            +
+                        </button>
+
+                    </div>
+
+                    <ul
+                        id="listaDistracoes"
+                        style="
+                            list-style: none;
+                            padding: 0;
+                            margin-top: 14px;
+                        "
+                    ></ul>
+                </div>
+            </div>
+
+
+            <!-- NOTAS DA SESSÃO -->
+
+            <div class="module-card">
+                <span class="icon">📝</span>
+                <div>
+                    <h2>Notas da sessão</h2>
+
+                    <textarea
+                        id="notasFoco"
+                        placeholder="Anotações enquanto executa."
+                        rows="5"
+                    ></textarea>
+                </div>
+            </div>
+
+
+            <!-- PAUSA -->
+
+            <div class="module-card">
+                <span class="icon">⏸️</span>
+                <div>
+                    <h2>Pausa</h2>
+
+                    <p style="color:#888; font-size:14px; margin-bottom:14px;">
+                        Ideias para descansar sem cair na procrastinação.
+                    </p>
+
+                    <div style="margin-bottom:14px;">
+                        <h3 style="margin-bottom:6px;">☕ Pausa curta (5 min)</h3>
+                        <p style="color:#888; font-size:14px;">
+                            Beber água, respirar fundo, alongar pescoço e ombros.
+                        </p>
+                    </div>
+
+                    <div style="margin-bottom:14px;">
+                        <h3 style="margin-bottom:6px;">🚶 Pausa longa (15–30 min)</h3>
+                        <p style="color:#888; font-size:14px;">
+                            Comer algo leve, caminhar, tomar banho, deitar sem tela.
+                        </p>
+                    </div>
+
+                    <div style="margin-bottom:14px;">
+                        <h3 style="margin-bottom:6px;">🔄 Entre tarefas (2 min)</h3>
+                        <p style="color:#888; font-size:14px;">
+                            Fechar o que estava fazendo, anotar o próximo passo, respirar antes de começar outra coisa.
+                        </p>
+                    </div>
+
+                    <div>
+                        <h3 style="margin-bottom:6px;">🌱 Sem nada para fazer</h3>
+                        <p style="color:#888; font-size:14px; margin-bottom:6px;">
+                            Para não procrastinar quando o dia está vazio:
+                        </p>
+                        <ul style="color:#888; font-size:14px; padding-left:20px;">
+                            <li>Ler algo leve por 10 min</li>
+                            <li>Organizar a mesa ou uma gaveta</li>
+                            <li>Resolver algo da lista “Pesquisar depois”</li>
+                            <li>Fazer uma caminhada curta</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+
+        <a href="../../index.html" class="back-button">
+            ← Voltar para o início
+        </a>
+
+    </main>
+
+
+    <script>
+        // ==================================================
+        // DATA ATUAL
+        // ==================================================
+
+        const hoje = new Date();
+
+        const ano = hoje.getFullYear();
+        const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+        const dia = String(hoje.getDate()).padStart(2, "0");
+
+        const dataAtual = `${ano}-${mes}-${dia}`;
+
+
+        // ==================================================
+        // CHAVES
+        // ==================================================
+
+        const chaveTarefa     = `planejamento_${dataAtual}_foco_tarefa`;
+        const chaveTempo      = `planejamento_${dataAtual}_foco_tempo`;
+        const chaveNotas      = `planejamento_${dataAtual}_foco_notas`;
+        const chaveDistancias = `planejamento_${dataAtual}_foco_distancias`;
+
+
+        // ==================================================
+        // ELEMENTOS
+        // ==================================================
+
+        const tarefaFoco     = document.getElementById("tarefaFoco");
+        const tempoFoco      = document.getElementById("tempoFoco");
+        const displayTimer   = document.getElementById("displayTimer");
+        const btnIniciar     = document.getElementById("btnIniciar");
+        const btnReiniciar   = document.getElementById("btnReiniciar");
+        const inputDistracao = document.getElementById("inputDistracao");
+        const btnAddDistracao = document.getElementById("btnAddDistracao");
+        const listaDistracoes = document.getElementById("listaDistracoes");
+        const notasFoco      = document.getElementById("notasFoco");
+
+
+        // ==================================================
+        // CARREGAR VALORES SALVOS
+        // ==================================================
+
+        tarefaFoco.value = localStorage.getItem(chaveTarefa) || "";
+        notasFoco.value  = localStorage.getItem(chaveNotas)  || "";
+
+        const tempoSalvo = localStorage.getItem(chaveTempo);
+        if (tempoSalvo) {
+            tempoFoco.value = tempoSalvo;
+        }
+
+
+        // ==================================================
+        // TIMER
+        // ==================================================
+
+        let segundosRestantes = Number(tempoFoco.value) * 60;
+        let intervalId = null;
+        let rodando = false;
+
+
+        function formatarTempo(segundos) {
+
+            const m = String(Math.floor(segundos / 60)).padStart(2, "0");
+            const s = String(segundos % 60).padStart(2, "0");
+
+            return `${m}:${s}`;
+        }
+
+
+        function atualizarDisplay() {
+            displayTimer.textContent = formatarTempo(segundosRestantes);
+        }
+
+
+        function iniciarTimer() {
+
+            // Já está rodando → pausa
+            if (rodando) {
+
+                clearInterval(intervalId);
+                rodando = false;
+                btnIniciar.textContent = "▶️ Continuar";
+                return;
+            }
+
+
+            // Se já acabou, reinicia do total
+            if (segundosRestantes <= 0) {
+                segundosRestantes = Number(tempoFoco.value) * 60;
+            }
+
+
+            rodando = true;
+            btnIniciar.textContent = "⏸️ Pausar";
+
+
+            intervalId = setInterval(() => {
+
+                segundosRestantes--;
+
+                if (segundosRestantes < 0) {
+                    segundosRestantes = 0;
+                }
+
+                atualizarDisplay();
+
+
+                if (segundosRestantes === 0) {
+
+                    clearInterval(intervalId);
+                    rodando = false;
+                    btnIniciar.textContent = "▶️ Iniciar";
+
+                    alert("⏱️ Sessão concluída! Faça uma pausa.");
+                }
+
+            }, 1000);
+        }
+
+
+        function resetTimer() {
+
+            clearInterval(intervalId);
+            rodando = false;
+            btnIniciar.textContent = "▶️ Iniciar";
+
+            segundosRestantes = Number(tempoFoco.value) * 60;
+
+            atualizarDisplay();
+        }
+
+
+        btnIniciar.addEventListener("click", iniciarTimer);
+        btnReiniciar.addEventListener("click", resetTimer);
+
+
+        // ==================================================
+        // SALVAMENTO AUTOMÁTICO
+        // ==================================================
+
+        tarefaFoco.addEventListener("input", () => {
+            localStorage.setItem(chaveTarefa, tarefaFoco.value);
+        });
+
+        notasFoco.addEventListener("input", () => {
+            localStorage.setItem(chaveNotas, notasFoco.value);
+        });
+
+        tempoFoco.addEventListener("change", () => {
+
+            localStorage.setItem(chaveTempo, tempoFoco.value);
+
+            if (!rodando) {
+                resetTimer();
+            }
+
+        });
+
+
+        // ==================================================
+        // DISTRAÇÕES
+        // ==================================================
+
+        let distracoes = [];
+
+        try {
+
+            const salvas = localStorage.getItem(chaveDistancias);
+
+            if (salvas) {
+                distracoes = JSON.parse(salvas);
+            }
+
+        } catch (erro) {
+
+            distracoes = [];
+
+        }
+
+
+        function salvarDistracoes() {
+            localStorage.setItem(
+                chaveDistancias,
+                JSON.stringify(distracoes)
+            );
+        }
+
+
+        function renderizarDistracoes() {
+
+            listaDistracoes.innerHTML = "";
+
+
+            distracoes.forEach((texto, indice) => {
+
+                const li = document.createElement("li");
+
+                li.style.display = "flex";
+                li.style.justifyContent = "space-between";
+                li.style.alignItems = "center";
+                li.style.padding = "6px 0";
+                li.style.borderBottom = "1px solid #eee";
+
+
+                const span = document.createElement("span");
+                span.textContent = "🚫 " + texto;
+                span.style.fontSize = "14px";
+
+
+                const btnRemover = document.createElement("button");
+                btnRemover.type = "button";
+                btnRemover.textContent = "×";
+                btnRemover.title = "Remover";
+                btnRemover.style.background = "none";
+                btnRemover.style.border = "none";
+                btnRemover.style.cursor = "pointer";
+                btnRemover.style.fontSize = "20px";
+                btnRemover.style.color = "#999";
+                btnRemover.style.padding = "0 8px";
+
+
+                btnRemover.addEventListener("click", () => {
+
+                    distracoes.splice(indice, 1);
+                    salvarDistracoes();
+                    renderizarDistracoes();
+
+                });
+
+
+                li.appendChild(span);
+                li.appendChild(btnRemover);
+
+                listaDistracoes.appendChild(li);
+
+            });
+
+        }
+
+
+        function adicionarDistracao() {
+
+            const texto = inputDistracao.value.trim();
+
+            if (!texto) return;
+
+            distracoes.push(texto);
+            salvarDistracoes();
+            renderizarDistracoes();
+
+            inputDistracao.value = "";
+            inputDistracao.focus();
+        }
+
+
+        btnAddDistracao.addEventListener("click", adicionarDistracao);
+
+        inputDistracao.addEventListener("keydown", (evento) => {
+
+            if (evento.key === "Enter") {
+
+                evento.preventDefault();
+                adicionarDistracao();
+
+            }
+
+        });
+
+
+        // ==================================================
+        // INICIALIZA
+        // ==================================================
+
+        resetTimer();
+        renderizarDistracoes();
+    </script>
+
+</body>
+</html>
