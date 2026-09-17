@@ -9,8 +9,6 @@
     <link rel="stylesheet" href="../../css/style.css">
 
     <style>
-        /* ===== Rating ===== */
-
         .rating-bloco {
             display: flex;
             flex-direction: column;
@@ -55,8 +53,6 @@
             transform: scale(1.1);
         }
 
-        /* ===== Toggle Rápida/Completa ===== */
-
         .toggle-modo {
             display: flex;
             justify-content: center;
@@ -81,8 +77,6 @@
             border-color: #55555c;
         }
 
-        /* ===== Título de seção ===== */
-
         .secao-titulo {
             color: #777;
             font-size: 12px;
@@ -91,8 +85,6 @@
             margin: 18px 0 4px;
             text-align: center;
         }
-
-        /* ===== Prioridades ===== */
 
         .prioridade-item {
             display: flex;
@@ -132,8 +124,6 @@
             color: #777;
         }
 
-        /* ===== Mini-panorama ===== */
-
         .mini-panorama {
             display: flex;
             justify-content: space-around;
@@ -141,9 +131,7 @@
             text-align: center;
         }
 
-        .mini-panorama .item {
-            flex: 1;
-        }
+        .mini-panorama .item { flex: 1; }
 
         .mini-panorama .valor {
             font-size: 22px;
@@ -159,8 +147,6 @@
             margin-top: 4px;
         }
 
-        /* ===== Distrações ===== */
-
         .distracao-item {
             padding: 8px 12px;
             border-left: 3px solid #a33;
@@ -171,7 +157,54 @@
             color: #e0e0e0;
         }
 
-        /* ===== Modo Rápida ===== */
+        /* Treino do dia */
+
+        .treino-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border: 1px solid #252529;
+            border-radius: 10px;
+            cursor: pointer;
+            user-select: none;
+            background: #1c1c20;
+            transition: 0.15s;
+        }
+
+        .treino-toggle:hover {
+            background: #202027;
+        }
+
+        .treino-toggle input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .treino-toggle span {
+            color: #e0e0e0;
+            font-size: 15px;
+        }
+
+        #treinoCampos {
+            animation: fadeInTreino 0.25s ease;
+        }
+
+        @keyframes fadeInTreino {
+            from { opacity: 0; transform: translateY(-4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .campo-label {
+            display: block;
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
 
         body.modo-rapida .modo-completo {
             display: none;
@@ -193,24 +226,16 @@
 
         <section class="modules">
 
-            <!-- TOGGLE -->
-
             <div class="toggle-modo" id="toggleModo">
                 <button type="button" data-modo="rapida">Rápida</button>
                 <button type="button" data-modo="completa">Completa</button>
             </div>
 
 
-            <!-- MINI-PANORAMA -->
-
             <div class="module-card">
-                <div class="mini-panorama" id="miniPanorama" style="width:100%;">
-                    <!-- Preenchido via JS -->
-                </div>
+                <div class="mini-panorama" id="miniPanorama" style="width:100%;"></div>
             </div>
 
-
-            <!-- RATING -->
 
             <div class="module-card" style="justify-content: center;">
                 <div class="rating-bloco">
@@ -227,10 +252,6 @@
             </div>
 
 
-            <!-- ================================================== -->
-            <!-- 📋 O QUE ACONTECEU                                    -->
-            <!-- ================================================== -->
-
             <p class="secao-titulo">📋 O que aconteceu</p>
 
 
@@ -238,11 +259,9 @@
                 <span class="icon">✅</span>
                 <div>
                     <h2>Prioridades do dia</h2>
-
                     <p style="color:#888; font-size:13px; margin-bottom:12px;">
                         Marcar aqui atualiza a página Prioridades.
                     </p>
-
                     <div id="listaPrioridades"></div>
                 </div>
             </div>
@@ -252,12 +271,46 @@
                 <span class="icon">➕</span>
                 <div>
                     <h2>Outras coisas realizadas</h2>
-
                     <textarea
                         id="outrasRealizadas"
-                        placeholder="Ex.: respondi o cliente do vídeo, adiantei o corte do projeto 3, organizei os arquivos do Hevy."
+                        placeholder="Ex.: respondi o cliente do vídeo, adiantei o corte do projeto 3."
                         rows="3"
                     ></textarea>
+                </div>
+            </div>
+
+
+            <!-- TREINO DO DIA -->
+
+            <div class="module-card modo-completo" style="align-items: flex-start;">
+                <span class="icon">🏋️</span>
+                <div style="width: 100%;">
+                    <h2>Treino</h2>
+                    <p style="color:#888; font-size:13px; margin-bottom:14px;">
+                        Marcador rápido. Para detalhes, use a página Treino.
+                    </p>
+
+                    <label class="treino-toggle">
+                        <input type="checkbox" id="treineiHoje">
+                        <span>Treinei hoje</span>
+                    </label>
+
+                    <div id="treinoCampos" style="display:none;">
+                        <label class="campo-label" style="margin-top:16px;">Tipo de treino</label>
+                        <select id="treinoTipo">
+                            <option value="">Selecione…</option>
+                            <option value="musculacao">🏋️ Musculação</option>
+                            <option value="corrida">🏃 Corrida</option>
+                            <option value="mobilidade">🤸 Mobilidade</option>
+                            <option value="ciclismo">🚴 Ciclismo</option>
+                            <option value="volei">🏐 Vôlei / Basquete</option>
+                            <option value="jiujitsu">🥋 Jiu-jitsu</option>
+                        </select>
+
+                        <label class="campo-label" style="margin-top:14px;">Como foi</label>
+                        <textarea id="treinoComo" rows="3"
+                            placeholder="Ex.: Treino bom, subi carga no supino."></textarea>
+                    </div>
                 </div>
             </div>
 
@@ -266,19 +319,14 @@
                 <span class="icon">📍</span>
                 <div>
                     <h2>Onde parei / o que ficou em aberto</h2>
-
                     <textarea
                         id="ondeParei"
-                        placeholder="Ex.: faltou exportar o vídeo final; próximo passo é revisar o áudio antes de subir."
+                        placeholder="Ex.: faltou exportar o vídeo final; próximo passo é revisar o áudio."
                         rows="3"
                     ></textarea>
                 </div>
             </div>
 
-
-            <!-- ================================================== -->
-            <!-- 🧠 O QUE ISSO SIGNIFICA                              -->
-            <!-- ================================================== -->
 
             <p class="secao-titulo modo-completo">🧠 O que isso significa</p>
 
@@ -287,10 +335,9 @@
                 <span class="icon">🔎</span>
                 <div>
                     <h2>O que funcionou e o que atrapalhou</h2>
-
                     <textarea
                         id="funcionouAtrapalhou"
-                        placeholder="✅ Celular longe = 50min sem interrupção · ❌ Abri Instagram 'só 5min' e perdi 40min."
+                        placeholder="✅ Celular longe = 50min sem interrupção · ❌ Instagram 'só 5min' = 40min perdidos."
                         rows="5"
                     ></textarea>
                 </div>
@@ -301,19 +348,14 @@
                 <span class="icon">💡</span>
                 <div>
                     <h2>O que aprendi e o que devo mudar</h2>
-
                     <textarea
                         id="aprendiMudar"
-                        placeholder="Aprendi: começo melhor pela tarefa mais difícil · Mudar: bloquear redes antes do 1º bloco amanhã."
+                        placeholder="Aprendi: começo melhor pela tarefa mais difícil · Mudar: bloquear redes antes do 1º bloco."
                         rows="5"
                     ></textarea>
                 </div>
             </div>
 
-
-            <!-- ================================================== -->
-            <!-- 🎯 SÍNTESE                                            -->
-            <!-- ================================================== -->
 
             <p class="secao-titulo">🎯 Síntese</p>
 
@@ -322,7 +364,6 @@
                 <span class="icon">🎯</span>
                 <div>
                     <h2>Principal conclusão do dia</h2>
-
                     <textarea
                         id="conclusaoDia"
                         placeholder="Ex.: hoje percebi que a manhã define meu dia inteiro."
@@ -336,10 +377,9 @@
                 <span class="icon">🪞</span>
                 <div>
                     <h2>O que merece ser lembrado</h2>
-
                     <textarea
                         id="mereceLembrado"
-                        placeholder="Ex.: o comentário do cliente sobre a edição; a sensação ao terminar o treino."
+                        placeholder="Ex.: o comentário do cliente sobre a edição."
                         rows="3"
                     ></textarea>
                 </div>
@@ -350,7 +390,6 @@
                 <span class="icon">↩️</span>
                 <div>
                     <h2>Se pudesse repetir o dia, mudaria...</h2>
-
                     <textarea
                         id="sePudesse"
                         placeholder="Ex.: não teria aberto o celular ao acordar."
@@ -360,31 +399,13 @@
             </div>
 
 
-            <!-- ================================================== -->
-            <!-- 🚫 DISTRAÇÕES DO FOCO (só aparece se houver)         -->
-            <!-- ================================================== -->
-
             <div class="module-card modo-completo" id="cardDistracoes" style="display:none;">
                 <span class="icon">🚫</span>
                 <div>
                     <h2>Distrações registradas no Foco</h2>
-
-                    <p style="color:#888; font-size:13px; margin-bottom:12px;">
-                        Do que você anotou hoje durante as sessões.
-                    </p>
-
-                    <div id="listaDistracoes"></div>
-
-                    <a
-                        href="../foco/foco.html"
-                        style="
-                            display: inline-block;
-                            margin-top: 12px;
-                            font-size: 13px;
-                            color: #c98a8a;
-                            text-decoration: none;
-                        "
-                    >
+                    <div id="listaDistracoes" style="margin-top:12px;"></div>
+                    <a href="../foco/foco.html"
+                       style="display:inline-block; margin-top:12px; font-size:13px; color:#c98a8a; text-decoration:none;">
                         → Ir para o Foco
                     </a>
                 </div>
@@ -400,33 +421,22 @@
 
 
     <script>
-        // ==================================================
-        // DATA (respeita ?data=)
-        // ==================================================
-
         const hoje = new Date();
-
         const anoHoje = hoje.getFullYear();
         const mesHoje = String(hoje.getMonth() + 1).padStart(2, "0");
         const diaHoje = String(hoje.getDate()).padStart(2, "0");
-
         const dataHoje = `${anoHoje}-${mesHoje}-${diaHoje}`;
 
         const paramsURL = new URLSearchParams(window.location.search);
         const dataParam = paramsURL.get("data");
-
         const dataAtual =
             (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam))
                 ? dataParam
                 : dataHoje;
 
 
-        // ==================================================
-        // BARRA DE NAVEGAÇÃO DE DATAS
-        // ==================================================
-
-        (function inserirBarraDatas() {
-
+        // Barra de datas
+        (function () {
             const container = document.querySelector("main.container");
             const header = container.querySelector(".header");
 
@@ -440,126 +450,58 @@
                 return `${yy}-${mm}-${dd}`;
             };
 
-            const anterior = new Date(dataObj);
-            anterior.setDate(anterior.getDate() - 1);
+            const anterior = new Date(dataObj); anterior.setDate(anterior.getDate() - 1);
+            const seguinte = new Date(dataObj); seguinte.setDate(seguinte.getDate() + 1);
 
-            const seguinte = new Date(dataObj);
-            seguinte.setDate(seguinte.getDate() + 1);
-
-            const fmtBR = (iso) => {
-                const [y, mo, dy] = iso.split("-");
-                return `${dy}/${mo}/${y}`;
-            };
-
+            const fmtBR = (iso) => { const [y, mo, dy] = iso.split("-"); return `${dy}/${mo}/${y}`; };
             const label = (iso) => iso === dataHoje ? "Hoje" : fmtBR(iso);
-
             const baseURL = window.location.pathname;
-
-            const urlComData = (iso) =>
-                iso === dataHoje ? baseURL : `${baseURL}?data=${iso}`;
+            const urlComData = (iso) => iso === dataHoje ? baseURL : `${baseURL}?data=${iso}`;
 
             const barra = document.createElement("div");
-
             barra.style.cssText = `
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 8px;
-                margin-bottom: 18px;
-                padding: 10px 12px;
-                border: 1px solid #252529;
-                border-radius: 10px;
-                background: #17171a;
-                font-size: 14px;
+                display:flex; align-items:center; justify-content:space-between; gap:8px;
+                margin-bottom:18px; padding:10px 12px; border:1px solid #252529;
+                border-radius:10px; background:#17171a; font-size:14px;
             `;
-
-            const linkStyle =
-                "text-decoration:none; color:#e0e0e0; padding:6px 10px; border-radius:6px;";
+            const linkStyle = "text-decoration:none; color:#e0e0e0; padding:6px 10px; border-radius:6px;";
 
             barra.innerHTML = `
-                <a href="${urlComData(fmtISO(anterior))}" style="${linkStyle}">
-                    ← ${label(fmtISO(anterior))}
-                </a>
-
+                <a href="${urlComData(fmtISO(anterior))}" style="${linkStyle}">← ${label(fmtISO(anterior))}</a>
                 <div style="text-align:center;">
-                    <div style="font-weight:600; color:#f5f5f5;">
-                        ${label(dataAtual)}
-                    </div>
-
+                    <div style="font-weight:600; color:#f5f5f5;">${label(dataAtual)}</div>
                     ${dataAtual !== dataHoje
-                        ? `<a href="${baseURL}" style="font-size:11px; color:#c98a8a; text-decoration:none;">
-                               voltar para hoje
-                           </a>`
+                        ? `<a href="${baseURL}" style="font-size:11px; color:#c98a8a; text-decoration:none;">voltar para hoje</a>`
                         : ""}
                 </div>
-
-                <a href="${urlComData(fmtISO(seguinte))}" style="${linkStyle}">
-                    ${label(fmtISO(seguinte))} →
-                </a>
+                <a href="${urlComData(fmtISO(seguinte))}" style="${linkStyle}">${label(fmtISO(seguinte))} →</a>
             `;
-
             container.insertBefore(barra, header);
-
         })();
 
 
-        // ==================================================
-        // MINI-PANORAMA
-        // ==================================================
-
-        (function montarMiniPanorama() {
-
-            const chaves = Object.keys(localStorage);
-
-            // Prioridades
-            let concluidas = 0;
-            let total = 0;
-
+        // Mini-panorama
+        (function () {
+            let concluidas = 0, total = 0;
             [0, 2, 4].forEach(i => {
-
-                const texto = localStorage.getItem(
-                    `planejamento_${dataAtual}_prioridades_${i}`
-                );
-                const check = localStorage.getItem(
-                    `planejamento_${dataAtual}_prioridades_${i + 1}`
-                );
-
-                if (texto && texto.trim()) {
-                    total++;
-                    if (check === "true") concluidas++;
-                }
-
+                const texto = localStorage.getItem(`planejamento_${dataAtual}_prioridades_${i}`);
+                const check = localStorage.getItem(`planejamento_${dataAtual}_prioridades_${i + 1}`);
+                if (texto && texto.trim()) { total++; if (check === "true") concluidas++; }
             });
 
-
-            // Sessões de foco
-            let sessoes = 0;
-            let tempoTotal = 0;
-
-            const sessStr = localStorage.getItem(
-                `planejamento_${dataAtual}_foco_sessoes`
-            );
-
+            let sessoes = 0, tempoTotal = 0;
+            const sessStr = localStorage.getItem(`planejamento_${dataAtual}_foco_sessoes`);
             if (sessStr) {
                 try {
                     const arr = JSON.parse(sessStr);
                     sessoes = arr.length;
-                    arr.forEach(s => {
-                        tempoTotal += (s.duracao || 0);
-                    });
+                    arr.forEach(s => { tempoTotal += (s.duracao || 0); });
                 } catch (e) {}
             }
-
             const minutosFoco = Math.floor(tempoTotal / 60);
 
-
-            // Distrações
             let distracoes = 0;
-
-            const distStr = localStorage.getItem(
-                `planejamento_${dataAtual}_foco_distancias`
-            );
-
+            const distStr = localStorage.getItem(`planejamento_${dataAtual}_foco_distancias`);
             if (distStr) {
                 try {
                     const arr = JSON.parse(distStr);
@@ -567,104 +509,54 @@
                 } catch (e) {}
             }
 
-
             const el = document.getElementById("miniPanorama");
-
             el.innerHTML = `
-                <div class="item">
-                    <div class="valor">${concluidas}/${total}</div>
-                    <div class="rotulo">Prioridades</div>
-                </div>
-
-                <div class="item">
-                    <div class="valor">${minutosFoco}min</div>
-                    <div class="rotulo">Foco</div>
-                </div>
-
-                <div class="item">
-                    <div class="valor">${sessoes}</div>
-                    <div class="rotulo">Sessões</div>
-                </div>
-
-                <div class="item">
-                    <div class="valor">${distracoes}</div>
-                    <div class="rotulo">Distrações</div>
-                </div>
+                <div class="item"><div class="valor">${concluidas}/${total}</div><div class="rotulo">Prioridades</div></div>
+                <div class="item"><div class="valor">${minutosFoco}min</div><div class="rotulo">Foco</div></div>
+                <div class="item"><div class="valor">${sessoes}</div><div class="rotulo">Sessões</div></div>
+                <div class="item"><div class="valor">${distracoes}</div><div class="rotulo">Distrações</div></div>
             `;
-
         })();
 
 
-        // ==================================================
-        // DISTRAÇÕES DO FOCO
-        // ==================================================
-
-        (function mostrarDistracoes() {
-
+        // Distrações do Foco
+        (function () {
             const chaveDist = `planejamento_${dataAtual}_foco_distancias`;
-
             let distracoes = [];
-
             try {
-                const salvas = localStorage.getItem(chaveDist);
-                if (salvas) distracoes = JSON.parse(salvas);
-            } catch (e) {
-                distracoes = [];
-            }
-
-            if (!Array.isArray(distracoes) || distracoes.length === 0) {
-                return;
-            }
+                const s = localStorage.getItem(chaveDist);
+                if (s) distracoes = JSON.parse(s);
+            } catch (e) {}
+            if (!Array.isArray(distracoes) || distracoes.length === 0) return;
 
             const card = document.getElementById("cardDistracoes");
             const lista = document.getElementById("listaDistracoes");
-
             card.style.display = "flex";
-
             distracoes.forEach(texto => {
-
                 const div = document.createElement("div");
                 div.className = "distracao-item";
                 div.textContent = "🚫 " + texto;
-
                 lista.appendChild(div);
-
             });
-
         })();
 
 
-        // ==================================================
-        // MODO (Rápida / Completa)
-        // ==================================================
-
+        // Modo Rápida/Completa
         const chaveModo = "planejamento_revisao_modo";
-
         const botoesModo = document.querySelectorAll("#toggleModo button");
 
         function aplicarModo(modo) {
-
             document.body.classList.toggle("modo-rapida", modo === "rapida");
-
             botoesModo.forEach(btn => {
                 btn.classList.toggle("ativo", btn.dataset.modo === modo);
             });
-
             localStorage.setItem(chaveModo, modo);
-
         }
-
-        botoesModo.forEach(btn => {
-            btn.addEventListener("click", () => aplicarModo(btn.dataset.modo));
-        });
-
+        botoesModo.forEach(btn => btn.addEventListener("click", () => aplicarModo(btn.dataset.modo)));
         aplicarModo(localStorage.getItem(chaveModo) || "completa");
 
 
-        // ==================================================
-        // CAMPOS DE TEXTO
-        // ==================================================
-
+        // Campos de texto
         const campos = [
             { id: "outrasRealizadas",    sufixo: "revisao_outras" },
             { id: "ondeParei",           sufixo: "revisao_onde_parei" },
@@ -674,69 +566,39 @@
             { id: "mereceLembrado",      sufixo: "revisao_merece_lembrado" },
             { id: "sePudesse",           sufixo: "revisao_se_pudesse" }
         ];
-
         campos.forEach(({ id, sufixo }) => {
-
             const campo = document.getElementById(id);
             const chave = `planejamento_${dataAtual}_${sufixo}`;
-
             const salvo = localStorage.getItem(chave);
             if (salvo !== null) campo.value = salvo;
-
-            const salvar = () => {
-                localStorage.setItem(chave, campo.value);
-            };
-
+            const salvar = () => localStorage.setItem(chave, campo.value);
             campo.addEventListener("input", salvar);
             campo.addEventListener("change", salvar);
-
         });
 
 
-        // ==================================================
-        // PRIORIDADES DO DIA
-        // ==================================================
-
+        // Prioridades
         const listaPrioridades = document.getElementById("listaPrioridades");
-
-        const prioridades = [
-            { texto: 0, check: 1 },
-            { texto: 2, check: 3 },
-            { texto: 4, check: 5 }
-        ];
-
+        const prioridades = [{ texto: 0, check: 1 }, { texto: 2, check: 3 }, { texto: 4, check: 5 }];
 
         function renderizarPrioridades() {
-
             listaPrioridades.innerHTML = "";
-
             prioridades.forEach((par, indice) => {
-
-                const chaveTexto =
-                    `planejamento_${dataAtual}_prioridades_${par.texto}`;
-
-                const chaveCheck =
-                    `planejamento_${dataAtual}_prioridades_${par.check}`;
-
+                const chaveTexto = `planejamento_${dataAtual}_prioridades_${par.texto}`;
+                const chaveCheck = `planejamento_${dataAtual}_prioridades_${par.check}`;
                 const texto = (localStorage.getItem(chaveTexto) || "").trim();
                 const concluida = localStorage.getItem(chaveCheck) === "true";
 
-
                 const item = document.createElement("label");
-
                 item.className = "prioridade-item";
-
                 if (concluida) item.classList.add("concluida");
-
 
                 const checkbox = document.createElement("input");
                 checkbox.type = "checkbox";
                 checkbox.checked = concluida;
 
-
                 const span = document.createElement("span");
                 span.className = "prioridade-texto";
-
                 if (texto) {
                     span.textContent = `${indice + 1}. ${texto}`;
                 } else {
@@ -744,107 +606,92 @@
                     span.classList.add("vazio");
                 }
 
-
                 checkbox.addEventListener("change", () => {
-
-                    localStorage.setItem(
-                        chaveCheck,
-                        checkbox.checked ? "true" : "false"
-                    );
-
+                    localStorage.setItem(chaveCheck, checkbox.checked ? "true" : "false");
                     item.classList.toggle("concluida", checkbox.checked);
-
-                    // Atualiza o mini-panorama
                     atualizarMiniPanorama();
-
                 });
-
 
                 item.appendChild(checkbox);
                 item.appendChild(span);
-
                 listaPrioridades.appendChild(item);
-
             });
-
         }
-
 
         function atualizarMiniPanorama() {
-
-            // Recalcula prioridades
-            let concluidas = 0;
-            let total = 0;
-
+            let concluidas = 0, total = 0;
             [0, 2, 4].forEach(i => {
-
-                const texto = localStorage.getItem(
-                    `planejamento_${dataAtual}_prioridades_${i}`
-                );
-                const check = localStorage.getItem(
-                    `planejamento_${dataAtual}_prioridades_${i + 1}`
-                );
-
-                if (texto && texto.trim()) {
-                    total++;
-                    if (check === "true") concluidas++;
-                }
-
+                const texto = localStorage.getItem(`planejamento_${dataAtual}_prioridades_${i}`);
+                const check = localStorage.getItem(`planejamento_${dataAtual}_prioridades_${i + 1}`);
+                if (texto && texto.trim()) { total++; if (check === "true") concluidas++; }
             });
-
-            // Atualiza só o valor das prioridades no painel
             const itens = document.querySelectorAll("#miniPanorama .item");
-
-            if (itens[0]) {
-                itens[0].querySelector(".valor").textContent =
-                    `${concluidas}/${total}`;
-            }
-
+            if (itens[0]) itens[0].querySelector(".valor").textContent = `${concluidas}/${total}`;
         }
-
 
         renderizarPrioridades();
 
 
-        // ==================================================
-        // RATING DO DIA
-        // ==================================================
-
+        // Rating
         const chaveRating = `planejamento_${dataAtual}_revisao_rating`;
-
         const botoesRating = document.querySelectorAll(".rating-emoji");
 
         function marcarRating(valor) {
-
             botoesRating.forEach(btn => {
-                btn.classList.toggle(
-                    "selecionado",
-                    Number(btn.dataset.valor) === Number(valor)
-                );
+                btn.classList.toggle("selecionado", Number(btn.dataset.valor) === Number(valor));
             });
-
         }
-
         const ratingSalvo = localStorage.getItem(chaveRating);
         if (ratingSalvo) marcarRating(ratingSalvo);
 
         botoesRating.forEach(btn => {
-
             btn.addEventListener("click", () => {
-
                 const valor = btn.dataset.valor;
-
                 if (btn.classList.contains("selecionado")) {
                     localStorage.removeItem(chaveRating);
                     marcarRating(null);
                     return;
                 }
-
                 localStorage.setItem(chaveRating, valor);
                 marcarRating(valor);
-
             });
+        });
 
+
+        // Treino do dia
+        const chaveTreinoFeito = `planejamento_${dataAtual}_revisao_treino_feito`;
+        const chaveTreinoTipo  = `planejamento_${dataAtual}_revisao_treino_tipo`;
+        const chaveTreinoComo  = `planejamento_${dataAtual}_revisao_treino_como`;
+
+        const treineiHoje  = document.getElementById("treineiHoje");
+        const treinoCampos = document.getElementById("treinoCampos");
+        const treinoTipo   = document.getElementById("treinoTipo");
+        const treinoComo   = document.getElementById("treinoComo");
+
+        treineiHoje.checked = localStorage.getItem(chaveTreinoFeito) === "true";
+        treinoTipo.value = localStorage.getItem(chaveTreinoTipo) || "";
+        treinoComo.value = localStorage.getItem(chaveTreinoComo) || "";
+
+        function atualizarVisibilidadeTreino() {
+            treinoCampos.style.display = treineiHoje.checked ? "block" : "none";
+        }
+        atualizarVisibilidadeTreino();
+
+        treineiHoje.addEventListener("change", () => {
+            if (treineiHoje.checked) {
+                localStorage.setItem(chaveTreinoFeito, "true");
+            } else {
+                localStorage.removeItem(chaveTreinoFeito);
+            }
+            atualizarVisibilidadeTreino();
+        });
+
+        treinoTipo.addEventListener("change", () => {
+            localStorage.setItem(chaveTreinoTipo, treinoTipo.value);
+        });
+
+        treinoComo.addEventListener("input", () => {
+            localStorage.setItem(chaveTreinoComo, treinoComo.value);
         });
     </script>
 
