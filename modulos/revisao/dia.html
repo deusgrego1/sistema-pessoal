@@ -103,6 +103,20 @@
             </p>
         </header>
 
+<div class="module-card" style="justify-content: center;">
+    <div class="rating-bloco">
+        <span class="rating-titulo">Como foi o dia?</span>
+
+        <div class="rating-opcoes" id="ratingOpcoes">
+            <button type="button" class="rating-emoji" data-valor="20">😞</button>
+            <button type="button" class="rating-emoji" data-valor="40">😕</button>
+            <button type="button" class="rating-emoji" data-valor="60">😐</button>
+            <button type="button" class="rating-emoji" data-valor="80">🙂</button>
+            <button type="button" class="rating-emoji" data-valor="100">😄</button>
+        </div>
+    </div>
+</div>
+        
         <section class="modules">
 
             <!-- 1. O QUE FOI FEITO -->
@@ -419,6 +433,52 @@
 
         }
 
+        // ==================================================
+// RATING DO DIA
+// ==================================================
+
+const chaveRating = `planejamento_${dataAtual}_revisao_rating`;
+
+const botoesRating = document.querySelectorAll(".rating-emoji");
+
+function marcarRating(valor) {
+
+    botoesRating.forEach(btn => {
+        btn.classList.toggle(
+            "selecionado",
+            Number(btn.dataset.valor) === Number(valor)
+        );
+    });
+
+}
+
+// Carrega salvo
+const ratingSalvo = localStorage.getItem(chaveRating);
+if (ratingSalvo) {
+    marcarRating(ratingSalvo);
+}
+
+// Clique
+botoesRating.forEach(btn => {
+
+    btn.addEventListener("click", () => {
+
+        const valor = btn.dataset.valor;
+
+        // Se clicar de novo no mesmo, desmarca
+        if (btn.classList.contains("selecionado")) {
+            localStorage.removeItem(chaveRating);
+            marcarRating(null);
+            return;
+        }
+
+        localStorage.setItem(chaveRating, valor);
+        marcarRating(valor);
+
+    });
+
+});
+        
         renderizarPrioridades();
     </script>
 
