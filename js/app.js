@@ -34,8 +34,47 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // ==================================================
+    // HELPER GLOBAL: COPIAR DO DIA ANTERIOR
+    // ==================================================
+
+    window.copiarDoDiaAnterior = function(paginaAlvo, dataRef) {
+
+        const [a, m, d] = dataRef.split("-").map(Number);
+        const dataObj = new Date(a, m - 1, d);
+        dataObj.setDate(dataObj.getDate() - 1);
+
+        const yAno = dataObj.getFullYear();
+        const yMes = String(dataObj.getMonth() + 1).padStart(2, "0");
+        const yDia = String(dataObj.getDate()).padStart(2, "0");
+
+        const dataOntem = `${yAno}-${yMes}-${yDia}`;
+
+        const prefixoOntem = `planejamento_${dataOntem}_${paginaAlvo}_`;
+        const prefixoHoje  = `planejamento_${dataRef}_${paginaAlvo}_`;
+
+        let copiados = 0;
+
+        Object.keys(localStorage).forEach(chave => {
+
+            if (chave.startsWith(prefixoOntem)) {
+
+                const sufixo = chave.replace(prefixoOntem, "");
+                localStorage.setItem(
+                    prefixoHoje + sufixo,
+                    localStorage.getItem(chave)
+                );
+                copiados++;
+
+            }
+
+        });
+
+        return copiados;
+    };
+
+
+    // ==================================================
     // BARRA DE NAVEGAÇÃO DE DATAS
-    // (só no módulo Planejamento, exceto Histórico)
     // ==================================================
 
     if (
@@ -52,11 +91,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const header = container ? container.querySelector(".header") : null;
 
         if (!container || !header) return;
-
-
-        // ---------------------------------------------
-        // CÁLCULO DE DATAS
-        // ---------------------------------------------
 
         const [a, m, d] = dataAtual.split("-").map(Number);
         const dataObj = new Date(a, m - 1, d);
@@ -77,11 +111,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const anterior = fmtISO(diaAnterior);
         const seguinte = fmtISO(diaSeguinte);
 
-
-        // ---------------------------------------------
-        // RÓTULOS
-        // ---------------------------------------------
-
         const fmtBR = (iso) => {
             const [y, mo, dy] = iso.split("-");
             return `${dy}/${mo}/${y}`;
@@ -92,22 +121,12 @@ document.addEventListener("DOMContentLoaded", () => {
             return fmtBR(iso);
         };
 
-
-        // ---------------------------------------------
-        // URLS
-        // ---------------------------------------------
-
         const baseURL = window.location.pathname;
 
         const urlComData = (dataIso) => {
             if (dataIso === dataHoje) return baseURL;
             return `${baseURL}?data=${dataIso}`;
         };
-
-
-        // ---------------------------------------------
-        // MONTAGEM
-        // ---------------------------------------------
 
         const barra = document.createElement("div");
 
@@ -211,10 +230,6 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("buscarData");
 
 
-        // ------------------------------------------------
-        // FORMATA DATA
-        // ------------------------------------------------
-
         function formatarData(data) {
 
             const [ano, mes, dia] = data.split("-");
@@ -223,10 +238,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
 
-
-        // ------------------------------------------------
-        // ENCONTRA TODAS AS DATAS SALVAS
-        // ------------------------------------------------
 
         function obterDatas() {
 
@@ -250,10 +261,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
 
-
-        // ------------------------------------------------
-        // MOSTRA LISTA DE DATAS
-        // ------------------------------------------------
 
         function mostrarDatas(filtro = "") {
 
@@ -310,10 +317,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         }
 
-
-        // ------------------------------------------------
-        // RENDERIZA UM MÓDULO
-        // ------------------------------------------------
 
         function mostrarModulo(
             data,
@@ -414,10 +417,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
 
-        // ------------------------------------------------
-        // ABRIR UM DIA ESPECÍFICO
-        // ------------------------------------------------
-
         const parametros =
             new URLSearchParams(
                 window.location.search
@@ -452,26 +451,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 "Planejamento registrado neste dia.";
 
 
-            // --------------------------------------------
-            // VISÃO DO DIA
-            // --------------------------------------------
-
             mostrarModulo(
                 dataSelecionada,
                 "visao",
                 document.getElementById("visaoHistorico"),
                 [
-                    "Data",
                     "Como estou hoje?",
                     "Compromissos",
                     "Intenção do dia"
                 ]
             );
 
-
-            // --------------------------------------------
-            // PRIORIDADES
-            // --------------------------------------------
 
             mostrarModulo(
                 dataSelecionada,
@@ -488,10 +478,6 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-            // --------------------------------------------
-            // TRABALHO
-            // --------------------------------------------
-
             mostrarModulo(
                 dataSelecionada,
                 "trabalho",
@@ -505,10 +491,6 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-            // --------------------------------------------
-            // ESTUDO
-            // --------------------------------------------
-
             mostrarModulo(
                 dataSelecionada,
                 "estudo",
@@ -521,10 +503,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 ]
             );
 
-
-            // --------------------------------------------
-            // O QUE APRENDI
-            // --------------------------------------------
 
             const numBlocosAprendi =
                 Number(localStorage.getItem(
@@ -563,10 +541,6 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-            // --------------------------------------------
-            // CORPO
-            // --------------------------------------------
-
             mostrarModulo(
                 dataSelecionada,
                 "corpo",
@@ -587,10 +561,6 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
 
-            // --------------------------------------------
-            // ESPIRITUALIDADE
-            // --------------------------------------------
-
             mostrarModulo(
                 dataSelecionada,
                 "espiritualidade",
@@ -603,10 +573,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 ]
             );
 
-
-            // --------------------------------------------
-            // NOTAS / IDEIAS
-            // --------------------------------------------
 
             mostrarModulo(
                 dataSelecionada,
