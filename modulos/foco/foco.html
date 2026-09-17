@@ -491,6 +491,19 @@
             tempoFoco.value = tempoSalvo;
         }
 
+        // ==================================================
+// TAREFA VINDA DA URL (?tarefa=...)
+// ==================================================
+
+const paramsURL = new URLSearchParams(window.location.search);
+const tarefaURL = paramsURL.get("tarefa");
+
+if (tarefaURL) {
+
+    tarefaFoco.value = tarefaURL;
+    localStorage.setItem(chaveTarefa, tarefaURL);
+
+}
 
         // ==================================================
         // TIMER — ESTADO
