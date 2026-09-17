@@ -46,13 +46,13 @@
                 <span class="icon">⏱️</span>
                 <div>
                     <h2>Sessão de foco</h2>
-
-                    <select id="tempoFoco">
-                        <option value="25">25 minutos</option>
-                        <option value="30">30 minutos</option>
-                        <option value="50" selected>50 minutos</option>
-                        <option value="90">90 minutos</option>
-                    </select>
+<select id="tempoFoco">
+    <option value="15">15 minutos</option>
+    <option value="25">25 minutos</option>
+    <option value="30">30 minutos</option>
+    <option value="50" selected>50 minutos</option>
+    <option value="90">90 minutos</option>
+</select>
 
                     <p
                         id="displayTimer"
@@ -650,11 +650,15 @@
         const botoesPausa = document.querySelectorAll(".btn-pausa");
 
 
-        function renderizarPausas(categoria) {
+let categoriaAtiva = "curta";
 
-            listaPausas.innerHTML = "";
+function renderizarPausas(categoria) {
 
-            const itens = pausas[categoria] || [];
+    categoriaAtiva = categoria;
+
+    listaPausas.innerHTML = "";
+
+    const itens = pausas[categoria] || [];
 
 
             itens.forEach(item => {
@@ -698,23 +702,19 @@
 
         btnSorteio.addEventListener("click", () => {
 
-            // Junta todas as categorias
-            const todas = [
-                ...pausas.curta,
-                ...pausas.longa,
-                ...pausas.tarefas,
-                ...pausas.semNada
-            ];
+    const listaAtual = pausas[categoriaAtiva] || [];
 
-            const escolhida =
-                todas[Math.floor(Math.random() * todas.length)];
+    if (listaAtual.length === 0) return;
 
-            resultadoSorteio.style.display = "block";
+    const escolhida =
+        listaAtual[Math.floor(Math.random() * listaAtual.length)];
 
-            resultadoSorteio.innerHTML =
-                `🎲 <strong>Faça agora:</strong><br><br>${escolhida}`;
+    resultadoSorteio.style.display = "block";
 
-        });
+    resultadoSorteio.innerHTML =
+        `🎲 <strong>Faça agora:</strong><br><br>${escolhida}`;
+
+});
 
 
         // ==================================================
