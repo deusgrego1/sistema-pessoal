@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Glossário</title>
+
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .campo-label {
+            display: block;
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 14px 0 8px;
+        }
+
+        .termo-card {
+            background: #1c1c20;
+            border: 1px solid #252529;
+            border-left: 3px solid #3a4a6a;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+
+        .termo-nome {
+            font-size: 15px;
+            font-weight: 600;
+            color: #a8c4e8;
+            margin-bottom: 8px;
+        }
+
+        .termo-def {
+            font-size: 14px;
+            color: #d0d0d0;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .termo-tema {
+            display: inline-block;
+            font-size: 11px;
+            color: #999;
+            background: #252529;
+            padding: 3px 9px;
+            border-radius: 10px;
+            margin-top: 8px;
+        }
+
+        .btn-remover {
+            background: none;
+            border: none;
+            color: #a33;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 0;
+            margin-top: 8px;
+        }
+
+        .btn-remover:hover { color: #e55; }
+
+        .vazio { text-align: center; color: #777; font-size: 14px; padding: 30px 0; }
+
+        .btn-primario {
+            width: 100%;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid #333;
+            background: #2a2a30;
+            color: #fff;
+            border-radius: 12px;
+        }
+
+        .btn-primario:hover { background: #333340; border-color: #555; }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="header">
+            <p class="eyebrow">ESTUDO</p>
+            <h1>📔 Glossário pessoal</h1>
+            <p class="subtitle">
+                Termos que você aprendeu, com suas próprias palavras.
+            </p>
+        </header>
+
+        <section class="modules" id="lista"></section>
+
+        <a href="estudo.html" class="back-button">
+            ← Voltar para Estudo
+        </a>
+
+    </main>
+
+
+    <script>
+        const chave = "planejamento_estudo_glossario";
+
+        let termos = [];
+        try {
+            const s = localStorage.getItem(chave);
+            if (s) termos = JSON.parse(s);
+        } catch (e) { termos = []; }
+
+        function salvar() {
+            localStorage.setItem(chave, JSON.stringify(termos));
+            render();
+        }
+
+        const lista = document.getElementById("lista");
+
+        function render() {
+
+            lista.innerHTML = "";
+
+            // Ordena alfabeticamente
+            const ordenados = [...termos].sort((a, b) =>
+                (a.termo || "").localeCompare(b.termo || "", "pt-BR")
+            );
+
+            if (ordenados.length === 0) {
+                const vazio = document.createElement("p");
+                vazio.className = "vazio";
+                vazio.textContent = "Nenhum termo registrado ainda.";
+                lista.appendChild(vazio);
+            } else {
+
+                ordenados.forEach((t) => {
+
+                    const idx = termos.indexOf(t);
+
+                    const div = document.createElement("div");
+                    div.className = "termo-card";
+
+                    div.innerHTML = `
+                        <div class="termo-nome">${t.termo || ""}</div>
+                        <div class="termo-def">${t.definicao || ""}</div>
+                        ${t.tema ? `<span class="termo-tema">${t.tema}</span>` : ""}
+                    `;
+
+                    const btnRem = document.createElement("button");
+                    btnRem.className = "btn-remover";
+                    btnRem.textContent = "remover";
+                    btnRem.addEventListener("click", () => {
+                        if (!confirm(`Remover "${t.termo}"?`)) return;
+                        termos.splice(idx, 1);
+                        salvar();
+                    });
+                    div.appendChild(btnRem);
+
+                    lista.appendChild(div);
+                });
+            }
+
+
+            const form = document.createElement("div");
+            form.className = "module-card";
+            form.style.alignItems = "flex-start";
+
+            form.innerHTML = `
+                <span class="icon">➕</span>
+                <div style="width: 100%;">
+                    <h2>Adicionar termo</h2>
+
+                    <label class="campo-label">Termo</label>
+                    <input type="text" id="novoTermo" placeholder="Ex.: ROI">
+
+                    <label class="campo-label">Definição (com suas palavras)</label>
+                    <textarea id="novaDef" rows="4"
+                        placeholder="Explique como se estivesse ensinando alguém."></textarea>
+
+                    <label class="campo-label">Tema (opcional)</label>
+                    <input type="text" id="novoTema" placeholder="Ex.: Marketing, Finanças">
+
+                    <div style="margin-top: 18px;">
+                        <button type="button" class="btn-primario" id="btnAdicionar">
+                            ＋ Adicionar
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            lista.appendChild(form);
+
+            document.getElementById("btnAdicionar").addEventListener("click", () => {
+                const termo = document.getElementById("novoTermo").value.trim();
+                const definicao = document.getElementById("novaDef").value.trim();
+
+                if (!termo) { alert("Escreva o termo."); return; }
+                if (!definicao) { alert("Escreva a definição."); return; }
+
+                termos.push({
+                    termo,
+                    definicao,
+                    tema: document.getElementById("novoTema").value.trim()
+                });
+
+                salvar();
+            });
+        }
+
+        render();
+    </script>
+
+</body>
+</html>
