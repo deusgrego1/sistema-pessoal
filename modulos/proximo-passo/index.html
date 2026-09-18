@@ -165,13 +165,14 @@
             // "planejamento_pp_mes_areas_atencao" se existir.
             // Como ainda não criamos esse campo no mes.html, deixamos vazio por ora.
 
-            const areas = localStorage.getItem("planejamento_pp_mes_areas_atencao");
+            let lista = [];
+try {
+    lista = JSON.parse(localStorage.getItem("planejamento_pp_mes_areas_atencao")) || [];
+} catch (e) {
+    lista = [];
+}
 
-            if (!areas || !areas.trim()) return;
-
-            const lista = areas.split(",").map(a => a.trim()).filter(Boolean);
-
-            if (lista.length === 0) return;
+if (!Array.isArray(lista) || lista.length === 0) return;
 
             const div = document.createElement("div");
             div.className = "aviso-hub aviso-areas";
