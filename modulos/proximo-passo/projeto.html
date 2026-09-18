@@ -733,6 +733,33 @@
                     </div>
                 </div>
 
+                            <div class="module-card timer-card">
+                <div class="timer-header">
+                    <div>
+                        <div class="timer-titulo">📅 Linha do tempo do projeto</div>
+                        <div class="timer-sub" id="timerSub">—</div>
+                    </div>
+                    <div class="timer-filtros" id="timerFiltros">
+                        <button type="button" data-meses="1">1 mês</button>
+                        <button type="button" data-meses="3">3 meses</button>
+                        <button type="button" data-meses="6">6 meses</button>
+                        <button type="button" data-meses="12" class="ativo">12 meses</button>
+                    </div>
+                </div>
+
+                <div class="timer-grid-wrap">
+                    <div class="timer-grid" id="timerGrid"></div>
+                </div>
+
+                <div class="timer-legenda">
+                    <div class="mini passada"></div>
+                    <span>sem atividade</span>
+                    <div class="mini ativa"></div>
+                    <span>com atividade</span>
+                    <div class="mini atual"></div>
+                    <span>semana atual</span>
+                </div>
+            </div>
 
                 <div class="banner-sprint" id="bannerSprint" style="display:none;">
                     <div class="txt" id="bannerSprintTexto"></div>
@@ -872,35 +899,6 @@
                     <button type="button" class="btn-adicionar" id="btnAddEtapa">
                         ＋ Adicionar etapa
                     </button>
-                </div>
-
-
-                <div class="module-card">
-                    <div class="bloco-titulo">
-                        <span class="icon">📅</span>
-                        <h2>Atividade do projeto</h2>
-                    </div>
-
-                    <div class="heatmap-filtros" id="heatmapFiltros">
-                        <button type="button" data-meses="1">1 mês</button>
-                        <button type="button" data-meses="3">3 meses</button>
-                        <button type="button" data-meses="6">6 meses</button>
-                        <button type="button" data-meses="12" class="ativo">12 meses</button>
-                    </div>
-
-                    <div class="heatmap-wrap">
-                        <div class="heatmap" id="heatmap"></div>
-                    </div>
-
-                    <div class="heatmap-legenda">
-                        <span>Menos</span>
-                        <div class="heat-cell"></div>
-                        <div class="heat-cell n1"></div>
-                        <div class="heat-cell n2"></div>
-                        <div class="heat-cell n3"></div>
-                        <div class="heat-cell n4"></div>
-                        <span>Mais</span>
-                    </div>
                 </div>
 
 
@@ -1878,60 +1876,98 @@
         renderDiario();
 
 
-        // ==================================================
-        // HEATMAP
+              // ==================================================
+        // TIMER DE SEMANAS (Memento Mori)
         // ==================================================
 
-        function renderHeatmap() {
-            const container = document.getElementById("heatmap");
-            container.innerHTML = "";
+        function renderTimerSemanas() {
 
-            const semanasMap = { 1: 5, 3: 13, 6: 26, 12: 52 };
-            const semanas = semanasMap[mesesHeatmap] || 52;
+            const grid = document.getElementById("timerGrid");
+            const sub = document.getElementById("timerSub");
+
+            grid.innerHTML = "";
+
+            const semanasMap = { 1: 4, 3: 13, 6: 26, 12: 52 };
+            const totalSemanas = semanasMap[mesesHeatmap] || 52;
+
+            // Ajusta colunas conforme o total
+            let colunas = 13;
+            if (totalSemanas <= 4) colunas = 4;
+            else if (totalSemanas <= 13) colunas = 13;
+            grid.style.gridTemplateColumns = `repeat(${colunas}, minmax(0, 1fr))`;
+
+            // Início = data de criação do projeto
+            const inicioProj = projeto.criadoEm
+                ? new Date(projeto.criadoEm)
+                : new Date();
+            inicioProj.setHours(0, 0, 0, 0);
 
             const hoje = new Date();
             hoje.setHours(0, 0, 0, 0);
 
-            const ultimoDomingo = new Date(hoje);
-            ultimoDomingo.setDate(ultimoDomingo.getDate() - ultimoDomingo.getDay());
+            const diffMs = hoje - inicioProj;
+            const semanasPassadas = Math.floor(diffMs / (7 * 86400000));
 
-            const inicio = new Date(ultimoDomingo);
-            inicio.setDate(inicio.getDate() - (semanas - 1) * 7);
-
-            for (let i = 0; i < semanas * 7; i++) {
-                const d = new Date(inicio);
-                d.setDate(d.getDate() + i);
-
-                const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-                const valor = atividade[iso] || 0;
-
-                let nivel = "";
-                if (valor >= 8) nivel = "n4";
-                else if (valor >= 5) nivel = "n3";
-                else if (valor >= 3) nivel = "n2";
-                else if (valor >= 1) nivel = "n1";
+            // Pra cada semana
+            for (let i = 0; i < totalSemanas; i++) {
 
                 const cell = document.createElement("div");
-                cell.className = "heat-cell" + (nivel ? " " + nivel : "");
-                cell.title = `${iso}: ${valor} ação(ões)`;
-                container.appendChild(cell);
+                cell.className = "timer-cell";
+
+                const inicioSemana = new Date(inicioProj);
+                inicioSemana.setDate(inicioSemana.getDate() + i * 7);
+
+                const fimSemana = new Date(inicioSemana);
+                fimSemana.setDate(fimSemana.getDate() + 7);
+
+                // Soma atividade dentro da semana
+                let ativSemana = 0;
+                Object.keys(atividade).forEach(dia => {
+                    const d = new Date(dia + "T00:00:00");
+                    if (d >= inicioSemana && d < fimSemana) {
+                        ativSemana += atividade[dia] || 0;
+                    }
+                });
+
+                if (i < semanasPassadas) {
+                    // Já passou
+                    if (ativSemana > 0) {
+                        cell.classList.add("ativa");
+                    } else {
+                        cell.classList.add("passada");
+                    }
+                } else if (i === semanasPassadas) {
+                    // Semana atual
+                    cell.classList.add("atual");
+                    if (ativSemana > 0) cell.classList.add("ativa");
+                }
+                // Futura = vazio
+
+                const inicioStr = `${String(inicioSemana.getDate()).padStart(2, "0")}/${String(inicioSemana.getMonth() + 1).padStart(2, "0")}`;
+                cell.title = `Semana ${i + 1} (${inicioStr}) — ${ativSemana} ação(ões)`;
+
+                grid.appendChild(cell);
             }
+
+            // Subtítulo
+            const semanaAtual = Math.min(semanasPassadas + 1, totalSemanas);
+            sub.textContent = `Semana ${semanaAtual} de ${totalSemanas}`;
         }
 
-        document.querySelectorAll("#heatmapFiltros button").forEach(btn => {
+        document.querySelectorAll("#timerFiltros button").forEach(btn => {
             if (Number(btn.dataset.meses) === mesesHeatmap) btn.classList.add("ativo");
             else btn.classList.remove("ativo");
 
             btn.addEventListener("click", () => {
                 mesesHeatmap = Number(btn.dataset.meses);
                 localStorage.setItem(CHAVE_HEAT_MESES, mesesHeatmap);
-                document.querySelectorAll("#heatmapFiltros button").forEach(b => b.classList.remove("ativo"));
+                document.querySelectorAll("#timerFiltros button").forEach(b => b.classList.remove("ativo"));
                 btn.classList.add("ativo");
-                renderHeatmap();
+                renderTimerSemanas();
             });
         });
-        renderHeatmap();
 
+        renderTimerSemanas();
 
         // ==================================================
         // GUIA DO PROJETO
