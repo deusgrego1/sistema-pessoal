@@ -10,132 +10,131 @@
 
     <style>
         .campo-label {
-            display: block;
-            font-size: 11px;
-            color: #888;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            display: block; font-size: 11px; color: #888;
+            letter-spacing: 1px; text-transform: uppercase;
             margin: 14px 0 8px;
         }
 
+        .data-cabecalho {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; padding: 12px 16px; border-radius: 12px;
+            background: #17171a; border: 1px solid #252529; margin-bottom: 4px;
+        }
+        .data-titulo { font-size: 15px; font-weight: 600; color: #f5f5f5; }
+        .data-sub { font-size: 12px; color: #888; margin-top: 2px; }
+        .link-revisao {
+            font-size: 12px; color: #8ab4f8; text-decoration: none;
+            padding: 6px 10px; border-radius: 8px;
+            border: 1px solid #2c3a55; background: #1a2235; flex-shrink: 0;
+        }
+        .link-revisao:hover { background: #232f4a; }
+
+        .bloco-ref {
+            padding: 14px 16px; border-radius: 12px;
+            background: #16161a; border: 1px solid #252529;
+            border-left: 3px solid #55555c;
+            font-size: 13px; color: #bbb; line-height: 1.5;
+        }
+        .bloco-ref .ref-titulo {
+            font-size: 11px; color: #888; letter-spacing: 1px;
+            text-transform: uppercase; margin-bottom: 8px;
+        }
+        .bloco-ref .ref-item { margin-bottom: 10px; }
+        .bloco-ref .ref-item:last-child { margin-bottom: 0; }
+        .bloco-ref .ref-label {
+            color: #777; font-size: 11px; display: block; margin-bottom: 3px;
+        }
+
         .item-linha {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 12px;
-            background: #1c1c20;
-            border: 1px solid #252529;
-            border-radius: 10px;
-            margin-bottom: 8px;
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; background: #1c1c20;
+            border: 1px solid #252529; border-radius: 10px; margin-bottom: 8px;
         }
-
+        .item-linha.concluida { opacity: 0.5; }
         .item-linha input[type="text"] {
-            flex: 1;
-            margin-top: 0 !important;
-            background: transparent !important;
-            border: none !important;
-            padding: 4px 0 !important;
-            font-size: 14px;
-            color: #e0e0e0;
-            outline: none;
+            flex: 1; margin-top: 0 !important;
+            background: transparent !important; border: none !important;
+            padding: 4px 0 !important; font-size: 14px;
+            color: #e0e0e0; outline: none;
         }
-
         .item-linha input[type="text"]::placeholder { color: #555; }
-
-        .item-remover {
-            background: none;
-            border: none;
-            color: #a33;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 0 4px;
-            flex-shrink: 0;
+        .item-linha input[type="checkbox"] {
+            width: 20px; height: 20px; cursor: pointer; flex-shrink: 0;
         }
-
+        .item-remover {
+            background: none; border: none; color: #a33;
+            font-size: 18px; cursor: pointer; padding: 0 4px; flex-shrink: 0;
+        }
         .item-remover:hover { color: #e55; }
 
         .btn-adicionar {
-            width: 100%;
-            padding: 10px;
-            font-size: 13px;
-            cursor: pointer;
-            border: 1px dashed #444;
-            background: transparent;
-            color: #999;
-            border-radius: 10px;
-            transition: 0.15s;
+            width: 100%; padding: 10px; font-size: 13px;
+            cursor: pointer; border: 1px dashed #444;
+            background: transparent; color: #999;
+            border-radius: 10px; transition: 0.15s;
         }
-
         .btn-adicionar:hover { border-color: #666; color: #ccc; background: #1a1a1e; }
 
-        /* Projeto detalhado */
-
-        .projeto-card {
-            padding: 14px;
-            background: #1c1c20;
+        .proj-card, .dev-card, .parar-card, .manter-card, .exp-card {
+            padding: 14px; background: #1c1c20;
             border: 1px solid #252529;
-            border-left: 3px solid #5a8ad4;
-            border-radius: 10px;
-            margin-bottom: 12px;
+            border-radius: 10px; margin-bottom: 12px;
+        }
+        .proj-card   { border-left: 3px solid #5a8ad4; }
+        .dev-card    { border-left: 3px solid #8a5ad4; }
+        .parar-card  { border-left: 3px solid #d45a5a; }
+        .manter-card { border-left: 3px solid #4caf50; }
+        .exp-card    { border-left: 3px solid #c9a44a; }
+
+        .cab {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+        }
+        .cab input[type="text"] {
+            flex: 1; margin-top: 0 !important;
+            font-weight: 600; font-size: 15px;
         }
 
-        .projeto-cabecalho {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 4px;
+        /* Áreas de atenção */
+        .areas-chips {
+            display: flex; flex-wrap: wrap; gap: 8px;
         }
-
-        .projeto-cabecalho input[type="text"] {
-            flex: 1;
-            margin-top: 0 !important;
+        .area-chip {
+            padding: 8px 14px; font-size: 13px;
+            cursor: pointer; border: 1px solid #333338;
+            background: #1a1a1e; color: #bbb;
+            border-radius: 16px; transition: 0.15s; user-select: none;
+        }
+        .area-chip:hover { background: #222228; color: #e0e0e0; }
+        .area-chip.selecionado {
+            background: #1a2233; border-color: #5a8ad4; color: #a8c4e8;
             font-weight: 600;
-            font-size: 15px;
         }
 
-        /* Desenvolvimento */
-
-        .dev-card {
-            padding: 14px;
-            background: #1c1c20;
-            border: 1px solid #252529;
-            border-left: 3px solid #8a5ad4;
-            border-radius: 10px;
-            margin-bottom: 12px;
+        details.bloco-expansivel {
+            background: #17171a; border: 1px solid #252529;
+            border-radius: 16px; padding: 16px;
         }
-
-        /* Parar/Mudar */
-
-        .parar-card {
-            padding: 14px;
-            background: #1c1c20;
-            border: 1px solid #252529;
-            border-left: 3px solid #d45a5a;
-            border-radius: 10px;
-            margin-bottom: 12px;
+        details.bloco-expansivel summary {
+            cursor: pointer; list-style: none; display: flex;
+            align-items: center; gap: 12px; outline: none;
         }
-
-        /* Manter */
-
-        .manter-card {
-            padding: 14px;
-            background: #1c1c20;
-            border: 1px solid #252529;
-            border-left: 3px solid #4caf50;
-            border-radius: 10px;
-            margin-bottom: 12px;
+        details.bloco-expansivel summary::-webkit-details-marker { display: none; }
+        details.bloco-expansivel summary::after {
+            content: "▼"; margin-left: auto; color: #777;
+            font-size: 11px; transition: 0.2s;
         }
+        details.bloco-expansivel[open] summary::after { transform: rotate(180deg); }
+        details.bloco-expansivel summary h2 { font-size: 15px; color: #f5f5f5; }
+        details.bloco-expansivel summary .mini-titulo { color: #666; font-size: 12px; }
 
-        /* Experimento */
-
-        .exp-card {
-            padding: 14px;
-            background: #1c1c20;
-            border: 1px solid #252529;
-            border-left: 3px solid #c9a44a;
-            border-radius: 10px;
-            margin-bottom: 12px;
+        .snapshot-item { padding: 12px 0; border-bottom: 1px solid #252529; }
+        .snapshot-item:last-child { border-bottom: none; }
+        .snapshot-data {
+            font-size: 12px; color: #888; margin-bottom: 6px;
+            letter-spacing: 1px; text-transform: uppercase;
         }
+        .snapshot-linha { font-size: 13px; color: #ccc; padding: 3px 0; }
+        .snapshot-vazio { color: #666; font-size: 13px; padding: 8px 0; }
     </style>
 </head>
 
@@ -153,37 +152,57 @@
 
         <section class="modules">
 
-            <!-- DIREÇÃO DO MÊS -->
+            <div class="data-cabecalho">
+                <div>
+                    <div class="data-titulo" id="tituloData">Próximo mês</div>
+                    <div class="data-sub" id="subData"></div>
+                </div>
+                <a href="#" id="linkRevisao" class="link-revisao">
+                    📊 Ver Revisão do Mês
+                </a>
+            </div>
+
+
+            <div class="bloco-ref" id="blocoRef" style="display:none;">
+                <div class="ref-titulo">📌 De onde você veio</div>
+                <div id="conteudoRef"></div>
+            </div>
+
 
             <div class="module-card">
                 <span class="icon">🧭</span>
                 <div>
                     <h2>Direção do mês</h2>
-                    <p style="color:#888; font-size:13px; margin: 6px 0 10px;">
-                        Se você pudesse definir uma direção só, qual seria?
-                    </p>
                     <input type="text" id="direcao"
                         placeholder="Ex.: construir e validar minha primeira oferta.">
                 </div>
             </div>
 
 
-            <!-- FOCO PRINCIPAL -->
-
             <div class="module-card">
                 <span class="icon">📌</span>
                 <div>
                     <h2>Foco principal</h2>
-                    <p style="color:#888; font-size:13px; margin: 6px 0 10px;">
-                        Se o mês ficar caótico, o que ainda precisa avançar?
-                    </p>
                     <input type="text" id="focoPrincipal"
                         placeholder="Ex.: publicar os primeiros 4 vídeos.">
                 </div>
             </div>
 
 
-            <!-- OBJETIVOS -->
+            <!-- ÁREAS DE ATENÇÃO -->
+
+            <div class="module-card" style="align-items: flex-start;">
+                <span class="icon">🧭</span>
+                <div style="width: 100%;">
+                    <h2>Áreas de atenção</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
+                        Em quais áreas da vida preciso prestar mais atenção neste mês?
+                        Aparecem também no hub do Próximo Passo.
+                    </p>
+                    <div class="areas-chips" id="areasAtencao"></div>
+                </div>
+            </div>
+
 
             <div class="module-card" style="align-items: flex-start;">
                 <span class="icon">🎯</span>
@@ -197,15 +216,10 @@
             </div>
 
 
-            <!-- RESULTADOS -->
-
             <div class="module-card" style="align-items: flex-start;">
                 <span class="icon">🏆</span>
                 <div style="width: 100%;">
                     <h2>Resultados que quero ter</h2>
-                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
-                        Como você saberá que o mês deu certo.
-                    </p>
                     <div id="listaResultados"></div>
                     <button type="button" class="btn-adicionar" id="btnAddResultado">
                         ＋ Adicionar resultado
@@ -214,15 +228,10 @@
             </div>
 
 
-            <!-- PROJETOS -->
-
             <div class="module-card" style="align-items: flex-start;">
                 <span class="icon">🚀</span>
                 <div style="width: 100%;">
                     <h2>Projetos prioritários</h2>
-                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
-                        O que precisa avançar de verdade neste mês.
-                    </p>
                     <div id="listaProjetos"></div>
                     <button type="button" class="btn-adicionar" id="btnAddProjeto">
                         ＋ Adicionar projeto
@@ -231,15 +240,10 @@
             </div>
 
 
-            <!-- DESENVOLVER -->
-
             <div class="module-card" style="align-items: flex-start;">
                 <span class="icon">📈</span>
                 <div style="width: 100%;">
                     <h2>O que quero desenvolver</h2>
-                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
-                        Que capacidade quero ter desenvolvido até o fim do mês.
-                    </p>
                     <div id="listaDesenvolver"></div>
                     <button type="button" class="btn-adicionar" id="btnAddDesenvolver">
                         ＋ Adicionar
@@ -248,29 +252,19 @@
             </div>
 
 
-            <!-- MUDANÇAS -->
-
             <div class="module-card">
                 <span class="icon">🔧</span>
                 <div>
                     <h2>Mudanças que preciso implementar</h2>
-                    <p style="color:#888; font-size:13px; margin: 6px 0 10px;">
-                        O que a revisão do mês anterior mostrou que precisa mudar.
-                    </p>
                     <textarea id="mudancas" rows="4"></textarea>
                 </div>
             </div>
 
 
-            <!-- PARAR -->
-
             <div class="module-card" style="align-items: flex-start;">
                 <span class="icon">🛑</span>
                 <div style="width: 100%;">
                     <h2>O que não devo continuar</h2>
-                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
-                        O que parar, reduzir ou fazer de outra forma.
-                    </p>
                     <div id="listaParar"></div>
                     <button type="button" class="btn-adicionar" id="btnAddParar">
                         ＋ Adicionar
@@ -279,15 +273,10 @@
             </div>
 
 
-            <!-- MANTER -->
-
             <div class="module-card" style="align-items: flex-start;">
                 <span class="icon">🧱</span>
                 <div style="width: 100%;">
                     <h2>O que preciso manter</h2>
-                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
-                        O que já funciona e não pode ser perdido.
-                    </p>
                     <div id="listaManter"></div>
                     <button type="button" class="btn-adicionar" id="btnAddManter">
                         ＋ Adicionar
@@ -296,15 +285,10 @@
             </div>
 
 
-            <!-- COMPROMISSOS -->
-
             <div class="module-card" style="align-items: flex-start;">
                 <span class="icon">📅</span>
                 <div style="width: 100%;">
                     <h2>Compromissos importantes</h2>
-                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
-                        Eventos, prazos e datas que afetam o mês.
-                    </p>
                     <div id="listaCompromissos"></div>
                     <button type="button" class="btn-adicionar" id="btnAddCompromisso">
                         ＋ Adicionar compromisso
@@ -313,21 +297,44 @@
             </div>
 
 
-            <!-- EXPERIMENTOS -->
-
             <div class="module-card" style="align-items: flex-start;">
                 <span class="icon">🧪</span>
                 <div style="width: 100%;">
                     <h2>Experimentos do mês</h2>
-                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
-                        O que quero testar para descobrir se funciona.
-                    </p>
                     <div id="listaExperimentos"></div>
                     <button type="button" class="btn-adicionar" id="btnAddExperimento">
                         ＋ Adicionar experimento
                     </button>
                 </div>
             </div>
+
+
+            <details class="bloco-expansivel">
+                <summary>
+                    <span class="icon">📝</span>
+                    <h2>Como foi este mês?</h2>
+                    <span class="mini-titulo" style="margin-left: 6px;">
+                        (preencher depois)
+                    </span>
+                </summary>
+                <textarea
+                    id="comoFoi"
+                    rows="4"
+                    placeholder="O que funcionou, o que travou, o que fica para o próximo mês."
+                    style="margin-top: 14px;"
+                ></textarea>
+            </details>
+
+
+            <details class="bloco-expansivel">
+                <summary>
+                    <span class="icon">🕰️</span>
+                    <h2>Meses anteriores</h2>
+                </summary>
+                <div id="historico" style="margin-top: 14px;">
+                    <p class="snapshot-vazio">Carregando…</p>
+                </div>
+            </details>
 
         </section>
 
@@ -339,14 +346,81 @@
 
 
     <script>
+        // ==================================================
+        // DATA — PRÓXIMO MÊS
+        // ==================================================
+
+        const hoje = new Date();
+
+        const NOMES_MES = [
+            "janeiro", "fevereiro", "março", "abril",
+            "maio", "junho", "julho", "agosto",
+            "setembro", "outubro", "novembro", "dezembro"
+        ];
+
+        // Próximo mês
+        let proxAno = hoje.getFullYear();
+        let proxMes = hoje.getMonth() + 2; // getMonth é 0-based
+        if (proxMes > 12) { proxMes = 1; proxAno++; }
+
+        const mesAncora = `${proxAno}-${String(proxMes).padStart(2, "0")}`;
+
+        document.getElementById("tituloData").textContent =
+            `${NOMES_MES[proxMes - 1]} de ${proxAno}`;
+        document.getElementById("subData").textContent =
+            "Direção dos próximos 30 dias.";
+
+        // Mês atual (o que acabou) — para a revisão
+        const mesAtualISO = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}`;
+        document.getElementById("linkRevisao").href =
+            `../revisao/mes.html?data=${mesAtualISO}-01`;
+
+
+        // ==================================================
+        // REFERÊNCIA — REVISÃO DO MÊS ANTERIOR
+        // ==================================================
+
+        (function blocoRef() {
+
+            let antAno = hoje.getFullYear();
+            let antMes = hoje.getMonth() + 1; // 1-based
+            if (antMes === 0) { antMes = 12; antAno--; }
+
+            const mesAnt = `${antAno}-${String(antMes).padStart(2, "0")}`;
+
+            const chaves = [
+                { k: "aprendizados", label: "🧠 Aprendizados do mês passado" },
+                { k: "mudar",       label: "🔧 O que deve mudar" },
+                { k: "padroes",     label: "🔁 Padrões percebidos" }
+            ];
+
+            const itens = [];
+
+            chaves.forEach(({ k, label }) => {
+                const v = localStorage.getItem(`planejamento_mes_${mesAnt}_${k}`);
+                if (v && v.trim()) itens.push({ label, valor: v.trim() });
+            });
+
+            if (itens.length === 0) return;
+
+            document.getElementById("blocoRef").style.display = "block";
+            document.getElementById("conteudoRef").innerHTML = itens.map(i => `
+                <div class="ref-item">
+                    <span class="ref-label">${i.label}</span>
+                    ${i.valor}
+                </div>
+            `).join("");
+
+        })();
+
+
+        // ==================================================
+        // CAMPOS TEXTO
+        // ==================================================
+
         const PREFIXO = "planejamento_pp_mes_";
 
-
-        // ==================================================
-        // CAMPOS TEXTO SIMPLES
-        // ==================================================
-
-        ["direcao", "focoPrincipal", "mudancas"].forEach(id => {
+        ["direcao", "focoPrincipal", "mudancas", "comoFoi"].forEach(id => {
             const campo = document.getElementById(id);
             const chave = PREFIXO + id;
             const salvo = localStorage.getItem(chave);
@@ -356,49 +430,88 @@
 
 
         // ==================================================
+        // ÁREAS DE ATENÇÃO
+        // ==================================================
+
+        const AREAS = [
+            "💼 Trabalho", "💰 Finanças", "🏋️ Corpo", "🧠 Mente",
+            "🙏 Espiritualidade", "🤝 Relacionamentos", "📚 Estudos",
+            "🏠 Casa", "🎨 Criatividade"
+        ];
+
+        (function areasAtencao() {
+
+            const container = document.getElementById("areasAtencao");
+            const chave = PREFIXO + "areas_atencao";
+
+            let selecionadas = [];
+            try {
+                selecionadas = JSON.parse(localStorage.getItem(chave)) || [];
+            } catch (e) { selecionadas = []; }
+
+            AREAS.forEach(area => {
+                const chip = document.createElement("div");
+                chip.className = "area-chip";
+                chip.textContent = area;
+                if (selecionadas.includes(area)) chip.classList.add("selecionado");
+
+                chip.addEventListener("click", () => {
+                    const jaSel = chip.classList.contains("selecionado");
+                    if (jaSel) {
+                        selecionadas = selecionadas.filter(a => a !== area);
+                        chip.classList.remove("selecionado");
+                    } else {
+                        selecionadas.push(area);
+                        chip.classList.add("selecionado");
+                    }
+                    localStorage.setItem(chave, JSON.stringify(selecionadas));
+
+                    // Alimenta o hub
+                    localStorage.setItem(
+                        "planejamento_pp_mes_areas_atencao",
+                        selecionadas.join(",")
+                    );
+                });
+
+                container.appendChild(chip);
+            });
+
+        })();
+
+
+        // ==================================================
         // LISTAS SIMPLES
         // ==================================================
 
         function setupLista(chave, containerId, btnId, placeholder) {
-
             const container = document.getElementById(containerId);
             const btnAdd = document.getElementById(btnId);
 
             let itens = [];
             try {
-                const s = localStorage.getItem(PREFIXO + chave);
+                const s = localStorage.getItem(chave);
                 if (s) itens = JSON.parse(s);
             } catch (e) { itens = []; }
 
-            function salvar() {
-                localStorage.setItem(PREFIXO + chave, JSON.stringify(itens));
-            }
+            function salvar() { localStorage.setItem(chave, JSON.stringify(itens)); }
 
             function render() {
                 container.innerHTML = "";
-
                 itens.forEach((item, i) => {
                     const linha = document.createElement("div");
                     linha.className = "item-linha";
 
                     const input = document.createElement("input");
-                    input.type = "text";
-                    input.value = item.texto || "";
+                    input.type = "text"; input.value = item.texto || "";
                     input.placeholder = placeholder;
-                    input.addEventListener("input", () => {
-                        item.texto = input.value;
-                        salvar();
-                    });
+                    input.addEventListener("input", () => { item.texto = input.value; salvar(); });
                     linha.appendChild(input);
 
                     const btnRem = document.createElement("button");
-                    btnRem.type = "button";
-                    btnRem.className = "item-remover";
+                    btnRem.type = "button"; btnRem.className = "item-remover";
                     btnRem.textContent = "×";
                     btnRem.addEventListener("click", () => {
-                        itens.splice(i, 1);
-                        salvar();
-                        render();
+                        itens.splice(i, 1); salvar(); render();
                     });
                     linha.appendChild(btnRem);
 
@@ -407,9 +520,7 @@
             }
 
             btnAdd.addEventListener("click", () => {
-                itens.push({ texto: "" });
-                salvar();
-                render();
+                itens.push({ texto: "" }); salvar(); render();
                 const inputs = container.querySelectorAll("input[type=text]");
                 if (inputs.length) inputs[inputs.length - 1].focus();
             });
@@ -417,11 +528,11 @@
             render();
         }
 
-        setupLista("objetivos", "listaObjetivos", "btnAddObjetivo", "Ex.: conseguir os primeiros clientes.");
-        setupLista("resultados", "listaResultados", "btnAddResultado", "Ex.: fazer 50 abordagens e conseguir 5 reuniões.");
-        setupLista("parar", "listaParar", "btnAddParar", "Ex.: consumir vídeos curtos à tarde.");
-        setupLista("manter", "listaManter", "btnAddManter", "Ex.: revisão semanal todo domingo.");
-        setupLista("compromissos", "listaCompromissos", "btnAddCompromisso", "Ex.: 15/10 — viagem.");
+        setupLista(`${PREFIXO}objetivos`, "listaObjetivos", "btnAddObjetivo", "Ex.: conseguir os primeiros clientes.");
+        setupLista(`${PREFIXO}resultados`, "listaResultados", "btnAddResultado", "Ex.: fazer 50 abordagens.");
+        setupLista(`${PREFIXO}parar", "listaParar".replace('"', ''), "btnAddParar`, "Ex.: consumir vídeos curtos à tarde.");
+        setupLista(`${PREFIXO}manter`, "listaManter", "btnAddManter", "Ex.: revisão semanal todo domingo.");
+        setupLista(`${PREFIXO}compromissos`, "listaCompromissos", "btnAddCompromisso", "Ex.: 15/10 — viagem.");
 
 
         // ==================================================
@@ -429,7 +540,6 @@
         // ==================================================
 
         (function setupProjetos() {
-
             const container = document.getElementById("listaProjetos");
             const btnAdd = document.getElementById("btnAddProjeto");
 
@@ -439,58 +549,46 @@
                 if (s) projetos = JSON.parse(s);
             } catch (e) { projetos = []; }
 
-            function salvar() {
-                localStorage.setItem(PREFIXO + "projetos", JSON.stringify(projetos));
-            }
+            function salvar() { localStorage.setItem(PREFIXO + "projetos", JSON.stringify(projetos)); }
 
             function render() {
                 container.innerHTML = "";
-
                 projetos.forEach((p, i) => {
-
                     const card = document.createElement("div");
-                    card.className = "projeto-card";
-
-                    const campos = [
-                        { k: "nome",     ph: "Nome do projeto",             tag: "input" },
-                        { k: "resultado",ph: "Resultado desejado",           tag: "input" },
-                        { k: "situacao", ph: "Situação atual",               tag: "input" },
-                        { k: "marco",    ph: "Próximo marco",                tag: "input" },
-                        { k: "prazo",    ph: "Prazo",                        tag: "input" },
-                        { k: "status",   ph: "Status (planejando, em curso, travado…)", tag: "input" }
-                    ];
+                    card.className = "proj-card";
 
                     const cab = document.createElement("div");
-                    cab.className = "projeto-cabecalho";
+                    cab.className = "cab";
 
                     const nome = document.createElement("input");
-                    nome.type = "text";
-                    nome.placeholder = campos[0].ph;
+                    nome.type = "text"; nome.placeholder = "Nome do projeto";
                     nome.value = p.nome || "";
                     nome.addEventListener("input", () => { p.nome = nome.value; salvar(); });
                     cab.appendChild(nome);
 
                     const btnRem = document.createElement("button");
-                    btnRem.type = "button";
-                    btnRem.className = "item-remover";
+                    btnRem.type = "button"; btnRem.className = "item-remover";
                     btnRem.textContent = "×";
                     btnRem.addEventListener("click", () => {
-                        projetos.splice(i, 1);
-                        salvar();
-                        render();
+                        projetos.splice(i, 1); salvar(); render();
                     });
                     cab.appendChild(btnRem);
 
                     card.appendChild(cab);
 
-                    campos.slice(1).forEach(c => {
-                        const input = document.createElement("input");
-                        input.type = "text";
-                        input.placeholder = c.ph;
-                        input.value = p[c.k] || "";
-                        input.style.marginTop = "8px";
-                        input.addEventListener("input", () => { p[c.k] = input.value; salvar(); });
-                        card.appendChild(input);
+                    [
+                        { k: "resultado", ph: "Resultado desejado" },
+                        { k: "situacao",  ph: "Situação atual" },
+                        { k: "marco",     ph: "Próximo marco" },
+                        { k: "prazo",     ph: "Prazo" },
+                        { k: "status",    ph: "Status" }
+                    ].forEach(c => {
+                        const inp = document.createElement("input");
+                        inp.type = "text"; inp.placeholder = c.ph;
+                        inp.value = p[c.k] || "";
+                        inp.style.marginTop = "8px";
+                        inp.addEventListener("input", () => { p[c.k] = inp.value; salvar(); });
+                        card.appendChild(inp);
                     });
 
                     container.appendChild(card);
@@ -498,10 +596,8 @@
             }
 
             btnAdd.addEventListener("click", () => {
-                projetos.push({});
-                salvar();
-                render();
-                const inputs = container.querySelectorAll(".projeto-cabecalho input");
+                projetos.push({}); salvar(); render();
+                const inputs = container.querySelectorAll(".cab input");
                 if (inputs.length) inputs[inputs.length - 1].focus();
             });
 
@@ -510,11 +606,10 @@
 
 
         // ==================================================
-        // DESENVOLVER (com sub-campos)
+        // DESENVOLVER
         // ==================================================
 
         (function setupDesenvolver() {
-
             const container = document.getElementById("listaDesenvolver");
             const btnAdd = document.getElementById("btnAddDesenvolver");
 
@@ -524,36 +619,28 @@
                 if (s) itens = JSON.parse(s);
             } catch (e) { itens = []; }
 
-            function salvar() {
-                localStorage.setItem(PREFIXO + "desenvolver", JSON.stringify(itens));
-            }
+            function salvar() { localStorage.setItem(PREFIXO + "desenvolver", JSON.stringify(itens)); }
 
             function render() {
                 container.innerHTML = "";
-
                 itens.forEach((d, i) => {
-
                     const card = document.createElement("div");
                     card.className = "dev-card";
 
                     const cab = document.createElement("div");
-                    cab.className = "projeto-cabecalho";
+                    cab.className = "cab";
 
                     const nome = document.createElement("input");
-                    nome.type = "text";
-                    nome.placeholder = "O que desenvolver (ex.: comunicação, vendas)";
+                    nome.type = "text"; nome.placeholder = "O que desenvolver";
                     nome.value = d.nome || "";
                     nome.addEventListener("input", () => { d.nome = nome.value; salvar(); });
                     cab.appendChild(nome);
 
                     const btnRem = document.createElement("button");
-                    btnRem.type = "button";
-                    btnRem.className = "item-remover";
+                    btnRem.type = "button"; btnRem.className = "item-remover";
                     btnRem.textContent = "×";
                     btnRem.addEventListener("click", () => {
-                        itens.splice(i, 1);
-                        salvar();
-                        render();
+                        itens.splice(i, 1); salvar(); render();
                     });
                     cab.appendChild(btnRem);
 
@@ -564,13 +651,12 @@
                         { k: "pratica",  ph: "Como vou praticar" },
                         { k: "evolucao", ph: "Como vou perceber evolução" }
                     ].forEach(c => {
-                        const input = document.createElement("input");
-                        input.type = "text";
-                        input.placeholder = c.ph;
-                        input.value = d[c.k] || "";
-                        input.style.marginTop = "8px";
-                        input.addEventListener("input", () => { d[c.k] = input.value; salvar(); });
-                        card.appendChild(input);
+                        const inp = document.createElement("input");
+                        inp.type = "text"; inp.placeholder = c.ph;
+                        inp.value = d[c.k] || "";
+                        inp.style.marginTop = "8px";
+                        inp.addEventListener("input", () => { d[c.k] = inp.value; salvar(); });
+                        card.appendChild(inp);
                     });
 
                     container.appendChild(card);
@@ -578,10 +664,8 @@
             }
 
             btnAdd.addEventListener("click", () => {
-                itens.push({});
-                salvar();
-                render();
-                const inputs = container.querySelectorAll(".projeto-cabecalho input");
+                itens.push({}); salvar(); render();
+                const inputs = container.querySelectorAll(".cab input");
                 if (inputs.length) inputs[inputs.length - 1].focus();
             });
 
@@ -594,7 +678,6 @@
         // ==================================================
 
         (function setupExperimentos() {
-
             const container = document.getElementById("listaExperimentos");
             const btnAdd = document.getElementById("btnAddExperimento");
 
@@ -604,36 +687,28 @@
                 if (s) itens = JSON.parse(s);
             } catch (e) { itens = []; }
 
-            function salvar() {
-                localStorage.setItem(PREFIXO + "experimentos", JSON.stringify(itens));
-            }
+            function salvar() { localStorage.setItem(PREFIXO + "experimentos", JSON.stringify(itens)); }
 
             function render() {
                 container.innerHTML = "";
-
                 itens.forEach((e, i) => {
-
                     const card = document.createElement("div");
                     card.className = "exp-card";
 
                     const cab = document.createElement("div");
-                    cab.className = "projeto-cabecalho";
+                    cab.className = "cab";
 
                     const nome = document.createElement("input");
-                    nome.type = "text";
-                    nome.placeholder = "O que quero testar?";
+                    nome.type = "text"; nome.placeholder = "O que quero testar?";
                     nome.value = e.nome || "";
                     nome.addEventListener("input", () => { e.nome = nome.value; salvar(); });
                     cab.appendChild(nome);
 
                     const btnRem = document.createElement("button");
-                    btnRem.type = "button";
-                    btnRem.className = "item-remover";
+                    btnRem.type = "button"; btnRem.className = "item-remover";
                     btnRem.textContent = "×";
                     btnRem.addEventListener("click", () => {
-                        itens.splice(i, 1);
-                        salvar();
-                        render();
+                        itens.splice(i, 1); salvar(); render();
                     });
                     cab.appendChild(btnRem);
 
@@ -644,13 +719,12 @@
                         { k: "como",      ph: "Como vou testar" },
                         { k: "descobrir", ph: "O que quero descobrir" }
                     ].forEach(c => {
-                        const input = document.createElement("input");
-                        input.type = "text";
-                        input.placeholder = c.ph;
-                        input.value = e[c.k] || "";
-                        input.style.marginTop = "8px";
-                        input.addEventListener("input", () => { e[c.k] = input.value; salvar(); });
-                        card.appendChild(input);
+                        const inp = document.createElement("input");
+                        inp.type = "text"; inp.placeholder = c.ph;
+                        inp.value = e[c.k] || "";
+                        inp.style.marginTop = "8px";
+                        inp.addEventListener("input", () => { e[c.k] = inp.value; salvar(); });
+                        card.appendChild(inp);
                     });
 
                     container.appendChild(card);
@@ -658,14 +732,82 @@
             }
 
             btnAdd.addEventListener("click", () => {
-                itens.push({});
-                salvar();
-                render();
-                const inputs = container.querySelectorAll(".projeto-cabecalho input");
+                itens.push({}); salvar(); render();
+                const inputs = container.querySelectorAll(".cab input");
                 if (inputs.length) inputs[inputs.length - 1].focus();
             });
 
             render();
+        })();
+
+
+        // ==================================================
+        // HISTÓRICO DE SNAPSHOTS
+        // ==================================================
+
+        (function snapshots() {
+            const chaveUltimo = "planejamento_pp_mes_ultima_data";
+            const ultimaData = localStorage.getItem(chaveUltimo);
+
+            if (ultimaData && ultimaData !== mesAncora) {
+                const chaves = Object.keys(localStorage).filter(k =>
+                    k.startsWith(PREFIXO) &&
+                    !k.includes("_snapshot_") &&
+                    !k.endsWith("_ultima_data")
+                );
+                const dados = {};
+                chaves.forEach(k => {
+                    const v = localStorage.getItem(k);
+                    if (v !== null && v.trim() !== "" && v !== "false") {
+                        dados[k] = v;
+                    }
+                });
+                if (Object.keys(dados).length > 0) {
+                    localStorage.setItem(
+                        `planejamento_pp_mes_snapshot_${ultimaData}`,
+                        JSON.stringify(dados)
+                    );
+                }
+            }
+
+            localStorage.setItem(chaveUltimo, mesAncora);
+
+            const container = document.getElementById("historico");
+            const snaps = Object.keys(localStorage)
+                .filter(k => k.startsWith("planejamento_pp_mes_snapshot_"))
+                .sort().reverse();
+
+            if (snaps.length === 0) {
+                container.innerHTML = `<p class="snapshot-vazio">Nada arquivado ainda. Ao virar o mês, o anterior é salvo aqui.</p>`;
+                return;
+            }
+
+            let html = "";
+            snaps.slice(0, 12).forEach(chave => {
+                const data = chave.replace("planejamento_pp_mes_snapshot_", "");
+                const [a, m] = data.split("-");
+                let dados = {};
+                try { dados = JSON.parse(localStorage.getItem(chave)) || {}; } catch (e) {}
+
+                const direcao = dados[`${PREFIXO}direcao`];
+                const foco = dados[`${PREFIXO}focoPrincipal`];
+                const comoFoi = dados[`${PREFIXO}comoFoi`];
+
+                html += `<div class="snapshot-item">`;
+                html += `<div class="snapshot-data">${NOMES_MES[Number(m) - 1]} de ${a}</div>`;
+                if (direcao && direcao.trim()) {
+                    html += `<div class="snapshot-linha">🧭 ${direcao.trim().slice(0, 120)}</div>`;
+                }
+                if (foco && foco.trim()) {
+                    html += `<div class="snapshot-linha">📌 ${foco.trim().slice(0, 120)}</div>`;
+                }
+                if (comoFoi && comoFoi.trim()) {
+                    html += `<div class="snapshot-linha" style="color:#888;">📝 ${comoFoi.trim().slice(0, 120)}</div>`;
+                }
+                html += `</div>`;
+            });
+
+            container.innerHTML = html;
         })();
     </script>
 
