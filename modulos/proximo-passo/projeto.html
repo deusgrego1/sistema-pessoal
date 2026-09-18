@@ -410,6 +410,136 @@
             color: #bbb; margin: 3px 4px 3px 0;
         }
 
+        /* ===== Timer de semanas ===== */
+        .timer-card {
+            padding: 20px 20px 16px;
+        }
+
+        .timer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .timer-titulo {
+            font-size: 15px;
+            font-weight: 600;
+            color: #f5f5f5;
+            margin-bottom: 4px;
+        }
+
+        .timer-sub {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .timer-filtros {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .timer-filtros button {
+            padding: 5px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid #333338;
+            background: #1a1a1e;
+            color: #aaa;
+            border-radius: 8px;
+            transition: 0.15s;
+        }
+
+        .timer-filtros button:hover {
+            background: #222228;
+            color: #e0e0e0;
+        }
+
+        .timer-filtros button.ativo {
+            background: #2e2e33;
+            border-color: #666;
+            color: #fff;
+        }
+
+        .timer-grid-wrap {
+            display: flex;
+            justify-content: center;
+        }
+
+        .timer-grid {
+            display: grid;
+            grid-template-columns: repeat(13, minmax(0, 1fr));
+            gap: 4px;
+            width: 100%;
+            max-width: 520px;
+        }
+
+        .timer-cell {
+            aspect-ratio: 1;
+            border-radius: 2px;
+            background: #131316;
+            border: 1px solid #1e1e22;
+            box-sizing: border-box;
+            transition: 0.2s;
+        }
+
+        .timer-cell.passada {
+            background: #333338;
+            border-color: #3a3a40;
+        }
+
+        .timer-cell.ativa {
+            background: #2ea043;
+            border-color: #2ea043;
+        }
+
+        .timer-cell.atual {
+            background: #333338;
+            border: 2px solid #f5f5f5;
+        }
+
+        .timer-cell.atual.ativa {
+            background: #2ea043;
+            border-color: #f5f5f5;
+        }
+
+        .timer-legenda {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 14px;
+            font-size: 11px;
+            color: #666;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .timer-legenda .mini {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            box-sizing: border-box;
+        }
+
+        .timer-legenda .mini.passada {
+            background: #333338;
+            border: 1px solid #3a3a40;
+        }
+
+        .timer-legenda .mini.ativa {
+            background: #2ea043;
+            border: 1px solid #2ea043;
+        }
+
+        .timer-legenda .mini.atual {
+            background: #333338;
+            border: 2px solid #f5f5f5;
+        }
+
+        
         body.modo-compacto .colapsavel-compacto { display: none; }
 
         .banner-parado, .banner-sprint {
