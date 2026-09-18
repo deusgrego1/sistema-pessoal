@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Próximo Dia</title>
+
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .campo-label {
+            display: block;
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 14px 0 8px;
+        }
+
+        /* Prioridade fixa */
+
+        .prio-fixa {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px;
+            background: #1c1c20;
+            border: 1px solid #252529;
+            border-left: 3px solid #d4a94a;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .prio-fixa .num {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .prio-fixa input {
+            flex: 1;
+            margin-top: 0 !important;
+            background: transparent !important;
+            border: none !important;
+            padding: 4px 0 !important;
+            font-size: 15px;
+            color: #e0e0e0;
+            outline: none;
+        }
+
+        .prio-fixa input::placeholder { color: #666; }
+
+        .prio-fixa .tag {
+            font-size: 10px;
+            padding: 3px 8px;
+            background: #3a2f1f;
+            color: #d4a94a;
+            border-radius: 8px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        /* Lista simples */
+
+        .item-linha {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: #1c1c20;
+            border: 1px solid #252529;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .item-linha.concluida { opacity: 0.5; }
+
+        .item-linha input[type="text"] {
+            flex: 1;
+            margin-top: 0 !important;
+            background: transparent !important;
+            border: none !important;
+            padding: 4px 0 !important;
+            font-size: 14px;
+            color: #e0e0e0;
+            outline: none;
+        }
+
+        .item-linha input[type="text"]::placeholder { color: #555; }
+
+        .item-linha input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .item-remover {
+            background: none;
+            border: none;
+            color: #a33;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0 4px;
+            flex-shrink: 0;
+        }
+
+        .item-remover:hover { color: #e55; }
+
+        .btn-adicionar {
+            width: 100%;
+            padding: 10px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px dashed #444;
+            background: transparent;
+            color: #999;
+            border-radius: 10px;
+            transition: 0.15s;
+        }
+
+        .btn-adicionar:hover { border-color: #666; color: #ccc; background: #1a1a1e; }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="header">
+            <p class="eyebrow">PRÓXIMO PASSO</p>
+            <h1>☀️ Próximo dia</h1>
+            <p class="subtitle">
+                Deixe preparado o que não pode faltar amanhã.
+            </p>
+        </header>
+
+        <section class="modules">
+
+            <!-- PRIORIDADE FIXA -->
+
+            <div class="module-card" style="align-items: flex-start;">
+                <span class="icon">🎯</span>
+                <div style="width: 100%;">
+                    <h2>Prioridade fixa</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 14px;">
+                        A primeira linha é obrigatória. Se amanhã só der para fazer uma coisa, é essa.
+                    </p>
+
+                    <div class="prio-fixa">
+                        <span class="num">1️⃣</span>
+                        <input type="text" id="prio1" placeholder="Prioridade 1 (obrigatória)">
+                        <span class="tag">Fixa</span>
+                    </div>
+
+                    <div class="prio-fixa" style="border-left-color: #666;">
+                        <span class="num">2️⃣</span>
+                        <input type="text" id="prio2" placeholder="Prioridade 2 (opcional)">
+                    </div>
+
+                    <div class="prio-fixa" style="border-left-color: #666;">
+                        <span class="num">3️⃣</span>
+                        <input type="text" id="prio3" placeholder="Prioridade 3 (opcional)">
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- TAREFAS IMPORTANTES -->
+
+            <div class="module-card" style="align-items: flex-start;">
+                <span class="icon">📌</span>
+                <div style="width: 100%;">
+                    <h2>Tarefas importantes</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
+                        Outras ações que precisam acontecer amanhã.
+                    </p>
+                    <div id="listaTarefas"></div>
+                    <button type="button" class="btn-adicionar" id="btnAddTarefa">
+                        ＋ Adicionar tarefa
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- COMPROMISSOS -->
+
+            <div class="module-card" style="align-items: flex-start;">
+                <span class="icon">📅</span>
+                <div style="width: 100%;">
+                    <h2>Compromissos</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
+                        Horários já marcados ou que não podem ser esquecidos.
+                    </p>
+                    <div id="listaCompromissos"></div>
+                    <button type="button" class="btn-adicionar" id="btnAddCompromisso">
+                        ＋ Adicionar compromisso
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- PENDÊNCIAS -->
+
+            <div class="module-card">
+                <span class="icon">🔄</span>
+                <div>
+                    <h2>Pendências</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 10px;">
+                        O que ficou para trás e vale considerar amanhã.
+                    </p>
+                    <textarea id="pendencias" rows="4"
+                        placeholder="Ex.: não terminei a pesquisa dos potenciais clientes."></textarea>
+                </div>
+            </div>
+
+
+            <!-- LEMBRAR -->
+
+            <div class="module-card">
+                <span class="icon">🧠</span>
+                <div>
+                    <h2>Lembrar</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 10px;">
+                        Algo para estar na cabeça amanhã — comportamento, decisão ou percepção.
+                    </p>
+                    <textarea id="lembrar" rows="3"
+                        placeholder="Ex.: começar pelo contato com os clientes antes de abrir o YouTube."></textarea>
+                </div>
+            </div>
+
+        </section>
+
+        <a href="index.html" class="back-button">
+            ← Voltar para Próximo Passo
+        </a>
+
+    </main>
+
+
+    <script>
+        // ==================================================
+        // PRIORIDADES FIXAS
+        // ==================================================
+
+        ["prio1", "prio2", "prio3"].forEach((id, i) => {
+            const campo = document.getElementById(id);
+            const chave = `planejamento_pp_dia_prioridade_${i + 1}`;
+            const salvo = localStorage.getItem(chave);
+            if (salvo !== null) campo.value = salvo;
+
+            campo.addEventListener("input", () => {
+                localStorage.setItem(chave, campo.value);
+            });
+        });
+
+
+        // ==================================================
+        // CAMPOS TEXTO LIVRES
+        // ==================================================
+
+        const campos = [
+            { id: "pendencias", chave: "planejamento_pp_dia_pendencias" },
+            { id: "lembrar",    chave: "planejamento_pp_dia_lembrar" }
+        ];
+
+        campos.forEach(({ id, chave }) => {
+            const campo = document.getElementById(id);
+            const salvo = localStorage.getItem(chave);
+            if (salvo !== null) campo.value = salvo;
+            campo.addEventListener("input", () => localStorage.setItem(chave, campo.value));
+        });
+
+
+        // ==================================================
+        // LISTAS (TAREFAS / COMPROMISSOS)
+        // ==================================================
+
+        function setupLista(config) {
+
+            const { chave, containerId, btnId, comCheckbox } = config;
+            const container = document.getElementById(containerId);
+            const btnAdd = document.getElementById(btnId);
+
+            let itens = [];
+            try {
+                const s = localStorage.getItem(chave);
+                if (s) itens = JSON.parse(s);
+            } catch (e) { itens = []; }
+
+            function salvar() {
+                localStorage.setItem(chave, JSON.stringify(itens));
+            }
+
+            function render() {
+
+                container.innerHTML = "";
+
+                itens.forEach((item, i) => {
+
+                    const linha = document.createElement("div");
+                    linha.className = "item-linha" + (item.concluida ? " concluida" : "");
+
+                    if (comCheckbox) {
+                        const check = document.createElement("input");
+                        check.type = "checkbox";
+                        check.checked = !!item.concluida;
+                        check.addEventListener("change", () => {
+                            item.concluida = check.checked;
+                            salvar();
+                            render();
+                        });
+                        linha.appendChild(check);
+                    }
+
+                    const input = document.createElement("input");
+                    input.type = "text";
+                    input.value = item.texto || "";
+                    input.placeholder = comCheckbox ? "O que fazer?" : "Ex.: 14h — Curso";
+                    input.addEventListener("input", () => {
+                        item.texto = input.value;
+                        salvar();
+                    });
+                    linha.appendChild(input);
+
+                    const btnRem = document.createElement("button");
+                    btnRem.type = "button";
+                    btnRem.className = "item-remover";
+                    btnRem.textContent = "×";
+                    btnRem.addEventListener("click", () => {
+                        itens.splice(i, 1);
+                        salvar();
+                        render();
+                    });
+                    linha.appendChild(btnRem);
+
+                    container.appendChild(linha);
+                });
+            }
+
+            btnAdd.addEventListener("click", () => {
+                itens.push({ texto: "", concluida: false });
+                salvar();
+                render();
+                const inputs = container.querySelectorAll("input[type=text]");
+                if (inputs.length) inputs[inputs.length - 1].focus();
+            });
+
+            render();
+        }
+
+        setupLista({
+            chave: "planejamento_pp_dia_tarefas",
+            containerId: "listaTarefas",
+            btnId: "btnAddTarefa",
+            comCheckbox: true
+        });
+
+        setupLista({
+            chave: "planejamento_pp_dia_compromissos",
+            containerId: "listaCompromissos",
+            btnId: "btnAddCompromisso",
+            comCheckbox: false
+        });
+    </script>
+
+</body>
+</html>
