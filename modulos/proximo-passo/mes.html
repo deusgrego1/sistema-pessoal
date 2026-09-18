@@ -358,9 +358,8 @@
             "setembro", "outubro", "novembro", "dezembro"
         ];
 
-        // Próximo mês
         let proxAno = hoje.getFullYear();
-        let proxMes = hoje.getMonth() + 2; // getMonth é 0-based
+        let proxMes = hoje.getMonth() + 2;
         if (proxMes > 12) { proxMes = 1; proxAno++; }
 
         const mesAncora = `${proxAno}-${String(proxMes).padStart(2, "0")}`;
@@ -370,7 +369,6 @@
         document.getElementById("subData").textContent =
             "Direção dos próximos 30 dias.";
 
-        // Mês atual (o que acabou) — para a revisão
         const mesAtualISO = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}`;
         document.getElementById("linkRevisao").href =
             `../revisao/mes.html?data=${mesAtualISO}-01`;
@@ -383,7 +381,7 @@
         (function blocoRef() {
 
             let antAno = hoje.getFullYear();
-            let antMes = hoje.getMonth() + 1; // 1-based
+            let antMes = hoje.getMonth() + 1;
             if (antMes === 0) { antMes = 12; antAno--; }
 
             const mesAnt = `${antAno}-${String(antMes).padStart(2, "0")}`;
@@ -445,8 +443,16 @@
             const chave = PREFIXO + "areas_atencao";
 
             let selecionadas = [];
+
             try {
-                selecionadas = JSON.parse(localStorage.getItem(chave)) || [];
+                const raw = localStorage.getItem(chave);
+                if (raw) {
+                    if (raw.trim().startsWith("[")) {
+                        selecionadas = JSON.parse(raw) || [];
+                    } else {
+                        selecionadas = raw.split(",").map(s => s.trim()).filter(Boolean);
+                    }
+                }
             } catch (e) { selecionadas = []; }
 
             AREAS.forEach(area => {
@@ -465,8 +471,6 @@
                         chip.classList.add("selecionado");
                     }
                     localStorage.setItem(chave, JSON.stringify(selecionadas));
-
-                    );
                 });
 
                 container.appendChild(chip);
