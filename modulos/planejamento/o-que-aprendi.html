@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>O que aprendi</title>
+    <title>Estudo</title>
 
     <link rel="stylesheet" href="../../css/style.css">
 
@@ -18,13 +18,13 @@
             margin: 14px 0 8px;
         }
 
-        .status-chips {
+        .chips {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
         }
 
-        .status-chip {
+        .chip {
             padding: 7px 13px;
             font-size: 12px;
             cursor: pointer;
@@ -36,49 +36,52 @@
             user-select: none;
         }
 
-        .status-chip:hover {
-            background: #222228;
-            color: #e0e0e0;
+        .chip:hover { background: #222228; color: #e0e0e0; }
+
+        .chip.selecionado {
+            background: #2e2e33;
+            border-color: #666;
+            color: #fff;
+            font-weight: 600;
         }
 
-        .status-chip.selecionado[data-valor="estudando"] {
-            background: #332e1a; border-color: #c9a44a; color: #e0d48a; font-weight: 600;
+        .meta-bloco {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .status-chip.selecionado[data-valor="praticar"] {
-            background: #1a2233; border-color: #5a8ad4; color: #a8c4e8; font-weight: 600;
+        .meta-bloco input {
+            flex: 1;
+            margin-top: 0;
         }
 
-        .status-chip.selecionado[data-valor="dominado"] {
-            background: #1f3320; border-color: #4caf50; color: #a5d6a7; font-weight: 600;
-        }
-
-        .status-chip.selecionado[data-valor="revisar"] {
-            background: #331f1f; border-color: #d45a5a; color: #e08b8b; font-weight: 600;
-        }
-
-        .link-preview {
+        .meta-status {
+            color: #aaa;
+            font-size: 13px;
             margin-top: 8px;
         }
 
-        .link-preview a {
-            display: inline-flex;
+        .link-subpagina {
+            display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border: 1px solid #2c3a55;
-            background: linear-gradient(135deg, #1a2235 0%, #232f4a 100%);
-            color: #dfe8ff;
-            border-radius: 8px;
+            gap: 15px;
+            padding: 18px;
+            background: #17171a;
+            border: 1px solid #252529;
+            border-radius: 16px;
+            color: inherit;
             text-decoration: none;
-            font-size: 13px;
-            transition: 0.15s;
+            transition: 0.2s;
         }
 
-        .link-preview a:hover {
-            border-color: #4a5c85;
-            transform: translateY(-1px);
+        .link-subpagina:hover {
+            background: #1e1e22;
+            border-color: #3a3a40;
         }
+
+        .link-subpagina h2 { font-size: 17px; margin-bottom: 5px; }
+        .link-subpagina p { color: #999; font-size: 13px; }
     </style>
 </head>
 
@@ -87,37 +90,131 @@
     <main class="container">
 
         <header class="header">
-            <p class="eyebrow">ESTUDO</p>
-            <h1>🧠 O que aprendi</h1>
+            <p class="eyebrow">PLANEJAMENTO</p>
+            <h1>📚 Estudo</h1>
             <p class="subtitle">
-                Registre o que realmente ficou de cada assunto estudado.
+                Defina o que você vai estudar e por quê.
             </p>
         </header>
 
         <section class="modules">
 
-            <!-- Os blocos são gerados via JS -->
+            <div class="module-card" style="align-items: flex-start;">
+                <div style="width: 100%;">
+                    <h2>Tipo de estudo</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
+                        Como você vai estudar hoje.
+                    </p>
+                    <div class="chips" id="chipsTipo"></div>
+                </div>
+            </div>
 
-            <button
-                type="button"
-                class="back-button"
-                id="adicionarAprendizado"
-            >
-                ＋ Adicionar outro aprendizado
-            </button>
+
+            <div class="module-card" style="align-items: flex-start;">
+                <div style="width: 100%;">
+                    <h2>Meta semanal</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
+                        Quantas horas de estudo você quer fazer por semana.
+                    </p>
+                    <div class="meta-bloco">
+                        <input type="text" id="metaSemanal" placeholder="Ex.: 5h ou 5">
+                    </div>
+                    <p class="meta-status" id="metaStatus"></p>
+                </div>
+            </div>
+
+
+            <div class="module-card">
+                <span class="icon">📌</span>
+                <div>
+                    <h2>Tema</h2>
+                    <textarea placeholder="O que vou estudar?" rows="3"></textarea>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <span class="icon">🎯</span>
+                <div>
+                    <h2>Objetivo do estudo</h2>
+                    <textarea placeholder="O que quero conseguir entender ou aprender?" rows="4"></textarea>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <span class="icon">📖</span>
+                <div>
+                    <h2>Fonte / material</h2>
+                    <textarea placeholder="Livro, curso, vídeo, artigo, aula..." rows="3"></textarea>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <span class="icon">⏱️</span>
+                <div>
+                    <h2>Tempo previsto</h2>
+                    <input type="text" placeholder="Ex.: 1h30">
+                </div>
+            </div>
+
+
+            <a href="o-que-aprendi.html" class="link-subpagina">
+                <span class="icon">🧠</span>
+                <div style="flex: 1;">
+                    <h2>O que aprendi</h2>
+                    <p>Registre, explique e aplique o que aprendeu.</p>
+                </div>
+                <span class="arrow">›</span>
+            </a>
+
+            <a href="biblioteca.html" class="link-subpagina">
+                <span class="icon">📚</span>
+                <div style="flex: 1;">
+                    <h2>Biblioteca de fontes</h2>
+                    <p>Cursos, livros, canais e materiais que você acompanha.</p>
+                </div>
+                <span class="arrow">›</span>
+            </a>
+
+            <a href="livros.html" class="link-subpagina">
+                <span class="icon">📖</span>
+                <div style="flex: 1;">
+                    <h2>Livros</h2>
+                    <p>Em progresso, pausados, concluídos.</p>
+                </div>
+                <span class="arrow">›</span>
+            </a>
+
+            <a href="citacoes.html" class="link-subpagina">
+                <span class="icon">💬</span>
+                <div style="flex: 1;">
+                    <h2>Citações</h2>
+                    <p>Frases que marcaram.</p>
+                </div>
+                <span class="arrow">›</span>
+            </a>
+
+            <a href="glossario.html" class="link-subpagina">
+                <span class="icon">📔</span>
+                <div style="flex: 1;">
+                    <h2>Glossário pessoal</h2>
+                    <p>Termos que você aprendeu, com suas palavras.</p>
+                </div>
+                <span class="arrow">›</span>
+            </a>
 
         </section>
 
-        <a href="estudo.html" class="back-button">
-            ← Voltar para Estudo
+        <a href="index.html" class="back-button">
+            ← Voltar para Planejamento
         </a>
 
     </main>
 
+    <script src="../../js/app.js"></script>
 
     <script>
         // ==================================================
-        // DATA
+        // DATA (respeita ?data=)
         // ==================================================
 
         const hoje = new Date();
@@ -134,196 +231,134 @@
                 : dataHoje;
 
 
-        // ==================================================
-        // ELEMENTOS E CHAVES
-        // ==================================================
-
-        const container = document.querySelector(".modules");
-        const botao = document.getElementById("adicionarAprendizado");
-
-        const camposPorAprendizado = 11;
-
-        const chaveQuantidade =
-            `planejamento_${dataAtual}_o-que-aprendi_blocos`;
-
-        let numeroAprendizado =
-            Number(localStorage.getItem(chaveQuantidade)) || 3;
+        // Propaga ?data= para os links internos
+        if (dataAtual !== dataHoje) {
+            document.querySelectorAll(".link-subpagina").forEach(a => {
+                const href = a.getAttribute("href");
+                if (href && !href.includes("?data=")) {
+                    a.setAttribute("href", `${href}?data=${dataAtual}`);
+                }
+            });
+        }
 
 
         // ==================================================
-        // STATUS
+        // TIPO DE ESTUDO
         // ==================================================
 
-        const STATUS = [
-            { valor: "estudando", label: "🟡 Estudando" },
-            { valor: "praticar",  label: "🔵 Praticar" },
-            { valor: "dominado",  label: "🟢 Dominado" },
-            { valor: "revisar",   label: "🔴 Preciso revisar" }
+        const TIPOS = [
+            "📖 Livro",
+            "🎓 Curso",
+            "🎥 Vídeo",
+            "📝 Artigo",
+            "🎧 Podcast",
+            "🧪 Prática"
         ];
 
+        const chaveTipo = `planejamento_${dataAtual}_estudo_tipo`;
+        const chipsTipo = document.getElementById("chipsTipo");
+        const tipoSalvo = localStorage.getItem(chaveTipo);
 
-        // ==================================================
-        // CRIA UM APRENDIZADO
-        // ==================================================
+        TIPOS.forEach(t => {
+            const chip = document.createElement("div");
+            chip.className = "chip";
+            chip.textContent = t;
+            if (tipoSalvo === t) chip.classList.add("selecionado");
 
-        function criarAprendizado(numero) {
-
-            const bloco = document.createElement("div");
-            bloco.className = "module-card";
-            bloco.style.alignItems = "flex-start";
-
-            bloco.innerHTML = `
-                <span class="icon">🧠</span>
-
-                <div style="width: 100%;">
-                    <h2>Aprendizado ${numero}</h2>
-
-                    <input type="text" data-idx="0"
-                        placeholder="📌 Assunto — o que estudei" style="margin-top:14px;">
-
-                    <textarea data-idx="1" rows="5"
-                        placeholder="💡 O que aprendi? Explique com suas próprias palavras."></textarea>
-
-                    <textarea data-idx="2" rows="3"
-                        placeholder="⭐ Principal insight"></textarea>
-
-                    <textarea data-idx="3" rows="3"
-                        placeholder="🔗 Com o que isso se conecta?"></textarea>
-
-                    <textarea data-idx="4" rows="3"
-                        placeholder="🛠️ Como posso aplicar?"></textarea>
-
-                    <textarea data-idx="5" rows="3"
-                        placeholder="❓ O que ainda não entendi?"></textarea>
-
-                    <textarea data-idx="6" rows="3"
-                        placeholder="🎯 Próxima ação"></textarea>
-
-                    <label class="campo-label">Status do aprendizado</label>
-                    <div class="status-chips">
-                        ${STATUS.map(s => `
-                            <div class="status-chip" data-valor="${s.valor}">
-                                ${s.label}
-                            </div>
-                        `).join("")}
-                    </div>
-
-                    <label class="campo-label">Link de referência</label>
-                    <input type="text" data-idx="8"
-                        placeholder="Cole o link do vídeo, artigo, curso...">
-                    <div class="link-preview"></div>
-
-                    <label class="campo-label">Revisar em (dias)</label>
-                    <input type="text" data-idx="9"
-                        placeholder="Ex.: 7 — para revisar daqui a uma semana">
-
-                    <label class="campo-label">Tema grande</label>
-                    <input type="text" data-idx="10"
-                        placeholder="Ex.: Marketing, Vendas, Programação">
-                </div>
-            `;
-
-            container.insertBefore(bloco, botao);
-
-
-            // ---------------------------------------------
-            // CAMPOS DE TEXTO
-            // ---------------------------------------------
-
-            bloco.querySelectorAll("[data-idx]").forEach(campo => {
-                const idx = Number(campo.dataset.idx);
-                const indice = (numero - 1) * camposPorAprendizado + idx;
-                const chave = `planejamento_${dataAtual}_o-que-aprendi_${indice}`;
-
-                const salvo = localStorage.getItem(chave);
-                if (salvo !== null) campo.value = salvo;
-
-                const salvar = () => {
-                    localStorage.setItem(chave, campo.value);
-                };
-
-                campo.addEventListener("input", salvar);
-                campo.addEventListener("change", salvar);
-            });
-
-
-            // ---------------------------------------------
-            // STATUS (chips)
-            // ---------------------------------------------
-
-            const idxStatus = (numero - 1) * camposPorAprendizado + 7;
-            const chaveStatus = `planejamento_${dataAtual}_o-que-aprendi_${idxStatus}`;
-            const chipsStatus = bloco.querySelectorAll(".status-chip");
-            const statusSalvo = localStorage.getItem(chaveStatus);
-
-            chipsStatus.forEach(chip => {
-
-                if (chip.dataset.valor === statusSalvo) {
-                    chip.classList.add("selecionado");
-                }
-
-                chip.addEventListener("click", () => {
-                    const jaSel = chip.classList.contains("selecionado");
-
-                    chipsStatus.forEach(c => c.classList.remove("selecionado"));
-
-                    if (jaSel) {
-                        localStorage.removeItem(chaveStatus);
-                    } else {
-                        chip.classList.add("selecionado");
-                        localStorage.setItem(chaveStatus, chip.dataset.valor);
-                    }
-                });
-            });
-
-
-            // ---------------------------------------------
-            // PREVIEW DE LINK
-            // ---------------------------------------------
-
-            const campoLink = bloco.querySelector('[data-idx="8"]');
-            const previewLink = bloco.querySelector(".link-preview");
-
-            function atualizarPreviewLink() {
-                const url = campoLink.value.trim();
-                if (/^https?:\/\//i.test(url)) {
-                    previewLink.innerHTML =
-                        `<a href="${url}" target="_blank" rel="noopener">🔗 Abrir link</a>`;
+            chip.addEventListener("click", () => {
+                const jaSel = chip.classList.contains("selecionado");
+                chipsTipo.querySelectorAll(".chip").forEach(c => c.classList.remove("selecionado"));
+                if (jaSel) {
+                    localStorage.removeItem(chaveTipo);
                 } else {
-                    previewLink.innerHTML = "";
+                    chip.classList.add("selecionado");
+                    localStorage.setItem(chaveTipo, t);
+                }
+            });
+
+            chipsTipo.appendChild(chip);
+        });
+
+
+        // ==================================================
+        // META SEMANAL
+        // ==================================================
+
+        const chaveMeta = "planejamento_estudo_meta_semanal";
+        const campoMeta = document.getElementById("metaSemanal");
+        const metaStatus = document.getElementById("metaStatus");
+
+        campoMeta.value = localStorage.getItem(chaveMeta) || "";
+
+        function extrairHoras(texto) {
+            if (!texto) return 0;
+            const match = texto.replace(",", ".").match(/(\d+(\.\d+)?)/);
+            return match ? Number(match[1]) : 0;
+        }
+
+        function calcularSemanaAtual() {
+
+            // Segunda-feira da semana atual
+            const d = new Date();
+            const dow = d.getDay();
+            const diff = (dow === 0) ? -6 : (1 - dow);
+            d.setDate(d.getDate() + diff);
+
+            let totalSegundos = 0;
+
+            for (let i = 0; i < 7; i++) {
+                const dt = new Date(d);
+                dt.setDate(dt.getDate() + i);
+                const iso = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
+
+                // Tempo previsto no planejamento
+                const tempo = localStorage.getItem(`planejamento_${iso}_estudo_3`);
+                if (tempo) {
+                    // Extrai horas de texto tipo "1h30", "90min", "2h"
+                    let h = 0, m = 0;
+                    const matchH = tempo.match(/(\d+)\s*h/i);
+                    const matchM = tempo.match(/(\d+)\s*min/i);
+                    if (matchH) h = Number(matchH[1]);
+                    if (matchM) m = Number(matchM[1]);
+                    if (!matchH && !matchM) {
+                        // Talvez só um número solto
+                        const so = tempo.match(/^(\d+(\.\d+)?)$/);
+                        if (so) h = Number(so[1]);
+                    }
+                    totalSegundos += (h * 3600) + (m * 60);
                 }
             }
 
-            atualizarPreviewLink();
-            campoLink.addEventListener("input", atualizarPreviewLink);
+            return totalSegundos / 3600;
         }
 
+        function atualizarStatusMeta() {
 
-        // ==================================================
-        // RENDER INICIAL
-        // ==================================================
+            const meta = extrairHoras(campoMeta.value);
+            const realizado = calcularSemanaAtual();
 
-        function renderTodos() {
-            // Remove blocos existentes
-            container.querySelectorAll(".module-card").forEach(b => b.remove());
-
-            for (let i = 1; i <= numeroAprendizado; i++) {
-                criarAprendizado(i);
+            if (!meta) {
+                metaStatus.textContent = "";
+                return;
             }
+
+            const pct = Math.round((realizado / meta) * 100);
+            const horasTexto = realizado.toFixed(1).replace(".", ",");
+
+            let cor = "#888";
+            if (pct >= 100) cor = "#4caf50";
+            else if (pct >= 60) cor = "#c9a44a";
+
+            metaStatus.innerHTML =
+                `Nesta semana: <strong style="color:${cor};">${horasTexto}h</strong> de ${meta}h (${pct}%)`;
         }
 
-        renderTodos();
-
-
-        // ==================================================
-        // ADICIONAR
-        // ==================================================
-
-        botao.addEventListener("click", () => {
-            numeroAprendizado++;
-            criarAprendizado(numeroAprendizado);
-            localStorage.setItem(chaveQuantidade, numeroAprendizado);
+        campoMeta.addEventListener("input", () => {
+            localStorage.setItem(chaveMeta, campoMeta.value);
+            atualizarStatusMeta();
         });
+
+        atualizarStatusMeta();
     </script>
 
 </body>
