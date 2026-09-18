@@ -51,6 +51,24 @@
         .chip.st-travado.selecionado    { background: #331f1f; border-color: #d45a5a; color: #e08b8b; }
         .chip.st-pausado.selecionado    { background: #332a1a; border-color: #d4954a; color: #e0b878; }
 
+        /* SELECT do ciclo/conexão */
+        select.sel-vinculo {
+            width: 100%;
+            margin-top: 10px;
+            padding: 12px;
+            background: #222225;
+            color: #f5f5f5;
+            border: 1px solid #333338;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+        }
+        select.sel-vinculo:focus {
+            border-color: #55555c;
+            background: #262629;
+        }
+
         .contagem {
             display: flex; align-items: center; justify-content: space-between;
             gap: 12px; padding: 14px 16px; border-radius: 12px;
@@ -126,11 +144,20 @@
         .progresso-barra {
             flex: 1; height: 10px; background: #1a1a1e;
             border-radius: 5px; overflow: hidden; position: relative;
+            transition: box-shadow 0.5s;
         }
         .progresso-preenchido {
             height: 100%;
             background: linear-gradient(90deg, #238636 0%, #2ea043 100%);
             transition: width 0.4s ease; border-radius: 5px;
+        }
+        .progresso-barra.completo {
+            box-shadow: 0 0 14px rgba(46, 160, 67, 0.7);
+            animation: pulseGreen 1.6s ease-in-out infinite;
+        }
+        @keyframes pulseGreen {
+            0%, 100% { box-shadow: 0 0 14px rgba(46, 160, 67, 0.7); }
+            50% { box-shadow: 0 0 26px rgba(46, 160, 67, 0.95); }
         }
         .progresso-texto {
             font-size: 12px; color: #999;
@@ -201,14 +228,43 @@
         }
         .bloqueio-linha .btn-destravar:hover { background: #4caf50; color: #000; }
 
+        /* ===== Diário — timeline ===== */
+
         .diario-item {
-            padding: 10px 12px; border-left: 2px solid #333;
-            margin-bottom: 8px; font-size: 13px; color: #bbb; line-height: 1.5;
+            position: relative;
+            padding: 10px 12px 10px 30px;
+            margin-bottom: 4px;
+            font-size: 13px;
+            color: #bbb;
+            line-height: 1.5;
         }
+        .diario-item::before {
+            content: "";
+            position: absolute;
+            left: 8px;
+            top: 15px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #444;
+            z-index: 2;
+        }
+        .diario-item::after {
+            content: "";
+            position: absolute;
+            left: 11px;
+            top: 23px;
+            bottom: -4px;
+            width: 2px;
+            background: #252529;
+        }
+        .diario-item:last-child::after { display: none; }
+        .diario-item.auto::before { background: #2ea043; box-shadow: 0 0 6px rgba(46,160,67,0.5); }
+        .diario-item.foco::before { background: #8ab4f8; box-shadow: 0 0 6px rgba(138,180,248,0.5); }
+
         .diario-item .data {
             color: #666; font-size: 11px; margin-right: 8px; font-family: monospace;
         }
-        .diario-item.auto { border-left-color: #2ea043; }
 
         .acao-card {
             display: flex; align-items: center; gap: 10px;
@@ -275,6 +331,13 @@
             transition: 0.15s; font-weight: 600;
         }
         .btn-sucesso:hover { background: #234528; }
+
+        .btn-secundario {
+            padding: 10px 16px; font-size: 13px; cursor: pointer;
+            border: 1px solid #333338; background: transparent;
+            color: #bbb; border-radius: 10px; transition: 0.15s;
+        }
+        .btn-secundario:hover { background: #1a1a1e; color: #e0e0e0; }
 
         details.bloco-expansivel {
             background: #17171a; border: 1px solid #252529;
@@ -349,16 +412,23 @@
 
         body.modo-compacto .colapsavel-compacto { display: none; }
 
-        .banner-parado {
-            padding: 14px 16px; background: #2a1f1a;
-            border: 1px solid #4a2f1f; border-left: 3px solid #d4774a;
-            border-radius: 12px;
+        .banner-parado, .banner-sprint {
+            padding: 14px 16px; border-radius: 12px;
         }
-        .banner-parado .txt {
+        .banner-parado {
+            background: #2a1f1a; border: 1px solid #4a2f1f;
+            border-left: 3px solid #d4774a;
+        }
+        .banner-sprint {
+            background: #1c1a2a; border: 1px solid #2f2a4a;
+            border-left: 3px solid #8a5ad4;
+        }
+        .banner-parado .txt, .banner-sprint .txt {
             color: #e0a878; font-size: 14px; line-height: 1.5; margin-bottom: 10px;
         }
-        .banner-parado .acoes { display: flex; gap: 8px; flex-wrap: wrap; }
-        .banner-parado button {
+        .banner-sprint .txt { color: #c9b0e8; }
+        .banner-parado .acoes, .banner-sprint .acoes { display: flex; gap: 8px; flex-wrap: wrap; }
+        .banner-parado button, .banner-sprint button {
             padding: 8px 14px; font-size: 12px; cursor: pointer;
             border-radius: 8px; transition: 0.15s;
         }
@@ -407,6 +477,16 @@
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            align-items: center;
+        }
+        .foco-timer {
+            font-size: 16px;
+            font-family: 'SF Mono', Consolas, monospace;
+            color: #8ab4f8;
+            padding: 8px 14px;
+            background: #1a2235;
+            border: 1px solid #2c3a55;
+            border-radius: 10px;
         }
         .btn-sair-foco {
             padding: 10px 16px; font-size: 13px; cursor: pointer;
@@ -418,6 +498,53 @@
         .acoes-fim {
             display: flex; gap: 10px; flex-wrap: wrap;
             justify-content: center; margin-top: 20px;
+        }
+
+        /* Tela inicial vazia */
+        #telaInicial {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            padding: 60px 24px;
+            text-align: center;
+            background: #17171a;
+            border: 1px solid #252529;
+            border-radius: 16px;
+        }
+        #telaInicial.visivel { display: flex; }
+        #telaInicial .grande {
+            font-size: 48px;
+            filter: grayscale(60%);
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+        #telaInicial h2 {
+            font-size: 20px;
+            color: #e0e0e0;
+            margin-bottom: 4px;
+        }
+        #telaInicial p {
+            font-size: 14px;
+            color: #888;
+            line-height: 1.6;
+            max-width: 380px;
+            margin-bottom: 16px;
+        }
+
+        /* Modo leitura */
+        body.modo-leitura .modules input,
+        body.modo-leitura .modules textarea,
+        body.modo-leitura .modules select,
+        body.modo-leitura .btn-adicionar,
+        body.modo-leitura .btn-remover-linha,
+        body.modo-leitura .btn-destravar,
+        body.modo-leitura .btn-acao-foco,
+        body.modo-leitura .heatmap-filtros,
+        body.modo-leitura .acoes-fim,
+        body.modo-leitura #barraAcoesTopo { display: none !important; }
+        body.modo-leitura .modules {
+            background: #17171a;
         }
     </style>
 </head>
@@ -436,278 +563,338 @@
 
         <section class="modules">
 
-            <div id="painelFoco">
-                <div class="painel-foco-nome" id="painelFocoNome">Projeto</div>
-                <input type="text" id="painelFocoInput" class="painel-foco-input"
-                    placeholder="O que você está fazendo agora?">
-                <div class="painel-foco-acoes">
-                    <button type="button" class="btn-sucesso" id="btnFocoConcluir">
-                        ✅ Concluir esta ação
+            <!-- TELA INICIAL (só aparece quando não há projeto ativo) -->
+
+            <div id="telaInicial">
+                <span class="grande">🎯</span>
+                <h2>Nenhum projeto ativo</h2>
+                <p>
+                    Um projeto por vez, bem-feito. Comece definindo o que você quer
+                    construir, entregar ou terminar. Quando concluir, arquiva — e a mesa
+                    fica limpa para o próximo.
+                </p>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                    <button type="button" class="btn-sucesso" id="btnComecarPrimeiro">
+                        ✨ Começar um projeto
                     </button>
-                    <button type="button" class="btn-sair-foco" id="btnSairFoco">
-                        ← Sair do modo foco
+                    <button type="button" class="btn-secundario" id="btnVerArquivadosInicial">
+                        🕰️ Ver anteriores
                     </button>
                 </div>
             </div>
 
 
-            <div class="banner-parado" id="bannerParado" style="display:none;">
-                <div class="txt" id="bannerTexto"></div>
-                <div class="acoes">
-                    <button type="button" class="btn-continuar" id="btnContinuarAtivo">
-                        Continuar ativo
+            <!-- CONTEÚDO DO PROJETO (oculto enquanto não há projeto) -->
+
+            <div id="conteudoProjeto" style="display: contents;">
+
+                <div id="painelFoco">
+                    <div class="painel-foco-nome" id="painelFocoNome">Projeto</div>
+                    <input type="text" id="painelFocoInput" class="painel-foco-input"
+                        placeholder="O que você está fazendo agora?">
+                    <div class="painel-foco-acoes">
+                        <span class="foco-timer" id="focoTimer">00:00</span>
+                        <button type="button" class="btn-sucesso" id="btnFocoConcluir">
+                            ✅ Concluir esta ação
+                        </button>
+                        <button type="button" class="btn-sair-foco" id="btnSairFoco">
+                            ← Sair do modo foco
+                        </button>
+                    </div>
+                </div>
+
+
+                <div class="banner-sprint" id="bannerSprint" style="display:none;">
+                    <div class="txt" id="bannerSprintTexto"></div>
+                    <div class="acoes">
+                        <button type="button" class="btn-secundario" id="btnSprintAtualizar">
+                            ✏️ Atualizar sprint
+                        </button>
+                        <button type="button" class="btn-secundario" id="btnSprintIgnorar">
+                            Ignorar por agora
+                        </button>
+                    </div>
+                </div>
+
+
+                <div class="banner-parado" id="bannerParado" style="display:none;">
+                    <div class="txt" id="bannerTexto"></div>
+                    <div class="acoes">
+                        <button type="button" class="btn-continuar" id="btnContinuarAtivo">
+                            Continuar ativo
+                        </button>
+                        <button type="button" class="btn-arquivar-parado" id="btnArquivarParado">
+                            💀 Arquivar
+                        </button>
+                    </div>
+                </div>
+
+
+                <div id="barraAcoesTopo" style="display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap;">
+                    <button type="button" id="btnModoFoco" class="btn-foco" style="padding: 8px 14px; font-size: 12px; letter-spacing: 0;">
+                        🎯 Modo Foco
                     </button>
-                    <button type="button" class="btn-arquivar-parado" id="btnArquivarParado">
+                    <button type="button" id="btnCompacto" class="btn-travado" style="border-color: #333; color: #bbb;">
+                        🔍 Modo compacto
+                    </button>
+                    <button type="button" id="btnLeitura" class="btn-travado" style="border-color: #333; color: #bbb;">
+                        📖 Modo leitura
+                    </button>
+                    <button type="button" id="btnTravado" class="btn-travado">
+                        🆘 Estou travado
+                    </button>
+                </div>
+
+                <div id="travadoPainel" class="travado-painel" style="display:none;">
+                    <div id="travadoTexto"></div>
+                    <div style="margin-top: 12px; text-align: right;">
+                        <button type="button" id="btnOutraSugestao"
+                            style="background: transparent; border: 1px solid #4a2f2f; color: #e08b8b; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer;">
+                            🔄 Outra sugestão
+                        </button>
+                    </div>
+                </div>
+
+
+                <div class="module-card" style="align-items: flex-start; flex-direction: column;">
+                    <div style="width: 100%;">
+                        <label class="campo-label">Nome do projeto</label>
+                        <input type="text" id="nomeProjeto" class="projeto-nome" placeholder="Dê um nome…">
+
+                        <div class="pulso" id="pulsoProjeto">
+                            <span class="pulso-dot"></span>
+                            <span id="pulsoTexto">Sem atividade ainda</span>
+                        </div>
+
+                        <label class="campo-label">Status</label>
+                        <div class="chips" id="chipsStatus"></div>
+
+                        <label class="campo-label">Área</label>
+                        <div class="chips" id="chipsArea"></div>
+
+                        <label class="campo-label">Faz parte do ciclo</label>
+                        <select class="sel-vinculo" id="selCiclo">
+                            <option value="">Nenhum ciclo específico</option>
+                        </select>
+
+                        <label class="campo-label">Cliente / Conexão (opcional)</label>
+                        <select class="sel-vinculo" id="selConexao">
+                            <option value="">Nenhuma conexão vinculada</option>
+                        </select>
+
+                        <label class="campo-label">Prazo (opcional)</label>
+                        <input type="text" id="prazoProjeto" placeholder="Ex.: 15/12/2026">
+                    </div>
+                </div>
+
+
+                <div id="contagemWrap" style="display:none;">
+                    <div class="contagem" id="contagemBox">
+                        <div>
+                            <div class="big" id="contagemDias">—</div>
+                            <div class="pace" id="contagemPace"></div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="color:#888; font-size:11px; letter-spacing:1px;">PRAZO</div>
+                            <div style="color:#f5f5f5; font-size:14px; font-weight:600;" id="contagemPrazo">—</div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="foco-card">
+                    <div class="foco-titulo">🎯 O que estou fazendo neste projeto AGORA?</div>
+                    <input type="text" id="focoPrincipal" class="foco-input"
+                        placeholder="A ação concreta que move isso pra frente.">
+                    <div class="foco-acoes">
+                        <button type="button" id="btnEnviarFoco" class="btn-foco">
+                            ▶️ Enviar para o Foco
+                        </button>
+                        <button type="button" id="btnEnviarPrioridade" class="btn-foco" style="border-color: #4a2f1f; background: #2a1f12; color: #e0b878;">
+                            🎯 Enviar para Prioridades
+                        </button>
+                    </div>
+                </div>
+
+
+                <div class="sprint-card">
+                    <span class="sprint-tag">🏁 Sprint desta semana</span>
+                    <input type="text" id="sprintAtual" class="sprint-input"
+                        placeholder="Ex.: terminar o corte bruto até sexta">
+                </div>
+
+
+                <div class="module-card">
+                    <div class="bloco-titulo">
+                        <span class="icon">📋</span>
+                        <h2>Etapas</h2>
+                        <span class="contador" id="contadorEtapas"></span>
+                    </div>
+
+                    <div class="progresso-wrap" style="margin-bottom: 16px;">
+                        <div class="progresso-barra" id="progressoBarraWrap">
+                            <div class="progresso-preenchido" id="progressoBarra" style="width: 0%;"></div>
+                        </div>
+                        <span class="progresso-texto" id="progressoTexto">0/0</span>
+                    </div>
+
+                    <div id="listaEtapas"></div>
+                    <button type="button" class="btn-adicionar" id="btnAddEtapa">
+                        ＋ Adicionar etapa
+                    </button>
+                </div>
+
+
+                <div class="module-card">
+                    <div class="bloco-titulo">
+                        <span class="icon">📅</span>
+                        <h2>Atividade do projeto</h2>
+                    </div>
+
+                    <div class="heatmap-filtros" id="heatmapFiltros">
+                        <button type="button" data-meses="1">1 mês</button>
+                        <button type="button" data-meses="3">3 meses</button>
+                        <button type="button" data-meses="6">6 meses</button>
+                        <button type="button" data-meses="12" class="ativo">12 meses</button>
+                    </div>
+
+                    <div class="heatmap-wrap">
+                        <div class="heatmap" id="heatmap"></div>
+                    </div>
+
+                    <div class="heatmap-legenda">
+                        <span>Menos</span>
+                        <div class="heat-cell"></div>
+                        <div class="heat-cell n1"></div>
+                        <div class="heat-cell n2"></div>
+                        <div class="heat-cell n3"></div>
+                        <div class="heat-cell n4"></div>
+                        <span>Mais</span>
+                    </div>
+                </div>
+
+
+                <div class="module-card">
+                    <div class="bloco-titulo">
+                        <span class="icon">🎬</span>
+                        <h2>Onde estou agora</h2>
+                    </div>
+                    <textarea id="ondeEstou" rows="3"
+                        placeholder="Factual. Ex.: 'Terminei o corte bruto. Falta colorir, ajustar áudio e subir.'"></textarea>
+                </div>
+
+
+                <details class="bloco-expansivel colapsavel-compacto">
+                    <summary>
+                        <span class="icon">✅</span>
+                        <h2>Checagem rápida</h2>
+                        <span style="color:#666; font-size:12px; margin-left: 6px;">
+                            (clareza antes de continuar)
+                        </span>
+                    </summary>
+                    <div style="margin-top: 12px;" id="checagemLista"></div>
+                    <p id="checagemAlerta" style="color: #e0b878; font-size: 13px; margin-top: 12px; line-height: 1.5;"></p>
+                </details>
+
+
+                <details class="bloco-expansivel colapsavel-compacto">
+                    <summary>
+                        <span class="icon">🧭</span>
+                        <h2>Guia do projeto</h2>
+                        <span style="color:#666; font-size:12px; margin-left: 6px;">
+                            (inspiração por área)
+                        </span>
+                    </summary>
+                    <div id="guiaConteudo" style="margin-top: 12px;"></div>
+                </details>
+
+
+                <div class="module-card colapsavel-compacto">
+                    <div class="bloco-titulo">
+                        <span class="icon">📦</span>
+                        <h2>Entregáveis</h2>
+                        <span class="contador">o que sai desse projeto</span>
+                    </div>
+                    <div id="listaEntregaveis"></div>
+                    <button type="button" class="btn-adicionar" id="btnAddEntregavel">
+                        ＋ Adicionar entregável
+                    </button>
+                </div>
+
+
+                <div class="module-card colapsavel-compacto">
+                    <div class="bloco-titulo">
+                        <span class="icon">🚧</span>
+                        <h2>Bloqueios</h2>
+                        <span class="contador">o que está travando agora</span>
+                    </div>
+                    <div id="listaBloqueios"></div>
+                    <button type="button" class="btn-adicionar" id="btnAddBloqueio">
+                        ＋ Adicionar bloqueio
+                    </button>
+                </div>
+
+
+                <div class="module-card">
+                    <div class="bloco-titulo">
+                        <span class="icon">🏁</span>
+                        <h2>Próximas 3 ações</h2>
+                        <span class="contador">na ordem</span>
+                    </div>
+                    <div id="listaAcoes"></div>
+                </div>
+
+
+                <div class="module-card colapsavel-compacto">
+                    <div class="bloco-titulo">
+                        <span class="icon">🔗</span>
+                        <h2>Links do projeto</h2>
+                        <span class="contador">Drive, Notion, repositório…</span>
+                    </div>
+                    <div id="listaLinks"></div>
+                    <button type="button" class="btn-adicionar" id="btnAddLink">
+                        ＋ Adicionar link
+                    </button>
+                </div>
+
+
+                <details class="bloco-expansivel colapsavel-compacto">
+                    <summary>
+                        <span class="icon">📝</span>
+                        <h2>Diário de bordo</h2>
+                        <span style="color:#666; font-size:12px; margin-left: 6px;">
+                            (histórico do projeto)
+                        </span>
+                    </summary>
+                    <div style="margin-top: 12px;" id="diarioLista"></div>
+
+                    <div style="margin-top: 16px; display: flex; gap: 8px;">
+                        <input type="text" id="inputDiario"
+                            placeholder="Adicionar entrada manual…"
+                            style="flex: 1;">
+                        <button type="button" id="btnAddDiario"
+                            style="padding: 10px 16px; font-size: 13px; cursor: pointer; border: 1px solid #333338; border-radius: 8px; background: #1a1a1e; color: #bbb;">
+                            ＋
+                        </button>
+                    </div>
+                </details>
+
+
+                <div class="acoes-fim">
+                    <button type="button" class="btn-sucesso" id="btnConcluir">
+                        🏆 Concluir projeto
+                    </button>
+                    <button type="button" class="btn-secundario" id="btnExportar">
+                        ⬇️ Exportar .json
+                    </button>
+                    <button type="button" class="btn-secundario" id="btnCopiarEstrutura">
+                        📋 Copiar estrutura
+                    </button>
+                    <button type="button" class="btn-perigo" id="btnArquivar">
                         💀 Arquivar
                     </button>
                 </div>
-            </div>
 
-
-            <div style="display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap;">
-                <button type="button" id="btnModoFoco" class="btn-foco" style="padding: 8px 14px; font-size: 12px; letter-spacing: 0;">
-                    🎯 Modo Foco
-                </button>
-                <button type="button" id="btnCompacto" class="btn-travado" style="border-color: #333; color: #bbb;">
-                    🔍 Modo compacto
-                </button>
-                <button type="button" id="btnTravado" class="btn-travado">
-                    🆘 Estou travado
-                </button>
-            </div>
-
-            <div id="travadoPainel" class="travado-painel" style="display:none;">
-                <div id="travadoTexto"></div>
-                <div style="margin-top: 12px; text-align: right;">
-                    <button type="button" id="btnOutraSugestao"
-                        style="background: transparent; border: 1px solid #4a2f2f; color: #e08b8b; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer;">
-                        🔄 Outra sugestão
-                    </button>
-                </div>
-            </div>
-
-
-            <div class="module-card" style="align-items: flex-start; flex-direction: column;">
-                <div style="width: 100%;">
-                    <label class="campo-label">Nome do projeto</label>
-                    <input type="text" id="nomeProjeto" class="projeto-nome" placeholder="Dê um nome…">
-
-                    <div class="pulso" id="pulsoProjeto">
-                        <span class="pulso-dot"></span>
-                        <span id="pulsoTexto">Sem atividade ainda</span>
-                    </div>
-
-                    <label class="campo-label">Status</label>
-                    <div class="chips" id="chipsStatus"></div>
-
-                    <label class="campo-label">Área</label>
-                    <div class="chips" id="chipsArea"></div>
-
-                    <label class="campo-label">Prazo (opcional)</label>
-                    <input type="text" id="prazoProjeto" placeholder="Ex.: 15/12/2026">
-                </div>
-            </div>
-
-
-            <div id="contagemWrap" style="display:none;">
-                <div class="contagem" id="contagemBox">
-                    <div>
-                        <div class="big" id="contagemDias">—</div>
-                        <div class="pace" id="contagemPace"></div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="color:#888; font-size:11px; letter-spacing:1px;">PRAZO</div>
-                        <div style="color:#f5f5f5; font-size:14px; font-weight:600;" id="contagemPrazo">—</div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="foco-card">
-                <div class="foco-titulo">🎯 O que estou fazendo neste projeto AGORA?</div>
-                <input type="text" id="focoPrincipal" class="foco-input"
-                    placeholder="A ação concreta que move isso pra frente.">
-                <div class="foco-acoes">
-                    <button type="button" id="btnEnviarFoco" class="btn-foco">
-                        ▶️ Enviar para o Foco
-                    </button>
-                    <button type="button" id="btnEnviarPrioridade" class="btn-foco" style="border-color: #4a2f1f; background: #2a1f12; color: #e0b878;">
-                        🎯 Enviar para Prioridades
-                    </button>
-                </div>
-            </div>
-
-
-            <div class="sprint-card">
-                <span class="sprint-tag">🏁 Sprint desta semana</span>
-                <input type="text" id="sprintAtual" class="sprint-input"
-                    placeholder="Ex.: terminar o corte bruto até sexta">
-            </div>
-
-
-            <div class="module-card">
-                <div class="bloco-titulo">
-                    <span class="icon">📋</span>
-                    <h2>Etapas</h2>
-                    <span class="contador" id="contadorEtapas"></span>
-                </div>
-
-                <div class="progresso-wrap" style="margin-bottom: 16px;">
-                    <div class="progresso-barra">
-                        <div class="progresso-preenchido" id="progressoBarra" style="width: 0%;"></div>
-                    </div>
-                    <span class="progresso-texto" id="progressoTexto">0/0</span>
-                </div>
-
-                <div id="listaEtapas"></div>
-                <button type="button" class="btn-adicionar" id="btnAddEtapa">
-                    ＋ Adicionar etapa
-                </button>
-            </div>
-
-
-            <div class="module-card">
-                <div class="bloco-titulo">
-                    <span class="icon">📅</span>
-                    <h2>Atividade do projeto</h2>
-                </div>
-
-                <div class="heatmap-filtros" id="heatmapFiltros">
-                    <button type="button" data-meses="1">1 mês</button>
-                    <button type="button" data-meses="3">3 meses</button>
-                    <button type="button" data-meses="6">6 meses</button>
-                    <button type="button" data-meses="12" class="ativo">12 meses</button>
-                </div>
-
-                <div class="heatmap-wrap">
-                    <div class="heatmap" id="heatmap"></div>
-                </div>
-
-                <div class="heatmap-legenda">
-                    <span>Menos</span>
-                    <div class="heat-cell"></div>
-                    <div class="heat-cell n1"></div>
-                    <div class="heat-cell n2"></div>
-                    <div class="heat-cell n3"></div>
-                    <div class="heat-cell n4"></div>
-                    <span>Mais</span>
-                </div>
-            </div>
-
-
-            <div class="module-card">
-                <div class="bloco-titulo">
-                    <span class="icon">🎬</span>
-                    <h2>Onde estou agora</h2>
-                </div>
-                <textarea id="ondeEstou" rows="3"
-                    placeholder="Factual. Ex.: 'Terminei o corte bruto. Falta colorir, ajustar áudio e subir.'"></textarea>
-            </div>
-
-
-            <details class="bloco-expansivel colapsavel-compacto">
-                <summary>
-                    <span class="icon">✅</span>
-                    <h2>Checagem rápida</h2>
-                    <span style="color:#666; font-size:12px; margin-left: 6px;">
-                        (clareza antes de continuar)
-                    </span>
-                </summary>
-                <div style="margin-top: 12px;" id="checagemLista"></div>
-                <p id="checagemAlerta" style="color: #e0b878; font-size: 13px; margin-top: 12px; line-height: 1.5;"></p>
-            </details>
-
-
-            <details class="bloco-expansivel colapsavel-compacto">
-                <summary>
-                    <span class="icon">🧭</span>
-                    <h2>Guia do projeto</h2>
-                    <span style="color:#666; font-size:12px; margin-left: 6px;">
-                        (inspiração por área)
-                    </span>
-                </summary>
-                <div id="guiaConteudo" style="margin-top: 12px;"></div>
-            </details>
-
-
-            <div class="module-card colapsavel-compacto">
-                <div class="bloco-titulo">
-                    <span class="icon">📦</span>
-                    <h2>Entregáveis</h2>
-                    <span class="contador">o que sai desse projeto</span>
-                </div>
-                <div id="listaEntregaveis"></div>
-                <button type="button" class="btn-adicionar" id="btnAddEntregavel">
-                    ＋ Adicionar entregável
-                </button>
-            </div>
-
-
-            <div class="module-card colapsavel-compacto">
-                <div class="bloco-titulo">
-                    <span class="icon">🚧</span>
-                    <h2>Bloqueios</h2>
-                    <span class="contador">o que está travando agora</span>
-                </div>
-                <div id="listaBloqueios"></div>
-                <button type="button" class="btn-adicionar" id="btnAddBloqueio">
-                    ＋ Adicionar bloqueio
-                </button>
-            </div>
-
-
-            <div class="module-card">
-                <div class="bloco-titulo">
-                    <span class="icon">🏁</span>
-                    <h2>Próximas 3 ações</h2>
-                    <span class="contador">na ordem</span>
-                </div>
-                <div id="listaAcoes"></div>
-            </div>
-
-
-            <div class="module-card colapsavel-compacto">
-                <div class="bloco-titulo">
-                    <span class="icon">🔗</span>
-                    <h2>Links do projeto</h2>
-                    <span class="contador">Drive, Notion, repositório…</span>
-                </div>
-                <div id="listaLinks"></div>
-                <button type="button" class="btn-adicionar" id="btnAddLink">
-                    ＋ Adicionar link
-                </button>
-            </div>
-
-
-            <details class="bloco-expansivel colapsavel-compacto">
-                <summary>
-                    <span class="icon">📝</span>
-                    <h2>Diário de bordo</h2>
-                    <span style="color:#666; font-size:12px; margin-left: 6px;">
-                        (histórico do projeto)
-                    </span>
-                </summary>
-                <div style="margin-top: 12px;" id="diarioLista"></div>
-
-                <div style="margin-top: 16px; display: flex; gap: 8px;">
-                    <input type="text" id="inputDiario"
-                        placeholder="Adicionar entrada manual…"
-                        style="flex: 1;">
-                    <button type="button" id="btnAddDiario"
-                        style="padding: 10px 16px; font-size: 13px; cursor: pointer; border: 1px solid #333338; border-radius: 8px; background: #1a1a1e; color: #bbb;">
-                        ＋
-                    </button>
-                </div>
-            </details>
-
-
-            <div class="acoes-fim">
-                <button type="button" class="btn-sucesso" id="btnConcluir">
-                    🏆 Concluir projeto
-                </button>
-                <button type="button" class="btn-perigo" id="btnArquivar">
-                    💀 Arquivar
-                </button>
             </div>
 
 
@@ -736,6 +923,7 @@
         const CHAVE_ARQUIVADOS  = "planejamento_projetos_arquivados";
         const CHAVE_HEAT_MESES  = "planejamento_projeto_heatmap_meses";
         const CHAVE_BANNER_IGN  = "planejamento_projeto_banner_parado_ignorado";
+        const CHAVE_SPRINT_IGN  = "planejamento_projeto_sprint_ignorado";
 
         const STATUS = [
             { v: "ideia",     l: "🌱 Ideia",         c: "st-ideia" },
@@ -878,15 +1066,30 @@
         ];
 
 
+        // ==================================================
+        // CARREGA ESTADO
+        // ==================================================
+
+        let projetoAtivoExiste = false;
         let projeto = {};
+
         try {
             const s = localStorage.getItem(CHAVE_ATIVO);
-            if (s) projeto = JSON.parse(s);
+            if (s) {
+                projeto = JSON.parse(s);
+                if (projeto && (projeto.nome || (projeto.etapas && projeto.etapas.length))) {
+                    projetoAtivoExiste = true;
+                }
+            }
         } catch (e) { projeto = {}; }
+
+        if (!projetoAtivoExiste) projeto = {};
 
         projeto.nome         = projeto.nome || "";
         projeto.status       = projeto.status || "ideia";
         projeto.area         = projeto.area || "";
+        projeto.ciclo        = projeto.ciclo || "";
+        projeto.conexao      = projeto.conexao || "";
         projeto.prazo        = projeto.prazo || "";
         projeto.foco         = projeto.foco || "";
         projeto.sprint       = projeto.sprint || "";
@@ -900,6 +1103,7 @@
         projeto.checagem     = projeto.checagem || {};
         projeto.criadoEm     = projeto.criadoEm || new Date().toISOString();
         projeto.ultimaEdicao = projeto.ultimaEdicao || null;
+        projeto.sprintData   = projeto.sprintData || null;
 
         let atividade = {};
         try {
@@ -910,12 +1114,17 @@
         let mesesHeatmap = Number(localStorage.getItem(CHAVE_HEAT_MESES)) || 12;
 
 
+        // ==================================================
+        // HELPERS
+        // ==================================================
+
         function salvar() {
             projeto.ultimaEdicao = new Date().toISOString();
             localStorage.setItem(CHAVE_ATIVO, JSON.stringify(projeto));
             registrarAtividade();
             atualizarPulso();
             esconderBannerSeEditou();
+            atualizarTituloAba();
         }
 
         function registrarAtividade() {
@@ -939,6 +1148,45 @@
             });
         }
 
+
+        // ==================================================
+        // TELA INICIAL VS CONTEÚDO
+        // ==================================================
+
+        function renderEstado() {
+            const telaInicial = document.getElementById("telaInicial");
+            const conteudo = document.getElementById("conteudoProjeto");
+
+            if (projetoAtivoExiste) {
+                telaInicial.classList.remove("visivel");
+                conteudo.style.display = "contents";
+            } else {
+                telaInicial.classList.add("visivel");
+                conteudo.style.display = "none";
+            }
+        }
+        renderEstado();
+
+        document.getElementById("btnComecarPrimeiro").addEventListener("click", () => {
+            projetoAtivoExiste = true;
+            projeto.criadoEm = new Date().toISOString();
+            salvar();
+            renderEstado();
+            document.getElementById("nomeProjeto").focus();
+        });
+
+        document.getElementById("btnVerArquivadosInicial").addEventListener("click", () => {
+            const details = document.querySelector("details.bloco-expansivel:last-of-type");
+            if (details) {
+                details.open = true;
+                details.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        });
+
+
+        // ==================================================
+        // CABEÇALHO
+        // ==================================================
 
         autoSaveInput("nomeProjeto", "nome");
         autoSaveInput("prazoProjeto", "prazo");
@@ -981,6 +1229,64 @@
         renderChips();
 
 
+        // ==================================================
+        // SELECT DO CICLO
+        // ==================================================
+
+        (function montarCiclos() {
+            const sel = document.getElementById("selCiclo");
+            const anoAtual = new Date().getFullYear();
+
+            for (let a = anoAtual - 1; a <= anoAtual + 2; a++) {
+                const opt = document.createElement("option");
+                opt.value = String(a);
+                opt.textContent = `Ciclo ${a}`;
+                sel.appendChild(opt);
+            }
+
+            if (projeto.ciclo) sel.value = projeto.ciclo;
+
+            sel.addEventListener("change", () => {
+                projeto.ciclo = sel.value;
+                salvar();
+            });
+        })();
+
+
+        // ==================================================
+        // SELECT DA CONEXÃO
+        // ==================================================
+
+        (function montarConexoes() {
+            const sel = document.getElementById("selConexao");
+
+            let conexoes = [];
+            try {
+                const s = localStorage.getItem("planejamento_trabalho_conexoes");
+                if (s) conexoes = JSON.parse(s) || [];
+            } catch (e) { conexoes = []; }
+
+            conexoes.forEach(c => {
+                if (!c.nome) return;
+                const opt = document.createElement("option");
+                opt.value = c.nome;
+                opt.textContent = c.nome;
+                sel.appendChild(opt);
+            });
+
+            if (projeto.conexao) sel.value = projeto.conexao;
+
+            sel.addEventListener("change", () => {
+                projeto.conexao = sel.value;
+                salvar();
+            });
+        })();
+
+
+        // ==================================================
+        // PULSO + TÍTULO DA ABA
+        // ==================================================
+
         function atualizarPulso() {
             const el = document.getElementById("pulsoProjeto");
             const txt = document.getElementById("pulsoTexto");
@@ -1007,6 +1313,37 @@
         }
         atualizarPulso();
 
+
+        function atualizarTituloAba() {
+            const nome = projeto.nome || "Projeto";
+
+            const prazo = projeto.prazo;
+            if (!prazo) {
+                document.title = nome;
+                return;
+            }
+
+            let dataAlvo = null;
+            const m1 = prazo.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+            const m2 = prazo.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (m1) dataAlvo = new Date(Number(m1[3]), Number(m1[2]) - 1, Number(m1[1]));
+            else if (m2) dataAlvo = new Date(Number(m2[1]), Number(m2[2]) - 1, Number(m2[3]));
+
+            if (!dataAlvo) { document.title = nome; return; }
+
+            const diff = Math.ceil((dataAlvo - new Date()) / 86400000);
+
+            if (diff < 0) document.title = `🔴 ${nome}`;
+            else if (diff === 0) document.title = `⏰ HOJE — ${nome}`;
+            else if (diff <= 7) document.title = `⏰ ${diff}d — ${nome}`;
+            else document.title = nome;
+        }
+        atualizarTituloAba();
+
+
+        // ==================================================
+        // BANNERS (parado + sprint)
+        // ==================================================
 
         function esconderBannerSeEditou() {
             localStorage.removeItem(CHAVE_BANNER_IGN);
@@ -1035,6 +1372,53 @@
             document.getElementById("btnArquivar").click();
         });
 
+
+        // Check-in semanal do sprint
+        (function checarSprint() {
+            if (!projeto.sprint || !projeto.sprintData) return;
+            if (localStorage.getItem(CHAVE_SPRINT_IGN) === "true") return;
+
+            const dias = Math.floor((Date.now() - new Date(projeto.sprintData).getTime()) / 86400000);
+
+            if (dias >= 7) {
+                document.getElementById("bannerSprintTexto").innerHTML =
+                    `🏁 O sprint da semana passada era: <em>"${projeto.sprint}"</em>.<br>` +
+                    `Como foi? Cumpriu? O que travou?`;
+                document.getElementById("bannerSprint").style.display = "block";
+            }
+        })();
+
+        document.getElementById("btnSprintAtualizar").addEventListener("click", () => {
+            const novo = prompt("Qual o sprint desta semana?", "");
+            if (novo && novo.trim()) {
+                adicionarDiario(`Sprint anterior: "${projeto.sprint}"`, false);
+                projeto.sprint = novo.trim();
+                projeto.sprintData = new Date().toISOString();
+                document.getElementById("sprintAtual").value = novo.trim();
+                salvar();
+                localStorage.removeItem(CHAVE_SPRINT_IGN);
+                document.getElementById("bannerSprint").style.display = "none";
+            }
+        });
+
+        document.getElementById("btnSprintIgnorar").addEventListener("click", () => {
+            localStorage.setItem(CHAVE_SPRINT_IGN, "true");
+            document.getElementById("bannerSprint").style.display = "none";
+        });
+
+
+        // Atualiza data do sprint quando o campo é editado
+        document.getElementById("sprintAtual").addEventListener("change", () => {
+            if (projeto.sprint && projeto.sprint.trim()) {
+                projeto.sprintData = new Date().toISOString();
+                localStorage.setItem(CHAVE_ATIVO, JSON.stringify(projeto));
+            }
+        });
+
+
+        // ==================================================
+        // CONTAGEM REGRESSIVA
+        // ==================================================
 
         function atualizarContagem() {
             const wrap = document.getElementById("contagemWrap");
@@ -1085,6 +1469,10 @@
         atualizarContagem();
 
 
+        // ==================================================
+        // FOCO
+        // ==================================================
+
         document.getElementById("btnEnviarFoco").addEventListener("click", () => {
             const texto = projeto.foco.trim();
             if (!texto) { alert("Escreva o foco principal antes."); return; }
@@ -1098,6 +1486,10 @@
             alert("Enviado como Prioridade 1 de hoje.");
         });
 
+
+        // ==================================================
+        // ETAPAS
+        // ==================================================
 
         function renderEtapas() {
             const container = document.getElementById("listaEtapas");
@@ -1140,6 +1532,9 @@
             document.getElementById("progressoBarra").style.width = pct + "%";
             document.getElementById("progressoTexto").textContent = `${feitas}/${total} · ${pct}%`;
             document.getElementById("contadorEtapas").textContent = `${feitas}/${total} concluídas`;
+
+            const wrap = document.getElementById("progressoBarraWrap");
+            wrap.classList.toggle("completo", total > 0 && feitas === total);
         }
 
         document.getElementById("btnAddEtapa").addEventListener("click", () => {
@@ -1154,6 +1549,10 @@
         renderEtapas();
         atualizarProgresso();
 
+
+        // ==================================================
+        // ENTREGÁVEIS
+        // ==================================================
 
         function renderEntregaveis() {
             const container = document.getElementById("listaEntregaveis");
@@ -1193,6 +1592,10 @@
         renderEntregaveis();
 
 
+        // ==================================================
+        // BLOQUEIOS
+        // ==================================================
+
         function renderBloqueios() {
             const container = document.getElementById("listaBloqueios");
             container.innerHTML = "";
@@ -1224,6 +1627,10 @@
         });
         renderBloqueios();
 
+
+        // ==================================================
+        // PRÓXIMAS 3 AÇÕES
+        // ==================================================
 
         function renderAcoes() {
             const container = document.getElementById("listaAcoes");
@@ -1257,6 +1664,10 @@
         }
         renderAcoes();
 
+
+        // ==================================================
+        // LINKS
+        // ==================================================
 
         function renderLinks() {
             const container = document.getElementById("listaLinks");
@@ -1296,12 +1707,17 @@
         renderLinks();
 
 
-        function adicionarDiario(texto, automatico = false) {
+        // ==================================================
+        // DIÁRIO (TIMELINE)
+        // ==================================================
+
+        function adicionarDiario(texto, automatico = false, tipo = "auto") {
             if (!texto.trim()) return;
             projeto.diario.unshift({
                 texto: texto.trim(),
                 data: new Date().toISOString(),
-                auto: automatico
+                auto: automatico,
+                tipo: tipo
             });
             localStorage.setItem(CHAVE_ATIVO, JSON.stringify(projeto));
             renderDiario();
@@ -1318,7 +1734,7 @@
                 const d = new Date(item.data);
                 const dataStr = `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
                 const div = document.createElement("div");
-                div.className = "diario-item" + (item.auto ? " auto" : "");
+                div.className = "diario-item" + (item.tipo === "foco" ? " foco" : (item.auto ? " auto" : ""));
                 div.innerHTML = `<span class="data">${dataStr}</span>${item.texto}`;
                 container.appendChild(div);
             });
@@ -1326,11 +1742,15 @@
         document.getElementById("btnAddDiario").addEventListener("click", () => {
             const inp = document.getElementById("inputDiario");
             if (!inp.value.trim()) return;
-            adicionarDiario(inp.value.trim(), false);
+            adicionarDiario(inp.value.trim(), false, "manual");
             inp.value = "";
         });
         renderDiario();
 
+
+        // ==================================================
+        // HEATMAP
+        // ==================================================
 
         function renderHeatmap() {
             const container = document.getElementById("heatmap");
@@ -1383,6 +1803,10 @@
         renderHeatmap();
 
 
+        // ==================================================
+        // GUIA DO PROJETO
+        // ==================================================
+
         function renderGuia() {
             const container = document.getElementById("guiaConteudo");
             const area = projeto.area;
@@ -1409,6 +1833,10 @@
         }
         renderGuia();
 
+
+        // ==================================================
+        // CHECAGEM RÁPIDA
+        // ==================================================
 
         const PERGUNTAS_CHECAGEM = [
             { k: "resultado", q: "Você sabe qual é o resultado final?" },
@@ -1465,6 +1893,10 @@
         renderChecagem();
 
 
+        // ==================================================
+        // ESTOU TRAVADO
+        // ==================================================
+
         const painelTravado = document.getElementById("travadoPainel");
         const textoTravado = document.getElementById("travadoTexto");
 
@@ -1481,6 +1913,10 @@
         document.getElementById("btnOutraSugestao").addEventListener("click", mostrarSugestao);
 
 
+        // ==================================================
+        // MODO COMPACTO + MODO LEITURA
+        // ==================================================
+
         let compacto = false;
         document.getElementById("btnCompacto").addEventListener("click", function () {
             compacto = !compacto;
@@ -1488,6 +1924,28 @@
             this.textContent = compacto ? "🔍 Sair do compacto" : "🔍 Modo compacto";
         });
 
+        let leitura = false;
+        document.getElementById("btnLeitura").addEventListener("click", function () {
+            leitura = !leitura;
+            document.body.classList.toggle("modo-leitura", leitura);
+            this.textContent = leitura ? "📖 Sair do leitura" : "📖 Modo leitura";
+        });
+
+
+        // ==================================================
+        // MODO FOCO (com cronômetro)
+        // ==================================================
+
+        let focoInicio = null;
+        let focoInterval = null;
+
+        function atualizarFocoTimer() {
+            if (!focoInicio) return;
+            const seg = Math.floor((Date.now() - focoInicio) / 1000);
+            const m = String(Math.floor(seg / 60)).padStart(2, "0");
+            const s = String(seg % 60).padStart(2, "0");
+            document.getElementById("focoTimer").textContent = `${m}:${s}`;
+        }
 
         document.getElementById("btnModoFoco").addEventListener("click", () => {
             const painelNome = document.getElementById("painelFocoNome");
@@ -1501,15 +1959,23 @@
                 salvar();
             };
 
+            focoInicio = Date.now();
+            document.getElementById("focoTimer").textContent = "00:00";
+            focoInterval = setInterval(atualizarFocoTimer, 1000);
+
             document.body.classList.add("modo-foco-projeto");
-            document.title = `🎯 ${projeto.nome || "Foco"} — Projeto`;
             painelInput.focus();
         });
 
-        document.getElementById("btnSairFoco").addEventListener("click", () => {
+        function sairModoFoco() {
             document.body.classList.remove("modo-foco-projeto");
+            if (focoInterval) { clearInterval(focoInterval); focoInterval = null; }
+            focoInicio = null;
             document.title = "Projeto";
-        });
+            atualizarTituloAba();
+        }
+
+        document.getElementById("btnSairFoco").addEventListener("click", sairModoFoco);
 
         document.getElementById("btnFocoConcluir").addEventListener("click", () => {
             const painelInput = document.getElementById("painelFocoInput");
@@ -1517,7 +1983,14 @@
 
             if (!concluido) { alert("Escreva o que você fez antes de concluir."); return; }
 
-            adicionarDiario(`Foco concluído: "${concluido}"`, true);
+            const seg = focoInicio ? Math.floor((Date.now() - focoInicio) / 1000) : 0;
+            const m = Math.floor(seg / 60);
+            const s = seg % 60;
+            let tempoStr = "";
+            if (m > 0) tempoStr = `${m}min${s > 0 ? " " + s + "s" : ""}`;
+            else tempoStr = `${s}s`;
+
+            adicionarDiario(`🎯 Foco de ${tempoStr}: "${concluido}"`, true, "foco");
             registrarAtividade();
             salvar();
 
@@ -1528,13 +2001,78 @@
                 projeto.foco = proximo.trim();
                 document.getElementById("focoPrincipal").value = proximo.trim();
                 salvar();
+                focoInicio = Date.now();
+                document.getElementById("focoTimer").textContent = "00:00";
                 painelInput.focus();
             } else {
-                document.body.classList.remove("modo-foco-projeto");
-                document.title = "Projeto";
+                sairModoFoco();
             }
         });
 
+
+        // ==================================================
+        // EXPORTAR / COPIAR ESTRUTURA
+        // ==================================================
+
+        document.getElementById("btnExportar").addEventListener("click", () => {
+            const conteudo = JSON.stringify(projeto, null, 2);
+            const blob = new Blob([conteudo], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            const nome = (projeto.nome || "projeto").replace(/[^a-z0-9]/gi, "-").toLowerCase();
+            const data = hojeISO();
+            a.href = url;
+            a.download = `projeto_${nome}_${data}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        document.getElementById("btnCopiarEstrutura").addEventListener("click", () => {
+            let arquivados = [];
+            try {
+                const s = localStorage.getItem(CHAVE_ARQUIVADOS);
+                if (s) arquivados = JSON.parse(s);
+            } catch (e) { arquivados = []; }
+
+            if (arquivados.length === 0) {
+                alert("Nenhum projeto arquivado para copiar estrutura.");
+                return;
+            }
+
+            const lista = arquivados.map((p, i) => `${i + 1}. ${p.nome}`).join("\n");
+            const escolha = prompt(
+                "De qual projeto copiar a estrutura?\n\n" + lista + "\n\nDigite o número:"
+            );
+
+            const idx = Number(escolha) - 1;
+            if (isNaN(idx) || idx < 0 || idx >= arquivados.length) return;
+
+            const fonte = arquivados[idx];
+
+            const ok = confirm(
+                `Isso vai SOBRESCREVER suas etapas, entregáveis e próximas ações com as do projeto "${fonte.nome}". Continuar?`
+            );
+            if (!ok) return;
+
+            projeto.etapas = (fonte.etapas || []).map(e => ({ texto: e.texto || "", feita: false }));
+            projeto.entregaveis = (fonte.entregaveis || []).map(e => ({ texto: e.texto || "", feito: false }));
+            projeto.acoes = (fonte.acoes || ["", "", ""]).slice(0, 3);
+
+            adicionarDiario(`Estrutura copiada do projeto "${fonte.nome}".`, true);
+            salvar();
+            renderEtapas(); atualizarProgresso();
+            renderEntregaveis();
+            renderAcoes();
+
+            alert("Estrutura copiada. Etapas e entregáveis começam desmarcadas.");
+        });
+
+
+        // ==================================================
+        // CONCLUIR / ARQUIVAR
+        // ==================================================
 
         document.getElementById("btnConcluir").addEventListener("click", () => {
             if (!projeto.nome.trim()) { alert("Dê um nome ao projeto antes de concluir."); return; }
@@ -1571,11 +2109,16 @@
             localStorage.removeItem(CHAVE_ATIVO);
             localStorage.removeItem(CHAVE_ATIVIDADE);
             localStorage.removeItem(CHAVE_BANNER_IGN);
+            localStorage.removeItem(CHAVE_SPRINT_IGN);
 
             alert("Projeto arquivado. A mesa está limpa para o próximo.");
             location.reload();
         }
 
+
+        // ==================================================
+        // HISTÓRICO DE ARQUIVADOS
+        // ==================================================
 
         (function renderHistorico() {
             const container = document.getElementById("historicoProjetos");
@@ -1600,7 +2143,11 @@
 
                 html += `<div style="padding: 12px 0; border-bottom: 1px solid #252529;">`;
                 html += `<div style="font-size: 14px; color: #e0e0e0; margin-bottom: 4px;">${emoji} <strong>${p.nome}</strong></div>`;
-                html += `<div style="font-size: 12px; color: #888; margin-bottom: 6px;">${dataStr} · ${etapasFeitas}/${etapasTotal} etapas</div>`;
+                html += `<div style="font-size: 12px; color: #888; margin-bottom: 6px;">${dataStr} · ${etapasFeitas}/${etapasTotal} etapas`;
+
+                if (p.ciclo) html += ` · Ciclo ${p.ciclo}`;
+                if (p.conexao) html += ` · ${p.conexao}`;
+                html += `</div>`;
 
                 if (p.retrospectiva && p.retrospectiva.funciona) {
                     html += `<div style="font-size: 12px; color: #bbb; padding-left: 8px; border-left: 2px solid #2ea043;">✅ ${p.retrospectiva.funciona}</div>`;
