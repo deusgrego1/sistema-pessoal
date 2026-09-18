@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Projeto</title>
+
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .projeto-nome {
+            font-size: 26px; font-weight: 700; color: #f5f5f5;
+            background: transparent; border: none; outline: none;
+            width: 100%; margin-top: 8px; padding: 0;
+        }
+        .projeto-nome::placeholder { color: #444; }
+
+        .pulso {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 12px; color: #888; margin-top: 8px;
+        }
+        .pulso .pulso-dot {
+            width: 8px; height: 8px; border-radius: 50%; background: #555;
+        }
+        .pulso.ativo .pulso-dot { background: #4caf50; box-shadow: 0 0 8px rgba(76,175,80,0.6); }
+        .pulso.frio .pulso-dot { background: #c9a44a; }
+        .pulso.zumbi .pulso-dot { background: #d45a5a; }
+
+        .campo-label {
+            display: block; font-size: 11px; color: #888;
+            letter-spacing: 1px; text-transform: uppercase;
+            margin: 14px 0 8px;
+        }
+
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+        .chip {
+            padding: 7px 13px; font-size: 12px; cursor: pointer;
+            border: 1px solid #333338; background: #1a1a1e;
+            color: #bbb; border-radius: 16px;
+            transition: 0.15s; user-select: none;
+        }
+        .chip:hover { background: #222228; color: #e0e0e0; }
+        .chip.selecionado {
+            background: #2e2e33; border-color: #666; color: #fff; font-weight: 600;
+        }
+
+        .chip.st-ideia.selecionado      { background: #2a2a30; border-color: #777; color: #ccc; }
+        .chip.st-andamento.selecionado  { background: #1a2233; border-color: #5a8ad4; color: #a8c4e8; }
+        .chip.st-travado.selecionado    { background: #331f1f; border-color: #d45a5a; color: #e08b8b; }
+        .chip.st-pausado.selecionado    { background: #332a1a; border-color: #d4954a; color: #e0b878; }
+
+        .contagem {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; padding: 14px 16px; border-radius: 12px;
+            background: #17171a; border: 1px solid #252529;
+            border-left: 3px solid #4caf50;
+            font-size: 14px; color: #e0e0e0;
+        }
+        .contagem.alerta { border-left-color: #c9a44a; }
+        .contagem.atrasado { border-left-color: #d45a5a; }
+        .contagem .big { font-size: 22px; font-weight: 700; color: #fff; }
+        .contagem .pace { font-size: 12px; color: #888; }
+
+        .foco-card {
+            background: linear-gradient(135deg, #1a1a20 0%, #17171a 100%);
+            border: 1px solid #2c3a55; border-radius: 16px; padding: 20px;
+        }
+        .foco-titulo {
+            font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+            color: #8ab4f8; margin-bottom: 12px;
+        }
+        .foco-input {
+            font-size: 20px; font-weight: 600;
+            background: transparent; border: none; outline: none;
+            width: 100%; color: #fff; padding: 0;
+        }
+        .foco-input::placeholder { color: #444; }
+        .foco-acoes { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+        .btn-foco {
+            padding: 12px 20px; font-size: 14px; font-weight: 700;
+            cursor: pointer; border: 1px solid #2c3a55;
+            background: linear-gradient(135deg, #1a2235 0%, #232f4a 100%);
+            color: #dfe8ff; border-radius: 10px;
+            transition: 0.15s; letter-spacing: 1px;
+        }
+        .btn-foco:hover { border-color: #5a7ab5; transform: translateY(-1px); }
+
+        .heatmap-wrap { overflow-x: auto; padding-bottom: 6px; }
+        .heatmap {
+            display: grid;
+            grid-template-rows: repeat(7, 12px);
+            grid-auto-flow: column;
+            grid-auto-columns: 12px;
+            gap: 3px; padding: 4px 0;
+        }
+        .heat-cell {
+            width: 12px; height: 12px; border-radius: 2px;
+            background: #1a1a1e; cursor: pointer; transition: 0.1s;
+        }
+        .heat-cell:hover { outline: 1px solid #555; }
+        .heat-cell.n1 { background: #0e4429; }
+        .heat-cell.n2 { background: #006d32; }
+        .heat-cell.n3 { background: #26a641; }
+        .heat-cell.n4 { background: #39d353; }
+
+        .heatmap-legenda {
+            display: flex; align-items: center; gap: 6px;
+            margin-top: 10px; font-size: 11px; color: #666;
+        }
+        .heatmap-legenda .heat-cell { cursor: default; }
+
+        .heatmap-filtros { display: flex; gap: 6px; margin-bottom: 12px; }
+        .heatmap-filtros button {
+            padding: 5px 12px; font-size: 12px; cursor: pointer;
+            border: 1px solid #333338; background: #1a1a1e;
+            color: #aaa; border-radius: 8px; transition: 0.15s;
+        }
+        .heatmap-filtros button:hover { background: #222228; color: #e0e0e0; }
+        .heatmap-filtros button.ativo {
+            background: #2e2e33; border-color: #666; color: #fff;
+        }
+
+        .progresso-wrap { display: flex; align-items: center; gap: 12px; }
+        .progresso-barra {
+            flex: 1; height: 10px; background: #1a1a1e;
+            border-radius: 5px; overflow: hidden; position: relative;
+        }
+        .progresso-preenchido {
+            height: 100%;
+            background: linear-gradient(90deg, #238636 0%, #2ea043 100%);
+            transition: width 0.4s ease; border-radius: 5px;
+        }
+        .progresso-texto {
+            font-size: 12px; color: #999;
+            font-variant-numeric: tabular-nums;
+            font-family: 'SF Mono', Consolas, monospace;
+            flex-shrink: 0;
+        }
+
+        .bloco-titulo {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+        }
+        .bloco-titulo h2 { font-size: 16px; color: #f5f5f5; }
+        .bloco-titulo .contador { font-size: 12px; color: #666; margin-left: auto; }
+
+        .entregavel-linha {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; background: #1c1c20;
+            border: 1px solid #252529; border-radius: 10px; margin-bottom: 8px;
+        }
+        .entregavel-linha.feito { opacity: 0.5; }
+        .entregavel-linha.feito input[type="text"] { text-decoration: line-through; }
+        .entregavel-linha input[type="text"] {
+            flex: 1; background: transparent; border: none;
+            outline: none; font-size: 14px; color: #e0e0e0; padding: 0;
+        }
+        .entregavel-linha input[type="checkbox"] {
+            width: 20px; height: 20px; cursor: pointer;
+            flex-shrink: 0; accent-color: #2ea043;
+        }
+
+        .etapa-linha {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; background: #1c1c20;
+            border: 1px solid #252529; border-radius: 10px;
+            margin-bottom: 8px; border-left: 3px solid #333;
+        }
+        .etapa-linha.feita {
+            opacity: 0.55; border-left-color: #2ea043;
+        }
+        .etapa-linha.feita input[type="text"] {
+            text-decoration: line-through; color: #777;
+        }
+        .etapa-linha input[type="text"] {
+            flex: 1; background: transparent; border: none;
+            outline: none; font-size: 14px; color: #e0e0e0; padding: 0;
+        }
+        .etapa-linha input[type="text"]::placeholder { color: #555; }
+        .etapa-linha input[type="checkbox"] {
+            width: 20px; height: 20px; cursor: pointer;
+            flex-shrink: 0; accent-color: #2ea043;
+        }
+
+        .bloqueio-linha {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; background: #1f1518;
+            border: 1px solid #3a1f1f; border-left: 3px solid #d45a5a;
+            border-radius: 10px; margin-bottom: 8px;
+        }
+        .bloqueio-linha input[type="text"] {
+            flex: 1; background: transparent; border: none;
+            outline: none; font-size: 14px; color: #e08b8b; padding: 0;
+        }
+        .bloqueio-linha input::placeholder { color: #a55; }
+        .bloqueio-linha .btn-destravar {
+            background: transparent; border: 1px solid #4caf50;
+            color: #4caf50; border-radius: 6px; font-size: 11px;
+            padding: 4px 10px; cursor: pointer; transition: 0.15s;
+        }
+        .bloqueio-linha .btn-destravar:hover { background: #4caf50; color: #000; }
+
+        .diario-item {
+            padding: 10px 12px; border-left: 2px solid #333;
+            margin-bottom: 8px; font-size: 13px; color: #bbb; line-height: 1.5;
+        }
+        .diario-item .data {
+            color: #666; font-size: 11px; margin-right: 8px; font-family: monospace;
+        }
+        .diario-item.auto { border-left-color: #2ea043; }
+
+        .acao-card {
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px 14px; background: #1c1c20;
+            border: 1px solid #252529; border-radius: 10px; margin-bottom: 8px;
+        }
+        .acao-num {
+            font-size: 14px; font-weight: 700; color: #666;
+            width: 24px; text-align: center; flex-shrink: 0;
+        }
+        .acao-card input[type="text"] {
+            flex: 1; background: transparent; border: none;
+            outline: none; font-size: 14px; color: #e0e0e0; padding: 0;
+        }
+        .acao-card input::placeholder { color: #555; }
+        .btn-acao-foco {
+            background: #1a2235; border: 1px solid #2c3a55;
+            color: #8ab4f8; border-radius: 6px; font-size: 11px;
+            padding: 5px 10px; cursor: pointer; flex-shrink: 0;
+        }
+        .btn-acao-foco:hover { background: #232f4a; }
+
+        .link-linha {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; background: #1c1c20;
+            border: 1px solid #252529; border-radius: 10px; margin-bottom: 8px;
+        }
+        .link-linha input[type="text"] {
+            flex: 1; background: transparent; border: none;
+            outline: none; font-size: 13px; color: #e0e0e0; padding: 0;
+        }
+        .link-linha a {
+            font-size: 12px; color: #8ab4f8;
+            text-decoration: none; flex-shrink: 0;
+        }
+        .link-linha a:hover { text-decoration: underline; }
+
+        .btn-remover-linha {
+            background: none; border: none; color: #a33;
+            font-size: 18px; cursor: pointer; padding: 0 4px;
+            flex-shrink: 0; line-height: 1;
+        }
+        .btn-remover-linha:hover { color: #e55; }
+
+        .btn-adicionar {
+            width: 100%; padding: 10px; font-size: 13px;
+            cursor: pointer; border: 1px dashed #444;
+            background: transparent; color: #999;
+            border-radius: 10px; transition: 0.15s;
+        }
+        .btn-adicionar:hover { border-color: #666; color: #ccc; background: #1a1a1e; }
+
+        .btn-perigo {
+            padding: 10px 16px; font-size: 13px; cursor: pointer;
+            border: 1px solid #4a2f2f; background: transparent;
+            color: #d45a5a; border-radius: 10px; transition: 0.15s;
+        }
+        .btn-perigo:hover { background: #2a1a1a; border-color: #d45a5a; }
+
+        .btn-sucesso {
+            padding: 10px 16px; font-size: 13px; cursor: pointer;
+            border: 1px solid #2ea043; background: #1a2e1e;
+            color: #7ee787; border-radius: 10px;
+            transition: 0.15s; font-weight: 600;
+        }
+        .btn-sucesso:hover { background: #234528; }
+
+        details.bloco-expansivel {
+            background: #17171a; border: 1px solid #252529;
+            border-radius: 16px; padding: 16px;
+        }
+        details.bloco-expansivel summary {
+            cursor: pointer; list-style: none;
+            display: flex; align-items: center; gap: 12px; outline: none;
+        }
+        details.bloco-expansivel summary::-webkit-details-marker { display: none; }
+        details.bloco-expansivel summary::after {
+            content: "▼"; margin-left: auto; color: #777;
+            font-size: 11px; transition: 0.2s;
+        }
+        details.bloco-expansivel[open] summary::after { transform: rotate(180deg); }
+        details.bloco-expansivel summary h2 { font-size: 15px; color: #f5f5f5; }
+
+        .sprint-card {
+            padding: 16px;
+            background: linear-gradient(135deg, #1c1c22 0%, #17171a 100%);
+            border: 1px solid #252529;
+            border-left: 3px solid #8a5ad4; border-radius: 12px;
+        }
+        .sprint-tag {
+            display: inline-block; font-size: 10px; letter-spacing: 2px;
+            text-transform: uppercase; color: #8a5ad4; margin-bottom: 8px;
+        }
+        .sprint-input {
+            width: 100%; background: transparent; border: none;
+            outline: none; font-size: 15px; color: #e0e0e0; padding: 0;
+        }
+        .sprint-input::placeholder { color: #555; }
+
+        .btn-travado {
+            padding: 8px 14px; font-size: 12px; cursor: pointer;
+            border: 1px solid #4a2f2f; background: transparent;
+            color: #d45a5a; border-radius: 10px; transition: 0.15s;
+        }
+        .btn-travado:hover { background: #2a1a1a; }
+
+        .travado-painel {
+            padding: 16px; background: #1f1518;
+            border: 1px solid #3a1f1f; border-radius: 12px;
+            font-size: 15px; color: #e8c5c5; line-height: 1.6;
+            font-style: italic;
+        }
+
+        .check-linha {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 0; font-size: 14px; color: #ccc; cursor: pointer;
+        }
+        .check-linha input[type="checkbox"] {
+            width: 18px; height: 18px;
+            accent-color: #2ea043; cursor: pointer;
+        }
+        .check-linha.nao { color: #d45a5a; }
+
+        .guia-titulo-mini {
+            font-size: 11px; letter-spacing: 1px;
+            text-transform: uppercase; color: #666; margin: 14px 0 6px;
+        }
+        .guia-item {
+            font-size: 13px; color: #bbb; padding: 4px 0; line-height: 1.5;
+        }
+        .guia-item::before { content: "→ "; color: #555; }
+        .guia-pill {
+            display: inline-block; padding: 4px 10px;
+            background: #1c1c20; border: 1px solid #333;
+            border-radius: 12px; font-size: 12px;
+            color: #bbb; margin: 3px 4px 3px 0;
+        }
+
+        body.modo-compacto .colapsavel-compacto { display: none; }
+
+        .banner-parado {
+            padding: 14px 16px; background: #2a1f1a;
+            border: 1px solid #4a2f1f; border-left: 3px solid #d4774a;
+            border-radius: 12px;
+        }
+        .banner-parado .txt {
+            color: #e0a878; font-size: 14px; line-height: 1.5; margin-bottom: 10px;
+        }
+        .banner-parado .acoes { display: flex; gap: 8px; flex-wrap: wrap; }
+        .banner-parado button {
+            padding: 8px 14px; font-size: 12px; cursor: pointer;
+            border-radius: 8px; transition: 0.15s;
+        }
+        .banner-parado .btn-continuar {
+            background: #2a1f12; border: 1px solid #4a2f1f; color: #e0b878;
+        }
+        .banner-parado .btn-continuar:hover { background: #3a2a1a; }
+        .banner-parado .btn-arquivar-parado {
+            background: transparent; border: 1px solid #4a2f2f; color: #d45a5a;
+        }
+        .banner-parado .btn-arquivar-parado:hover { background: #2a1a1a; }
+
+        body.modo-foco-projeto .modules > * {
+            display: none !important;
+        }
+        body.modo-foco-projeto #painelFoco { display: flex !important; }
+
+        #painelFoco {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+            padding: 24px;
+            background: linear-gradient(135deg, #16161c 0%, #1a1a20 100%);
+            border: 2px solid #2c3a55;
+            border-radius: 16px;
+        }
+
+        .painel-foco-nome {
+            font-size: 13px;
+            color: #666;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .painel-foco-input {
+            font-size: 24px;
+            font-weight: 600;
+            color: #fff;
+            background: transparent;
+            border: none;
+            outline: none;
+            width: 100%;
+            padding: 0;
+        }
+        .painel-foco-input::placeholder { color: #444; }
+        .painel-foco-acoes {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn-sair-foco {
+            padding: 10px 16px; font-size: 13px; cursor: pointer;
+            border: 1px solid #333338; background: #1a1a1e;
+            color: #bbb; border-radius: 10px;
+        }
+        .btn-sair-foco:hover { background: #222228; color: #e0e0e0; }
+
+        .acoes-fim {
+            display: flex; gap: 10px; flex-wrap: wrap;
+            justify-content: center; margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="header">
+            <p class="eyebrow">PRÓXIMO PASSO</p>
+            <h1>🎯 Projeto</h1>
+            <p class="subtitle">
+                Um projeto por vez, bem-feito.
+            </p>
+        </header>
+
+        <section class="modules">
+
+            <div id="painelFoco">
+                <div class="painel-foco-nome" id="painelFocoNome">Projeto</div>
+                <input type="text" id="painelFocoInput" class="painel-foco-input"
+                    placeholder="O que você está fazendo agora?">
+                <div class="painel-foco-acoes">
+                    <button type="button" class="btn-sucesso" id="btnFocoConcluir">
+                        ✅ Concluir esta ação
+                    </button>
+                    <button type="button" class="btn-sair-foco" id="btnSairFoco">
+                        ← Sair do modo foco
+                    </button>
+                </div>
+            </div>
+
+
+            <div class="banner-parado" id="bannerParado" style="display:none;">
+                <div class="txt" id="bannerTexto"></div>
+                <div class="acoes">
+                    <button type="button" class="btn-continuar" id="btnContinuarAtivo">
+                        Continuar ativo
+                    </button>
+                    <button type="button" class="btn-arquivar-parado" id="btnArquivarParado">
+                        💀 Arquivar
+                    </button>
+                </div>
+            </div>
+
+
+            <div style="display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap;">
+                <button type="button" id="btnModoFoco" class="btn-foco" style="padding: 8px 14px; font-size: 12px; letter-spacing: 0;">
+                    🎯 Modo Foco
+                </button>
+                <button type="button" id="btnCompacto" class="btn-travado" style="border-color: #333; color: #bbb;">
+                    🔍 Modo compacto
+                </button>
+                <button type="button" id="btnTravado" class="btn-travado">
+                    🆘 Estou travado
+                </button>
+            </div>
+
+            <div id="travadoPainel" class="travado-painel" style="display:none;">
+                <div id="travadoTexto"></div>
+                <div style="margin-top: 12px; text-align: right;">
+                    <button type="button" id="btnOutraSugestao"
+                        style="background: transparent; border: 1px solid #4a2f2f; color: #e08b8b; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer;">
+                        🔄 Outra sugestão
+                    </button>
+                </div>
+            </div>
+
+
+            <div class="module-card" style="align-items: flex-start; flex-direction: column;">
+                <div style="width: 100%;">
+                    <label class="campo-label">Nome do projeto</label>
+                    <input type="text" id="nomeProjeto" class="projeto-nome" placeholder="Dê um nome…">
+
+                    <div class="pulso" id="pulsoProjeto">
+                        <span class="pulso-dot"></span>
+                        <span id="pulsoTexto">Sem atividade ainda</span>
+                    </div>
+
+                    <label class="campo-label">Status</label>
+                    <div class="chips" id="chipsStatus"></div>
+
+                    <label class="campo-label">Área</label>
+                    <div class="chips" id="chipsArea"></div>
+
+                    <label class="campo-label">Prazo (opcional)</label>
+                    <input type="text" id="prazoProjeto" placeholder="Ex.: 15/12/2026">
+                </div>
+            </div>
+
+
+            <div id="contagemWrap" style="display:none;">
+                <div class="contagem" id="contagemBox">
+                    <div>
+                        <div class="big" id="contagemDias">—</div>
+                        <div class="pace" id="contagemPace"></div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="color:#888; font-size:11px; letter-spacing:1px;">PRAZO</div>
+                        <div style="color:#f5f5f5; font-size:14px; font-weight:600;" id="contagemPrazo">—</div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="foco-card">
+                <div class="foco-titulo">🎯 O que estou fazendo neste projeto AGORA?</div>
+                <input type="text" id="focoPrincipal" class="foco-input"
+                    placeholder="A ação concreta que move isso pra frente.">
+                <div class="foco-acoes">
+                    <button type="button" id="btnEnviarFoco" class="btn-foco">
+                        ▶️ Enviar para o Foco
+                    </button>
+                    <button type="button" id="btnEnviarPrioridade" class="btn-foco" style="border-color: #4a2f1f; background: #2a1f12; color: #e0b878;">
+                        🎯 Enviar para Prioridades
+                    </button>
+                </div>
+            </div>
+
+
+            <div class="sprint-card">
+                <span class="sprint-tag">🏁 Sprint desta semana</span>
+                <input type="text" id="sprintAtual" class="sprint-input"
+                    placeholder="Ex.: terminar o corte bruto até sexta">
+            </div>
+
+
+            <div class="module-card">
+                <div class="bloco-titulo">
+                    <span class="icon">📋</span>
+                    <h2>Etapas</h2>
+                    <span class="contador" id="contadorEtapas"></span>
+                </div>
+
+                <div class="progresso-wrap" style="margin-bottom: 16px;">
+                    <div class="progresso-barra">
+                        <div class="progresso-preenchido" id="progressoBarra" style="width: 0%;"></div>
+                    </div>
+                    <span class="progresso-texto" id="progressoTexto">0/0</span>
+                </div>
+
+                <div id="listaEtapas"></div>
+                <button type="button" class="btn-adicionar" id="btnAddEtapa">
+                    ＋ Adicionar etapa
+                </button>
+            </div>
+
+
+            <div class="module-card">
+                <div class="bloco-titulo">
+                    <span class="icon">📅</span>
+                    <h2>Atividade do projeto</h2>
+                </div>
+
+                <div class="heatmap-filtros" id="heatmapFiltros">
+                    <button type="button" data-meses="1">1 mês</button>
+                    <button type="button" data-meses="3">3 meses</button>
+                    <button type="button" data-meses="6">6 meses</button>
+                    <button type="button" data-meses="12" class="ativo">12 meses</button>
+                </div>
+
+                <div class="heatmap-wrap">
+                    <div class="heatmap" id="heatmap"></div>
+                </div>
+
+                <div class="heatmap-legenda">
+                    <span>Menos</span>
+                    <div class="heat-cell"></div>
+                    <div class="heat-cell n1"></div>
+                    <div class="heat-cell n2"></div>
+                    <div class="heat-cell n3"></div>
+                    <div class="heat-cell n4"></div>
+                    <span>Mais</span>
+                </div>
+            </div>
+
+
+            <div class="module-card">
+                <div class="bloco-titulo">
+                    <span class="icon">🎬</span>
+                    <h2>Onde estou agora</h2>
+                </div>
+                <textarea id="ondeEstou" rows="3"
+                    placeholder="Factual. Ex.: 'Terminei o corte bruto. Falta colorir, ajustar áudio e subir.'"></textarea>
+            </div>
+
+
+            <details class="bloco-expansivel colapsavel-compacto">
+                <summary>
+                    <span class="icon">✅</span>
+                    <h2>Checagem rápida</h2>
+                    <span style="color:#666; font-size:12px; margin-left: 6px;">
+                        (clareza antes de continuar)
+                    </span>
+                </summary>
+                <div style="margin-top: 12px;" id="checagemLista"></div>
+                <p id="checagemAlerta" style="color: #e0b878; font-size: 13px; margin-top: 12px; line-height: 1.5;"></p>
+            </details>
+
+
+            <details class="bloco-expansivel colapsavel-compacto">
+                <summary>
+                    <span class="icon">🧭</span>
+                    <h2>Guia do projeto</h2>
+                    <span style="color:#666; font-size:12px; margin-left: 6px;">
+                        (inspiração por área)
+                    </span>
+                </summary>
+                <div id="guiaConteudo" style="margin-top: 12px;"></div>
+            </details>
+
+
+            <div class="module-card colapsavel-compacto">
+                <div class="bloco-titulo">
+                    <span class="icon">📦</span>
+                    <h2>Entregáveis</h2>
+                    <span class="contador">o que sai desse projeto</span>
+                </div>
+                <div id="listaEntregaveis"></div>
+                <button type="button" class="btn-adicionar" id="btnAddEntregavel">
+                    ＋ Adicionar entregável
+                </button>
+            </div>
+
+
+            <div class="module-card colapsavel-compacto">
+                <div class="bloco-titulo">
+                    <span class="icon">🚧</span>
+                    <h2>Bloqueios</h2>
+                    <span class="contador">o que está travando agora</span>
+                </div>
+                <div id="listaBloqueios"></div>
+                <button type="button" class="btn-adicionar" id="btnAddBloqueio">
+                    ＋ Adicionar bloqueio
+                </button>
+            </div>
+
+
+            <div class="module-card">
+                <div class="bloco-titulo">
+                    <span class="icon">🏁</span>
+                    <h2>Próximas 3 ações</h2>
+                    <span class="contador">na ordem</span>
+                </div>
+                <div id="listaAcoes"></div>
+            </div>
+
+
+            <div class="module-card colapsavel-compacto">
+                <div class="bloco-titulo">
+                    <span class="icon">🔗</span>
+                    <h2>Links do projeto</h2>
+                    <span class="contador">Drive, Notion, repositório…</span>
+                </div>
+                <div id="listaLinks"></div>
+                <button type="button" class="btn-adicionar" id="btnAddLink">
+                    ＋ Adicionar link
+                </button>
+            </div>
+
+
+            <details class="bloco-expansivel colapsavel-compacto">
+                <summary>
+                    <span class="icon">📝</span>
+                    <h2>Diário de bordo</h2>
+                    <span style="color:#666; font-size:12px; margin-left: 6px;">
+                        (histórico do projeto)
+                    </span>
+                </summary>
+                <div style="margin-top: 12px;" id="diarioLista"></div>
+
+                <div style="margin-top: 16px; display: flex; gap: 8px;">
+                    <input type="text" id="inputDiario"
+                        placeholder="Adicionar entrada manual…"
+                        style="flex: 1;">
+                    <button type="button" id="btnAddDiario"
+                        style="padding: 10px 16px; font-size: 13px; cursor: pointer; border: 1px solid #333338; border-radius: 8px; background: #1a1a1e; color: #bbb;">
+                        ＋
+                    </button>
+                </div>
+            </details>
+
+
+            <div class="acoes-fim">
+                <button type="button" class="btn-sucesso" id="btnConcluir">
+                    🏆 Concluir projeto
+                </button>
+                <button type="button" class="btn-perigo" id="btnArquivar">
+                    💀 Arquivar
+                </button>
+            </div>
+
+
+            <details class="bloco-expansivel colapsavel-compacto" style="margin-top: 20px;">
+                <summary>
+                    <span class="icon">🕰️</span>
+                    <h2>Projetos anteriores</h2>
+                </summary>
+                <div id="historicoProjetos" style="margin-top: 12px;">
+                    <p style="color:#666; font-size:13px;">Nenhum projeto arquivado ainda.</p>
+                </div>
+            </details>
+
+        </section>
+
+        <a href="index.html" class="back-button">
+            ← Voltar para Próximo Passo
+        </a>
+
+    </main>
+
+
+    <script>
+        const CHAVE_ATIVO       = "planejamento_projeto_ativo";
+        const CHAVE_ATIVIDADE   = "planejamento_projeto_atividade";
+        const CHAVE_ARQUIVADOS  = "planejamento_projetos_arquivados";
+        const CHAVE_HEAT_MESES  = "planejamento_projeto_heatmap_meses";
+        const CHAVE_BANNER_IGN  = "planejamento_projeto_banner_parado_ignorado";
+
+        const STATUS = [
+            { v: "ideia",     l: "🌱 Ideia",         c: "st-ideia" },
+            { v: "andamento", l: "🔨 Em andamento",  c: "st-andamento" },
+            { v: "travado",   l: "🚧 Travado",       c: "st-travado" },
+            { v: "pausado",   l: "⏸️ Pausado",       c: "st-pausado" }
+        ];
+
+        const AREAS = [
+            { v: "trabalho",   l: "💼 Trabalho" },
+            { v: "criativo",   l: "🎨 Criativo" },
+            { v: "estudo",     l: "📚 Estudo" },
+            { v: "corpo",      l: "🏋️ Corpo" },
+            { v: "espiritual", l: "🙏 Espiritual" },
+            { v: "financeiro", l: "💰 Financeiro" }
+        ];
+
+        const GUIAS = {
+            criativo: {
+                nome: "🎨 Projeto criativo",
+                fases: [
+                    "Ideação — o que exatamente quero criar?",
+                    "Referências — o que já existe e me inspira?",
+                    "Rascunho — versão bruta, sem refinamento",
+                    "Estrutura — organizar o que existe",
+                    "Execução — produzir o conteúdo real",
+                    "Revisão — cortar, ajustar, criticar",
+                    "Publicação — subir no mundo"
+                ],
+                perguntas: [
+                    "Qual o formato final? (vídeo, texto, imagem, físico)",
+                    "Para quem isso existe?",
+                    "Se eu tivesse que cortar 80%, o que sobraria?",
+                    "O que faz isso ser único?"
+                ],
+                exemplos: ["Série de vídeos curtos", "Pequeno livro / e-book", "Podcast", "Curso curto"]
+            },
+            trabalho: {
+                nome: "💼 Projeto comercial",
+                fases: [
+                    "Briefing — entender o que o cliente quer",
+                    "Escopo — o que entra e o que NÃO entra",
+                    "Orçamento — quanto custa, quanto tempo",
+                    "Execução — produzir",
+                    "Revisão — o que o cliente devolve",
+                    "Entrega — entregar formalmente",
+                    "Follow-up — pedir feedback e próximo trabalho"
+                ],
+                perguntas: [
+                    "Quem é o cliente?",
+                    "O que 'pronto' significa?",
+                    "Qual o prazo real e o que pode atrasar?",
+                    "Quanto tempo de revisão vou precisar?"
+                ],
+                exemplos: ["Serviço para cliente local", "Proposta enviada", "Pacote mensal"]
+            },
+            estudo: {
+                nome: "📚 Projeto de estudo",
+                fases: [
+                    "Objetivo — o que quero saber ao final?",
+                    "Fontes — onde vou aprender isso",
+                    "Estudo — consumir o material",
+                    "Prática — aplicar em algo real",
+                    "Revisão — o que fixou e o que não",
+                    "Síntese — explicar com minhas palavras"
+                ],
+                perguntas: [
+                    "O que saber ao final? (em uma frase)",
+                    "Como vou saber que aprendi?",
+                    "Onde vou aplicar?",
+                    "Quanto tempo por dia?"
+                ],
+                exemplos: ["Curso concluído", "Idioma estudado", "Tema dominado"]
+            },
+            corpo: {
+                nome: "🏋️ Projeto físico",
+                fases: [
+                    "Objetivo — força, resistência, peso, mobilidade",
+                    "Baseline — onde estou hoje?",
+                    "Rotina — o que vou fazer semanalmente",
+                    "Consistência — manter por semanas",
+                    "Medição — como vou medir progresso",
+                    "Ajuste — o que está funcionando"
+                ],
+                perguntas: [
+                    "Qual o objetivo específico?",
+                    "Como vou medir?",
+                    "Com que frequência?",
+                    "O que vai atrapalhar?"
+                ],
+                exemplos: ["Ganho de massa", "Correr 5km", "Flexibilidade", "Perder Xkg"]
+            },
+            espiritual: {
+                nome: "🙏 Projeto espiritual",
+                fases: [
+                    "Intenção — por que estou fazendo isso",
+                    "Prática — o que vou fazer",
+                    "Constância — tempo diário / semanal",
+                    "Reflexão — o que estou percebendo",
+                    "Partilha — conversar ou anotar"
+                ],
+                perguntas: [
+                    "Qual o propósito?",
+                    "Qual a prática concreta?",
+                    "Como vou lembrar de fazer?",
+                    "Como vou perceber evolução?"
+                ],
+                exemplos: ["Leitura devocional", "Prática diária", "Retiro", "Jejum"]
+            },
+            financeiro: {
+                nome: "💰 Projeto financeiro",
+                fases: [
+                    "Objetivo — quanto / quando",
+                    "Ponto atual — de onde parto",
+                    "Plano — o que vou fazer",
+                    "Acompanhamento — medir semanalmente",
+                    "Ajuste — o que mudou"
+                ],
+                perguntas: [
+                    "Qual o valor exato?",
+                    "Até quando?",
+                    "De onde vem?",
+                    "Como vou controlar?"
+                ],
+                exemplos: ["Reserva de emergência", "Quitar dívida", "Comprar X"]
+            }
+        };
+
+        const SUGESTOES_TRAVADO = [
+            "Qual o MENOR passo possível que você poderia dar agora? Tipo, ridiculamente pequeno.",
+            "Se você tivesse que entregar esse projeto amanhã, o que faria primeiro?",
+            "O que você está evitando? Por que está evitando?",
+            "Você sabe qual é a próxima ação? Se não, esse é o bloqueio.",
+            "Se um amigo te pedisse conselho sobre esse projeto, o que você diria?",
+            "Escreva o problema em UMA frase. Só uma. Sem contexto.",
+            "O que tornaria esse projeto mais fácil? Simplifique.",
+            "Você precisa mesmo fazer tudo isso? O que dá pra cortar?",
+            "Quem já fez algo parecido? Pode te dar 20 minutos?",
+            "Qual foi a última coisa que funcionou? Por que parou?"
+        ];
+
+
+        let projeto = {};
+        try {
+            const s = localStorage.getItem(CHAVE_ATIVO);
+            if (s) projeto = JSON.parse(s);
+        } catch (e) { projeto = {}; }
+
+        projeto.nome         = projeto.nome || "";
+        projeto.status       = projeto.status || "ideia";
+        projeto.area         = projeto.area || "";
+        projeto.prazo        = projeto.prazo || "";
+        projeto.foco         = projeto.foco || "";
+        projeto.sprint       = projeto.sprint || "";
+        projeto.ondeEstou    = projeto.ondeEstou || "";
+        projeto.etapas       = projeto.etapas || [];
+        projeto.entregaveis  = projeto.entregaveis || [];
+        projeto.bloqueios    = projeto.bloqueios || [];
+        projeto.acoes        = projeto.acoes || ["", "", ""];
+        projeto.links        = projeto.links || [];
+        projeto.diario       = projeto.diario || [];
+        projeto.checagem     = projeto.checagem || {};
+        projeto.criadoEm     = projeto.criadoEm || new Date().toISOString();
+        projeto.ultimaEdicao = projeto.ultimaEdicao || null;
+
+        let atividade = {};
+        try {
+            const s = localStorage.getItem(CHAVE_ATIVIDADE);
+            if (s) atividade = JSON.parse(s);
+        } catch (e) { atividade = {}; }
+
+        let mesesHeatmap = Number(localStorage.getItem(CHAVE_HEAT_MESES)) || 12;
+
+
+        function salvar() {
+            projeto.ultimaEdicao = new Date().toISOString();
+            localStorage.setItem(CHAVE_ATIVO, JSON.stringify(projeto));
+            registrarAtividade();
+            atualizarPulso();
+            esconderBannerSeEditou();
+        }
+
+        function registrarAtividade() {
+            const h = new Date().toISOString().split("T")[0];
+            atividade[h] = (atividade[h] || 0) + 1;
+            localStorage.setItem(CHAVE_ATIVIDADE, JSON.stringify(atividade));
+        }
+
+        function hojeISO() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        }
+
+        function autoSaveInput(id, prop) {
+            const el = document.getElementById(id);
+            el.value = projeto[prop] || "";
+            el.addEventListener("input", () => {
+                projeto[prop] = el.value;
+                salvar();
+                if (prop === "prazo") atualizarContagem();
+            });
+        }
+
+
+        autoSaveInput("nomeProjeto", "nome");
+        autoSaveInput("prazoProjeto", "prazo");
+        autoSaveInput("focoPrincipal", "foco");
+        autoSaveInput("sprintAtual", "sprint");
+        autoSaveInput("ondeEstou", "ondeEstou");
+
+        const chipsStatus = document.getElementById("chipsStatus");
+        STATUS.forEach(s => {
+            const chip = document.createElement("div");
+            chip.className = "chip " + s.c;
+            chip.textContent = s.l;
+            if (projeto.status === s.v) chip.classList.add("selecionado");
+            chip.addEventListener("click", () => {
+                projeto.status = s.v; salvar(); renderChips();
+            });
+            chipsStatus.appendChild(chip);
+        });
+
+        const chipsArea = document.getElementById("chipsArea");
+        AREAS.forEach(a => {
+            const chip = document.createElement("div");
+            chip.className = "chip";
+            chip.textContent = a.l;
+            if (projeto.area === a.v) chip.classList.add("selecionado");
+            chip.addEventListener("click", () => {
+                projeto.area = a.v; salvar(); renderChips(); renderGuia();
+            });
+            chipsArea.appendChild(chip);
+        });
+
+        function renderChips() {
+            chipsStatus.querySelectorAll(".chip").forEach((c, i) => {
+                c.classList.toggle("selecionado", STATUS[i].v === projeto.status);
+            });
+            chipsArea.querySelectorAll(".chip").forEach((c, i) => {
+                c.classList.toggle("selecionado", AREAS[i].v === projeto.area);
+            });
+        }
+        renderChips();
+
+
+        function atualizarPulso() {
+            const el = document.getElementById("pulsoProjeto");
+            const txt = document.getElementById("pulsoTexto");
+
+            if (!projeto.ultimaEdicao) {
+                el.className = "pulso";
+                txt.textContent = "Sem atividade ainda";
+                return;
+            }
+
+            const dias = Math.floor((Date.now() - new Date(projeto.ultimaEdicao).getTime()) / 86400000);
+            let classe = "pulso ativo";
+            let label = "";
+
+            if (dias === 0) label = "💓 Última atividade: hoje";
+            else if (dias === 1) label = "💓 Última atividade: ontem";
+            else if (dias <= 3) label = `💓 Última atividade: há ${dias} dias`;
+            else if (dias <= 7) { classe = "pulso frio"; label = `💤 Última atividade: há ${dias} dias`; }
+            else if (dias <= 21) { classe = "pulso frio"; label = `💤 Parado há ${dias} dias`; }
+            else { classe = "pulso zumbi"; label = `💀 Sem mexer há ${dias} dias`; }
+
+            el.className = classe;
+            txt.textContent = label;
+        }
+        atualizarPulso();
+
+
+        function esconderBannerSeEditou() {
+            localStorage.removeItem(CHAVE_BANNER_IGN);
+            document.getElementById("bannerParado").style.display = "none";
+        }
+
+        (function checarParado() {
+            if (!projeto.ultimaEdicao) return;
+            if (!projeto.nome.trim()) return;
+            if (localStorage.getItem(CHAVE_BANNER_IGN) === "true") return;
+
+            const dias = Math.floor((Date.now() - new Date(projeto.ultimaEdicao).getTime()) / 86400000);
+            if (dias >= 30) {
+                document.getElementById("bannerTexto").textContent =
+                    `Esse projeto está parado há ${dias} dias. Quer arquivar?`;
+                document.getElementById("bannerParado").style.display = "block";
+            }
+        })();
+
+        document.getElementById("btnContinuarAtivo").addEventListener("click", () => {
+            localStorage.setItem(CHAVE_BANNER_IGN, "true");
+            document.getElementById("bannerParado").style.display = "none";
+        });
+
+        document.getElementById("btnArquivarParado").addEventListener("click", () => {
+            document.getElementById("btnArquivar").click();
+        });
+
+
+        function atualizarContagem() {
+            const wrap = document.getElementById("contagemWrap");
+            const prazo = projeto.prazo;
+
+            if (!prazo || !prazo.trim()) { wrap.style.display = "none"; return; }
+
+            let dataAlvo = null;
+            const m1 = prazo.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+            const m2 = prazo.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+            if (m1) dataAlvo = new Date(Number(m1[3]), Number(m1[2]) - 1, Number(m1[1]));
+            else if (m2) dataAlvo = new Date(Number(m2[1]), Number(m2[2]) - 1, Number(m2[3]));
+
+            if (!dataAlvo) { wrap.style.display = "none"; return; }
+
+            wrap.style.display = "block";
+
+            const diffDias = Math.ceil((dataAlvo - new Date()) / 86400000);
+            const box = document.getElementById("contagemBox");
+            box.classList.remove("alerta", "atrasado");
+
+            let textoDias = "";
+            if (diffDias < 0) { box.classList.add("atrasado"); textoDias = `${Math.abs(diffDias)} dias atrasado`; }
+            else if (diffDias === 0) { box.classList.add("alerta"); textoDias = "É HOJE"; }
+            else if (diffDias <= 7) { box.classList.add("alerta"); textoDias = `${diffDias} dias restantes`; }
+            else textoDias = `${diffDias} dias restantes`;
+
+            document.getElementById("contagemDias").textContent = textoDias;
+            document.getElementById("contagemPrazo").textContent = prazo;
+
+            const feitas = projeto.etapas.filter(e => e.feita).length;
+            const restantes = projeto.etapas.length - feitas;
+
+            if (restantes === 0 && projeto.etapas.length > 0) {
+                document.getElementById("contagemPace").textContent = "Todas as etapas concluídas ✅";
+            } else if (diffDias > 0 && restantes > 0) {
+                const porSemana = (restantes / (diffDias / 7)).toFixed(1);
+                const semanas = Math.ceil(restantes / Math.max(porSemana, 0.5));
+                const prev = new Date();
+                prev.setDate(prev.getDate() + semanas * 7);
+                const pStr = `${String(prev.getDate()).padStart(2, "0")}/${String(prev.getMonth() + 1).padStart(2, "0")}`;
+                document.getElementById("contagemPace").textContent =
+                    `Pace: ${porSemana} etapas/sem · Previsão: ${pStr}`;
+            } else {
+                document.getElementById("contagemPace").textContent = "—";
+            }
+        }
+        atualizarContagem();
+
+
+        document.getElementById("btnEnviarFoco").addEventListener("click", () => {
+            const texto = projeto.foco.trim();
+            if (!texto) { alert("Escreva o foco principal antes."); return; }
+            window.location.href = `../foco/foco.html?tarefa=${encodeURIComponent(texto)}`;
+        });
+
+        document.getElementById("btnEnviarPrioridade").addEventListener("click", () => {
+            const texto = projeto.foco.trim();
+            if (!texto) { alert("Escreva o foco principal antes."); return; }
+            localStorage.setItem(`planejamento_${hojeISO()}_prioridades_0`, texto);
+            alert("Enviado como Prioridade 1 de hoje.");
+        });
+
+
+        function renderEtapas() {
+            const container = document.getElementById("listaEtapas");
+            container.innerHTML = "";
+            projeto.etapas.forEach((etapa, i) => {
+                const linha = document.createElement("div");
+                linha.className = "etapa-linha" + (etapa.feita ? " feita" : "");
+
+                const check = document.createElement("input");
+                check.type = "checkbox";
+                check.checked = !!etapa.feita;
+                check.addEventListener("change", () => {
+                    etapa.feita = check.checked;
+                    if (etapa.feita) adicionarDiario(`Etapa "${etapa.texto || "(sem texto)"}" concluída.`, true);
+                    salvar(); renderEtapas(); atualizarProgresso(); atualizarContagem();
+                });
+                linha.appendChild(check);
+
+                const input = document.createElement("input");
+                input.type = "text"; input.value = etapa.texto || "";
+                input.placeholder = "Descreva a etapa…";
+                input.addEventListener("input", () => { etapa.texto = input.value; salvar(); });
+                linha.appendChild(input);
+
+                const btnRem = document.createElement("button");
+                btnRem.className = "btn-remover-linha"; btnRem.textContent = "×";
+                btnRem.addEventListener("click", () => {
+                    projeto.etapas.splice(i, 1);
+                    salvar(); renderEtapas(); atualizarProgresso(); atualizarContagem();
+                });
+                linha.appendChild(btnRem);
+                container.appendChild(linha);
+            });
+        }
+
+        function atualizarProgresso() {
+            const total = projeto.etapas.length;
+            const feitas = projeto.etapas.filter(e => e.feita).length;
+            const pct = total > 0 ? Math.round((feitas / total) * 100) : 0;
+            document.getElementById("progressoBarra").style.width = pct + "%";
+            document.getElementById("progressoTexto").textContent = `${feitas}/${total} · ${pct}%`;
+            document.getElementById("contadorEtapas").textContent = `${feitas}/${total} concluídas`;
+        }
+
+        document.getElementById("btnAddEtapa").addEventListener("click", () => {
+            if (projeto.etapas.length >= 12) {
+                alert("Máximo de 12 etapas. Menos é mais — simplifique.");
+                return;
+            }
+            projeto.etapas.push({ texto: "", feita: false });
+            salvar(); renderEtapas(); atualizarProgresso();
+        });
+
+        renderEtapas();
+        atualizarProgresso();
+
+
+        function renderEntregaveis() {
+            const container = document.getElementById("listaEntregaveis");
+            container.innerHTML = "";
+            projeto.entregaveis.forEach((ent, i) => {
+                const linha = document.createElement("div");
+                linha.className = "entregavel-linha" + (ent.feito ? " feito" : "");
+
+                const check = document.createElement("input");
+                check.type = "checkbox"; check.checked = !!ent.feito;
+                check.addEventListener("change", () => {
+                    ent.feito = check.checked;
+                    if (ent.feito) adicionarDiario(`Entregável "${ent.texto}" pronto.`, true);
+                    salvar(); renderEntregaveis();
+                });
+                linha.appendChild(check);
+
+                const input = document.createElement("input");
+                input.type = "text"; input.value = ent.texto || "";
+                input.placeholder = "Ex.: vídeo final no YouTube";
+                input.addEventListener("input", () => { ent.texto = input.value; salvar(); });
+                linha.appendChild(input);
+
+                const btnRem = document.createElement("button");
+                btnRem.className = "btn-remover-linha"; btnRem.textContent = "×";
+                btnRem.addEventListener("click", () => {
+                    projeto.entregaveis.splice(i, 1); salvar(); renderEntregaveis();
+                });
+                linha.appendChild(btnRem);
+                container.appendChild(linha);
+            });
+        }
+        document.getElementById("btnAddEntregavel").addEventListener("click", () => {
+            projeto.entregaveis.push({ texto: "", feito: false });
+            salvar(); renderEntregaveis();
+        });
+        renderEntregaveis();
+
+
+        function renderBloqueios() {
+            const container = document.getElementById("listaBloqueios");
+            container.innerHTML = "";
+            projeto.bloqueios.forEach((b, i) => {
+                const linha = document.createElement("div");
+                linha.className = "bloqueio-linha";
+
+                const input = document.createElement("input");
+                input.type = "text"; input.value = b.texto || "";
+                input.placeholder = "Ex.: esperando resposta do cliente";
+                input.addEventListener("input", () => { b.texto = input.value; salvar(); });
+                linha.appendChild(input);
+
+                const btn = document.createElement("button");
+                btn.className = "btn-destravar";
+                btn.textContent = "✓ Destravado";
+                btn.addEventListener("click", () => {
+                    adicionarDiario(`Bloqueio removido: "${b.texto}".`, true);
+                    projeto.bloqueios.splice(i, 1);
+                    salvar(); renderBloqueios();
+                });
+                linha.appendChild(btn);
+                container.appendChild(linha);
+            });
+        }
+        document.getElementById("btnAddBloqueio").addEventListener("click", () => {
+            projeto.bloqueios.push({ texto: "" });
+            salvar(); renderBloqueios();
+        });
+        renderBloqueios();
+
+
+        function renderAcoes() {
+            const container = document.getElementById("listaAcoes");
+            container.innerHTML = "";
+            projeto.acoes.forEach((acao, i) => {
+                const card = document.createElement("div");
+                card.className = "acao-card";
+
+                const num = document.createElement("span");
+                num.className = "acao-num";
+                num.textContent = (i + 1) + ".";
+                card.appendChild(num);
+
+                const input = document.createElement("input");
+                input.type = "text"; input.value = acao || "";
+                input.placeholder = i === 0 ? "A próxima ação" : (i === 1 ? "Se a primeira travar" : "Plano C");
+                input.addEventListener("input", () => { projeto.acoes[i] = input.value; salvar(); });
+                card.appendChild(input);
+
+                const btn = document.createElement("button");
+                btn.className = "btn-acao-foco";
+                btn.textContent = "🎯 Focar";
+                btn.addEventListener("click", () => {
+                    const t = (projeto.acoes[i] || "").trim();
+                    if (!t) { alert("Escreva a ação."); return; }
+                    window.location.href = `../foco/foco.html?tarefa=${encodeURIComponent(t)}`;
+                });
+                card.appendChild(btn);
+                container.appendChild(card);
+            });
+        }
+        renderAcoes();
+
+
+        function renderLinks() {
+            const container = document.getElementById("listaLinks");
+            container.innerHTML = "";
+            projeto.links.forEach((lk, i) => {
+                const linha = document.createElement("div");
+                linha.className = "link-linha";
+
+                const input = document.createElement("input");
+                input.type = "text"; input.value = lk.url || "";
+                input.placeholder = "Cole o link…";
+                input.addEventListener("input", () => {
+                    lk.url = input.value; salvar(); renderLinks();
+                });
+                linha.appendChild(input);
+
+                if (lk.url && /^https?:\/\//i.test(lk.url)) {
+                    const a = document.createElement("a");
+                    a.href = lk.url; a.target = "_blank"; a.rel = "noopener";
+                    a.textContent = "abrir";
+                    linha.appendChild(a);
+                }
+
+                const btnRem = document.createElement("button");
+                btnRem.className = "btn-remover-linha"; btnRem.textContent = "×";
+                btnRem.addEventListener("click", () => {
+                    projeto.links.splice(i, 1); salvar(); renderLinks();
+                });
+                linha.appendChild(btnRem);
+                container.appendChild(linha);
+            });
+        }
+        document.getElementById("btnAddLink").addEventListener("click", () => {
+            projeto.links.push({ url: "" });
+            salvar(); renderLinks();
+        });
+        renderLinks();
+
+
+        function adicionarDiario(texto, automatico = false) {
+            if (!texto.trim()) return;
+            projeto.diario.unshift({
+                texto: texto.trim(),
+                data: new Date().toISOString(),
+                auto: automatico
+            });
+            localStorage.setItem(CHAVE_ATIVO, JSON.stringify(projeto));
+            renderDiario();
+        }
+
+        function renderDiario() {
+            const container = document.getElementById("diarioLista");
+            container.innerHTML = "";
+            if (projeto.diario.length === 0) {
+                container.innerHTML = `<p style="color:#666; font-size:13px;">Ainda sem registros.</p>`;
+                return;
+            }
+            projeto.diario.slice(0, 50).forEach(item => {
+                const d = new Date(item.data);
+                const dataStr = `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+                const div = document.createElement("div");
+                div.className = "diario-item" + (item.auto ? " auto" : "");
+                div.innerHTML = `<span class="data">${dataStr}</span>${item.texto}`;
+                container.appendChild(div);
+            });
+        }
+        document.getElementById("btnAddDiario").addEventListener("click", () => {
+            const inp = document.getElementById("inputDiario");
+            if (!inp.value.trim()) return;
+            adicionarDiario(inp.value.trim(), false);
+            inp.value = "";
+        });
+        renderDiario();
+
+
+        function renderHeatmap() {
+            const container = document.getElementById("heatmap");
+            container.innerHTML = "";
+
+            const semanasMap = { 1: 5, 3: 13, 6: 26, 12: 52 };
+            const semanas = semanasMap[mesesHeatmap] || 52;
+
+            const hoje = new Date();
+            hoje.setHours(0, 0, 0, 0);
+
+            const ultimoDomingo = new Date(hoje);
+            ultimoDomingo.setDate(ultimoDomingo.getDate() - ultimoDomingo.getDay());
+
+            const inicio = new Date(ultimoDomingo);
+            inicio.setDate(inicio.getDate() - (semanas - 1) * 7);
+
+            for (let i = 0; i < semanas * 7; i++) {
+                const d = new Date(inicio);
+                d.setDate(d.getDate() + i);
+
+                const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                const valor = atividade[iso] || 0;
+
+                let nivel = "";
+                if (valor >= 8) nivel = "n4";
+                else if (valor >= 5) nivel = "n3";
+                else if (valor >= 3) nivel = "n2";
+                else if (valor >= 1) nivel = "n1";
+
+                const cell = document.createElement("div");
+                cell.className = "heat-cell" + (nivel ? " " + nivel : "");
+                cell.title = `${iso}: ${valor} ação(ões)`;
+                container.appendChild(cell);
+            }
+        }
+
+        document.querySelectorAll("#heatmapFiltros button").forEach(btn => {
+            if (Number(btn.dataset.meses) === mesesHeatmap) btn.classList.add("ativo");
+            else btn.classList.remove("ativo");
+
+            btn.addEventListener("click", () => {
+                mesesHeatmap = Number(btn.dataset.meses);
+                localStorage.setItem(CHAVE_HEAT_MESES, mesesHeatmap);
+                document.querySelectorAll("#heatmapFiltros button").forEach(b => b.classList.remove("ativo"));
+                btn.classList.add("ativo");
+                renderHeatmap();
+            });
+        });
+        renderHeatmap();
+
+
+        function renderGuia() {
+            const container = document.getElementById("guiaConteudo");
+            const area = projeto.area;
+
+            if (!area) {
+                container.innerHTML = `<p style="color:#666; font-size:13px;">Escolha uma área no topo para ver o guia específico.</p>`;
+                return;
+            }
+            const g = GUIAS[area];
+            if (!g) {
+                container.innerHTML = `<p style="color:#666; font-size:13px;">Sem guia para essa área.</p>`;
+                return;
+            }
+
+            let html = `<div style="font-size:16px; font-weight:600; color:#e0e0e0; margin-bottom:12px;">${g.nome}</div>`;
+            html += `<div class="guia-titulo-mini">📋 Fases típicas</div>`;
+            g.fases.forEach(f => { html += `<div class="guia-item">${f}</div>`; });
+            html += `<div class="guia-titulo-mini">❓ Perguntas-chave</div>`;
+            g.perguntas.forEach(p => { html += `<div class="guia-item">${p}</div>`; });
+            html += `<div class="guia-titulo-mini">💡 Exemplos comuns</div>`;
+            g.exemplos.forEach(e => { html += `<span class="guia-pill">${e}</span>`; });
+
+            container.innerHTML = html;
+        }
+        renderGuia();
+
+
+        const PERGUNTAS_CHECAGEM = [
+            { k: "resultado", q: "Você sabe qual é o resultado final?" },
+            { k: "proximo",   q: "Você sabe qual é o próximo passo?" },
+            { k: "porque",    q: "Você sabe por que isso importa?" },
+            { k: "paraQuem",  q: "Você sabe para quem?" },
+            { k: "quando",    q: "Você sabe quando quer terminar?" }
+        ];
+
+        const DICAS = {
+            resultado: "Sem saber o resultado final, o projeto vira uma direção sem fim. Escreva o entregável.",
+            proximo:   "O próximo passo é a única coisa que destrava. Se você não sabe qual é, esse é o problema.",
+            porque:    "Se você não sabe por quê, vai desistir quando bater o cansaço. Volte ao bloco de objetivo.",
+            paraQuem:  "Projeto sem destinatário claro costuma virar perfeccionismo sem propósito.",
+            quando:    "Sem prazo, o projeto nunca termina. Coloque um, mesmo que provisório."
+        };
+
+        function renderChecagem() {
+            const container = document.getElementById("checagemLista");
+            container.innerHTML = "";
+
+            PERGUNTAS_CHECAGEM.forEach(p => {
+                const marcado = !!projeto.checagem[p.k];
+                const label = document.createElement("label");
+                label.className = "check-linha" + (marcado ? "" : " nao");
+
+                const check = document.createElement("input");
+                check.type = "checkbox";
+                check.checked = marcado;
+                check.addEventListener("change", () => {
+                    projeto.checagem[p.k] = check.checked;
+                    salvar(); renderChecagem();
+                });
+                label.appendChild(check);
+
+                const span = document.createElement("span");
+                span.textContent = p.q;
+                label.appendChild(span);
+                container.appendChild(label);
+            });
+
+            const naoMarcados = PERGUNTAS_CHECAGEM.filter(p => !projeto.checagem[p.k]);
+            const alerta = document.getElementById("checagemAlerta");
+
+            if (naoMarcados.length === 0) {
+                alerta.textContent = "✅ Tudo em ordem. Você sabe onde está e para onde vai.";
+                alerta.style.color = "#7ee787";
+            } else {
+                alerta.innerHTML = `<strong>⚠️ ${naoMarcados.length} ponto(s) em aberto:</strong><br>` +
+                    naoMarcados.map(p => `→ ${DICAS[p.k]}`).join("<br>");
+                alerta.style.color = "#e0b878";
+            }
+        }
+        renderChecagem();
+
+
+        const painelTravado = document.getElementById("travadoPainel");
+        const textoTravado = document.getElementById("travadoTexto");
+
+        function mostrarSugestao() {
+            const s = SUGESTOES_TRAVADO[Math.floor(Math.random() * SUGESTOES_TRAVADO.length)];
+            textoTravado.textContent = "“" + s + "”";
+        }
+
+        document.getElementById("btnTravado").addEventListener("click", () => {
+            const visivel = painelTravado.style.display !== "none";
+            painelTravado.style.display = visivel ? "none" : "block";
+            if (!visivel) mostrarSugestao();
+        });
+        document.getElementById("btnOutraSugestao").addEventListener("click", mostrarSugestao);
+
+
+        let compacto = false;
+        document.getElementById("btnCompacto").addEventListener("click", function () {
+            compacto = !compacto;
+            document.body.classList.toggle("modo-compacto", compacto);
+            this.textContent = compacto ? "🔍 Sair do compacto" : "🔍 Modo compacto";
+        });
+
+
+        document.getElementById("btnModoFoco").addEventListener("click", () => {
+            const painelNome = document.getElementById("painelFocoNome");
+            painelNome.textContent = projeto.nome || "Projeto sem nome";
+
+            const painelInput = document.getElementById("painelFocoInput");
+            painelInput.value = projeto.foco || "";
+            painelInput.oninput = () => {
+                projeto.foco = painelInput.value;
+                document.getElementById("focoPrincipal").value = painelInput.value;
+                salvar();
+            };
+
+            document.body.classList.add("modo-foco-projeto");
+            document.title = `🎯 ${projeto.nome || "Foco"} — Projeto`;
+            painelInput.focus();
+        });
+
+        document.getElementById("btnSairFoco").addEventListener("click", () => {
+            document.body.classList.remove("modo-foco-projeto");
+            document.title = "Projeto";
+        });
+
+        document.getElementById("btnFocoConcluir").addEventListener("click", () => {
+            const painelInput = document.getElementById("painelFocoInput");
+            const concluido = painelInput.value.trim();
+
+            if (!concluido) { alert("Escreva o que você fez antes de concluir."); return; }
+
+            adicionarDiario(`Foco concluído: "${concluido}"`, true);
+            registrarAtividade();
+            salvar();
+
+            const proximo = prompt("O que vem agora? (deixe em branco para sair do modo foco)", "");
+
+            if (proximo && proximo.trim()) {
+                painelInput.value = proximo.trim();
+                projeto.foco = proximo.trim();
+                document.getElementById("focoPrincipal").value = proximo.trim();
+                salvar();
+                painelInput.focus();
+            } else {
+                document.body.classList.remove("modo-foco-projeto");
+                document.title = "Projeto";
+            }
+        });
+
+
+        document.getElementById("btnConcluir").addEventListener("click", () => {
+            if (!projeto.nome.trim()) { alert("Dê um nome ao projeto antes de concluir."); return; }
+            if (!confirm("Concluir o projeto? Ele vai para os arquivados.")) return;
+
+            const funciona = prompt("O que funcionou?") || "";
+            const atrapalhou = prompt("O que atrapalhou?") || "";
+            const diferente = prompt("O que faria diferente?") || "";
+
+            arquivar("concluido", { funciona, atrapalhou, diferente });
+        });
+
+        document.getElementById("btnArquivar").addEventListener("click", () => {
+            if (!projeto.nome.trim()) { alert("Dê um nome antes."); return; }
+            if (!confirm("Arquivar sem concluir? Vai para os projetos anteriores.")) return;
+            arquivar("arquivado", {});
+        });
+
+        function arquivar(tipo, retro) {
+            let arquivados = [];
+            try {
+                const s = localStorage.getItem(CHAVE_ARQUIVADOS);
+                if (s) arquivados = JSON.parse(s);
+            } catch (e) { arquivados = []; }
+
+            arquivados.unshift({
+                ...projeto,
+                tipoFinal: tipo,
+                retrospectiva: retro,
+                encerradoEm: new Date().toISOString()
+            });
+
+            localStorage.setItem(CHAVE_ARQUIVADOS, JSON.stringify(arquivados));
+            localStorage.removeItem(CHAVE_ATIVO);
+            localStorage.removeItem(CHAVE_ATIVIDADE);
+            localStorage.removeItem(CHAVE_BANNER_IGN);
+
+            alert("Projeto arquivado. A mesa está limpa para o próximo.");
+            location.reload();
+        }
+
+
+        (function renderHistorico() {
+            const container = document.getElementById("historicoProjetos");
+            let arquivados = [];
+            try {
+                const s = localStorage.getItem(CHAVE_ARQUIVADOS);
+                if (s) arquivados = JSON.parse(s);
+            } catch (e) { arquivados = []; }
+
+            if (arquivados.length === 0) {
+                container.innerHTML = `<p style="color:#666; font-size:13px;">Nenhum projeto arquivado ainda.</p>`;
+                return;
+            }
+
+            let html = "";
+            arquivados.slice(0, 20).forEach(p => {
+                const d = new Date(p.encerradoEm);
+                const dataStr = `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+                const emoji = p.tipoFinal === "concluido" ? "🏆" : "💀";
+                const etapasFeitas = (p.etapas || []).filter(e => e.feita).length;
+                const etapasTotal = (p.etapas || []).length;
+
+                html += `<div style="padding: 12px 0; border-bottom: 1px solid #252529;">`;
+                html += `<div style="font-size: 14px; color: #e0e0e0; margin-bottom: 4px;">${emoji} <strong>${p.nome}</strong></div>`;
+                html += `<div style="font-size: 12px; color: #888; margin-bottom: 6px;">${dataStr} · ${etapasFeitas}/${etapasTotal} etapas</div>`;
+
+                if (p.retrospectiva && p.retrospectiva.funciona) {
+                    html += `<div style="font-size: 12px; color: #bbb; padding-left: 8px; border-left: 2px solid #2ea043;">✅ ${p.retrospectiva.funciona}</div>`;
+                }
+                if (p.retrospectiva && p.retrospectiva.atrapalhou) {
+                    html += `<div style="font-size: 12px; color: #bbb; padding-left: 8px; border-left: 2px solid #d45a5a; margin-top: 4px;">❌ ${p.retrospectiva.atrapalhou}</div>`;
+                }
+                html += `</div>`;
+            });
+
+            container.innerHTML = html;
+        })();
+    </script>
+
+</body>
+</html>
