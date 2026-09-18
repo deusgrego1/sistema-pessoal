@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Citações</title>
+
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .campo-label {
+            display: block;
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 14px 0 8px;
+        }
+
+        .citacao-card {
+            background: #1c1c20;
+            border: 1px solid #252529;
+            border-left: 3px solid #8a6a2a;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 10px;
+        }
+
+        .citacao-texto {
+            font-size: 15px;
+            color: #e0e0e0;
+            font-style: italic;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .citacao-autor {
+            font-size: 13px;
+            color: #b8a06a;
+            margin-bottom: 4px;
+        }
+
+        .citacao-fonte {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .citacao-tema {
+            display: inline-block;
+            font-size: 11px;
+            color: #999;
+            background: #252529;
+            padding: 3px 9px;
+            border-radius: 10px;
+            margin-top: 4px;
+        }
+
+        .btn-remover {
+            background: none;
+            border: none;
+            color: #a33;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 0;
+            margin-top: 8px;
+        }
+
+        .btn-remover:hover { color: #e55; }
+
+        .vazio { text-align: center; color: #777; font-size: 14px; padding: 30px 0; }
+
+        .btn-primario {
+            width: 100%;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid #333;
+            background: #2a2a30;
+            color: #fff;
+            border-radius: 12px;
+        }
+
+        .btn-primario:hover { background: #333340; border-color: #555; }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="header">
+            <p class="eyebrow">ESTUDO</p>
+            <h1>💬 Citações</h1>
+            <p class="subtitle">
+                Frases que marcaram.
+            </p>
+        </header>
+
+        <section class="modules" id="lista"></section>
+
+        <a href="estudo.html" class="back-button">
+            ← Voltar para Estudo
+        </a>
+
+    </main>
+
+
+    <script>
+        const chave = "planejamento_estudo_citacoes";
+
+        let citacoes = [];
+        try {
+            const s = localStorage.getItem(chave);
+            if (s) citacoes = JSON.parse(s);
+        } catch (e) { citacoes = []; }
+
+        function salvar() {
+            localStorage.setItem(chave, JSON.stringify(citacoes));
+            render();
+        }
+
+        const lista = document.getElementById("lista");
+
+        function render() {
+
+            lista.innerHTML = "";
+
+            if (citacoes.length === 0) {
+                const vazio = document.createElement("p");
+                vazio.className = "vazio";
+                vazio.textContent = "Nenhuma citação registrada ainda.";
+                lista.appendChild(vazio);
+            } else {
+
+                citacoes.forEach((c, i) => {
+
+                    const div = document.createElement("div");
+                    div.className = "citacao-card";
+
+                    div.innerHTML = `
+                        <div class="citacao-texto">“${c.texto || ""}”</div>
+                        ${c.autor ? `<div class="citacao-autor">— ${c.autor}</div>` : ""}
+                        ${c.fonte ? `<div class="citacao-fonte">${c.fonte}</div>` : ""}
+                        ${c.tema ? `<span class="citacao-tema">${c.tema}</span>` : ""}
+                    `;
+
+                    const btnRem = document.createElement("button");
+                    btnRem.className = "btn-remover";
+                    btnRem.textContent = "remover";
+                    btnRem.addEventListener("click", () => {
+                        if (!confirm("Remover essa citação?")) return;
+                        citacoes.splice(i, 1);
+                        salvar();
+                    });
+                    div.appendChild(btnRem);
+
+                    lista.appendChild(div);
+                });
+            }
+
+
+            const form = document.createElement("div");
+            form.className = "module-card";
+            form.style.alignItems = "flex-start";
+
+            form.innerHTML = `
+                <span class="icon">➕</span>
+                <div style="width: 100%;">
+                    <h2>Adicionar citação</h2>
+
+                    <label class="campo-label">Texto</label>
+                    <textarea id="novoTexto" rows="3" placeholder="A frase em si"></textarea>
+
+                    <label class="campo-label">Autor</label>
+                    <input type="text" id="novoAutor" placeholder="Ex.: James Clear">
+
+                    <label class="campo-label">Fonte (opcional)</label>
+                    <input type="text" id="novaFonte" placeholder="Ex.: Hábitos Atômicos, cap. 3">
+
+                    <label class="campo-label">Tema (opcional)</label>
+                    <input type="text" id="novoTema" placeholder="Ex.: Hábitos, disciplina, foco">
+
+                    <div style="margin-top: 18px;">
+                        <button type="button" class="btn-primario" id="btnAdicionar">
+                            ＋ Adicionar
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            lista.appendChild(form);
+
+            document.getElementById("btnAdicionar").addEventListener("click", () => {
+                const texto = document.getElementById("novoTexto").value.trim();
+                if (!texto) { alert("Escreva a citação."); return; }
+
+                citacoes.push({
+                    texto,
+                    autor: document.getElementById("novoAutor").value.trim(),
+                    fonte: document.getElementById("novaFonte").value.trim(),
+                    tema: document.getElementById("novoTema").value.trim()
+                });
+
+                salvar();
+            });
+        }
+
+        render();
+    </script>
+
+</body>
+</html>
