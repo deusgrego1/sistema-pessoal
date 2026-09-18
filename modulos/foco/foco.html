@@ -525,15 +525,45 @@
         const resultadoSorteio = document.getElementById("resultadoSorteio");
 
 
-        // ==================================================
-        // CARREGAR VALORES SALVOS
-        // ==================================================
+       // ==================================================
+// CARREGAR VALORES SALVOS
+// ==================================================
 
-        tarefaFoco.value = localStorage.getItem(chaveTarefa) || "";
-        notasFoco.value  = localStorage.getItem(chaveNotas)  || "";
+tarefaFoco.value = localStorage.getItem(chaveTarefa) || "";
+notasFoco.value  = localStorage.getItem(chaveNotas)  || "";
 
-        const tempoSalvo = localStorage.getItem(chaveTempo);
-        if (tempoSalvo) tempoFoco.value = tempoSalvo;
+const tempoSalvo = localStorage.getItem(chaveTempo);
+if (tempoSalvo) tempoFoco.value = tempoSalvo;
+
+
+// ==================================================
+// PARÂMETROS DA URL (?tarefa= e ?tempo=)
+// ==================================================
+
+const paramsURL = new URLSearchParams(window.location.search);
+const tarefaURL = paramsURL.get("tarefa");
+const tempoURL  = paramsURL.get("tempo");
+
+if (tarefaURL) {
+    tarefaFoco.value = tarefaURL;
+    localStorage.setItem(chaveTarefa, tarefaURL);
+}
+
+if (tempoURL && ["5", "15", "25", "30", "50", "90"].includes(tempoURL)) {
+
+    // Se o tempo da URL não existir no select, adiciona
+    const existe = Array.from(tempoFoco.options).some(o => o.value === tempoURL);
+
+    if (!existe) {
+        const opt = document.createElement("option");
+        opt.value = tempoURL;
+        opt.textContent = tempoURL + " minutos";
+        tempoFoco.appendChild(opt);
+    }
+
+    tempoFoco.value = tempoURL;
+    localStorage.setItem(chaveTempo, tempoURL);
+}
 
 
         // ==================================================
