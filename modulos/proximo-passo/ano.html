@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Próximo Ciclo</title>
+
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .campo-label {
+            display: block;
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 14px 0 8px;
+        }
+
+        .item-linha {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: #1c1c20;
+            border: 1px solid #252529;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .item-linha input[type="text"] {
+            flex: 1;
+            margin-top: 0 !important;
+            background: transparent !important;
+            border: none !important;
+            padding: 4px 0 !important;
+            font-size: 14px;
+            color: #e0e0e0;
+            outline: none;
+        }
+
+        .item-linha input[type="text"]::placeholder { color: #555; }
+
+        .item-remover {
+            background: none;
+            border: none;
+            color: #a33;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0 4px;
+            flex-shrink: 0;
+        }
+
+        .item-remover:hover { color: #e55; }
+
+        .btn-adicionar {
+            width: 100%;
+            padding: 10px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px dashed #444;
+            background: transparent;
+            color: #999;
+            border-radius: 10px;
+            transition: 0.15s;
+        }
+
+        .btn-adicionar:hover { border-color: #666; color: #ccc; background: #1a1a1e; }
+
+        /* Cards de projetos, mudanças, experiências */
+
+        .proj-card {
+            padding: 14px;
+            background: #1c1c20;
+            border: 1px solid #252529;
+            border-left: 3px solid #5a8ad4;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .mud-card {
+            padding: 14px;
+            background: #1c1c20;
+            border: 1px solid #252529;
+            border-left: 3px solid #d4774a;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .exp-card {
+            padding: 14px;
+            background: #1c1c20;
+            border: 1px solid #252529;
+            border-left: 3px solid #c9a44a;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .cab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .cab input[type="text"] {
+            flex: 1;
+            margin-top: 0 !important;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        /* Experiências — categorias */
+
+        .cat-titulo {
+            color: #bbb;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 18px 0 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #252529;
+        }
+
+        .sugestoes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .sugestao {
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px dashed #333;
+            background: transparent;
+            color: #888;
+            border-radius: 14px;
+            transition: 0.15s;
+        }
+
+        .sugestao:hover {
+            border-color: #666;
+            color: #ccc;
+            background: #1a1a1e;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="header">
+            <p class="eyebrow">PRÓXIMO PASSO</p>
+            <h1>📆 Próximo ciclo</h1>
+            <p class="subtitle">
+                Direção, identidade e experiências para o próximo ano.
+            </p>
+        </header>
+
+        <section class="modules">
+
+            <!-- DIREÇÃO -->
+
+            <div class="module-card">
+                <span class="icon">🧭</span>
+                <div>
+                    <h2>Direção do ciclo</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 10px;">
+                        Uma frase. Para onde quero levar minha vida neste ciclo.
+                    </p>
+                    <input type="text" id="direcao"
+                        placeholder="Ex.: construir uma base sólida para minha independência.">
+                </div>
+            </div>
+
+
+            <!-- GRANDES OBJETIVOS -->
+
+            <div class="module-card" style="align-items: flex-start;">
+                <span class="icon">🎯</span>
+                <div style="width: 100%;">
+                    <h2>Grandes objetivos</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
+                        Poucos, mas importantes.
+                    </p>
+                    <div id="listaObjetivos"></div>
+                    <button type="button" class="btn-adicionar" id="btnAddObjetivo">
+                        ＋ Adicionar objetivo
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- PROJETOS DO CICLO -->
+
+            <div class="module-card" style="align-items: flex-start;">
+                <span class="icon">🚀</span>
+                <div style="width: 100%;">
+                    <h2>Projetos do ciclo</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
+                        Projetos grandes demais para um mês só.
+                    </p>
+                    <div id="listaProjetos"></div>
+                    <button type="button" class="btn-adicionar" id="btnAddProjeto">
+                        ＋ Adicionar projeto
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- QUEM QUERO ME TORNAR -->
+
+            <div class="module-card" style="align-items: flex-start;">
+                <span class="icon">🧍</span>
+                <div style="width: 100%;">
+                    <h2>Quem quero me tornar</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
+                        Que tipo de pessoa quero ser ao final deste ciclo.
+                    </p>
+                    <div id="listaQuem"></div>
+                    <button type="button" class="btn-adicionar" id="btnAddQuem">
+                        ＋ Adicionar
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- O QUE DESENVOLVER -->
+
+            <div class="module-card" style="align-items: flex-start;">
+                <span class="icon">📈</span>
+                <div style="width: 100%;">
+                    <h2>O que quero desenvolver</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
+                        Capacidades que precisam crescer durante o ciclo.
+                    </p>
+                    <div id="listaDesenvolver"></div>
+                    <button type="button" class="btn-adicionar" id="btnAddDesenvolver">
+                        ＋ Adicionar
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- MUDANÇAS ESTRUTURAIS -->
+
+            <div class="module-card" style="align-items: flex-start;">
+                <span class="icon">🔧</span>
+                <div style="width: 100%;">
+                    <h2>Mudanças estruturais</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
+                        O que precisa mudar na estrutura da vida.
+                    </p>
+                    <div id="listaMudancas"></div>
+                    <button type="button" class="btn-adicionar" id="btnAddMudanca">
+                        ＋ Adicionar mudança
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- PRESERVAR -->
+
+            <div class="module-card" style="align-items: flex-start;">
+                <span class="icon">🧱</span>
+                <div style="width: 100%;">
+                    <h2>O que quero preservar</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
+                        O que não quero perder ao longo do ciclo.
+                    </p>
+                    <div id="listaPreservar"></div>
+                    <button type="button" class="btn-adicionar" id="btnAddPreservar">
+                        ＋ Adicionar
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- EXPERIÊNCIAS -->
+
+            <div class="module-card" style="align-items: flex-start;">
+                <span class="icon">🗺️</span>
+                <div style="width: 100%;">
+                    <h2>Experiências que quero viver</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
+                        O que quero experimentar, conhecer, criar ou viver neste ciclo.
+                        <br><br>
+                        Toque numa sugestão para transformar em experiência sua.
+                    </p>
+
+                    <div id="listaExperiencias"></div>
+
+                    <div class="cat-titulo">🌎 Explorar</div>
+                    <div class="sugestoes" data-cat="explorar"></div>
+
+                    <div class="cat-titulo">🧪 Experimentar</div>
+                    <div class="sugestoes" data-cat="experimentar"></div>
+
+                    <div class="cat-titulo">🤝 Conectar</div>
+                    <div class="sugestoes" data-cat="conectar"></div>
+
+                    <div class="cat-titulo">🎨 Criar</div>
+                    <div class="sugestoes" data-cat="criar"></div>
+
+                    <button type="button" class="btn-adicionar" id="btnAddExperiencia" style="margin-top: 12px;">
+                        ＋ Adicionar experiência personalizada
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- COMO QUERO TERMINAR -->
+
+            <div class="module-card">
+                <span class="icon">🏆</span>
+                <div>
+                    <h2>Como quero terminar o ciclo</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 10px;">
+                        O que precisa ser verdade no último dia para eu considerar que foi um ciclo de grande evolução.
+                    </p>
+                    <textarea id="fimCiclo" rows="5"></textarea>
+                </div>
+            </div>
+
+        </section>
+
+        <a href="index.html" class="back-button">
+            ← Voltar para Próximo Passo
+        </a>
+
+    </main>
+
+
+    <script>
+        const PREFIXO = "planejamento_pp_ano_";
+
+
+        // ==================================================
+        // CAMPOS TEXTO SIMPLES
+        // ==================================================
+
+        ["direcao", "fimCiclo"].forEach(id => {
+            const campo = document.getElementById(id);
+            const chave = PREFIXO + id;
+            const salvo = localStorage.getItem(chave);
+            if (salvo !== null) campo.value = salvo;
+            campo.addEventListener("input", () => localStorage.setItem(chave, campo.value));
+        });
+
+
+        // ==================================================
+        // LISTAS SIMPLES
+        // ==================================================
+
+        function setupLista(chave, containerId, btnId, placeholder) {
+
+            const container = document.getElementById(containerId);
+            const btnAdd = document.getElementById(btnId);
+
+            let itens = [];
+            try {
+                const s = localStorage.getItem(PREFIXO + chave);
+                if (s) itens = JSON.parse(s);
+            } catch (e) { itens = []; }
+
+            function salvar() {
+                localStorage.setItem(PREFIXO + chave, JSON.stringify(itens));
+            }
+
+            function render() {
+                container.innerHTML = "";
+
+                itens.forEach((item, i) => {
+                    const linha = document.createElement("div");
+                    linha.className = "item-linha";
+
+                    const input = document.createElement("input");
+                    input.type = "text";
+                    input.value = item.texto || "";
+                    input.placeholder = placeholder;
+                    input.addEventListener("input", () => {
+                        item.texto = input.value;
+                        salvar();
+                    });
+                    linha.appendChild(input);
+
+                    const btnRem = document.createElement("button");
+                    btnRem.type = "button";
+                    btnRem.className = "item-remover";
+                    btnRem.textContent = "×";
+                    btnRem.addEventListener("click", () => {
+                        itens.splice(i, 1);
+                        salvar();
+                        render();
+                    });
+                    linha.appendChild(btnRem);
+
+                    container.appendChild(linha);
+                });
+            }
+
+            btnAdd.addEventListener("click", () => {
+                itens.push({ texto: "" });
+                salvar();
+                render();
+                const inputs = container.querySelectorAll("input[type=text]");
+                if (inputs.length) inputs[inputs.length - 1].focus();
+            });
+
+            render();
+
+            return {
+                adicionar(texto) {
+                    itens.push({ texto });
+                    salvar();
+                    render();
+                }
+            };
+        }
+
+        setupLista("objetivos", "listaObjetivos", "btnAddObjetivo",
+            "Ex.: criar uma fonte de renda própria.");
+        setupLista("preservar", "listaPreservar", "btnAddPreservar",
+            "Ex.: tempo com a família.");
+
+
+        // ==================================================
+        // PROJETOS DO CICLO
+        // ==================================================
+
+        (function () {
+
+            const container = document.getElementById("listaProjetos");
+            const btnAdd = document.getElementById("btnAddProjeto");
+
+            let itens = [];
+            try {
+                const s = localStorage.getItem(PREFIXO + "projetos");
+                if (s) itens = JSON.parse(s);
+            } catch (e) { itens = []; }
+
+            function salvar() { localStorage.setItem(PREFIXO + "projetos", JSON.stringify(itens)); }
+
+            function render() {
+                container.innerHTML = "";
+
+                itens.forEach((p, i) => {
+
+                    const card = document.createElement("div");
+                    card.className = "proj-card";
+
+                    const cab = document.createElement("div");
+                    cab.className = "cab";
+
+                    const nome = document.createElement("input");
+                    nome.type = "text";
+                    nome.placeholder = "Nome do projeto";
+                    nome.value = p.nome || "";
+                    nome.addEventListener("input", () => { p.nome = nome.value; salvar(); });
+                    cab.appendChild(nome);
+
+                    const btnRem = document.createElement("button");
+                    btnRem.type = "button";
+                    btnRem.className = "item-remover";
+                    btnRem.textContent = "×";
+                    btnRem.addEventListener("click", () => {
+                        itens.splice(i, 1); salvar(); render();
+                    });
+                    cab.appendChild(btnRem);
+
+                    card.appendChild(cab);
+
+                    [
+                        { k: "construir", ph: "O que quero construir" },
+                        { k: "resultado", ph: "Resultado final" },
+                        { k: "situacao",  ph: "Situação atual" }
+                    ].forEach(c => {
+                        const input = document.createElement("input");
+                        input.type = "text";
+                        input.placeholder = c.ph;
+                        input.value = p[c.k] || "";
+                        input.style.marginTop = "8px";
+                        input.addEventListener("input", () => { p[c.k] = input.value; salvar(); });
+                        card.appendChild(input);
+                    });
+
+                    container.appendChild(card);
+                });
+            }
+
+            btnAdd.addEventListener("click", () => {
+                itens.push({}); salvar(); render();
+                const inputs = container.querySelectorAll(".cab input");
+                if (inputs.length) inputs[inputs.length - 1].focus();
+            });
+
+            render();
+        })();
+
+
+        // ==================================================
+        // QUEM QUERO ME TORNAR
+        // ==================================================
+
+        (function () {
+
+            const container = document.getElementById("listaQuem");
+            const btnAdd = document.getElementById("btnAddQuem");
+
+            let itens = [];
+            try {
+                const s = localStorage.getItem(PREFIXO + "quem");
+                if (s) itens = JSON.parse(s);
+            } catch (e) { itens = []; }
+
+            function salvar() { localStorage.setItem(PREFIXO + "quem", JSON.stringify(itens)); }
+
+            function render() {
+                container.innerHTML = "";
+
+                itens.forEach((q, i) => {
+
+                    const card = document.createElement("div");
+                    card.className = "proj-card";
+
+                    const cab = document.createElement("div");
+                    cab.className = "cab";
+
+                    const nome = document.createElement("input");
+                    nome.type = "text";
+                    nome.placeholder = "Quem quero me tornar";
+                    nome.value = q.nome || "";
+                    nome.addEventListener("input", () => { q.nome = nome.value; salvar(); });
+                    cab.appendChild(nome);
+
+                    const btnRem = document.createElement("button");
+                    btnRem.type = "button";
+                    btnRem.className = "item-remover";
+                    btnRem.textContent = "×";
+                    btnRem.addEventListener("click", () => {
+                        itens.splice(i, 1); salvar(); render();
+                    });
+                    cab.appendChild(btnRem);
+
+                    card.appendChild(cab);
+
+                    [
+                        { k: "caracteristicas", ph: "Características que quero desenvolver" },
+                        { k: "pratica",         ph: "Como isso apareceria na prática" },
+                        { k: "aproximar",       ph: "O que preciso fazer para me aproximar" }
+                    ].forEach(c => {
+                        const input = document.createElement("input");
+                        input.type = "text";
+                        input.placeholder = c.ph;
+                        input.value = q[c.k] || "";
+                        input.style.marginTop = "8px";
+                        input.addEventListener("input", () => { q[c.k] = input.value; salvar(); });
+                        card.appendChild(input);
+                    });
+
+                    container.appendChild(card);
+                });
+            }
+
+            btnAdd.addEventListener("click", () => {
+                itens.push({}); salvar(); render();
+                const inputs = container.querySelectorAll(".cab input");
+                if (inputs.length) inputs[inputs.length - 1].focus();
+            });
+
+            render();
+        })();
+
+
+        // ==================================================
+        // O QUE DESENVOLVER
+        // ==================================================
+
+        (function () {
+
+            const container = document.getElementById("listaDesenvolver");
+            const btnAdd = document.getElementById("btnAddDesenvolver");
+
+            let itens = [];
+            try {
+                const s = localStorage.getItem(PREFIXO + "desenvolver");
+                if (s) itens = JSON.parse(s);
+            } catch (e) { itens = []; }
+
+            function salvar() { localStorage.setItem(PREFIXO + "desenvolver", JSON.stringify(itens)); }
+
+            function render() {
+                container.innerHTML = "";
+
+                itens.forEach((d, i) => {
+
+                    const card = document.createElement("div");
+                    card.className = "proj-card";
+
+                    const cab = document.createElement("div");
+                    cab.className = "cab";
+
+                    const nome = document.createElement("input");
+                    nome.type = "text";
+                    nome.placeholder = "O que quero desenvolver";
+                    nome.value = d.nome || "";
+                    nome.addEventListener("input", () => { d.nome = nome.value; salvar(); });
+                    cab.appendChild(nome);
+
+                    const btnRem = document.createElement("button");
+                    btnRem.type = "button";
+                    btnRem.className = "item-remover";
+                    btnRem.textContent = "×";
+                    btnRem.addEventListener("click", () => {
+                        itens.splice(i, 1); salvar(); render();
+                    });
+                    cab.appendChild(btnRem);
+
+                    card.appendChild(cab);
+
+                    [
+                        { k: "nivel",     ph: "Nível que quero alcançar" },
+                        { k: "como",      ph: "Como vou desenvolver" },
+                        { k: "perceber",  ph: "Como vou perceber a evolução" }
+                    ].forEach(c => {
+                        const input = document.createElement("input");
+                        input.type = "text";
+                        input.placeholder = c.ph;
+                        input.value = d[c.k] || "";
+                        input.style.marginTop = "8px";
+                        input.addEventListener("input", () => { d[c.k] = input.value; salvar(); });
+                        card.appendChild(input);
+                    });
+
+                    container.appendChild(card);
+                });
+            }
+
+            btnAdd.addEventListener("click", () => {
+                itens.push({}); salvar(); render();
+                const inputs = container.querySelectorAll(".cab input");
+                if (inputs.length) inputs[inputs.length - 1].focus();
+            });
+
+            render();
+        })();
+
+
+        // ==================================================
+        // MUDANÇAS ESTRUTURAIS
+        // ==================================================
+
+        (function () {
+
+            const container = document.getElementById("listaMudancas");
+            const btnAdd = document.getElementById("btnAddMudanca");
+
+            let itens = [];
+            try {
+                const s = localStorage.getItem(PREFIXO + "mudancas");
+                if (s) itens = JSON.parse(s);
+            } catch (e) { itens = []; }
+
+            function salvar() { localStorage.setItem(PREFIXO + "mudancas", JSON.stringify(itens)); }
+
+            function render() {
+                container.innerHTML = "";
+
+                itens.forEach((m, i) => {
+
+                    const card = document.createElement("div");
+                    card.className = "mud-card";
+
+                    const cab = document.createElement("div");
+                    cab.className = "cab";
+
+                    const nome = document.createElement("input");
+                    nome.type = "text";
+                    nome.placeholder = "O que precisa mudar";
+                    nome.value = m.nome || "";
+                    nome.addEventListener("input", () => { m.nome = nome.value; salvar(); });
+                    cab.appendChild(nome);
+
+                    const btnRem = document.createElement("button");
+                    btnRem.type = "button";
+                    btnRem.className = "item-remover";
+                    btnRem.textContent = "×";
+                    btnRem.addEventListener("click", () => {
+                        itens.splice(i, 1); salvar(); render();
+                    });
+                    cab.appendChild(btnRem);
+
+                    card.appendChild(cab);
+
+                    [
+                        { k: "porque",   ph: "Por que precisa mudar" },
+                        { k: "funcionar",ph: "Como quero que funcione" },
+                        { k: "passo",    ph: "Primeiro passo" }
+                    ].forEach(c => {
+                        const input = document.createElement("input");
+                        input.type = "text";
+                        input.placeholder = c.ph;
+                        input.value = m[c.k] || "";
+                        input.style.marginTop = "8px";
+                        input.addEventListener("input", () => { m[c.k] = input.value; salvar(); });
+                        card.appendChild(input);
+                    });
+
+                    container.appendChild(card);
+                });
+            }
+
+            btnAdd.addEventListener("click", () => {
+                itens.push({}); salvar(); render();
+                const inputs = container.querySelectorAll(".cab input");
+                if (inputs.length) inputs[inputs.length - 1].focus();
+            });
+
+            render();
+        })();
+
+
+        // ==================================================
+        // EXPERIÊNCIAS
+        // ==================================================
+
+        const SUGESTOES = {
+
+            explorar: [
+                "Viajar para uma cidade nova", "Conhecer outro estado", "Conhecer outro país",
+                "Fazer uma viagem sozinho", "Fazer uma trilha", "Acampar",
+                "Conhecer uma praia diferente", "Conhecer uma cachoeira",
+                "Visitar uma cidade histórica", "Conhecer um parque nacional",
+                "Fazer uma viagem de carro", "Conhecer uma comunidade diferente",
+                "Visitar um museu importante", "Conhecer um lugar ligado à história",
+                "Fazer uma viagem espontânea", "Ver o nascer do sol em um lugar especial",
+                "Ver o pôr do sol em um lugar especial", "Passar dias em contato com a natureza",
+                "Conhecer uma cultura diferente", "Planejar uma viagem do zero sozinho"
+            ],
+
+            experimentar: [
+                "Aprender um instrumento", "Fazer uma aula de dança",
+                "Praticar uma modalidade esportiva nova", "Fazer uma aula de luta",
+                "Experimentar escalada", "Fazer mergulho", "Andar de caiaque",
+                "Fazer ciclismo em uma rota nova", "Participar de uma corrida",
+                "Fazer um curso fora da minha área", "Trabalhar temporariamente em algo novo",
+                "Fazer um projeto experimental", "Criar um produto",
+                "Tentar vender algo pela primeira vez", "Participar de um hackathon",
+                "Fazer voluntariado", "Passar um período sem redes sociais",
+                "Fazer um desafio pessoal", "Aprender uma habilidade manual",
+                "Fazer algo que normalmente evitaria por medo"
+            ],
+
+            conectar: [
+                "Conhecer alguém novo", "Fazer uma nova amizade",
+                "Participar de um evento", "Participar de uma comunidade",
+                "Ir a um encontro profissional", "Participar de um grupo de estudos",
+                "Conversar com alguém de uma área que me interessa",
+                "Reencontrar alguém que não vejo há muito tempo",
+                "Organizar um encontro com amigos", "Fazer uma atividade em grupo",
+                "Participar de um evento cultural", "Participar de uma conferência",
+                "Fazer networking presencial", "Pedir orientação a alguém experiente",
+                "Ensinar algo que sei para outra pessoa",
+                "Fazer uma atividade voluntária em grupo",
+                "Conhecer pessoas de outra cidade",
+                "Participar de uma comunidade online e ir ao presencial",
+                "Fazer uma viagem com outras pessoas",
+                "Criar uma experiência especial para alguém importante"
+            ],
+
+            criar: [
+                "Criar um canal", "Produzir um documentário curto",
+                "Fazer um curta-metragem", "Criar uma série de vídeos",
+                "Escrever um pequeno livro", "Escrever um diário por um período",
+                "Criar um projeto artístico", "Fotografar uma cidade",
+                "Produzir um ensaio fotográfico", "Criar uma música",
+                "Aprender edição de vídeo com um projeto real", "Criar um site",
+                "Construir uma pequena aplicação", "Criar um produto digital",
+                "Organizar uma exposição ou apresentação", "Criar algo manualmente",
+                "Reformar ou construir alguma coisa",
+                "Registrar uma viagem em vídeo",
+                "Criar um projeto pessoal de longo prazo",
+                "Publicar algo que eu criei"
+            ]
+        };
+
+
+        (function () {
+
+            const container = document.getElementById("listaExperiencias");
+            const btnAdd = document.getElementById("btnAddExperiencia");
+
+            let itens = [];
+            try {
+                const s = localStorage.getItem(PREFIXO + "experiencias");
+                if (s) itens = JSON.parse(s);
+            } catch (e) { itens = []; }
+
+            function salvar() {
+                localStorage.setItem(PREFIXO + "experiencias", JSON.stringify(itens));
+            }
+
+            function render() {
+
+                container.innerHTML = "";
+
+                itens.forEach((e, i) => {
+
+                    const card = document.createElement("div");
+                    card.className = "exp-card";
+
+                    const cab = document.createElement("div");
+                    cab.className = "cab";
+
+                    const nome = document.createElement("input");
+                    nome.type = "text";
+                    nome.placeholder = "Experiência";
+                    nome.value = e.nome || "";
+                    nome.addEventListener("input", () => { e.nome = nome.value; salvar(); });
+                    cab.appendChild(nome);
+
+                    const btnRem = document.createElement("button");
+                    btnRem.type = "button";
+                    btnRem.className = "item-remover";
+                    btnRem.textContent = "×";
+                    btnRem.addEventListener("click", () => {
+                        itens.splice(i, 1); salvar(); render();
+                    });
+                    cab.appendChild(btnRem);
+
+                    card.appendChild(cab);
+
+                    [
+                        { k: "porque",  ph: "Por que quero viver isso" },
+                        { k: "quando",  ph: "Quando / período" },
+                        { k: "fazer",   ph: "O que preciso fazer para acontecer" }
+                    ].forEach(c => {
+                        const input = document.createElement("input");
+                        input.type = "text";
+                        input.placeholder = c.ph;
+                        input.value = e[c.k] || "";
+                        input.style.marginTop = "8px";
+                        input.addEventListener("input", () => { e[c.k] = input.value; salvar(); });
+                        card.appendChild(input);
+                    });
+
+                    if (e.categoria) {
+                        const tag = document.createElement("div");
+                        tag.style.cssText = "margin-top: 10px; font-size: 11px; color: #888; letter-spacing: 1px; text-transform: uppercase;";
+                        tag.textContent = "Categoria: " + e.categoria;
+                        card.appendChild(tag);
+                    }
+
+                    container.appendChild(card);
+                });
+            }
+
+            btnAdd.addEventListener("click", () => {
+                itens.push({}); salvar(); render();
+                const inputs = container.querySelectorAll(".cab input");
+                if (inputs.length) inputs[inputs.length - 1].focus();
+            });
+
+            // Sugestões clicáveis
+            document.querySelectorAll(".sugestoes").forEach(bloco => {
+                const cat = bloco.dataset.cat;
+                SUGESTOES[cat].forEach(txt => {
+                    const el = document.createElement("div");
+                    el.className = "sugestao";
+                    el.textContent = txt;
+                    el.addEventListener("click", () => {
+                        itens.push({ nome: txt, categoria: cat });
+                        salvar();
+                        render();
+                        el.style.opacity = "0.3";
+                        el.style.pointerEvents = "none";
+                    });
+                    bloco.appendChild(el);
+                });
+            });
+
+            render();
+        })();
+    </script>
+
+</body>
+</html>
