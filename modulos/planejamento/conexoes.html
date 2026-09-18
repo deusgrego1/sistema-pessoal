@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Conexões</title>
+
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .campo-label {
+            display: block;
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 14px 0 8px;
+        }
+
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+        .chip {
+            padding: 7px 13px;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid #333338;
+            background: #1a1a1e;
+            color: #bbb;
+            border-radius: 16px;
+            transition: 0.15s;
+            user-select: none;
+        }
+
+        .chip:hover { background: #222228; color: #e0e0e0; }
+
+        .chip.selecionado { background: #2e2e33; border-color: #666; color: #fff; font-weight: 600; }
+
+        .chip.st-prospect.selecionado  { background: #1a2233; border-color: #5a8ad4; color: #a8c4e8; }
+        .chip.st-conversando.selecionado { background: #332e1a; border-color: #c9a44a; color: #e0d48a; }
+        .chip.st-proposta.selecionado  { background: #33231f; border-color: #d4774a; color: #e0a878; }
+        .chip.st-cliente.selecionado   { background: #1f3320; border-color: #4caf50; color: #a5d6a7; }
+        .chip.st-finalizado.selecionado{ background: #2e2e33; border-color: #666; color: #ccc; }
+        .chip.st-perdido.selecionado   { background: #331f1f; border-color: #d45a5a; color: #e08b8b; }
+
+        .contato-card {
+            background: #1c1c20;
+            border: 1px solid #252529;
+            border-left: 3px solid #555;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+
+        .contato-card.prospect     { border-left-color: #5a8ad4; }
+        .contato-card.conversando  { border-left-color: #c9a44a; }
+        .contato-card.proposta     { border-left-color: #d4774a; }
+        .contato-card.cliente      { border-left-color: #4caf50; }
+        .contato-card.finalizado   { border-left-color: #666; }
+        .contato-card.perdido      { border-left-color: #d45a5a; }
+
+        .contato-nome {
+            font-size: 15px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin-bottom: 6px;
+        }
+
+        .contato-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .contato-meta .tag {
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #252529;
+            color: #bbb;
+            font-size: 11px;
+        }
+
+        .contato-notas {
+            font-size: 13px;
+            color: #bbb;
+            padding: 8px 10px;
+            background: #16161a;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            margin-top: 8px;
+        }
+
+        .contato-acoes {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+            align-items: center;
+        }
+
+        .contato-link {
+            font-size: 12px;
+            color: #8ab4f8;
+            text-decoration: none;
+        }
+
+        .contato-link:hover { text-decoration: underline; }
+
+        .btn-remover {
+            background: none;
+            border: none;
+            color: #a33;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .btn-remover:hover { color: #e55; }
+
+        .vazio {
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+            padding: 30px 0;
+        }
+
+        .btn-primario {
+            width: 100%;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid #333;
+            background: #2a2a30;
+            color: #fff;
+            border-radius: 12px;
+        }
+
+        .btn-primario:hover { background: #333340; border-color: #555; }
+
+        /* Filtro */
+        .filtro-linha {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .filtro-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid #333338;
+            background: #17171a;
+            color: #aaa;
+            border-radius: 16px;
+        }
+
+        .filtro-btn.ativo {
+            background: #333;
+            color: #fff;
+            border-color: #55555c;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="header">
+            <p class="eyebrow">TRABALHO</p>
+            <h1>👥 Conexões</h1>
+            <p class="subtitle">
+                Pessoas, prospects e clientes.
+            </p>
+        </header>
+
+        <section class="modules">
+
+            <div class="module-card" style="align-items: flex-start;">
+                <div style="width: 100%;">
+                    <h2>Filtrar</h2>
+                    <div class="filtro-linha" id="filtroLinha" style="margin-top: 10px;"></div>
+                </div>
+            </div>
+
+            <div id="listaContatos"></div>
+
+        </section>
+
+        <a href="trabalho.html" class="back-button">
+            ← Voltar para Trabalho
+        </a>
+
+    </main>
+
+
+    <script>
+        const chave = "planejamento_trabalho_conexoes";
+
+        const STATUS = [
+            { valor: "prospect",    label: "🎯 Prospect" },
+            { valor: "conversando", label: "🟡 Conversando", classe: "st-conversando" },
+            { valor: "proposta",    label: "🟠 Proposta enviada", classe: "st-proposta" },
+            { valor: "cliente",     label: "🟢 Cliente", classe: "st-cliente" },
+            { valor: "finalizado",  label: "⚪ Finalizado", classe: "st-finalizado" },
+            { valor: "perdido",     label: "🔴 Não deu", classe: "st-perdido" }
+        ];
+
+        let contatos = [];
+        try {
+            const s = localStorage.getItem(chave);
+            if (s) contatos = JSON.parse(s);
+        } catch (e) { contatos = []; }
+
+        let filtroAtivo = null;
+
+        function salvar() {
+            localStorage.setItem(chave, JSON.stringify(contatos));
+            render();
+        }
+
+
+        // ==================================================
+        // FILTRO
+        // ==================================================
+
+        function renderFiltro() {
+            const linha = document.getElementById("filtroLinha");
+            linha.innerHTML = "";
+
+            const btnTodos = document.createElement("div");
+            btnTodos.className = "filtro-btn" + (filtroAtivo === null ? " ativo" : "");
+            btnTodos.textContent = "Todos";
+            btnTodos.addEventListener("click", () => { filtroAtivo = null; render(); });
+            linha.appendChild(btnTodos);
+
+            STATUS.forEach(s => {
+                const btn = document.createElement("div");
+                btn.className = "filtro-btn" + (filtroAtivo === s.valor ? " ativo" : "");
+                btn.textContent = s.label;
+                btn.addEventListener("click", () => { filtroAtivo = s.valor; render(); });
+                linha.appendChild(btn);
+            });
+        }
+
+
+        // ==================================================
+        // RENDER
+        // ==================================================
+
+        const lista = document.getElementById("listaContatos");
+
+        function render() {
+
+            renderFiltro();
+
+            lista.innerHTML = "";
+
+            const visiveis = filtroAtivo === null
+                ? contatos
+                : contatos.filter(c => c.status === filtroAtivo);
+
+            if (visiveis.length === 0) {
+                const vazio = document.createElement("p");
+                vazio.className = "vazio";
+                vazio.textContent = contatos.length === 0
+                    ? "Nenhuma conexão registrada ainda."
+                    : "Nada neste filtro.";
+                lista.appendChild(vazio);
+            } else {
+
+                visiveis.forEach((c) => {
+
+                    const idx = contatos.indexOf(c);
+
+                    const card = document.createElement("div");
+                    card.className = "contato-card " + (c.status || "");
+
+                    let html = `<div class="contato-nome">${c.nome}</div>`;
+
+                    const tags = [];
+                    const st = STATUS.find(s => s.valor === c.status);
+                    if (st) tags.push(st.label);
+                    if (c.tipo) tags.push(c.tipo);
+                    if (c.onde) tags.push("📍 " + c.onde);
+
+                    if (tags.length) {
+                        html += `<div class="contato-meta">${tags.map(t => `<span class="tag">${t}</span>`).join("")}</div>`;
+                    }
+
+                    if (c.ultimoContato) {
+                        html += `<div class="contato-meta" style="margin-bottom: 4px;">
+                            <span style="color:#888; font-size: 12px;">Último contato: ${c.ultimoContato}</span>
+                        </div>`;
+                    }
+
+                    if (c.notas) {
+                        html += `<div class="contato-notas">${c.notas}</div>`;
+                    }
+
+                    card.innerHTML = html;
+
+                    const acoes = document.createElement("div");
+                    acoes.className = "contato-acoes";
+
+                    if (c.link) {
+                        const a = document.createElement("a");
+                        a.href = c.link;
+                        a.target = "_blank";
+                        a.rel = "noopener";
+                        a.className = "contato-link";
+                        a.textContent = "🔗 Abrir";
+                        acoes.appendChild(a);
+                    }
+
+                    const btnRem = document.createElement("button");
+                    btnRem.className = "btn-remover";
+                    btnRem.textContent = "remover";
+                    btnRem.addEventListener("click", () => {
+                        if (!confirm(`Remover "${c.nome}"?`)) return;
+                        contatos.splice(idx, 1);
+                        salvar();
+                    });
+                    acoes.appendChild(btnRem);
+
+                    card.appendChild(acoes);
+
+                    lista.appendChild(card);
+                });
+            }
+
+
+            // Form de adicionar
+            const form = document.createElement("div");
+            form.className = "module-card";
+            form.style.alignItems = "flex-start";
+
+            form.innerHTML = `
+                <span class="icon">➕</span>
+                <div style="width: 100%;">
+                    <h2>Adicionar conexão</h2>
+
+                    <label class="campo-label">Nome</label>
+                    <input type="text" id="novoNome" placeholder="Ex.: João Silva">
+
+                    <label class="campo-label">Tipo</label>
+                    <div class="chips" id="chipsTipoConexao"></div>
+
+                    <label class="campo-label">Status</label>
+                    <div class="chips" id="chipsStatusConexao"></div>
+
+                    <label class="campo-label">Onde conheceu (opcional)</label>
+                    <input type="text" id="novoOnde" placeholder="Ex.: Instagram, indicação do Pedro">
+
+                    <label class="campo-label">Último contato</label>
+                    <input type="text" id="novoContato" placeholder="Ex.: Hoje · 14/09 · semana passada">
+
+                    <label class="campo-label">Link (opcional)</label>
+                    <input type="text" id="novoLink" placeholder="Instagram, site, LinkedIn...">
+
+                    <label class="campo-label">Notas</label>
+                    <textarea id="novoNotas" rows="4"
+                        placeholder="O que essa pessoa precisa, contexto, próximos passos..."></textarea>
+
+                    <div style="margin-top: 18px;">
+                        <button type="button" class="btn-primario" id="btnAdicionar">
+                            ＋ Adicionar
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            lista.appendChild(form);
+
+
+            // Tipos
+            const TIPOS = ["PJ", "PF"];
+            let tipoSel = null;
+            const chipsTipo = document.getElementById("chipsTipoConexao");
+            TIPOS.forEach(t => {
+                const chip = document.createElement("div");
+                chip.className = "chip";
+                chip.textContent = t;
+                chip.addEventListener("click", () => {
+                    const jaSel = chip.classList.contains("selecionado");
+                    chipsTipo.querySelectorAll(".chip").forEach(c => c.classList.remove("selecionado"));
+                    if (jaSel) { tipoSel = null; }
+                    else { chip.classList.add("selecionado"); tipoSel = t; }
+                });
+                chipsTipo.appendChild(chip);
+            });
+
+            // Status
+            let statusSel = null;
+            const chipsStatus = document.getElementById("chipsStatusConexao");
+            STATUS.forEach(s => {
+                const chip = document.createElement("div");
+                chip.className = "chip" + (s.classe ? " " + s.classe : "");
+                chip.textContent = s.label;
+                chip.addEventListener("click", () => {
+                    const jaSel = chip.classList.contains("selecionado");
+                    chipsStatus.querySelectorAll(".chip").forEach(c => c.classList.remove("selecionado"));
+                    if (jaSel) { statusSel = null; }
+                    else { chip.classList.add("selecionado"); statusSel = s.valor; }
+                });
+                chipsStatus.appendChild(chip);
+            });
+
+            // Botão
+            document.getElementById("btnAdicionar").addEventListener("click", () => {
+                const nome = document.getElementById("novoNome").value.trim();
+                if (!nome) { alert("Escreva o nome."); return; }
+
+                contatos.push({
+                    nome,
+                    tipo: tipoSel,
+                    status: statusSel,
+                    onde: document.getElementById("novoOnde").value.trim(),
+                    ultimoContato: document.getElementById("novoContato").value.trim(),
+                    link: document.getElementById("novoLink").value.trim(),
+                    notas: document.getElementById("novoNotas").value.trim()
+                });
+
+                salvar();
+            });
+        }
+
+        render();
+    </script>
+
+</body>
+</html>
