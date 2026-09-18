@@ -7,6 +7,181 @@
     <title>Trabalho</title>
 
     <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .campo-label {
+            display: block;
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 14px 0 8px;
+        }
+
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+        .chip {
+            padding: 7px 13px;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid #333338;
+            background: #1a1a1e;
+            color: #bbb;
+            border-radius: 16px;
+            transition: 0.15s;
+            user-select: none;
+        }
+
+        .chip:hover { background: #222228; color: #e0e0e0; }
+
+        .chip.selecionado {
+            background: #2e2e33; border-color: #666; color: #fff; font-weight: 600;
+        }
+
+        .chip.tipo-producao.selecionado    { background: #1f3320; border-color: #4caf50; color: #a5d6a7; }
+        .chip.tipo-divulgacao.selecionado  { background: #33231f; border-color: #d4774a; color: #e0a878; }
+        .chip.tipo-prospeccao.selecionado  { background: #1a2233; border-color: #5a8ad4; color: #a8c4e8; }
+        .chip.tipo-estudo.selecionado      { background: #2e1f33; border-color: #8a5ad4; color: #c9a8e8; }
+        .chip.tipo-planejamento.selecionado{ background: #332e1a; border-color: #c9a44a; color: #e0d48a; }
+        .chip.tipo-travado.selecionado     { background: #331f1f; border-color: #d45a5a; color: #e08b8b; }
+
+        /* Link de referência */
+
+        .link-preview { margin-top: 10px; }
+
+        .link-preview a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border: 1px solid #2c3a55;
+            background: linear-gradient(135deg, #1a2235 0%, #232f4a 100%);
+            color: #dfe8ff;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.15s;
+        }
+
+        .link-preview a:hover { border-color: #4a5c85; transform: translateY(-1px); }
+
+        /* Tarefas */
+
+        .tarefa-linha {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            background: #1c1c20;
+            border: 1px solid #252529;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .tarefa-linha.concluida { opacity: 0.5; }
+
+        .prio-grupo {
+            display: flex;
+            gap: 3px;
+            flex-shrink: 0;
+        }
+
+        .prio-btn {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 1px solid #333;
+            background: #1a1a1e;
+            cursor: pointer;
+            transition: 0.15s;
+            padding: 0;
+        }
+
+        .prio-btn[data-prio="alta"]:hover,
+        .prio-btn[data-prio="alta"].ativo {
+            background: #d45a5a; border-color: #d45a5a;
+        }
+
+        .prio-btn[data-prio="media"]:hover,
+        .prio-btn[data-prio="media"].ativo {
+            background: #c9a44a; border-color: #c9a44a;
+        }
+
+        .prio-btn[data-prio="baixa"]:hover,
+        .prio-btn[data-prio="baixa"].ativo {
+            background: #4caf50; border-color: #4caf50;
+        }
+
+        .tarefa-input {
+            flex: 1;
+            margin-top: 0 !important;
+            background: transparent !important;
+            border: none !important;
+            padding: 4px 0 !important;
+            font-size: 14px;
+            color: #e0e0e0;
+            outline: none;
+        }
+
+        .tarefa-input::placeholder { color: #555; }
+
+        .tarefa-check {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .tarefa-remover {
+            background: none;
+            border: none;
+            color: #a33;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0 4px;
+            flex-shrink: 0;
+        }
+
+        .tarefa-remover:hover { color: #e55; }
+
+        .btn-adicionar {
+            width: 100%;
+            padding: 10px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px dashed #444;
+            background: transparent;
+            color: #999;
+            border-radius: 10px;
+            transition: 0.15s;
+        }
+
+        .btn-adicionar:hover { border-color: #666; color: #ccc; background: #1a1a1e; }
+
+        .contador-tarefas {
+            color: #888;
+            font-size: 12px;
+            text-align: right;
+            margin-top: 8px;
+        }
+
+        .link-subpagina {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 18px;
+            background: #17171a;
+            border: 1px solid #252529;
+            border-radius: 16px;
+            color: inherit;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .link-subpagina:hover { background: #1e1e22; border-color: #3a3a40; }
+        .link-subpagina h2 { font-size: 17px; margin-bottom: 5px; }
+        .link-subpagina p { color: #999; font-size: 13px; }
+    </style>
 </head>
 
 <body>
@@ -17,55 +192,145 @@
             <p class="eyebrow">PLANEJAMENTO</p>
             <h1>💼 Trabalho</h1>
             <p class="subtitle">
-                Organize como você vai executar sua frente de trabalho.
+                Organize como você vai executar e se expor hoje.
             </p>
         </header>
 
         <section class="modules">
 
-            <div class="module-card">
-                <span class="icon">🎯</span>
-                <div>
-                    <h2>Objetivo do trabalho</h2>
-                    <textarea
-                        placeholder="O que quero alcançar com o trabalho hoje?"
-                        rows="4"
-                    ></textarea>
+            <!-- TIPO DE DIA -->
+
+            <div class="module-card" style="align-items: flex-start;">
+                <div style="width: 100%;">
+                    <h2>Tipo de dia</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
+                        Como vai ser o dia hoje.
+                    </p>
+                    <div class="chips" id="chipsTipo"></div>
                 </div>
             </div>
 
+
+            <!-- FOCO PRINCIPAL -->
+
             <div class="module-card">
-                <span class="icon">📋</span>
+                <span class="icon">🎯</span>
                 <div>
-                    <h2>Tarefas</h2>
-                    <textarea
-                        placeholder="Quais tarefas precisam ser executadas?"
-                        rows="5"
-                    ></textarea>
+                    <h2>Foco principal do dia</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 10px;">
+                        Qual é a única coisa que, se você fizer hoje, o dia valeu?
+                    </p>
+                    <input
+                        type="text"
+                        id="focoPrincipal"
+                        placeholder="Ex.: Publicar o primeiro vídeo do portfólio."
+                    >
                 </div>
             </div>
+
+
+            <!-- LINK DE REFERÊNCIA -->
+
+            <div class="module-card">
+                <span class="icon">🔗</span>
+                <div>
+                    <h2>Link de referência</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 4px;">
+                        Pasta, briefing, protótipo, vídeo de referência.
+                    </p>
+                    <input type="text" id="linkRef" placeholder="https://...">
+                    <div class="link-preview" id="linkPreview"></div>
+                </div>
+            </div>
+
+
+            <!-- EXPOSIÇÃO DO DIA -->
+
+            <div class="module-card" style="align-items: flex-start;">
+                <span class="icon">🚀</span>
+                <div style="width: 100%;">
+                    <h2>Exposição do dia</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
+                        O que fiz hoje para me expor? Marque tudo o que vale.
+                    </p>
+                    <div class="chips" id="chipsExposicao"></div>
+                </div>
+            </div>
+
+
+            <!-- TAREFAS -->
+
+            <div class="module-card" style="align-items: flex-start;">
+                <span class="icon">📋</span>
+                <div style="width: 100%;">
+                    <h2>Tarefas</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
+                        No máximo 5. Menos é mais.
+                    </p>
+                    <div id="listaTarefas"></div>
+                    <button type="button" class="btn-adicionar" id="btnAddTarefa">
+                        ＋ Adicionar tarefa
+                    </button>
+                    <div class="contador-tarefas" id="contadorTarefas"></div>
+                </div>
+            </div>
+
+
+            <!-- PRÓXIMA AÇÃO -->
 
             <div class="module-card">
                 <span class="icon">➡️</span>
                 <div>
-                    <h2>Próxima ação</h2>
-                    <textarea
-                        placeholder="Qual é a próxima ação concreta?"
-                        rows="3"
-                    ></textarea>
+                    <h2>Próxima ação concreta</h2>
+                    <input
+                        type="text"
+                        id="proximaAcao"
+                        placeholder="A coisa mais específica que você vai fazer em seguida."
+                    >
                 </div>
             </div>
+
+
+            <!-- BLOQUEIO -->
+
+            <div class="module-card">
+                <span class="icon">🚧</span>
+                <div>
+                    <h2>O que me travou hoje?</h2>
+                    <input
+                        type="text"
+                        id="bloqueio"
+                        placeholder="Ex.: Medo de publicar; esperando resposta do cliente."
+                    >
+                </div>
+            </div>
+
+
+            <!-- IDEIAS -->
 
             <div class="module-card">
                 <span class="icon">💡</span>
                 <div>
                     <h2>Ideias / observações</h2>
                     <textarea
+                        id="ideiasObs"
                         placeholder="Registre ideias, observações ou informações importantes."
                         rows="4"
                     ></textarea>
                 </div>
             </div>
+
+
+            <!-- SUBPÁGINA -->
+
+            <a href="conexoes.html" class="link-subpagina">
+                <span class="icon">👥</span>
+                <div style="flex: 1;">
+                    <h2>Conexões</h2>
+                    <p>Pessoas, prospects e clientes que passaram pelo caminho.</p>
+                </div>
+                <span class="arrow">›</span>
+            </a>
 
         </section>
 
@@ -75,7 +340,328 @@
 
     </main>
 
-    <script src="../../js/app.js"></script>
-    
+
+    <script>
+        // ==================================================
+        // DATA
+        // ==================================================
+
+        const hoje = new Date();
+        const anoHoje = hoje.getFullYear();
+        const mesHoje = String(hoje.getMonth() + 1).padStart(2, "0");
+        const diaHoje = String(hoje.getDate()).padStart(2, "0");
+        const dataHoje = `${anoHoje}-${mesHoje}-${diaHoje}`;
+
+        const paramsURL = new URLSearchParams(window.location.search);
+        const dataParam = paramsURL.get("data");
+        const dataAtual =
+            (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam))
+                ? dataParam
+                : dataHoje;
+
+        const PREFIXO = `planejamento_${dataAtual}_trabalho_`;
+
+
+        // ==================================================
+        // BARRA DE DATAS
+        // ==================================================
+
+        (function () {
+            const container = document.querySelector("main.container");
+            const header = container.querySelector(".header");
+
+            const [a, m, d] = dataAtual.split("-").map(Number);
+            const dataObj = new Date(a, m - 1, d);
+
+            const fmtISO = (dt) => {
+                const yy = dt.getFullYear();
+                const mm = String(dt.getMonth() + 1).padStart(2, "0");
+                const dd = String(dt.getDate()).padStart(2, "0");
+                return `${yy}-${mm}-${dd}`;
+            };
+
+            const anterior = new Date(dataObj); anterior.setDate(anterior.getDate() - 1);
+            const seguinte = new Date(dataObj); seguinte.setDate(seguinte.getDate() + 1);
+
+            const fmtBR = (iso) => { const [y, mo, dy] = iso.split("-"); return `${dy}/${mo}/${y}`; };
+            const label = (iso) => iso === dataHoje ? "Hoje" : fmtBR(iso);
+            const baseURL = window.location.pathname;
+            const urlComData = (iso) => iso === dataHoje ? baseURL : `${baseURL}?data=${iso}`;
+
+            const barra = document.createElement("div");
+            barra.style.cssText = `
+                display:flex; align-items:center; justify-content:space-between; gap:8px;
+                margin-bottom:18px; padding:10px 12px; border:1px solid #252529;
+                border-radius:10px; background:#17171a; font-size:14px;
+            `;
+            const linkStyle = "text-decoration:none; color:#e0e0e0; padding:6px 10px; border-radius:6px;";
+
+            barra.innerHTML = `
+                <a href="${urlComData(fmtISO(anterior))}" style="${linkStyle}">← ${label(fmtISO(anterior))}</a>
+                <div style="text-align:center;">
+                    <div style="font-weight:600; color:#f5f5f5;">${label(dataAtual)}</div>
+                    ${dataAtual !== dataHoje
+                        ? `<a href="${baseURL}" style="font-size:11px; color:#c98a8a; text-decoration:none;">voltar para hoje</a>`
+                        : ""}
+                </div>
+                <a href="${urlComData(fmtISO(seguinte))}" style="${linkStyle}">${label(fmtISO(seguinte))} →</a>
+            `;
+            container.insertBefore(barra, header);
+        })();
+
+
+        // Propaga data para o link de conexões
+        if (dataAtual !== dataHoje) {
+            const linkConexoes = document.querySelector(".link-subpagina");
+            if (linkConexoes && !linkConexoes.getAttribute("href").includes("?data=")) {
+                linkConexoes.setAttribute("href", linkConexoes.getAttribute("href") + `?data=${dataAtual}`);
+            }
+        }
+
+
+        // ==================================================
+        // TIPO DE DIA
+        // ==================================================
+
+        const TIPOS = [
+            { valor: "producao",     label: "🎬 Produção",     classe: "tipo-producao" },
+            { valor: "divulgacao",   label: "📣 Divulgação",   classe: "tipo-divulgacao" },
+            { valor: "prospeccao",   label: "🤝 Prospecção",   classe: "tipo-prospeccao" },
+            { valor: "estudo",       label: "📚 Estudo",       classe: "tipo-estudo" },
+            { valor: "planejamento", label: "🧠 Planejamento", classe: "tipo-planejamento" },
+            { valor: "travado",      label: "🔴 Travado",      classe: "tipo-travado" }
+        ];
+
+        const chaveTipo = PREFIXO + "tipo_dia";
+        const chipsTipo = document.getElementById("chipsTipo");
+        const tipoSalvo = localStorage.getItem(chaveTipo);
+
+        TIPOS.forEach(t => {
+            const chip = document.createElement("div");
+            chip.className = "chip " + t.classe;
+            chip.textContent = t.label;
+            if (tipoSalvo === t.valor) chip.classList.add("selecionado");
+
+            chip.addEventListener("click", () => {
+                const jaSel = chip.classList.contains("selecionado");
+                chipsTipo.querySelectorAll(".chip").forEach(c => c.classList.remove("selecionado"));
+                if (jaSel) {
+                    localStorage.removeItem(chaveTipo);
+                } else {
+                    chip.classList.add("selecionado");
+                    localStorage.setItem(chaveTipo, t.valor);
+                }
+            });
+
+            chipsTipo.appendChild(chip);
+        });
+
+
+        // ==================================================
+        // EXPOSIÇÃO DO DIA
+        // ==================================================
+
+        const OPCOES_EXPOSICAO = [
+            "📱 Postei algo",
+            "🎥 Publiquei vídeo",
+            "💬 Mandei msg para possível cliente",
+            "📧 Enviei proposta",
+            "🤝 Falei sobre o que faço",
+            "📝 Atualizei portfólio",
+            "👀 Me candidatei a algo",
+            "📣 Divulguei em algum lugar"
+        ];
+
+        const chaveExposicao = PREFIXO + "exposicao";
+        let exposicoes = [];
+        try {
+            const s = localStorage.getItem(chaveExposicao);
+            if (s) exposicoes = JSON.parse(s);
+        } catch (e) { exposicoes = []; }
+
+        const chipsExposicao = document.getElementById("chipsExposicao");
+
+        function renderExposicao() {
+            chipsExposicao.innerHTML = "";
+            OPCOES_EXPOSICAO.forEach(op => {
+                const chip = document.createElement("div");
+                chip.className = "chip";
+                if (exposicoes.includes(op)) chip.classList.add("selecionado");
+                chip.textContent = op;
+
+                chip.addEventListener("click", () => {
+                    const idx = exposicoes.indexOf(op);
+                    if (idx >= 0) {
+                        exposicoes.splice(idx, 1);
+                    } else {
+                        exposicoes.push(op);
+                    }
+                    localStorage.setItem(chaveExposicao, JSON.stringify(exposicoes));
+                    renderExposicao();
+                });
+
+                chipsExposicao.appendChild(chip);
+            });
+        }
+        renderExposicao();
+
+
+        // ==================================================
+        // CAMPOS DE TEXTO SIMPLES
+        // ==================================================
+
+        const campos = [
+            { id: "focoPrincipal", chave: PREFIXO + "foco_principal" },
+            { id: "proximaAcao",   chave: PREFIXO + "proxima_acao" },
+            { id: "bloqueio",      chave: PREFIXO + "bloqueio" },
+            { id: "ideiasObs",     chave: PREFIXO + "ideias_obs" }
+        ];
+
+        campos.forEach(({ id, chave }) => {
+            const campo = document.getElementById(id);
+            const salvo = localStorage.getItem(chave);
+            if (salvo !== null) campo.value = salvo;
+            const salvar = () => localStorage.setItem(chave, campo.value);
+            campo.addEventListener("input", salvar);
+            campo.addEventListener("change", salvar);
+        });
+
+
+        // ==================================================
+        // LINK DE REFERÊNCIA
+        // ==================================================
+
+        const chaveLink = PREFIXO + "link_ref";
+        const campoLink = document.getElementById("linkRef");
+        const preview = document.getElementById("linkPreview");
+
+        campoLink.value = localStorage.getItem(chaveLink) || "";
+
+        function atualizarPreview() {
+            const url = campoLink.value.trim();
+            if (/^https?:\/\//i.test(url)) {
+                preview.innerHTML = `<a href="${url}" target="_blank" rel="noopener">🔗 Abrir link</a>`;
+            } else {
+                preview.innerHTML = "";
+            }
+        }
+        atualizarPreview();
+
+        campoLink.addEventListener("input", () => {
+            localStorage.setItem(chaveLink, campoLink.value);
+            atualizarPreview();
+        });
+
+
+        // ==================================================
+        // TAREFAS COM PRIORIDADE
+        // ==================================================
+
+        const chaveTarefas = PREFIXO + "tarefas";
+        let tarefas = [];
+        try {
+            const s = localStorage.getItem(chaveTarefas);
+            if (s) tarefas = JSON.parse(s);
+        } catch (e) { tarefas = []; }
+
+        const listaTarefas = document.getElementById("listaTarefas");
+        const contador = document.getElementById("contadorTarefas");
+
+        function salvarTarefas() {
+            localStorage.setItem(chaveTarefas, JSON.stringify(tarefas));
+        }
+
+        function renderTarefas() {
+
+            listaTarefas.innerHTML = "";
+
+            tarefas.forEach((t, i) => {
+
+                const linha = document.createElement("div");
+                linha.className = "tarefa-linha" + (t.concluida ? " concluida" : "");
+
+                // Prioridade — 3 botões
+                const prioGrupo = document.createElement("div");
+                prioGrupo.className = "prio-grupo";
+
+                ["alta", "media", "baixa"].forEach(p => {
+                    const btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.className = "prio-btn" + (t.prioridade === p ? " ativo" : "");
+                    btn.dataset.prio = p;
+                    btn.title = p.charAt(0).toUpperCase() + p.slice(1);
+                    btn.addEventListener("click", () => {
+                        t.prioridade = p;
+                        salvarTarefas();
+                        renderTarefas();
+                    });
+                    prioGrupo.appendChild(btn);
+                });
+
+                linha.appendChild(prioGrupo);
+
+                // Texto
+                const input = document.createElement("input");
+                input.type = "text";
+                input.className = "tarefa-input";
+                input.value = t.texto || "";
+                input.placeholder = "O que fazer?";
+                input.addEventListener("input", () => {
+                    t.texto = input.value;
+                    salvarTarefas();
+                });
+                linha.appendChild(input);
+
+                // Checkbox
+                const check = document.createElement("input");
+                check.type = "checkbox";
+                check.className = "tarefa-check";
+                check.checked = !!t.concluida;
+                check.addEventListener("change", () => {
+                    t.concluida = check.checked;
+                    salvarTarefas();
+                    renderTarefas();
+                });
+                linha.appendChild(check);
+
+                // Remover
+                const btnRem = document.createElement("button");
+                btnRem.type = "button";
+                btnRem.className = "tarefa-remover";
+                btnRem.textContent = "×";
+                btnRem.title = "Remover";
+                btnRem.addEventListener("click", () => {
+                    tarefas.splice(i, 1);
+                    salvarTarefas();
+                    renderTarefas();
+                });
+                linha.appendChild(btnRem);
+
+                listaTarefas.appendChild(linha);
+            });
+
+            // Contador
+            const feitas = tarefas.filter(t => t.concluida).length;
+            contador.textContent = tarefas.length === 0
+                ? ""
+                : `${feitas}/${tarefas.length} concluídas`;
+        }
+
+        document.getElementById("btnAddTarefa").addEventListener("click", () => {
+            if (tarefas.length >= 5) {
+                alert("Máximo de 5 tarefas. Menos é mais.");
+                return;
+            }
+            tarefas.push({ texto: "", prioridade: "media", concluida: false });
+            salvarTarefas();
+            renderTarefas();
+            // Foca no último input
+            const inputs = listaTarefas.querySelectorAll(".tarefa-input");
+            if (inputs.length) inputs[inputs.length - 1].focus();
+        });
+
+        renderTarefas();
+    </script>
+
 </body>
 </html>
