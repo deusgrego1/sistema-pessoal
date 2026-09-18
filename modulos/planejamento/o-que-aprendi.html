@@ -7,6 +7,79 @@
     <title>O que aprendi</title>
 
     <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .campo-label {
+            display: block;
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 14px 0 8px;
+        }
+
+        .status-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .status-chip {
+            padding: 7px 13px;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid #333338;
+            background: #1a1a1e;
+            color: #bbb;
+            border-radius: 16px;
+            transition: 0.15s;
+            user-select: none;
+        }
+
+        .status-chip:hover {
+            background: #222228;
+            color: #e0e0e0;
+        }
+
+        .status-chip.selecionado[data-valor="estudando"] {
+            background: #332e1a; border-color: #c9a44a; color: #e0d48a; font-weight: 600;
+        }
+
+        .status-chip.selecionado[data-valor="praticar"] {
+            background: #1a2233; border-color: #5a8ad4; color: #a8c4e8; font-weight: 600;
+        }
+
+        .status-chip.selecionado[data-valor="dominado"] {
+            background: #1f3320; border-color: #4caf50; color: #a5d6a7; font-weight: 600;
+        }
+
+        .status-chip.selecionado[data-valor="revisar"] {
+            background: #331f1f; border-color: #d45a5a; color: #e08b8b; font-weight: 600;
+        }
+
+        .link-preview {
+            margin-top: 8px;
+        }
+
+        .link-preview a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border: 1px solid #2c3a55;
+            background: linear-gradient(135deg, #1a2235 0%, #232f4a 100%);
+            color: #dfe8ff;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            transition: 0.15s;
+        }
+
+        .link-preview a:hover {
+            border-color: #4a5c85;
+            transform: translateY(-1px);
+        }
+    </style>
 </head>
 
 <body>
@@ -21,161 +94,9 @@
             </p>
         </header>
 
-
         <section class="modules">
 
-
-            <!-- APRENDIZADO 1 -->
-
-            <div class="module-card">
-
-                <span class="icon">1️⃣</span>
-
-                <div>
-
-                    <h2>Aprendizado 1</h2>
-
-                    <input
-                        type="text"
-                        placeholder="📌 Assunto"
-                    >
-
-                    <textarea
-                        placeholder="💡 O que aprendi? Explique com suas próprias palavras."
-                        rows="5"
-                    ></textarea>
-
-                    <textarea
-                        placeholder="⭐ Principal insight"
-                        rows="3"
-                    ></textarea>
-
-                    <textarea
-                        placeholder="🔗 Com o que isso se conecta?"
-                        rows="3"
-                    ></textarea>
-
-                    <textarea
-                        placeholder="🛠️ Como posso aplicar?"
-                        rows="3"
-                    ></textarea>
-
-                    <textarea
-                        placeholder="❓ O que ainda não entendi?"
-                        rows="3"
-                    ></textarea>
-
-                    <textarea
-                        placeholder="🎯 Próxima ação"
-                        rows="3"
-                    ></textarea>
-
-                </div>
-
-            </div>
-
-
-            <!-- APRENDIZADO 2 -->
-
-            <div class="module-card">
-
-                <span class="icon">2️⃣</span>
-
-                <div>
-
-                    <h2>Aprendizado 2</h2>
-
-                    <input
-                        type="text"
-                        placeholder="📌 Assunto"
-                    >
-
-                    <textarea
-                        placeholder="💡 O que aprendi? Explique com suas próprias palavras."
-                        rows="5"
-                    ></textarea>
-
-                    <textarea
-                        placeholder="⭐ Principal insight"
-                        rows="3"
-                    ></textarea>
-
-                    <textarea
-                        placeholder="🔗 Com o que isso se conecta?"
-                        rows="3"
-                    ></textarea>
-
-                    <textarea
-                        placeholder="🛠️ Como posso aplicar?"
-                        rows="3"
-                    ></textarea>
-
-                    <textarea
-                        placeholder="❓ O que ainda não entendi?"
-                        rows="3"
-                    ></textarea>
-
-                    <textarea
-                        placeholder="🎯 Próxima ação"
-                        rows="3"
-                    ></textarea>
-
-                </div>
-
-            </div>
-
-
-            <!-- APRENDIZADO 3 -->
-
-            <div class="module-card">
-
-                <span class="icon">3️⃣</span>
-
-                <div>
-
-                    <h2>Aprendizado 3</h2>
-
-                    <input
-                        type="text"
-                        placeholder="📌 Assunto"
-                    >
-
-                    <textarea
-                        placeholder="💡 O que aprendi? Explique com suas próprias palavras."
-                        rows="5"
-                    ></textarea>
-
-                    <textarea
-                        placeholder="⭐ Principal insight"
-                        rows="3"
-                    ></textarea>
-
-                    <textarea
-                        placeholder="🔗 Com o que isso se conecta?"
-                        rows="3"
-                    ></textarea>
-
-                    <textarea
-                        placeholder="🛠️ Como posso aplicar?"
-                        rows="3"
-                    ></textarea>
-
-                    <textarea
-                        placeholder="❓ O que ainda não entendi?"
-                        rows="3"
-                    ></textarea>
-
-                    <textarea
-                        placeholder="🎯 Próxima ação"
-                        rows="3"
-                    ></textarea>
-
-                </div>
-
-            </div>
-
-
-            <!-- ADICIONAR -->
+            <!-- Os blocos são gerados via JS -->
 
             <button
                 type="button"
@@ -187,217 +108,223 @@
 
         </section>
 
-
         <a href="estudo.html" class="back-button">
             ← Voltar para Estudo
         </a>
 
-
     </main>
 
+
     <script>
-    // ==================================================
-    // DATA ATUAL
-    // ==================================================
+        // ==================================================
+        // DATA
+        // ==================================================
 
- const hoje = new Date();
+        const hoje = new Date();
+        const anoHoje = hoje.getFullYear();
+        const mesHoje = String(hoje.getMonth() + 1).padStart(2, "0");
+        const diaHoje = String(hoje.getDate()).padStart(2, "0");
+        const dataHoje = `${anoHoje}-${mesHoje}-${diaHoje}`;
 
-const ano = hoje.getFullYear();
-const mes = String(hoje.getMonth() + 1).padStart(2, "0");
-const dia = String(hoje.getDate()).padStart(2, "0");
-
-const dataHoje = `${ano}-${mes}-${dia}`;
-
-const paramsURL = new URLSearchParams(window.location.search);
-const dataParam = paramsURL.get("data");
-
-const dataAtual =
-    (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam))
-        ? dataParam
-        : dataHoje;
+        const paramsURL = new URLSearchParams(window.location.search);
+        const dataParam = paramsURL.get("data");
+        const dataAtual =
+            (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam))
+                ? dataParam
+                : dataHoje;
 
 
-    // ==================================================
-    // ELEMENTOS
-    // ==================================================
+        // ==================================================
+        // ELEMENTOS E CHAVES
+        // ==================================================
 
-    const container = document.querySelector(".modules");
-    const botao = document.getElementById("adicionarAprendizado");
+        const container = document.querySelector(".modules");
+        const botao = document.getElementById("adicionarAprendizado");
 
+        const camposPorAprendizado = 11;
 
-    // ==================================================
-    // CONFIGURAÇÃO
-    // ==================================================
+        const chaveQuantidade =
+            `planejamento_${dataAtual}_o-que-aprendi_blocos`;
 
-    const camposPorAprendizado = 7;
-
-    const chaveQuantidade =
-        `planejamento_${dataAtual}_o-que-aprendi_blocos`;
-
-    let numeroAprendizado =
-        Number(localStorage.getItem(chaveQuantidade)) || 3;
+        let numeroAprendizado =
+            Number(localStorage.getItem(chaveQuantidade)) || 3;
 
 
-    // ==================================================
-    // CRIA UM APRENDIZADO
-    // ==================================================
+        // ==================================================
+        // STATUS
+        // ==================================================
 
-    function criarAprendizado(numero, carregarDados = false) {
-
-        const bloco = document.createElement("div");
-
-        bloco.className = "module-card";
-
-        bloco.innerHTML = `
-            <span class="icon">🧠</span>
-
-            <div>
-                <h2>Aprendizado ${numero}</h2>
-
-                <input
-                    type="text"
-                    placeholder="📌 Assunto"
-                >
-
-                <textarea
-                    placeholder="💡 O que aprendi? Explique com suas próprias palavras."
-                    rows="5"
-                ></textarea>
-
-                <textarea
-                    placeholder="⭐ Principal insight"
-                    rows="3"
-                ></textarea>
-
-                <textarea
-                    placeholder="🔗 Com o que isso se conecta?"
-                    rows="3"
-                ></textarea>
-
-                <textarea
-                    placeholder="🛠️ Como posso aplicar?"
-                    rows="3"
-                ></textarea>
-
-                <textarea
-                    placeholder="❓ O que ainda não entendi?"
-                    rows="3"
-                ></textarea>
-
-                <textarea
-                    placeholder="🎯 Próxima ação"
-                    rows="3"
-                ></textarea>
-            </div>
-        `;
+        const STATUS = [
+            { valor: "estudando", label: "🟡 Estudando" },
+            { valor: "praticar",  label: "🔵 Praticar" },
+            { valor: "dominado",  label: "🟢 Dominado" },
+            { valor: "revisar",   label: "🔴 Preciso revisar" }
+        ];
 
 
-        container.insertBefore(bloco, botao);
+        // ==================================================
+        // CRIA UM APRENDIZADO
+        // ==================================================
+
+        function criarAprendizado(numero) {
+
+            const bloco = document.createElement("div");
+            bloco.className = "module-card";
+            bloco.style.alignItems = "flex-start";
+
+            bloco.innerHTML = `
+                <span class="icon">🧠</span>
+
+                <div style="width: 100%;">
+                    <h2>Aprendizado ${numero}</h2>
+
+                    <input type="text" data-idx="0"
+                        placeholder="📌 Assunto — o que estudei" style="margin-top:14px;">
+
+                    <textarea data-idx="1" rows="5"
+                        placeholder="💡 O que aprendi? Explique com suas próprias palavras."></textarea>
+
+                    <textarea data-idx="2" rows="3"
+                        placeholder="⭐ Principal insight"></textarea>
+
+                    <textarea data-idx="3" rows="3"
+                        placeholder="🔗 Com o que isso se conecta?"></textarea>
+
+                    <textarea data-idx="4" rows="3"
+                        placeholder="🛠️ Como posso aplicar?"></textarea>
+
+                    <textarea data-idx="5" rows="3"
+                        placeholder="❓ O que ainda não entendi?"></textarea>
+
+                    <textarea data-idx="6" rows="3"
+                        placeholder="🎯 Próxima ação"></textarea>
+
+                    <label class="campo-label">Status do aprendizado</label>
+                    <div class="status-chips">
+                        ${STATUS.map(s => `
+                            <div class="status-chip" data-valor="${s.valor}">
+                                ${s.label}
+                            </div>
+                        `).join("")}
+                    </div>
+
+                    <label class="campo-label">Link de referência</label>
+                    <input type="text" data-idx="8"
+                        placeholder="Cole o link do vídeo, artigo, curso...">
+                    <div class="link-preview"></div>
+
+                    <label class="campo-label">Revisar em (dias)</label>
+                    <input type="text" data-idx="9"
+                        placeholder="Ex.: 7 — para revisar daqui a uma semana">
+
+                    <label class="campo-label">Tema grande</label>
+                    <input type="text" data-idx="10"
+                        placeholder="Ex.: Marketing, Vendas, Programação">
+                </div>
+            `;
+
+            container.insertBefore(bloco, botao);
 
 
-        // ----------------------------------------------
-        // CAMPOS
-        // ----------------------------------------------
+            // ---------------------------------------------
+            // CAMPOS DE TEXTO
+            // ---------------------------------------------
 
-        const campos = bloco.querySelectorAll(
-            "input, textarea"
-        );
+            bloco.querySelectorAll("[data-idx]").forEach(campo => {
+                const idx = Number(campo.dataset.idx);
+                const indice = (numero - 1) * camposPorAprendizado + idx;
+                const chave = `planejamento_${dataAtual}_o-que-aprendi_${indice}`;
+
+                const salvo = localStorage.getItem(chave);
+                if (salvo !== null) campo.value = salvo;
+
+                const salvar = () => {
+                    localStorage.setItem(chave, campo.value);
+                };
+
+                campo.addEventListener("input", salvar);
+                campo.addEventListener("change", salvar);
+            });
 
 
-        campos.forEach((campo, indiceCampo) => {
+            // ---------------------------------------------
+            // STATUS (chips)
+            // ---------------------------------------------
 
-            const indice =
-                (numero - 1) * camposPorAprendizado
-                + indiceCampo;
+            const idxStatus = (numero - 1) * camposPorAprendizado + 7;
+            const chaveStatus = `planejamento_${dataAtual}_o-que-aprendi_${idxStatus}`;
+            const chipsStatus = bloco.querySelectorAll(".status-chip");
+            const statusSalvo = localStorage.getItem(chaveStatus);
 
-            const chave =
-                `planejamento_${dataAtual}_o-que-aprendi_${indice}`;
+            chipsStatus.forEach(chip => {
 
-
-            // Carrega dados salvos
-            if (carregarDados) {
-
-                const salvo =
-                    localStorage.getItem(chave);
-
-                if (salvo !== null) {
-                    campo.value = salvo;
+                if (chip.dataset.valor === statusSalvo) {
+                    chip.classList.add("selecionado");
                 }
 
+                chip.addEventListener("click", () => {
+                    const jaSel = chip.classList.contains("selecionado");
+
+                    chipsStatus.forEach(c => c.classList.remove("selecionado"));
+
+                    if (jaSel) {
+                        localStorage.removeItem(chaveStatus);
+                    } else {
+                        chip.classList.add("selecionado");
+                        localStorage.setItem(chaveStatus, chip.dataset.valor);
+                    }
+                });
+            });
+
+
+            // ---------------------------------------------
+            // PREVIEW DE LINK
+            // ---------------------------------------------
+
+            const campoLink = bloco.querySelector('[data-idx="8"]');
+            const previewLink = bloco.querySelector(".link-preview");
+
+            function atualizarPreviewLink() {
+                const url = campoLink.value.trim();
+                if (/^https?:\/\//i.test(url)) {
+                    previewLink.innerHTML =
+                        `<a href="${url}" target="_blank" rel="noopener">🔗 Abrir link</a>`;
+                } else {
+                    previewLink.innerHTML = "";
+                }
             }
 
-
-            // Salva alterações
-            const salvar = () => {
-
-                localStorage.setItem(
-                    chave,
-                    campo.value
-                );
-
-            };
-
-            campo.addEventListener(
-                "input",
-                salvar
-            );
-
-            campo.addEventListener(
-                "change",
-                salvar
-            );
-
-        });
-
-    }
-
-
-    // ==================================================
-    // RECRIA APRENDIZADOS EXTRAS DO DIA
-    // ==================================================
-
-    if (numeroAprendizado > 3) {
-
-        for (
-            let numero = 4;
-            numero <= numeroAprendizado;
-            numero++
-        ) {
-
-            criarAprendizado(
-                numero,
-                true
-            );
-
+            atualizarPreviewLink();
+            campoLink.addEventListener("input", atualizarPreviewLink);
         }
 
-    }
+
+        // ==================================================
+        // RENDER INICIAL
+        // ==================================================
+
+        function renderTodos() {
+            // Remove blocos existentes
+            container.querySelectorAll(".module-card").forEach(b => b.remove());
+
+            for (let i = 1; i <= numeroAprendizado; i++) {
+                criarAprendizado(i);
+            }
+        }
+
+        renderTodos();
 
 
-    // ==================================================
-    // ADICIONAR NOVO APRENDIZADO
-    // ==================================================
+        // ==================================================
+        // ADICIONAR
+        // ==================================================
 
-    botao.addEventListener("click", () => {
-
-        numeroAprendizado++;
-
-        criarAprendizado(
-            numeroAprendizado,
-            false
-        );
-
-
-        // Salva quantidade de blocos existentes
-        localStorage.setItem(
-            chaveQuantidade,
-            numeroAprendizado
-        );
-
-    });
-</script>
-
-    <script src="../../js/app.js"></script>
+        botao.addEventListener("click", () => {
+            numeroAprendizado++;
+            criarAprendizado(numeroAprendizado);
+            localStorage.setItem(chaveQuantidade, numeroAprendizado);
+        });
+    </script>
 
 </body>
 </html>
