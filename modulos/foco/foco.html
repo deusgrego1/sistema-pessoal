@@ -7,6 +7,86 @@
     <title>Foco</title>
 
     <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .btn-pausa {
+            padding: 8px 14px;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            background: #fff;
+        }
+
+        .btn-pausa.ativo {
+            background: #333;
+            color: #fff;
+            border-color: #333;
+        }
+
+        .item-pausa {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 15px;
+        }
+
+        /* Playlists */
+
+        .playlists-linha {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .playlist-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 13px;
+            font-size: 12px;
+            border: 1px solid #2c3a55;
+            background: linear-gradient(135deg, #1a2235 0%, #232f4a 100%);
+            color: #dfe8ff;
+            border-radius: 16px;
+            text-decoration: none;
+            transition: 0.15s;
+        }
+
+        .playlist-link:hover {
+            border-color: #4a5c85;
+            transform: translateY(-1px);
+        }
+
+        .playlist-link .sp-icon {
+            font-size: 14px;
+        }
+
+        /* Ajustes tema escuro para a página (ela era antiga e clara) */
+
+        .btn-pausa {
+            background: #1a1a1e;
+            border-color: #333338;
+            color: #bbb;
+        }
+
+        .btn-pausa:hover {
+            background: #222228;
+            color: #e0e0e0;
+        }
+
+        .btn-pausa.ativo {
+            background: #333;
+            color: #fff;
+            border-color: #55555c;
+        }
+
+        .item-pausa {
+            border-bottom: 1px solid #252529;
+            color: #ccc;
+        }
+    </style>
 </head>
 
 <body>
@@ -20,7 +100,6 @@
                 Escolha uma ação e execute.
             </p>
         </header>
-
 
         <section class="modules">
 
@@ -44,7 +123,7 @@
 
             <div class="module-card">
                 <span class="icon">⏱️</span>
-                <div>
+                <div style="width: 100%;">
                     <h2>Sessão de foco</h2>
 
                     <select id="tempoFoco">
@@ -68,13 +147,11 @@
                         50:00
                     </p>
 
-                    <!-- Barra de progresso -->
-
                     <div
                         style="
                             width: 100%;
                             height: 8px;
-                            background: #eee;
+                            background: #252529;
                             border-radius: 4px;
                             overflow: hidden;
                             margin-bottom: 20px;
@@ -85,7 +162,7 @@
                             style="
                                 height: 100%;
                                 width: 0%;
-                                background: #333;
+                                background: #4caf50;
                                 transition: width 0.4s ease;
                             "
                         ></div>
@@ -101,9 +178,10 @@
                                 padding: 12px;
                                 font-size: 16px;
                                 cursor: pointer;
-                                border: 1px solid #ccc;
+                                border: 1px solid #333;
                                 border-radius: 8px;
-                                background: #fff;
+                                background: #333;
+                                color: #fff;
                             "
                         >
                             ▶️ Iniciar
@@ -117,9 +195,10 @@
                                 padding: 12px 16px;
                                 font-size: 16px;
                                 cursor: pointer;
-                                border: 1px solid #ccc;
+                                border: 1px solid #333338;
                                 border-radius: 8px;
-                                background: #fff;
+                                background: #1a1a1e;
+                                color: #bbb;
                             "
                         >
                             🔄
@@ -148,6 +227,33 @@
                         </button>
                     </div>
 
+
+                    <!-- PLAYLISTS -->
+
+                    <p style="color: #777; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; text-align: center; margin-top: 22px;">
+                        🎧 Trilha sonora
+                    </p>
+
+                    <div class="playlists-linha">
+                        <a
+                            href="https://open.spotify.com/playlist/6BpVYHnVFxJIKtaCKUXjH6?si=579a167debab47a2"
+                            target="_blank"
+                            rel="noopener"
+                            class="playlist-link"
+                        >
+                            <span class="sp-icon">🎧</span> Foco profundo
+                        </a>
+
+                        <a
+                            href="https://open.spotify.com/playlist/2Al9G2jrWkwDlRFMZaw1GX?si=4fcea0b9a758469a"
+                            target="_blank"
+                            rel="noopener"
+                            class="playlist-link"
+                        >
+                            <span class="sp-icon">🎵</span> Foco leve
+                        </a>
+                    </div>
+
                 </div>
             </div>
 
@@ -167,10 +273,10 @@
                                 display: inline-block;
                                 margin-left: 6px;
                                 padding: 2px 8px;
-                                background: #f0f0f0;
+                                background: #252529;
                                 border-radius: 10px;
                                 font-size: 12px;
-                                color: #555;
+                                color: #aaa;
                             "
                         >
                             Hoje: 0
@@ -193,9 +299,10 @@
                                 padding: 8px 16px;
                                 font-size: 18px;
                                 cursor: pointer;
-                                border: 1px solid #ccc;
+                                border: 1px solid #333338;
                                 border-radius: 8px;
-                                background: #fff;
+                                background: #1a1a1e;
+                                color: #bbb;
                             "
                         >
                             +
@@ -235,7 +342,7 @@
 
             <div class="module-card">
                 <span class="icon">⏸️</span>
-                <div>
+                <div style="width: 100%;">
                     <h2>Pausa</h2>
 
                     <p style="color:#888; font-size:14px; margin-bottom:14px;">
@@ -273,9 +380,10 @@
                             width: 100%;
                             font-size: 16px;
                             cursor: pointer;
-                            border: 1px solid #ccc;
+                            border: 1px solid #333338;
                             border-radius: 8px;
-                            background: #fff;
+                            background: #1a1a1e;
+                            color: #bbb;
                         "
                     >
                         🎲 Escolher por mim
@@ -287,8 +395,10 @@
                             margin-top: 14px;
                             padding: 14px;
                             border-radius: 8px;
-                            background: #f5f5f5;
+                            background: #1c1c20;
+                            border: 1px solid #252529;
                             font-size: 16px;
+                            color: #e0e0e0;
                             display: none;
                         "
                     ></div>
@@ -298,36 +408,11 @@
 
         </section>
 
-
         <a href="../../index.html" class="back-button">
             ← Voltar para o início
         </a>
 
     </main>
-
-
-    <style>
-        .btn-pausa {
-            padding: 8px 14px;
-            font-size: 14px;
-            cursor: pointer;
-            border: 1px solid #ccc;
-            border-radius: 20px;
-            background: #fff;
-        }
-
-        .btn-pausa.ativo {
-            background: #333;
-            color: #fff;
-            border-color: #333;
-        }
-
-        .item-pausa {
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-            font-size: 15px;
-        }
-    </style>
 
 
     <script>
@@ -363,65 +448,37 @@
         const pausas = {
 
             curta: [
-                "💧 Beber água",
-                "🚶 Caminhar pela casa",
-                "👀 Descansar os olhos",
-                "🧘 Fazer respiração profunda",
-                "🚽 Ir ao banheiro",
-                "🪟 Ir até uma janela e olhar para longe",
-                "🤸 Alongar o corpo",
-                "🧍 Ficar alguns minutos em pé",
-                "🧹 Organizar rapidamente a mesa",
-                "🗑️ Jogar algo fora",
-                "🌿 Ir para uma área externa",
-                "😮‍💨 Fazer uma pausa sem tela",
-                "🧼 Lavar o rosto",
-                "☀️ Tomar um pouco de sol",
-                "🧠 Ficar alguns minutos em silêncio",
-                "📝 Anotar algo que está incomodando",
-                "🎵 Ouvir uma música",
+                "💧 Beber água", "🚶 Caminhar pela casa", "👀 Descansar os olhos",
+                "🧘 Fazer respiração profunda", "🚽 Ir ao banheiro",
+                "🪟 Ir até uma janela e olhar para longe", "🤸 Alongar o corpo",
+                "🧍 Ficar alguns minutos em pé", "🧹 Organizar rapidamente a mesa",
+                "🗑️ Jogar algo fora", "🌿 Ir para uma área externa",
+                "😮‍💨 Fazer uma pausa sem tela", "🧼 Lavar o rosto",
+                "☀️ Tomar um pouco de sol", "🧠 Ficar alguns minutos em silêncio",
+                "📝 Anotar algo que está incomodando", "🎵 Ouvir uma música",
                 "🐕 Interagir rapidamente com um animal de estimação",
-                "👕 Arrumar a roupa/ambiente",
-                "🙏 Fazer uma oração curta"
+                "👕 Arrumar a roupa/ambiente", "🙏 Fazer uma oração curta"
             ],
 
             longa: [
-                "🍽️ Fazer uma refeição",
-                "🚿 Tomar banho",
-                "🚶 Fazer uma caminhada",
-                "🎵 Ouvir música",
-                "📖 Ler algumas páginas",
-                "🧘 Meditar",
-                "🙏 Fazer um momento com Deus",
-                "🏃 Fazer uma atividade física leve",
-                "☕ Preparar e tomar um café",
-                "🌳 Ficar um tempo ao ar livre",
-                "🧹 Organizar o quarto",
-                "🧺 Organizar roupas",
-                "🍳 Preparar alguma comida",
-                "🗣️ Conversar com alguém",
-                "🎨 Fazer uma atividade criativa",
-                "✍️ Escrever livremente",
-                "😴 Tirar um descanso breve",
-                "🧩 Fazer um hobby",
-                "📵 Ficar longe do celular",
-                "🌅 Simplesmente sentar e descansar"
+                "🍽️ Fazer uma refeição", "🚿 Tomar banho", "🚶 Fazer uma caminhada",
+                "🎵 Ouvir música", "📖 Ler algumas páginas", "🧘 Meditar",
+                "🙏 Fazer um momento com Deus", "🏃 Fazer uma atividade física leve",
+                "☕ Preparar e tomar um café", "🌳 Ficar um tempo ao ar livre",
+                "🧹 Organizar o quarto", "🧺 Organizar roupas",
+                "🍳 Preparar alguma comida", "🗣️ Conversar com alguém",
+                "🎨 Fazer uma atividade criativa", "✍️ Escrever livremente",
+                "😴 Tirar um descanso breve", "🧩 Fazer um hobby",
+                "📵 Ficar longe do celular", "🌅 Simplesmente sentar e descansar"
             ],
 
             tarefas: [
-                "💾 Salvar o trabalho",
-                "📁 Organizar os arquivos usados",
-                "📝 Registrar onde parou",
-                "🎯 Definir a próxima ação",
-                "🧹 Limpar a mesa",
-                "💧 Beber água",
-                "🚶 Levantar e caminhar",
-                "👀 Descansar os olhos",
-                "🧘 Respirar profundamente",
-                "📋 Conferir o que foi concluído",
-                "🗑️ Fechar arquivos desnecessários",
-                "🖥️ Fechar programas que não serão usados",
-                "📱 Guardar o celular",
+                "💾 Salvar o trabalho", "📁 Organizar os arquivos usados",
+                "📝 Registrar onde parou", "🎯 Definir a próxima ação",
+                "🧹 Limpar a mesa", "💧 Beber água", "🚶 Levantar e caminhar",
+                "👀 Descansar os olhos", "🧘 Respirar profundamente",
+                "📋 Conferir o que foi concluído", "🗑️ Fechar arquivos desnecessários",
+                "🖥️ Fechar programas que não serão usados", "📱 Guardar o celular",
                 "🧠 Esvaziar a cabeça por alguns minutos",
                 "📝 Registrar uma ideia que surgiu",
                 "⏱️ Definir o próximo bloco de foco",
@@ -432,25 +489,14 @@
             ],
 
             semNada: [
-                "📖 Ler um capítulo",
-                "🎓 Fazer uma aula",
-                "🧠 Estudar um conceito",
-                "📚 Pesquisar um assunto",
-                "📝 Fazer anotações",
-                "🗣️ Praticar comunicação",
-                "🇺🇸 Estudar inglês",
-                "💼 Estudar vendas",
-                "📈 Estudar marketing",
-                "💻 Aprender uma habilidade",
-                "🚶 Caminhar",
-                "🏃 Fazer cardio",
-                "🤸 Alongar",
-                "🏋️ Fazer um treino",
-                "🧘 Relaxar o corpo",
-                "💡 Desenvolver uma ideia",
-                "🎬 Criar uma ideia de conteúdo",
-                "✍️ Escrever",
-                "🛠️ Trabalhar em um projeto pessoal",
+                "📖 Ler um capítulo", "🎓 Fazer uma aula", "🧠 Estudar um conceito",
+                "📚 Pesquisar um assunto", "📝 Fazer anotações",
+                "🗣️ Praticar comunicação", "🇺🇸 Estudar inglês",
+                "💼 Estudar vendas", "📈 Estudar marketing",
+                "💻 Aprender uma habilidade", "🚶 Caminhar", "🏃 Fazer cardio",
+                "🤸 Alongar", "🏋️ Fazer um treino", "🧘 Relaxar o corpo",
+                "💡 Desenvolver uma ideia", "🎬 Criar uma ideia de conteúdo",
+                "✍️ Escrever", "🛠️ Trabalhar em um projeto pessoal",
                 "🔬 Fazer uma pesquisa útil"
             ]
 
@@ -487,26 +533,11 @@
         notasFoco.value  = localStorage.getItem(chaveNotas)  || "";
 
         const tempoSalvo = localStorage.getItem(chaveTempo);
-        if (tempoSalvo) {
-            tempoFoco.value = tempoSalvo;
-        }
+        if (tempoSalvo) tempoFoco.value = tempoSalvo;
+
 
         // ==================================================
-// TAREFA VINDA DA URL (?tarefa=...)
-// ==================================================
-
-const paramsURL = new URLSearchParams(window.location.search);
-const tarefaURL = paramsURL.get("tarefa");
-
-if (tarefaURL) {
-
-    tarefaFoco.value = tarefaURL;
-    localStorage.setItem(chaveTarefa, tarefaURL);
-
-}
-
-        // ==================================================
-        // TIMER — ESTADO
+        // TIMER
         // ==================================================
 
         let rodando          = false;
@@ -516,38 +547,27 @@ if (tarefaURL) {
         let intervalId       = null;
         let wakeLock         = null;
 
-
         function formatarTempo(segundos) {
-
             const m = String(Math.floor(segundos / 60)).padStart(2, "0");
             const s = String(segundos % 60).padStart(2, "0");
-
             return `${m}:${s}`;
         }
-
 
         function atualizarDisplay() {
             displayTimer.textContent = formatarTempo(segundosRestantes);
         }
 
-
         function atualizarBarra() {
-
             const pct = duracaoTotal > 0
                 ? ((duracaoTotal - segundosRestantes) / duracaoTotal) * 100
                 : 0;
-
             barraProgresso.style.width = pct + "%";
         }
 
-
         function atualizarTitulo() {
-
-            if (rodando) {
-                document.title = `⏱️ ${formatarTempo(segundosRestantes)} — Foco`;
-            } else {
-                document.title = "Foco";
-            }
+            document.title = rodando
+                ? `⏱️ ${formatarTempo(segundosRestantes)} — Foco`
+                : "Foco";
         }
 
 
@@ -556,157 +576,91 @@ if (tarefaURL) {
         // ==================================================
 
         function salvarEstado() {
-
             localStorage.setItem(chaveEstado, JSON.stringify({
-                rodando: rodando,
-                inicio: inicioSessao,
-                duracao: duracaoTotal,
-                restante: segundosRestantes
+                rodando, inicio: inicioSessao,
+                duracao: duracaoTotal, restante: segundosRestantes
             }));
-
         }
 
-
-        function limparEstado() {
-            localStorage.removeItem(chaveEstado);
-        }
-
+        function limparEstado() { localStorage.removeItem(chaveEstado); }
 
         function restaurarEstado() {
-
             let salvo = null;
-
-            try {
-                salvo = JSON.parse(localStorage.getItem(chaveEstado));
-            } catch (e) {
-                salvo = null;
-            }
-
+            try { salvo = JSON.parse(localStorage.getItem(chaveEstado)); }
+            catch (e) { salvo = null; }
             if (!salvo || typeof salvo !== "object") return;
 
             if (salvo.duracao) {
-
                 duracaoTotal = salvo.duracao;
-
                 const min = duracaoTotal / 60;
-                const opt = Array.from(tempoFoco.options)
-                    .find(o => Number(o.value) === min);
-
+                const opt = Array.from(tempoFoco.options).find(o => Number(o.value) === min);
                 if (opt) tempoFoco.value = String(min);
-
             }
 
             if (salvo.rodando && salvo.inicio) {
-
                 const decorrido = Math.floor((Date.now() - salvo.inicio) / 1000);
                 const restante = duracaoTotal - decorrido;
-
                 if (restante > 0) {
-
                     segundosRestantes = restante;
                     inicioSessao = salvo.inicio;
                     rodando = true;
-
                     btnIniciar.textContent = "⏸️ Pausar";
-
                 } else {
-
                     segundosRestantes = duracaoTotal;
-
                 }
-
             } else if (typeof salvo.restante === "number") {
-
-                segundosRestantes = Math.max(
-                    0,
-                    Math.min(salvo.restante, duracaoTotal)
-                );
-
-                if (segundosRestantes < duracaoTotal) {
-                    btnIniciar.textContent = "▶️ Continuar";
-                }
-
+                segundosRestantes = Math.max(0, Math.min(salvo.restante, duracaoTotal));
+                if (segundosRestantes < duracaoTotal) btnIniciar.textContent = "▶️ Continuar";
             }
-
         }
 
 
         // ==================================================
-        // SOM, NOTIFICAÇÃO, WAKE LOCK
+        // SOM / NOTIFICAÇÃO / WAKE LOCK
         // ==================================================
 
         function tocarBipe() {
-
             try {
-
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const o = ctx.createOscillator();
                 const g = ctx.createGain();
-
-                o.connect(g);
-                g.connect(ctx.destination);
-
-                o.type = "sine";
-                o.frequency.value = 880;
-
+                o.connect(g); g.connect(ctx.destination);
+                o.type = "sine"; o.frequency.value = 880;
                 g.gain.setValueAtTime(0.3, ctx.currentTime);
-                g.gain.exponentialRampToValueAtTime(
-                    0.0001,
-                    ctx.currentTime + 1
-                );
-
-                o.start();
-                o.stop(ctx.currentTime + 1);
-
+                g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1);
+                o.start(); o.stop(ctx.currentTime + 1);
             } catch (e) {}
-
         }
 
-
         function pedirPermissaoNotificacao() {
-
             if ("Notification" in window && Notification.permission === "default") {
                 Notification.requestPermission();
             }
-
         }
 
-
         function mostrarNotificacao() {
-
             if ("Notification" in window && Notification.permission === "granted") {
-
                 try {
                     new Notification("⏱️ Sessão concluída!", {
                         body: "Faça uma pausa consciente."
                     });
                 } catch (e) {}
-
             }
-
         }
 
-
         async function ativarWakeLock() {
-
             try {
-
                 if ("wakeLock" in navigator) {
                     wakeLock = await navigator.wakeLock.request("screen");
                 }
-
             } catch (e) {}
-
         }
 
-
         function liberarWakeLock() {
-
             if (wakeLock) {
                 wakeLock.release().catch(() => {});
                 wakeLock = null;
             }
-
         }
 
 
@@ -715,144 +669,79 @@ if (tarefaURL) {
         // ==================================================
 
         function registrarSessao(tarefa, duracaoSegundos) {
-
             let sessoes = [];
-
-            try {
-                sessoes = JSON.parse(localStorage.getItem(chaveSessoes)) || [];
-            } catch (e) {
-                sessoes = [];
-            }
-
+            try { sessoes = JSON.parse(localStorage.getItem(chaveSessoes)) || []; }
+            catch (e) { sessoes = []; }
             sessoes.push({
                 tarefa: tarefa || "(sem tarefa)",
                 duracao: duracaoSegundos,
                 hora: new Date().toISOString()
             });
-
             localStorage.setItem(chaveSessoes, JSON.stringify(sessoes));
-
         }
 
 
         // ==================================================
-        // AÇÕES DE FIM
-        // ==================================================
-
-        function mostrarAcoesFim() {
-            acoesFim.style.display = "block";
-        }
-
-
-        function esconderAcoesFim() {
-            acoesFim.style.display = "none";
-        }
-
-
-        // ==================================================
-        // CICLO DO TIMER
+        // CICLO
         // ==================================================
 
         function tick() {
-
             segundosRestantes--;
-
             if (segundosRestantes < 0) segundosRestantes = 0;
-
-            atualizarDisplay();
-            atualizarBarra();
-            atualizarTitulo();
-            salvarEstado();
-
-            if (segundosRestantes === 0) {
-                finalizarSessao();
-            }
-
+            atualizarDisplay(); atualizarBarra(); atualizarTitulo(); salvarEstado();
+            if (segundosRestantes === 0) finalizarSessao();
         }
 
-
         function iniciarTimer() {
-
-            // Pausar
             if (rodando) {
-
                 clearInterval(intervalId);
                 rodando = false;
                 btnIniciar.textContent = "▶️ Continuar";
-
-                salvarEstado();
-                liberarWakeLock();
-                atualizarTitulo();
-
+                salvarEstado(); liberarWakeLock(); atualizarTitulo();
                 return;
             }
 
-            // Reinicia do total se já acabou
-            if (segundosRestantes <= 0) {
-                segundosRestantes = duracaoTotal;
-            }
+            if (segundosRestantes <= 0) segundosRestantes = duracaoTotal;
 
             rodando = true;
             inicioSessao = Date.now() - (duracaoTotal - segundosRestantes) * 1000;
             btnIniciar.textContent = "⏸️ Pausar";
-
-            esconderAcoesFim();
+            acoesFim.style.display = "none";
 
             pedirPermissaoNotificacao();
             ativarWakeLock();
-
-            salvarEstado();
-            atualizarTitulo();
+            salvarEstado(); atualizarTitulo();
 
             intervalId = setInterval(tick, 1000);
-
         }
-
 
         function finalizarSessao() {
-
             clearInterval(intervalId);
             rodando = false;
             btnIniciar.textContent = "▶️ Iniciar";
-
             liberarWakeLock();
             document.title = "Foco";
-
             registrarSessao(tarefaFoco.value.trim(), duracaoTotal);
-
-            tocarBipe();
-            mostrarNotificacao();
-            mostrarAcoesFim();
-
+            tocarBipe(); mostrarNotificacao();
+            acoesFim.style.display = "block";
             limparEstado();
-
         }
 
-
         function resetTimer() {
-
             clearInterval(intervalId);
             rodando = false;
             btnIniciar.textContent = "▶️ Iniciar";
-
             duracaoTotal = Number(tempoFoco.value) * 60;
             segundosRestantes = duracaoTotal;
             inicioSessao = null;
-
-            atualizarDisplay();
-            atualizarBarra();
+            atualizarDisplay(); atualizarBarra();
             document.title = "Foco";
-            esconderAcoesFim();
-
-            limparEstado();
-            liberarWakeLock();
-
+            acoesFim.style.display = "none";
+            limparEstado(); liberarWakeLock();
         }
-
 
         btnIniciar.addEventListener("click", iniciarTimer);
         btnReiniciar.addEventListener("click", resetTimer);
-
         btnNovoFoco.addEventListener("click", () => {
             resetTimer();
             tarefaFoco.focus();
@@ -872,13 +761,8 @@ if (tarefaURL) {
         });
 
         tempoFoco.addEventListener("change", () => {
-
             localStorage.setItem(chaveTempo, tempoFoco.value);
-
-            if (!rodando) {
-                resetTimer();
-            }
-
+            if (!rodando) resetTimer();
         });
 
 
@@ -887,60 +771,37 @@ if (tarefaURL) {
         // ==================================================
 
         let distracoes = [];
-
         try {
-
             const salvas = localStorage.getItem(chaveDistancias);
-
-            if (salvas) {
-                distracoes = JSON.parse(salvas);
-            }
-
-        } catch (erro) {
-
-            distracoes = [];
-
-        }
-
+            if (salvas) distracoes = JSON.parse(salvas);
+        } catch (erro) { distracoes = []; }
 
         function salvarDistracoes() {
-            localStorage.setItem(
-                chaveDistancias,
-                JSON.stringify(distracoes)
-            );
+            localStorage.setItem(chaveDistancias, JSON.stringify(distracoes));
         }
-
 
         function atualizarContadorDistracoes() {
             contadorDistracoes.textContent = `Hoje: ${distracoes.length}`;
         }
 
-
         function renderizarDistracoes() {
-
             listaDistracoes.innerHTML = "";
-
-
             distracoes.forEach((texto, indice) => {
-
                 const li = document.createElement("li");
-
                 li.style.display = "flex";
                 li.style.justifyContent = "space-between";
                 li.style.alignItems = "center";
                 li.style.padding = "6px 0";
-                li.style.borderBottom = "1px solid #eee";
-
+                li.style.borderBottom = "1px solid #252529";
 
                 const span = document.createElement("span");
                 span.textContent = "🚫 " + texto;
                 span.style.fontSize = "14px";
-
+                span.style.color = "#e0e0e0";
 
                 const btnRemover = document.createElement("button");
                 btnRemover.type = "button";
                 btnRemover.textContent = "×";
-                btnRemover.title = "Remover";
                 btnRemover.style.background = "none";
                 btnRemover.style.border = "none";
                 btnRemover.style.cursor = "pointer";
@@ -948,129 +809,77 @@ if (tarefaURL) {
                 btnRemover.style.color = "#999";
                 btnRemover.style.padding = "0 8px";
 
-
                 btnRemover.addEventListener("click", () => {
-
                     distracoes.splice(indice, 1);
                     salvarDistracoes();
                     renderizarDistracoes();
                     atualizarContadorDistracoes();
-
                 });
-
 
                 li.appendChild(span);
                 li.appendChild(btnRemover);
-
                 listaDistracoes.appendChild(li);
-
             });
-
             atualizarContadorDistracoes();
-
         }
 
-
         function adicionarDistracao() {
-
             const texto = inputDistracao.value.trim();
-
             if (!texto) return;
-
             distracoes.push(texto);
             salvarDistracoes();
             renderizarDistracoes();
-
             inputDistracao.value = "";
             inputDistracao.focus();
         }
 
-
         btnAddDistracao.addEventListener("click", adicionarDistracao);
-
         inputDistracao.addEventListener("keydown", (evento) => {
-
             if (evento.key === "Enter") {
-
                 evento.preventDefault();
                 adicionarDistracao();
-
             }
-
         });
 
 
         // ==================================================
-        // PAUSAS — CATEGORIAS
+        // PAUSAS
         // ==================================================
 
         let categoriaAtiva = "curta";
-
         const botoesPausa = document.querySelectorAll(".btn-pausa");
 
-
         function renderizarPausas(categoria) {
-
             categoriaAtiva = categoria;
-
             listaPausas.innerHTML = "";
-
             const itens = pausas[categoria] || [];
-
-
             itens.forEach(item => {
-
                 const div = document.createElement("div");
-
                 div.className = "item-pausa";
                 div.textContent = item;
-
                 listaPausas.appendChild(div);
-
             });
-
-
             botoesPausa.forEach(btn => {
-
-                btn.classList.toggle(
-                    "ativo",
-                    btn.dataset.cat === categoria
-                );
-
+                btn.classList.toggle("ativo", btn.dataset.cat === categoria);
             });
-
         }
 
-
         botoesPausa.forEach(btn => {
-
-            btn.addEventListener("click", () => {
-
-                renderizarPausas(btn.dataset.cat);
-
-            });
-
+            btn.addEventListener("click", () => renderizarPausas(btn.dataset.cat));
         });
 
 
         // ==================================================
-        // SORTEIO DENTRO DA CATEGORIA ATIVA
+        // SORTEIO
         // ==================================================
 
         btnSorteio.addEventListener("click", () => {
-
             const listaAtual = pausas[categoriaAtiva] || [];
-
             if (listaAtual.length === 0) return;
-
-            const escolhida =
-                listaAtual[Math.floor(Math.random() * listaAtual.length)];
-
+            const escolhida = listaAtual[Math.floor(Math.random() * listaAtual.length)];
             resultadoSorteio.style.display = "block";
-
             resultadoSorteio.innerHTML =
                 `🎲 <strong>Faça agora:</strong><br><br>${escolhida}`;
-
         });
 
 
@@ -1079,17 +888,13 @@ if (tarefaURL) {
         // ==================================================
 
         restaurarEstado();
-
         atualizarDisplay();
         atualizarBarra();
         atualizarTitulo();
         renderizarDistracoes();
         renderizarPausas("curta");
 
-        if (rodando) {
-            intervalId = setInterval(tick, 1000);
-        }
-
+        if (rodando) intervalId = setInterval(tick, 1000);
     </script>
 
 </body>
