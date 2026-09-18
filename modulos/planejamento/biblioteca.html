@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Biblioteca de Fontes</title>
+
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .campo-label {
+            display: block;
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 14px 0 8px;
+        }
+
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+        .chip {
+            padding: 7px 13px;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid #333338;
+            background: #1a1a1e;
+            color: #bbb;
+            border-radius: 16px;
+            transition: 0.15s;
+            user-select: none;
+        }
+
+        .chip:hover { background: #222228; color: #e0e0e0; }
+
+        .chip.selecionado {
+            background: #2e2e33;
+            border-color: #666;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .chip.status-estudando.selecionado { background: #332e1a; border-color: #c9a44a; color: #e0d48a; }
+        .chip.status-pausado.selecionado   { background: #332a1a; border-color: #d4954a; color: #e0b878; }
+        .chip.status-concluido.selecionado { background: #1f3320; border-color: #4caf50; color: #a5d6a7; }
+
+        .item-card {
+            background: #1c1c20;
+            border: 1px solid #252529;
+            border-left: 3px solid #555;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+
+        .item-card.estudando { border-left-color: #c9a44a; }
+        .item-card.pausado   { border-left-color: #d4954a; }
+        .item-card.concluido { border-left-color: #4caf50; }
+
+        .item-nome {
+            font-size: 15px;
+            font-weight: 600;
+            color: #e0e0e0;
+            margin-bottom: 4px;
+        }
+
+        .item-meta {
+            font-size: 12px;
+            color: #888;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .item-meta .tag {
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #252529;
+            font-size: 11px;
+            color: #bbb;
+        }
+
+        .item-link {
+            display: inline-block;
+            font-size: 12px;
+            color: #8ab4f8;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+
+        .item-link:hover { text-decoration: underline; }
+
+        .item-remover {
+            background: none;
+            border: none;
+            color: #a33;
+            font-size: 13px;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 6px;
+        }
+
+        .item-remover:hover { color: #e55; }
+
+        .vazio {
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+            padding: 30px 0;
+        }
+
+        .btn-primario {
+            width: 100%;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid #333;
+            background: #2a2a30;
+            color: #fff;
+            border-radius: 12px;
+            transition: 0.15s;
+        }
+
+        .btn-primario:hover {
+            background: #333340;
+            border-color: #555;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="header">
+            <p class="eyebrow">ESTUDO</p>
+            <h1>📚 Biblioteca de fontes</h1>
+            <p class="subtitle">
+                Onde você estuda: cursos, canais, livros, materiais.
+            </p>
+        </header>
+
+        <section class="modules" id="lista"></section>
+
+        <a href="estudo.html" class="back-button">
+            ← Voltar para Estudo
+        </a>
+
+    </main>
+
+
+    <script>
+        const chaveBiblioteca = "planejamento_estudo_biblioteca";
+
+        const TIPOS = ["🎓 Curso", "📖 Livro", "🎥 Canal", "🎧 Podcast", "📝 Blog", "🧪 Outro"];
+        const STATUS = [
+            { valor: "naoComecei", label: "⚪ Não comecei" },
+            { valor: "estudando",  label: "🟡 Estudando", classe: "status-estudando" },
+            { valor: "pausado",    label: "🟠 Pausado",   classe: "status-pausado" },
+            { valor: "concluido",  label: "🟢 Concluído", classe: "status-concluido" }
+        ];
+
+        let itens = [];
+        try {
+            const s = localStorage.getItem(chaveBiblioteca);
+            if (s) itens = JSON.parse(s);
+        } catch (e) { itens = []; }
+
+        function salvar() {
+            localStorage.setItem(chaveBiblioteca, JSON.stringify(itens));
+            render();
+        }
+
+
+        // ==================================================
+        // RENDER
+        // ==================================================
+
+        const lista = document.getElementById("lista");
+
+        function render() {
+
+            lista.innerHTML = "";
+
+            if (itens.length === 0) {
+                const vazio = document.createElement("p");
+                vazio.className = "vazio";
+                vazio.textContent = "Nenhuma fonte registrada ainda.";
+                lista.appendChild(vazio);
+            } else {
+
+                itens.forEach((item, i) => {
+
+                    const div = document.createElement("div");
+                    div.className = `item-card ${item.status || ""}`;
+
+                    const nome = document.createElement("div");
+                    nome.className = "item-nome";
+                    nome.textContent = item.nome;
+                    div.appendChild(nome);
+
+                    const meta = document.createElement("div");
+                    meta.className = "item-meta";
+                    if (item.tipo) meta.innerHTML += `<span class="tag">${item.tipo}</span>`;
+                    if (item.status) {
+                        const st = STATUS.find(s => s.valor === item.status);
+                        if (st) meta.innerHTML += `<span class="tag">${st.label}</span>`;
+                    }
+                    div.appendChild(meta);
+
+                    const acoes = document.createElement("div");
+
+                    if (item.link) {
+                        const a = document.createElement("a");
+                        a.href = item.link;
+                        a.target = "_blank";
+                        a.rel = "noopener";
+                        a.className = "item-link";
+                        a.textContent = "🔗 Abrir";
+                        acoes.appendChild(a);
+                    }
+
+                    const btnRem = document.createElement("button");
+                    btnRem.className = "item-remover";
+                    btnRem.textContent = "remover";
+                    btnRem.addEventListener("click", () => {
+                        if (!confirm(`Remover "${item.nome}"?`)) return;
+                        itens.splice(i, 1);
+                        salvar();
+                    });
+                    acoes.appendChild(btnRem);
+
+                    div.appendChild(acoes);
+
+                    lista.appendChild(div);
+                });
+            }
+
+
+            // Form de adicionar
+            const form = document.createElement("div");
+            form.className = "module-card";
+            form.style.alignItems = "flex-start";
+
+            form.innerHTML = `
+                <span class="icon">➕</span>
+                <div style="width: 100%;">
+                    <h2>Adicionar fonte</h2>
+
+                    <label class="campo-label">Nome</label>
+                    <input type="text" id="novoNome" placeholder="Ex.: Curso de Vendas — Ícaro">
+
+                    <label class="campo-label">Tipo</label>
+                    <div class="chips" id="chipsTipo"></div>
+
+                    <label class="campo-label">Link (opcional)</label>
+                    <input type="text" id="novoLink" placeholder="Cole o link">
+
+                    <label class="campo-label">Status</label>
+                    <div class="chips" id="chipsStatus"></div>
+
+                    <div style="margin-top: 18px;">
+                        <button type="button" class="btn-primario" id="btnAdicionar">
+                            ＋ Adicionar
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            lista.appendChild(form);
+
+            // Chips tipo
+            let tipoSel = null;
+            const chipsTipo = document.getElementById("chipsTipo");
+            TIPOS.forEach(t => {
+                const chip = document.createElement("div");
+                chip.className = "chip";
+                chip.textContent = t;
+                chip.addEventListener("click", () => {
+                    const jaSel = chip.classList.contains("selecionado");
+                    chipsTipo.querySelectorAll(".chip").forEach(c => c.classList.remove("selecionado"));
+                    if (jaSel) { tipoSel = null; }
+                    else { chip.classList.add("selecionado"); tipoSel = t; }
+                });
+                chipsTipo.appendChild(chip);
+            });
+
+            // Chips status
+            let statusSel = null;
+            const chipsStatus = document.getElementById("chipsStatus");
+            STATUS.forEach(s => {
+                const chip = document.createElement("div");
+                chip.className = "chip" + (s.classe ? " " + s.classe : "");
+                chip.textContent = s.label;
+                chip.addEventListener("click", () => {
+                    const jaSel = chip.classList.contains("selecionado");
+                    chipsStatus.querySelectorAll(".chip").forEach(c => c.classList.remove("selecionado"));
+                    if (jaSel) { statusSel = null; }
+                    else { chip.classList.add("selecionado"); statusSel = s.valor; }
+                });
+                chipsStatus.appendChild(chip);
+            });
+
+            // Botão adicionar
+            document.getElementById("btnAdicionar").addEventListener("click", () => {
+                const nome = document.getElementById("novoNome").value.trim();
+                const link = document.getElementById("novoLink").value.trim();
+
+                if (!nome) {
+                    alert("Escreva o nome da fonte.");
+                    return;
+                }
+
+                itens.push({ nome, tipo: tipoSel, link, status: statusSel });
+                salvar();
+            });
+        }
+
+        render();
+    </script>
+
+</body>
+</html>
