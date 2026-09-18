@@ -55,13 +55,9 @@
             box-shadow: 0 0 6px rgba(46, 204, 113, 0.6);
         }
 
-        .dot-indicator.visivel {
-            display: inline-block;
-        }
+        .dot-indicator.visivel { display: inline-block; }
 
-        .conteudo-tipo {
-            animation: fadeIn 0.25s ease;
-        }
+        .conteudo-tipo { animation: fadeIn 0.25s ease; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(6px); }
@@ -144,10 +140,7 @@
 
         .pr-card.ativo .pr-titulo { color: #e0b851; }
 
-        .pr-sub {
-            font-size: 12px;
-            color: #777;
-        }
+        .pr-sub { font-size: 12px; color: #777; }
 
         .pr-toggle {
             display: flex;
@@ -231,13 +224,7 @@
             margin-bottom: 8px;
         }
 
-        /* ===== Chips ===== */
-
-        .chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 
         .chip {
             padding: 6px 12px;
@@ -251,10 +238,7 @@
             user-select: none;
         }
 
-        .chip:hover {
-            background: #222228;
-            color: #e0e0e0;
-        }
+        .chip:hover { background: #222228; color: #e0e0e0; }
 
         .chip.selecionado {
             background: #2a2318;
@@ -269,19 +253,12 @@
             color: #fff;
         }
 
-        .rpe-chips .chip {
-            min-width: 34px;
-            text-align: center;
-        }
-
-        /* RPE colorido — não selecionado */
+        .rpe-chips .chip { min-width: 34px; text-align: center; }
 
         .rpe-chips .chip.rpe-baixo { border-color: #2f4a2f; color: #86b886; }
         .rpe-chips .chip.rpe-medio { border-color: #4a4a2f; color: #c2c286; }
         .rpe-chips .chip.rpe-alto  { border-color: #4a3f2a; color: #d4a97a; }
         .rpe-chips .chip.rpe-max   { border-color: #4a2a2a; color: #d48a8a; }
-
-        /* RPE colorido — selecionado */
 
         .rpe-chips .chip.rpe-baixo.selecionado {
             background: #1f3320; border-color: #4caf50; color: #a5d6a7;
@@ -296,8 +273,6 @@
             background: #331f1f; border-color: #d45a5a; color: #e08b8b;
         }
 
-        /* ===== Campo opcional ===== */
-
         .campo-opcional-toggle {
             display: inline-block;
             margin-top: 12px;
@@ -309,24 +284,12 @@
             border-bottom: 1px dashed #444;
         }
 
-        .campo-opcional-toggle:hover {
-            color: #ccc;
-            border-bottom-color: #666;
-        }
+        .campo-opcional-toggle:hover { color: #ccc; border-bottom-color: #666; }
 
-        .campo-opcional {
-            display: none;
-        }
+        .campo-opcional { display: none; }
+        .campo-opcional.aberto { display: block; }
 
-        .campo-opcional.aberto {
-            display: block;
-        }
-
-        /* ===== Lista de PRs ===== */
-
-        .lista-prs {
-            margin-top: 8px;
-        }
+        .lista-prs { margin-top: 8px; }
 
         .pr-linha {
             display: flex;
@@ -341,34 +304,33 @@
             font-size: 13px;
         }
 
-        .pr-linha-data {
-            color: #777;
-            font-size: 11px;
-            min-width: 74px;
+        .pr-linha-data { color: #777; font-size: 11px; min-width: 74px; }
+
+        .pr-linha-info { flex: 1; color: #e0e0e0; line-height: 1.4; }
+
+        .pr-linha-info .nome { color: #e0b851; font-weight: 600; }
+
+        .pr-linha-valor { color: #fff; font-weight: 600; white-space: nowrap; }
+
+        .pr-vazio { text-align: center; color: #666; font-size: 13px; padding: 12px 0; }
+
+        .video-preview-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border: 1px solid #2c3a55;
+            background: linear-gradient(135deg, #1a2235 0%, #232f4a 100%);
+            color: #dfe8ff;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.15s;
         }
 
-        .pr-linha-info {
-            flex: 1;
-            color: #e0e0e0;
-            line-height: 1.4;
-        }
-
-        .pr-linha-info .nome {
-            color: #e0b851;
-            font-weight: 600;
-        }
-
-        .pr-linha-valor {
-            color: #fff;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .pr-vazio {
-            text-align: center;
-            color: #666;
-            font-size: 13px;
-            padding: 12px 0;
+        .video-preview-btn:hover {
+            border-color: #4a5c85;
+            transform: translateY(-1px);
         }
     </style>
 </head>
@@ -404,6 +366,10 @@
                     <span class="emoji">🚴</span> Ciclismo
                     <span class="dot-indicator" data-dot="ciclismo"></span>
                 </button>
+                <button type="button" class="tipo-btn" data-tipo="trilha">
+                    <span class="emoji">🥾</span> Trilha
+                    <span class="dot-indicator" data-dot="trilha"></span>
+                </button>
                 <button type="button" class="tipo-btn" data-tipo="volei">
                     <span class="emoji">🏐</span> Vôlei / Basquete
                     <span class="dot-indicator" data-dot="volei"></span>
@@ -426,10 +392,6 @@
 
 
     <script>
-        // ==================================================
-        // DATA E PREFERÊNCIA POR DIA DA SEMANA
-        // ==================================================
-
         const hoje = new Date();
         const anoHoje = hoje.getFullYear();
         const mesHoje = String(hoje.getMonth() + 1).padStart(2, "0");
@@ -437,13 +399,13 @@
         const dataAtual = `${anoHoje}-${mesHoje}-${diaHoje}`;
 
         const PREFERENCIA_DIA = {
-            0: "mobilidade",   // Domingo
-            1: "musculacao",   // Segunda
-            2: "corrida",      // Terça
-            3: "musculacao",   // Quarta
-            4: "corrida",      // Quinta
-            5: "musculacao",   // Sexta
-            6: "mobilidade"    // Sábado
+            0: "mobilidade",
+            1: "musculacao",
+            2: "corrida",
+            3: "musculacao",
+            4: "corrida",
+            5: "musculacao",
+            6: "mobilidade"
         };
 
         const chaveTipoAtivo = "planejamento_treino_tipo_ativo";
@@ -466,7 +428,6 @@
             campo.addEventListener("change", salvar);
         }
 
-        // Auto-adiciona "km" se digitar só o número
         function salvarAutoKm(campo, chave) {
             const salvo = localStorage.getItem(chave);
             if (salvo !== null) campo.value = salvo;
@@ -479,15 +440,12 @@
             };
 
             campo.addEventListener("input", () => {
-                // Durante digitação, salva cru
                 localStorage.setItem(chave, campo.value);
             });
-
             campo.addEventListener("blur", () => {
                 normalizar();
                 localStorage.setItem(chave, campo.value);
             });
-
             campo.addEventListener("change", () => {
                 normalizar();
                 localStorage.setItem(chave, campo.value);
@@ -501,14 +459,11 @@
                 const chip = document.createElement("div");
                 chip.className = "chip" + (neutro ? " neutro" : "");
                 chip.textContent = op;
-
                 if (salvo === op) chip.classList.add("selecionado");
 
                 chip.addEventListener("click", () => {
                     const jaSelecionado = chip.classList.contains("selecionado");
-                    container.querySelectorAll(".chip").forEach(c => {
-                        c.classList.remove("selecionado");
-                    });
+                    container.querySelectorAll(".chip").forEach(c => c.classList.remove("selecionado"));
                     if (jaSelecionado) {
                         localStorage.removeItem(chave);
                     } else {
@@ -521,7 +476,6 @@
             });
         }
 
-        // RPE com cores
         function setupRpeChips(container, chave) {
             const salvo = localStorage.getItem(chave);
 
@@ -532,17 +486,13 @@
                 else if (i <= 6) classe += " rpe-medio";
                 else if (i <= 8) classe += " rpe-alto";
                 else classe += " rpe-max";
-
                 chip.className = classe;
                 chip.textContent = String(i);
-
                 if (salvo === String(i)) chip.classList.add("selecionado");
 
                 chip.addEventListener("click", () => {
                     const jaSelecionado = chip.classList.contains("selecionado");
-                    container.querySelectorAll(".chip").forEach(c => {
-                        c.classList.remove("selecionado");
-                    });
+                    container.querySelectorAll(".chip").forEach(c => c.classList.remove("selecionado"));
                     if (jaSelecionado) {
                         localStorage.removeItem(chave);
                     } else {
@@ -555,7 +505,6 @@
             }
         }
 
-        // Setup do PR
         function setupPR(tipoKey, opcoesArea, opcoesTipoPR, tituloPR, labelExercicio) {
 
             const prefixo = `planejamento_${dataAtual}_treino_${tipoKey}_pr`;
@@ -565,7 +514,6 @@
             const prToggle = $("prToggle");
             const prToggleLabel = prToggle.querySelector(".pr-toggle-label");
 
-            // título específico
             prCard.querySelector(".pr-titulo").textContent = tituloPR;
 
             if (localStorage.getItem(chaveAtivo) === "true") {
@@ -597,7 +545,6 @@
             salvarAuto($("prObs"), `${prefixo}_obs`);
         }
 
-        // Bloco HTML de um card de texto
         function cardTexto(campos) {
             return `
                 <div class="module-card" style="align-items: flex-start;">
@@ -622,7 +569,6 @@
             `;
         }
 
-        // Bloco HTML do card de PR
         function blocoPR() {
             return `
                 <div class="pr-card" id="prCard">
@@ -684,21 +630,15 @@
             const container = $("listaPRs");
             if (!container) return;
 
-            const prefixoBusca = `planejamento_`;
             const sufixoTipo = `_treino_${tipoKey}_pr_`;
-
             const prs = [];
 
             Object.keys(localStorage).forEach(chave => {
-
                 if (!chave.includes(sufixoTipo)) return;
                 if (!chave.endsWith("_ativo")) return;
                 if (localStorage.getItem(chave) !== "true") return;
 
-                const match = chave.match(
-                    /^planejamento_(\d{4}-\d{2}-\d{2})_treino_(\w+)_pr_ativo$/
-                );
-
+                const match = chave.match(/^planejamento_(\d{4}-\d{2}-\d{2})_treino_(\w+)_pr_ativo$/);
                 if (!match) return;
 
                 const data = match[1];
@@ -710,7 +650,6 @@
                 const valor = localStorage.getItem(`${prefixoData}_valor`) || "";
 
                 if (!exercicio && !valor) return;
-
                 prs.push({ data, exercicio, area, tipo, valor });
             });
 
@@ -721,19 +660,14 @@
                 return;
             }
 
-            let html = "";
-
-            prs.forEach(pr => {
+            container.innerHTML = prs.map(pr => {
                 const [y, m, d] = pr.data.split("-");
-                const dataBR = `${d}/${m}/${y}`;
-
                 const partes = [];
                 if (pr.area) partes.push(pr.area);
                 if (pr.tipo) partes.push(pr.tipo);
-
-                html += `
+                return `
                     <div class="pr-linha">
-                        <span class="pr-linha-data">${dataBR}</span>
+                        <span class="pr-linha-data">${d}/${m}/${y}</span>
                         <span class="pr-linha-info">
                             <span class="nome">${pr.exercicio || "—"}</span>
                             ${partes.length ? `· ${partes.join(" · ")}` : ""}
@@ -741,9 +675,7 @@
                         <span class="pr-linha-valor">${pr.valor || ""}</span>
                     </div>
                 `;
-            });
-
-            container.innerHTML = html;
+            }).join("");
         }
 
 
@@ -853,65 +785,52 @@
 
         function renderMobilidade() {
 
-    $("conteudoTipo").innerHTML = `
-        <div class="conteudo-tipo">
+            $("conteudoTipo").innerHTML = `
+                <div class="conteudo-tipo">
 
-            ${cardTexto(
-                campoTexto("mobQuando", "Quando", "Ex.: Antes do treino · 07h") +
-                campoTexto("mobTempo", "Quanto tempo", "Ex.: 15min") +
-                campoTexto("mobFoco", "Qual o foco", "Ex.: Quadril e posterior") +
-                `<label class="campo-label" style="margin-top: 14px;">Vídeo de referência (YouTube)</label>
-                 <input type="text" id="mobVideo" placeholder="Cole o link do vídeo">
-                 <div id="mobVideoPreview" style="margin-top: 10px;"></div>`
-            )}
+                    ${cardTexto(
+                        campoTexto("mobQuando", "Quando", "Ex.: Antes do treino · 07h") +
+                        campoTexto("mobTempo", "Quanto tempo", "Ex.: 15min") +
+                        campoTexto("mobFoco", "Qual o foco", "Ex.: Quadril e posterior") +
+                        `<label class="campo-label" style="margin-top: 14px;">Vídeo de referência (YouTube)</label>
+                         <input type="text" id="mobVideo" placeholder="Cole o link do vídeo">
+                         <div id="mobVideoPreview" style="margin-top: 10px;"></div>`
+                    )}
 
-        </div>
-    `;
-
-    salvarAuto($("mobQuando"), `planejamento_${dataAtual}_treino_mob_quando`);
-    salvarAuto($("mobTempo"),  `planejamento_${dataAtual}_treino_mob_tempo`);
-    salvarAuto($("mobFoco"),   `planejamento_${dataAtual}_treino_mob_foco`);
-
-
-    // Vídeo — salva e mostra prévia clicável
-    const campoVideo = $("mobVideo");
-    const preview = $("mobVideoPreview");
-    const chaveVideo = `planejamento_${dataAtual}_treino_mob_video`;
-
-    function atualizarPreview() {
-
-        const url = campoVideo.value.trim();
-
-        if (!url) {
-            preview.innerHTML = "";
-            return;
-        }
-
-        // Só mostra se parece uma URL
-        if (/^https?:\/\//i.test(url)) {
-            preview.innerHTML = `
-                <a href="${url}" target="_blank" rel="noopener"
-                   style="display:inline-flex; align-items:center; gap:8px;
-                          padding:10px 14px; border:1px solid #2c3a55;
-                          background:linear-gradient(135deg,#1a2235 0%,#232f4a 100%);
-                          color:#dfe8ff; border-radius:10px; text-decoration:none;
-                          font-size:14px; transition:0.15s;">
-                    ▶️ Abrir vídeo
-                </a>
+                </div>
             `;
-        } else {
-            preview.innerHTML = "";
+
+            salvarAuto($("mobQuando"), `planejamento_${dataAtual}_treino_mob_quando`);
+            salvarAuto($("mobTempo"),  `planejamento_${dataAtual}_treino_mob_tempo`);
+            salvarAuto($("mobFoco"),   `planejamento_${dataAtual}_treino_mob_foco`);
+
+            const campoVideo = $("mobVideo");
+            const preview = $("mobVideoPreview");
+            const chaveVideo = `planejamento_${dataAtual}_treino_mob_video`;
+
+            function atualizarPreview() {
+                const url = campoVideo.value.trim();
+                if (!url) { preview.innerHTML = ""; return; }
+
+                if (/^https?:\/\//i.test(url)) {
+                    preview.innerHTML = `
+                        <a href="${url}" target="_blank" rel="noopener" class="video-preview-btn">
+                            ▶️ Abrir vídeo
+                        </a>
+                    `;
+                } else {
+                    preview.innerHTML = "";
+                }
+            }
+
+            campoVideo.value = localStorage.getItem(chaveVideo) || "";
+            atualizarPreview();
+
+            campoVideo.addEventListener("input", () => {
+                localStorage.setItem(chaveVideo, campoVideo.value);
+                atualizarPreview();
+            });
         }
-    }
-
-    campoVideo.value = localStorage.getItem(chaveVideo) || "";
-    atualizarPreview();
-
-    campoVideo.addEventListener("input", () => {
-        localStorage.setItem(chaveVideo, campoVideo.value);
-        atualizarPreview();
-    });
-}
 
 
         // ==================================================
@@ -959,7 +878,6 @@
                 true
             );
 
-            // Campo opcional "Como me senti"
             const chaveSentiuAberto = "planejamento_treino_cic_sentiu_aberto";
             const campoSentiu = $("campoSentiu");
             const toggleSentiu = $("toggleSentiu");
@@ -972,9 +890,7 @@
             toggleSentiu.addEventListener("click", () => {
                 const aberto = campoSentiu.classList.toggle("aberto");
                 localStorage.setItem(chaveSentiuAberto, aberto ? "true" : "false");
-                toggleSentiu.textContent = aberto
-                    ? "– remover \"Como me senti\""
-                    : "+ adicionar \"Como me senti\"";
+                toggleSentiu.textContent = aberto ? "– remover \"Como me senti\"" : "+ adicionar \"Como me senti\"";
             });
 
             salvarAuto($("cicSentiu"), `planejamento_${dataAtual}_treino_cic_sentiu`);
@@ -988,6 +904,113 @@
             );
 
             renderListaPRs("cic");
+        }
+
+
+        // ==================================================
+        // TRILHA
+        // ==================================================
+
+        function renderTrilha() {
+
+            $("conteudoTipo").innerHTML = `
+                <div class="conteudo-tipo">
+
+                    <div class="module-card" style="align-items: flex-start;">
+                        <span class="icon">📋</span>
+                        <div style="width: 100%;">
+                            <h2>Planejamento da trilha</h2>
+
+                            <label class="campo-label" style="margin-top: 14px;">Local / nome</label>
+                            <input type="text" id="trilLocal" placeholder="Ex.: Pedra do Sino">
+
+                            <label class="campo-label" style="margin-top: 14px;">Data prevista</label>
+                            <input type="text" id="trilData" placeholder="Ex.: Sábado 21/09">
+
+                            <label class="campo-label" style="margin-top: 14px;">Quem vai</label>
+                            <input type="text" id="trilQuem" placeholder="Ex.: João, Pedro e eu">
+
+                            <label class="campo-label" style="margin-top: 14px;">Ponto de encontro</label>
+                            <input type="text" id="trilEncontro" placeholder="Ex.: Posto BR às 6h">
+                        </div>
+                    </div>
+
+                    <div class="module-card" style="align-items: flex-start;">
+                        <span class="icon">📏</span>
+                        <div style="width: 100%;">
+                            <h2>Dados da trilha</h2>
+
+                            <label class="campo-label" style="margin-top: 14px;">Distância (km)</label>
+                            <input type="text" id="trilDistancia" placeholder="Ex.: 12 → vira 12km">
+
+                            <label class="campo-label" style="margin-top: 14px;">Duração estimada</label>
+                            <input type="text" id="trilDuracao" placeholder="Ex.: 5h ida e volta">
+
+                            <label class="campo-label" style="margin-top: 14px;">Altimetria</label>
+                            <input type="text" id="trilAltimetria" placeholder="Ex.: 800m de subida">
+
+                            <label class="campo-label" style="margin-top: 14px;">Dificuldade</label>
+                            <div class="chips" id="trilDificuldadeChips"></div>
+                        </div>
+                    </div>
+
+                    <div class="module-card" style="align-items: flex-start;">
+                        <span class="icon">🎒</span>
+                        <div style="width: 100%;">
+                            <h2>Preparação</h2>
+
+                            <label class="campo-label" style="margin-top: 14px;">O que levar</label>
+                            <textarea id="trilLevar" rows="4"
+                                placeholder="Ex.: 2L de água, frutas, sanduíche, protetor solar, boné, casaco."></textarea>
+
+                            <label class="campo-label" style="margin-top: 14px;">Clima previsto</label>
+                            <input type="text" id="trilClima" placeholder="Ex.: Sol, 28°C, sem previsão de chuva">
+
+                            <label class="campo-label" style="margin-top: 14px;">Transporte / como chegar</label>
+                            <input type="text" id="trilTransporte" placeholder="Ex.: Carro do João, saída 5h30">
+                        </div>
+                    </div>
+
+                    <div class="module-card" style="align-items: flex-start;">
+                        <span class="icon">📝</span>
+                        <div style="width: 100%;">
+                            <h2>Pós-trilha</h2>
+                            <p style="color:#888; font-size:13px; margin-top:4px;">
+                                Preencha depois que voltar.
+                            </p>
+
+                            <label class="campo-label" style="margin-top: 14px;">Como foi</label>
+                            <textarea id="trilComoFoi" rows="4"
+                                placeholder="Ex.: Trilha pesada, mas visual incrível no topo."></textarea>
+
+                            <label class="campo-label" style="margin-top: 14px;">O que aprendi</label>
+                            <textarea id="trilAprendi" rows="4"
+                                placeholder="Ex.: Levar mais água da próxima; bota fez diferença."></textarea>
+                        </div>
+                    </div>
+
+                </div>
+            `;
+
+            salvarAuto($("trilLocal"),      `planejamento_${dataAtual}_treino_tril_local`);
+            salvarAuto($("trilData"),       `planejamento_${dataAtual}_treino_tril_data`);
+            salvarAuto($("trilQuem"),       `planejamento_${dataAtual}_treino_tril_quem`);
+            salvarAuto($("trilEncontro"),   `planejamento_${dataAtual}_treino_tril_encontro`);
+            salvarAutoKm($("trilDistancia"),`planejamento_${dataAtual}_treino_tril_distancia`);
+            salvarAuto($("trilDuracao"),    `planejamento_${dataAtual}_treino_tril_duracao`);
+            salvarAuto($("trilAltimetria"), `planejamento_${dataAtual}_treino_tril_altimetria`);
+            salvarAuto($("trilLevar"),      `planejamento_${dataAtual}_treino_tril_levar`);
+            salvarAuto($("trilClima"),      `planejamento_${dataAtual}_treino_tril_clima`);
+            salvarAuto($("trilTransporte"), `planejamento_${dataAtual}_treino_tril_transporte`);
+            salvarAuto($("trilComoFoi"),    `planejamento_${dataAtual}_treino_tril_como_foi`);
+            salvarAuto($("trilAprendi"),    `planejamento_${dataAtual}_treino_tril_aprendi`);
+
+            setupChips(
+                $("trilDificuldadeChips"),
+                ["Fácil", "Moderada", "Difícil", "Muito difícil"],
+                `planejamento_${dataAtual}_treino_tril_dificuldade`,
+                true
+            );
         }
 
 
@@ -1044,36 +1067,28 @@
 
 
         // ==================================================
-        // INDICADORES "JÁ PREENCHEU HOJE"
+        // INDICADORES
         // ==================================================
 
         function atualizarIndicadores() {
 
-            const tipos = ["musculacao", "corrida", "mobilidade", "ciclismo", "volei", "jiujitsu"];
+            const tipos = ["musculacao", "corrida", "mobilidade", "ciclismo", "trilha", "volei", "jiujitsu"];
+
+            const mapaChaves = {
+                musculacao: "musc_",
+                corrida:    "cor_",
+                mobilidade: "mob_",
+                ciclismo:   "cic_",
+                trilha:     "tril_",
+                volei:      "vol_",
+                jiujitsu:   "jj_"
+            };
 
             tipos.forEach(tipo => {
-
                 const dot = document.querySelector(`[data-dot="${tipo}"]`);
                 if (!dot) return;
 
                 const prefixo = `planejamento_${dataAtual}_treino_`;
-                const algumaChave = Object.keys(localStorage).some(k => {
-                    if (!k.startsWith(prefixo)) return false;
-                    const v = localStorage.getItem(k);
-                    return v !== null && v.trim() !== "" && v !== "false";
-                });
-
-                // Precisa corresponder ao tipo especificamente
-                // Mapeia tipo do botão → prefixo de chave
-                const mapaChaves = {
-                    musculacao: "musc_",
-                    corrida:    "cor_",
-                    mobilidade: "mob_",
-                    ciclismo:   "cic_",
-                    volei:      "vol_",
-                    jiujitsu:   "jj_"
-                };
-
                 const sub = mapaChaves[tipo];
 
                 const preencheu = Object.keys(localStorage).some(k => {
@@ -1097,6 +1112,7 @@
             corrida:    renderCorrida,
             mobilidade: renderMobilidade,
             ciclismo:   renderCiclismo,
+            trilha:     renderTrilha,
             volei:      renderVolei,
             jiujitsu:   renderJiujitsu
         };
@@ -1109,11 +1125,6 @@
             atualizarIndicadores();
         }
 
-
-        // ==================================================
-        // EVENTOS
-        // ==================================================
-
         document.querySelectorAll(".tipo-btn").forEach(btn => {
             btn.addEventListener("click", () => {
                 tipoAtivo = btn.dataset.tipo;
@@ -1121,11 +1132,6 @@
                 render();
             });
         });
-
-
-        // ==================================================
-        // INICIALIZA
-        // ==================================================
 
         render();
     </script>
