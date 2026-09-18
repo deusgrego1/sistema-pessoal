@@ -23,46 +23,96 @@
 
         <section class="modules">
 
+            <!-- DATA -->
+
             <div class="module-card">
                 <span class="icon">📅</span>
+
                 <div>
                     <h2>Data</h2>
                     <p id="data"></p>
                 </div>
             </div>
 
+
+            <!-- COMO ESTOU -->
+
             <div class="module-card">
+
                 <span class="icon">🌅</span>
+
                 <div>
+
                     <h2>Como estou hoje?</h2>
+
+                    <select id="estadoHoje">
+                        <option value="">Como você está?</option>
+                        <option value="😴 Cansado">😴 Cansado</option>
+                        <option value="😐 Normal">😐 Normal</option>
+                        <option value="🙂 Bem">🙂 Bem</option>
+                        <option value="🔥 Disposto">🔥 Disposto</option>
+                        <option value="😣 Sobrecarregado">😣 Sobrecarregado</option>
+                    </select>
+
                     <textarea
-                        placeholder="Como você está se sentindo hoje?"
-                        rows="4"
+                        id="motivoEstado"
+                        placeholder="Por quê? (opcional)"
+                        rows="3"
                     ></textarea>
+
                 </div>
+
             </div>
 
+
+            <!-- COMPROMISSOS -->
+
             <div class="module-card">
+
                 <span class="icon">📌</span>
+
                 <div>
+
                     <h2>Compromissos</h2>
-                    <textarea
-                        placeholder="Horários, compromissos ou acontecimentos fixos..."
-                        rows="4"
-                    ></textarea>
+
+                    <div id="listaCompromissos"></div>
+
+                    <button
+                        type="button"
+                        id="btnAdicionarCompromisso"
+                        class="back-button"
+                        style="margin-top:12px;"
+                    >
+                        ＋ Adicionar compromisso
+                    </button>
+
                 </div>
+
             </div>
 
+
+            <!-- INTENÇÃO -->
+
             <div class="module-card">
+
                 <span class="icon">🎯</span>
+
                 <div>
-                    <h2>Intenção do dia</h2>
+
+                    <h2>Como quero conduzir meu dia?</h2>
+
                     <textarea
+                        id="intencaoDia"
                         placeholder="Como você quer agir hoje?"
                         rows="4"
                     ></textarea>
+
                 </div>
+
             </div>
+
+
+            <!-- COPIAR DE ONTEM -->
 
             <button
                 type="button"
@@ -84,45 +134,185 @@
 
         </section>
 
+
         <a href="index.html" class="back-button">
             ← Voltar para Planejamento
         </a>
 
     </main>
 
+
     <script src="../../js/app.js"></script>
 
+
     <script>
+
         // ==================================================
-        // DATA VISÍVEL (respeita ?data=)
+        // DATA VISÍVEL
         // ==================================================
 
-        const paramsVisao = new URLSearchParams(window.location.search);
-        const dataParamVisao = paramsVisao.get("data");
+        const paramsVisao =
+            new URLSearchParams(window.location.search);
 
-        const hojeVisao = new Date();
+        const dataParamVisao =
+            paramsVisao.get("data");
+
+        const hojeVisao =
+            new Date();
 
         const dataBaseVisao =
-            (dataParamVisao && /^\d{4}-\d{2}-\d{2}$/.test(dataParamVisao))
+            (dataParamVisao &&
+            /^\d{4}-\d{2}-\d{2}$/.test(dataParamVisao))
+
                 ? dataParamVisao
+
                 : (() => {
-                    const y = hojeVisao.getFullYear();
-                    const m = String(hojeVisao.getMonth() + 1).padStart(2, "0");
-                    const d = String(hojeVisao.getDate()).padStart(2, "0");
+
+                    const y =
+                        hojeVisao.getFullYear();
+
+                    const m =
+                        String(
+                            hojeVisao.getMonth() + 1
+                        ).padStart(2, "0");
+
+                    const d =
+                        String(
+                            hojeVisao.getDate()
+                        ).padStart(2, "0");
+
                     return `${y}-${m}-${d}`;
+
                 })();
 
-        const [aV, mV, dV] = dataBaseVisao.split("-").map(Number);
-        const dataObjVisao = new Date(aV, mV - 1, dV);
 
-        const dataFormatada = dataObjVisao.toLocaleDateString("pt-BR", {
-            weekday: "long",
-            day: "2-digit",
-            month: "long",
-            year: "numeric"
-        });
+        const [aV, mV, dV] =
+            dataBaseVisao
+                .split("-")
+                .map(Number);
 
-        document.getElementById("data").textContent = dataFormatada;
+
+        const dataObjVisao =
+            new Date(
+                aV,
+                mV - 1,
+                dV
+            );
+
+
+        const dataFormatada =
+            dataObjVisao.toLocaleDateString(
+                "pt-BR",
+                {
+                    weekday: "long",
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric"
+                }
+            );
+
+
+        document
+            .getElementById("data")
+            .textContent = dataFormatada;
+
+
+        // ==================================================
+        // COMPROMISSO — ESTRUTURA VISUAL
+        // ==================================================
+
+        const listaCompromissos =
+            document.getElementById(
+                "listaCompromissos"
+            );
+
+
+        const btnAdicionarCompromisso =
+            document.getElementById(
+                "btnAdicionarCompromisso"
+            );
+
+
+        function adicionarCompromisso() {
+
+            const compromisso =
+                document.createElement("div");
+
+            compromisso.className =
+                "module-card";
+
+            compromisso.style.marginTop = "12px";
+
+            compromisso.innerHTML = `
+
+                <div style="width:100%;">
+
+                    <input
+                        type="time"
+                        placeholder="Horário"
+                    >
+
+                    <input
+                        type="text"
+                        placeholder="📌 Compromisso"
+                    >
+
+                    <input
+                        type="text"
+                        placeholder="⏱️ Duração"
+                    >
+
+                    <input
+                        type="text"
+                        placeholder="📍 Local (opcional)"
+                    >
+
+                    <textarea
+                        placeholder="📝 Observação (opcional)"
+                        rows="2"
+                    ></textarea>
+
+                    <button
+                        type="button"
+                        class="back-button"
+                        style="margin-top:8px;"
+                    >
+                        🗑️ Remover
+                    </button>
+
+                </div>
+
+            `;
+
+
+            const btnRemover =
+                compromisso.querySelector(
+                    "button"
+                );
+
+
+            btnRemover.addEventListener(
+                "click",
+                () => {
+
+                    compromisso.remove();
+
+                }
+            );
+
+
+            listaCompromissos.appendChild(
+                compromisso
+            );
+
+        }
+
+
+        btnAdicionarCompromisso
+            .addEventListener(
+                "click",
+                adicionarCompromisso
+            );
 
 
         // ==================================================
@@ -138,17 +328,29 @@
                     "Isso vai sobrescrever o que já estiver preenchido aqui."
                 )) return;
 
+
                 const copiados =
-                    window.copiarDoDiaAnterior("visao", dataBaseVisao);
+                    window.copiarDoDiaAnterior(
+                        "visao",
+                        dataBaseVisao
+                    );
+
 
                 if (copiados === 0) {
-                    alert("Nada encontrado para o dia anterior.");
+
+                    alert(
+                        "Nada encontrado para o dia anterior."
+                    );
+
                     return;
+
                 }
+
 
                 window.location.reload();
 
             });
+
     </script>
 
 </body>
