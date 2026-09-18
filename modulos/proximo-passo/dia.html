@@ -18,13 +18,93 @@
             margin: 14px 0 8px;
         }
 
-        /* Prioridade fixa */
+        /* Cabeçalho de data */
+
+        .data-cabecalho {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: #17171a;
+            border: 1px solid #252529;
+            margin-bottom: 4px;
+        }
+
+        .data-titulo {
+            font-size: 15px;
+            font-weight: 600;
+            color: #f5f5f5;
+        }
+
+        .data-sub {
+            font-size: 12px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .link-revisao {
+            font-size: 12px;
+            color: #8ab4f8;
+            text-decoration: none;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid #2c3a55;
+            background: #1a2235;
+            flex-shrink: 0;
+        }
+
+        .link-revisao:hover {
+            background: #232f4a;
+        }
+
+        /* Bloco referência (read-only) */
+
+        .bloco-ref {
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: #16161a;
+            border: 1px solid #252529;
+            border-left: 3px solid #55555c;
+            font-size: 13px;
+            color: #bbb;
+            line-height: 1.5;
+        }
+
+        .bloco-ref .ref-titulo {
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .bloco-ref .ref-item {
+            margin-bottom: 10px;
+        }
+
+        .bloco-ref .ref-item:last-child { margin-bottom: 0; }
+
+        .bloco-ref .ref-label {
+            color: #777;
+            font-size: 11px;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .bloco-ref .ref-vazio {
+            color: #555;
+            font-style: italic;
+        }
+
+        /* Prioridades */
 
         .prio-fixa {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 14px;
+            padding: 12px 14px;
             background: #1c1c20;
             border: 1px solid #252529;
             border-left: 3px solid #d4a94a;
@@ -37,7 +117,14 @@
             flex-shrink: 0;
         }
 
-        .prio-fixa input {
+        .prio-fixa input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .prio-fixa input[type="text"] {
             flex: 1;
             margin-top: 0 !important;
             background: transparent !important;
@@ -48,7 +135,12 @@
             outline: none;
         }
 
-        .prio-fixa input::placeholder { color: #666; }
+        .prio-fixa input[type="text"]::placeholder { color: #666; }
+
+        .prio-fixa.concluida input[type="text"] {
+            text-decoration: line-through;
+            color: #777;
+        }
 
         .prio-fixa .tag {
             font-size: 10px;
@@ -61,7 +153,7 @@
             flex-shrink: 0;
         }
 
-        /* Lista simples */
+        /* Listas genéricas */
 
         .item-linha {
             display: flex;
@@ -121,6 +213,75 @@
         }
 
         .btn-adicionar:hover { border-color: #666; color: #ccc; background: #1a1a1e; }
+
+        /* Colapsáveis */
+
+        details.bloco-expansivel {
+            background: #17171a;
+            border: 1px solid #252529;
+            border-radius: 16px;
+            padding: 16px;
+        }
+
+        details.bloco-expansivel summary {
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            outline: none;
+        }
+
+        details.bloco-expansivel summary::-webkit-details-marker { display: none; }
+
+        details.bloco-expansivel summary::after {
+            content: "▼";
+            margin-left: auto;
+            color: #777;
+            font-size: 11px;
+            transition: 0.2s;
+        }
+
+        details.bloco-expansivel[open] summary::after { transform: rotate(180deg); }
+
+        details.bloco-expansivel summary h2 {
+            font-size: 15px;
+            color: #f5f5f5;
+        }
+
+        details.bloco-expansivel summary .mini-titulo {
+            color: #666;
+            font-size: 12px;
+        }
+
+        /* Snapshot */
+
+        .snapshot-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #252529;
+        }
+
+        .snapshot-item:last-child { border-bottom: none; }
+
+        .snapshot-data {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .snapshot-linha {
+            font-size: 13px;
+            color: #ccc;
+            padding: 3px 0;
+        }
+
+        .snapshot-vazio {
+            color: #666;
+            font-size: 13px;
+            padding: 8px 0;
+        }
     </style>
 </head>
 
@@ -138,29 +299,53 @@
 
         <section class="modules">
 
+            <!-- DATA AUTOMÁTICA -->
+
+            <div class="data-cabecalho">
+                <div>
+                    <div class="data-titulo" id="tituloData">Amanhã</div>
+                    <div class="data-sub" id="subData"></div>
+                </div>
+                <a href="#" id="linkRevisao" class="link-revisao">
+                    📊 Ver Revisão do Dia
+                </a>
+            </div>
+
+
+            <!-- REFERÊNCIA DA REVISÃO DE ONTEM -->
+
+            <div class="bloco-ref" id="blocoRef" style="display:none;">
+                <div class="ref-titulo">📌 De onde você veio</div>
+                <div id="conteudoRef"></div>
+            </div>
+
+
             <!-- PRIORIDADE FIXA -->
 
             <div class="module-card" style="align-items: flex-start;">
                 <span class="icon">🎯</span>
                 <div style="width: 100%;">
-                    <h2>Prioridade fixa</h2>
+                    <h2>Prioridades</h2>
                     <p style="color:#888; font-size:13px; margin: 6px 0 14px;">
-                        A primeira linha é obrigatória. Se amanhã só der para fazer uma coisa, é essa.
+                        A prioridade 1 vira automaticamente a Prioridade 1 do dia de amanhã no Planejamento.
                     </p>
 
-                    <div class="prio-fixa">
+                    <div class="prio-fixa" id="prioWrap1">
                         <span class="num">1️⃣</span>
+                        <input type="checkbox" id="prio1Check">
                         <input type="text" id="prio1" placeholder="Prioridade 1 (obrigatória)">
                         <span class="tag">Fixa</span>
                     </div>
 
-                    <div class="prio-fixa" style="border-left-color: #666;">
+                    <div class="prio-fixa" id="prioWrap2" style="border-left-color: #666;">
                         <span class="num">2️⃣</span>
+                        <input type="checkbox" id="prio2Check">
                         <input type="text" id="prio2" placeholder="Prioridade 2 (opcional)">
                     </div>
 
-                    <div class="prio-fixa" style="border-left-color: #666;">
+                    <div class="prio-fixa" id="prioWrap3" style="border-left-color: #666;">
                         <span class="num">3️⃣</span>
+                        <input type="checkbox" id="prio3Check">
                         <input type="text" id="prio3" placeholder="Prioridade 3 (opcional)">
                     </div>
                 </div>
@@ -173,9 +358,6 @@
                 <span class="icon">📌</span>
                 <div style="width: 100%;">
                     <h2>Tarefas importantes</h2>
-                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
-                        Outras ações que precisam acontecer amanhã.
-                    </p>
                     <div id="listaTarefas"></div>
                     <button type="button" class="btn-adicionar" id="btnAddTarefa">
                         ＋ Adicionar tarefa
@@ -190,9 +372,6 @@
                 <span class="icon">📅</span>
                 <div style="width: 100%;">
                     <h2>Compromissos</h2>
-                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
-                        Horários já marcados ou que não podem ser esquecidos.
-                    </p>
                     <div id="listaCompromissos"></div>
                     <button type="button" class="btn-adicionar" id="btnAddCompromisso">
                         ＋ Adicionar compromisso
@@ -207,9 +386,6 @@
                 <span class="icon">🔄</span>
                 <div>
                     <h2>Pendências</h2>
-                    <p style="color:#888; font-size:13px; margin: 6px 0 10px;">
-                        O que ficou para trás e vale considerar amanhã.
-                    </p>
                     <textarea id="pendencias" rows="4"
                         placeholder="Ex.: não terminei a pesquisa dos potenciais clientes."></textarea>
                 </div>
@@ -222,13 +398,42 @@
                 <span class="icon">🧠</span>
                 <div>
                     <h2>Lembrar</h2>
-                    <p style="color:#888; font-size:13px; margin: 6px 0 10px;">
-                        Algo para estar na cabeça amanhã — comportamento, decisão ou percepção.
-                    </p>
                     <textarea id="lembrar" rows="3"
-                        placeholder="Ex.: começar pelo contato com os clientes antes de abrir o YouTube."></textarea>
+                        placeholder="Ex.: começar pelo contato com clientes antes de abrir o YouTube."></textarea>
                 </div>
             </div>
+
+
+            <!-- COMO FOI -->
+
+            <details class="bloco-expansivel">
+                <summary>
+                    <span class="icon">📝</span>
+                    <h2>Como foi este dia?</h2>
+                    <span class="mini-titulo" style="margin-left: 6px;">
+                        (preencher depois)
+                    </span>
+                </summary>
+                <textarea
+                    id="comoFoi"
+                    rows="4"
+                    placeholder="O que funcionou, o que travou, o que você levaria para o próximo dia."
+                    style="margin-top: 14px;"
+                ></textarea>
+            </details>
+
+
+            <!-- HISTÓRICO DE DECISÕES -->
+
+            <details class="bloco-expansivel">
+                <summary>
+                    <span class="icon">🕰️</span>
+                    <h2>Decisões anteriores</h2>
+                </summary>
+                <div id="historico" style="margin-top: 14px;">
+                    <p class="snapshot-vazio">Carregando…</p>
+                </div>
+            </details>
 
         </section>
 
@@ -241,17 +446,125 @@
 
     <script>
         // ==================================================
-        // PRIORIDADES FIXAS
+        // DATA — AMANHÃ
         // ==================================================
+
+        const hoje = new Date();
+        const amanha = new Date(hoje);
+        amanha.setDate(amanha.getDate() + 1);
+
+        const ontem = new Date(hoje);
+        ontem.setDate(ontem.getDate() - 1);
+
+        function fmtISO(dt) {
+            const yy = dt.getFullYear();
+            const mm = String(dt.getMonth() + 1).padStart(2, "0");
+            const dd = String(dt.getDate()).padStart(2, "0");
+            return `${yy}-${mm}-${dd}`;
+        }
+
+        function fmtBRCurto(iso) {
+            const [y, m, d] = iso.split("-");
+            return `${d}/${m}`;
+        }
+
+        function nomeDia(iso) {
+            const [a, m, d] = iso.split("-").map(Number);
+            const dt = new Date(a, m - 1, d);
+            const nomes = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+            return nomes[dt.getDay()];
+        }
+
+        const dataAmanha = fmtISO(amanha);
+        const dataOntem = fmtISO(ontem);
+
+        // Cabeçalho
+        document.getElementById("tituloData").textContent =
+            `${nomeDia(dataAmanha)}, ${fmtBRCurto(dataAmanha)}`;
+        document.getElementById("subData").textContent =
+            "Prioridade 1 vira Prioridade 1 do dia seguinte no Planejamento.";
+
+        // Link para a Revisão do dia de hoje (que é a Revisão de "ontem" do ponto de vista de amanhã)
+        document.getElementById("linkRevisao").href =
+            `../revisao/dia.html?data=${fmtISO(hoje)}`;
+
+
+        // ==================================================
+        // REFERÊNCIA — LEITURA DA REVISÃO DO DIA
+        // ==================================================
+
+        (function blocoRef() {
+
+            const ondeParei = localStorage.getItem(`planejamento_${fmtISO(hoje)}_revisao_onde_parei`);
+            const aprendi   = localStorage.getItem(`planejamento_${fmtISO(hoje)}_revisao_aprendi`);
+            const funcionou = localStorage.getItem(`planejamento_${fmtISO(hoje)}_revisao_funcionou`);
+
+            const itens = [];
+
+            if (ondeParei && ondeParei.trim()) {
+                itens.push({ label: "📍 Onde parei", valor: ondeParei.trim() });
+            }
+            if (funcionou && funcionou.trim()) {
+                itens.push({ label: "🔎 O que funcionou / atrapalhou", valor: funcionou.trim() });
+            }
+            if (aprendi && aprendi.trim()) {
+                itens.push({ label: "💡 O que aprendi e devo mudar", valor: aprendi.trim() });
+            }
+
+            if (itens.length === 0) return;
+
+            const bloco = document.getElementById("blocoRef");
+            const container = document.getElementById("conteudoRef");
+
+            bloco.style.display = "block";
+
+            container.innerHTML = itens.map(i => `
+                <div class="ref-item">
+                    <span class="ref-label">${i.label}</span>
+                    ${i.valor}
+                </div>
+            `).join("");
+
+        })();
+
+
+        // ==================================================
+        // PRIORIDADES FIXAS + SINCRONIZAÇÃO COM PLANEJAMENTO
+        // ==================================================
+
+        const PREFIXO = "planejamento_pp_dia_";
 
         ["prio1", "prio2", "prio3"].forEach((id, i) => {
             const campo = document.getElementById(id);
-            const chave = `planejamento_pp_dia_prioridade_${i + 1}`;
-            const salvo = localStorage.getItem(chave);
-            if (salvo !== null) campo.value = salvo;
+            const check = document.getElementById(id + "Check");
+            const wrap = document.getElementById("prioWrap" + (i + 1));
+            const chaveTexto = `${PREFIXO}prioridade_${i + 1}`;
+            const chaveCheck = `${PREFIXO}prioridade_${i + 1}_check`;
 
+            // Carrega
+            const textoSalvo = localStorage.getItem(chaveTexto);
+            const checkSalvo = localStorage.getItem(chaveCheck) === "true";
+            if (textoSalvo !== null) campo.value = textoSalvo;
+            check.checked = checkSalvo;
+            wrap.classList.toggle("concluida", checkSalvo);
+
+            // Texto
             campo.addEventListener("input", () => {
-                localStorage.setItem(chave, campo.value);
+                localStorage.setItem(chaveTexto, campo.value);
+
+                // Espelha prioridade 1 no Planejamento do dia de amanhã
+                if (i === 0) {
+                    localStorage.setItem(
+                        `planejamento_${dataAmanha}_prioridades_0`,
+                        campo.value
+                    );
+                }
+            });
+
+            // Checkbox
+            check.addEventListener("change", () => {
+                localStorage.setItem(chaveCheck, check.checked ? "true" : "false");
+                wrap.classList.toggle("concluida", check.checked);
             });
         });
 
@@ -261,8 +574,9 @@
         // ==================================================
 
         const campos = [
-            { id: "pendencias", chave: "planejamento_pp_dia_pendencias" },
-            { id: "lembrar",    chave: "planejamento_pp_dia_lembrar" }
+            { id: "pendencias", chave: `${PREFIXO}pendencias` },
+            { id: "lembrar",    chave: `${PREFIXO}lembrar` },
+            { id: "comoFoi",    chave: `${PREFIXO}como_foi` }
         ];
 
         campos.forEach(({ id, chave }) => {
@@ -274,12 +588,11 @@
 
 
         // ==================================================
-        // LISTAS (TAREFAS / COMPROMISSOS)
+        // LISTAS
         // ==================================================
 
-        function setupLista(config) {
+        function setupLista(chave, containerId, btnId, comCheckbox) {
 
-            const { chave, containerId, btnId, comCheckbox } = config;
             const container = document.getElementById(containerId);
             const btnAdd = document.getElementById(btnId);
 
@@ -294,7 +607,6 @@
             }
 
             function render() {
-
                 container.innerHTML = "";
 
                 itens.forEach((item, i) => {
@@ -350,19 +662,102 @@
             render();
         }
 
-        setupLista({
-            chave: "planejamento_pp_dia_tarefas",
-            containerId: "listaTarefas",
-            btnId: "btnAddTarefa",
-            comCheckbox: true
-        });
+        setupLista(`${PREFIXO}tarefas`, "listaTarefas", "btnAddTarefa", true);
+        setupLista(`${PREFIXO}compromissos`, "listaCompromissos", "btnAddCompromisso", false);
 
-        setupLista({
-            chave: "planejamento_pp_dia_compromissos",
-            containerId: "listaCompromissos",
-            btnId: "btnAddCompromisso",
-            comCheckbox: false
-        });
+
+        // ==================================================
+        // HISTÓRICO DE DECISÕES (SNAPSHOT AUTOMÁTICO)
+        // ==================================================
+
+        (function snapshots() {
+
+            const chaveUltimo = "planejamento_pp_dia_ultima_data";
+            const ultimaData = localStorage.getItem(chaveUltimo);
+
+            // Se abriu com uma data diferente da última, arquiva o snapshot anterior
+            if (ultimaData && ultimaData !== dataAmanha) {
+
+                const chaves = Object.keys(localStorage).filter(k =>
+                    k.startsWith(PREFIXO) &&
+                    !k.includes("_snapshot_") &&
+                    !k.endsWith("_ultima_data")
+                );
+
+                const dados = {};
+                chaves.forEach(k => {
+                    const v = localStorage.getItem(k);
+                    if (v !== null && v.trim() !== "" && v !== "false") {
+                        dados[k] = v;
+                    }
+                });
+
+                if (Object.keys(dados).length > 0) {
+                    localStorage.setItem(
+                        `planejamento_pp_dia_snapshot_${ultimaData}`,
+                        JSON.stringify(dados)
+                    );
+                }
+            }
+
+            localStorage.setItem(chaveUltimo, dataAmanha);
+
+            // Render histórico
+            const container = document.getElementById("historico");
+
+            const snapshots = Object.keys(localStorage)
+                .filter(k => k.startsWith("planejamento_pp_dia_snapshot_"))
+                .sort()
+                .reverse();
+
+            if (snapshots.length === 0) {
+                container.innerHTML = `<p class="snapshot-vazio">Nada arquivado ainda. Ao virar o dia, o anterior é salvo aqui.</p>`;
+                return;
+            }
+
+            let html = "";
+
+            snapshots.slice(0, 20).forEach(chave => {
+
+                const data = chave.replace("planejamento_pp_dia_snapshot_", "");
+
+                let dados = {};
+                try {
+                    dados = JSON.parse(localStorage.getItem(chave)) || {};
+                } catch (e) {}
+
+                const prioridades = [];
+                [1, 2, 3].forEach(n => {
+                    const v = dados[`${PREFIXO}prioridade_${n}`];
+                    if (v) prioridades.push(`P${n}: ${v}`);
+                });
+
+                const pendencias = dados[`${PREFIXO}pendencias`];
+                const comoFoi = dados[`${PREFIXO}como_foi`];
+
+                html += `<div class="snapshot-item">`;
+                html += `<div class="snapshot-data">${nomeDia(data)}, ${fmtBRCurto(data)}</div>`;
+
+                if (prioridades.length) {
+                    prioridades.forEach(p => {
+                        html += `<div class="snapshot-linha">🎯 ${p}</div>`;
+                    });
+                }
+
+                if (pendencias && pendencias.trim()) {
+                    html += `<div class="snapshot-linha">🔄 ${pendencias.trim().slice(0, 120)}</div>`;
+                }
+
+                if (comoFoi && comoFoi.trim()) {
+                    html += `<div class="snapshot-linha" style="color: #888;">📝 ${comoFoi.trim().slice(0, 120)}</div>`;
+                }
+
+                html += `</div>`;
+            });
+
+            container.innerHTML = html;
+
+        })();
     </script>
 
 </body>
