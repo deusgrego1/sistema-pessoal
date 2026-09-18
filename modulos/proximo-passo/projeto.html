@@ -51,7 +51,6 @@
         .chip.st-travado.selecionado    { background: #331f1f; border-color: #d45a5a; color: #e08b8b; }
         .chip.st-pausado.selecionado    { background: #332a1a; border-color: #d4954a; color: #e0b878; }
 
-        /* SELECT do ciclo/conexão */
         select.sel-vinculo {
             width: 100%;
             margin-top: 10px;
@@ -67,6 +66,204 @@
         select.sel-vinculo:focus {
             border-color: #55555c;
             background: #262629;
+        }
+
+        /* ===== Prazo — date input + atalhos ===== */
+        .prazo-linha {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .prazo-input {
+            width: 100%;
+            padding: 12px;
+            background: #222225;
+            color: #f5f5f5;
+            border: 1px solid #333338;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            color-scheme: dark;
+        }
+
+        .prazo-input:focus {
+            border-color: #55555c;
+            background: #262629;
+        }
+
+        .prazo-input::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            filter: invert(0.7);
+        }
+
+        .prazo-input::-webkit-calendar-picker-indicator:hover {
+            filter: invert(1);
+        }
+
+        .prazo-atalhos {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .prazo-atalho {
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid #333338;
+            background: #1a1a1e;
+            color: #aaa;
+            border-radius: 8px;
+            transition: 0.15s;
+        }
+
+        .prazo-atalho:hover {
+            background: #222228;
+            color: #e0e0e0;
+            border-color: #555;
+        }
+
+        .prazo-limpar {
+            color: #d45a5a;
+            border-color: #4a2f2f;
+        }
+
+        .prazo-limpar:hover {
+            background: #2a1a1a;
+            color: #e08b8b;
+            border-color: #d45a5a;
+        }
+
+        /* ===== Timer de semanas ===== */
+        .timer-card {
+            padding: 20px 20px 16px;
+        }
+
+        .timer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .timer-titulo {
+            font-size: 15px;
+            font-weight: 600;
+            color: #f5f5f5;
+            margin-bottom: 4px;
+        }
+
+        .timer-sub {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .timer-filtros {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .timer-filtros button {
+            padding: 5px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid #333338;
+            background: #1a1a1e;
+            color: #aaa;
+            border-radius: 8px;
+            transition: 0.15s;
+        }
+
+        .timer-filtros button:hover {
+            background: #222228;
+            color: #e0e0e0;
+        }
+
+        .timer-filtros button.ativo {
+            background: #2e2e33;
+            border-color: #666;
+            color: #fff;
+        }
+
+        .timer-grid-wrap {
+            display: flex;
+            justify-content: center;
+        }
+
+        .timer-grid {
+            display: grid;
+            grid-template-columns: repeat(13, minmax(0, 1fr));
+            gap: 4px;
+            width: 100%;
+            max-width: 520px;
+        }
+
+        .timer-cell {
+            aspect-ratio: 1;
+            border-radius: 2px;
+            background: #131316;
+            border: 1px solid #1e1e22;
+            box-sizing: border-box;
+            transition: 0.2s;
+        }
+
+        .timer-cell.passada {
+            background: #333338;
+            border-color: #3a3a40;
+        }
+
+        .timer-cell.ativa {
+            background: #2ea043;
+            border-color: #2ea043;
+        }
+
+        .timer-cell.atual {
+            background: #333338;
+            border: 2px solid #f5f5f5;
+        }
+
+        .timer-cell.atual.ativa {
+            background: #2ea043;
+            border-color: #f5f5f5;
+        }
+
+        .timer-legenda {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 14px;
+            font-size: 11px;
+            color: #666;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .timer-legenda .mini {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            box-sizing: border-box;
+        }
+
+        .timer-legenda .mini.passada {
+            background: #333338;
+            border: 1px solid #3a3a40;
+        }
+
+        .timer-legenda .mini.ativa {
+            background: #2ea043;
+            border: 1px solid #2ea043;
+        }
+
+        .timer-legenda .mini.atual {
+            background: #333338;
+            border: 2px solid #f5f5f5;
         }
 
         .contagem {
@@ -104,41 +301,6 @@
             transition: 0.15s; letter-spacing: 1px;
         }
         .btn-foco:hover { border-color: #5a7ab5; transform: translateY(-1px); }
-
-        .heatmap-wrap { overflow-x: auto; padding-bottom: 6px; }
-        .heatmap {
-            display: grid;
-            grid-template-rows: repeat(7, 12px);
-            grid-auto-flow: column;
-            grid-auto-columns: 12px;
-            gap: 3px; padding: 4px 0;
-        }
-        .heat-cell {
-            width: 12px; height: 12px; border-radius: 2px;
-            background: #1a1a1e; cursor: pointer; transition: 0.1s;
-        }
-        .heat-cell:hover { outline: 1px solid #555; }
-        .heat-cell.n1 { background: #0e4429; }
-        .heat-cell.n2 { background: #006d32; }
-        .heat-cell.n3 { background: #26a641; }
-        .heat-cell.n4 { background: #39d353; }
-
-        .heatmap-legenda {
-            display: flex; align-items: center; gap: 6px;
-            margin-top: 10px; font-size: 11px; color: #666;
-        }
-        .heatmap-legenda .heat-cell { cursor: default; }
-
-        .heatmap-filtros { display: flex; gap: 6px; margin-bottom: 12px; }
-        .heatmap-filtros button {
-            padding: 5px 12px; font-size: 12px; cursor: pointer;
-            border: 1px solid #333338; background: #1a1a1e;
-            color: #aaa; border-radius: 8px; transition: 0.15s;
-        }
-        .heatmap-filtros button:hover { background: #222228; color: #e0e0e0; }
-        .heatmap-filtros button.ativo {
-            background: #2e2e33; border-color: #666; color: #fff;
-        }
 
         .progresso-wrap { display: flex; align-items: center; gap: 12px; }
         .progresso-barra {
@@ -227,8 +389,6 @@
             padding: 4px 10px; cursor: pointer; transition: 0.15s;
         }
         .bloqueio-linha .btn-destravar:hover { background: #4caf50; color: #000; }
-
-        /* ===== Diário — timeline ===== */
 
         .diario-item {
             position: relative;
@@ -410,136 +570,7 @@
             color: #bbb; margin: 3px 4px 3px 0;
         }
 
-        /* ===== Timer de semanas ===== */
-        .timer-card {
-            padding: 20px 20px 16px;
-        }
-
-        .timer-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-
-        .timer-titulo {
-            font-size: 15px;
-            font-weight: 600;
-            color: #f5f5f5;
-            margin-bottom: 4px;
-        }
-
-        .timer-sub {
-            font-size: 12px;
-            color: #888;
-        }
-
-        .timer-filtros {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .timer-filtros button {
-            padding: 5px 12px;
-            font-size: 12px;
-            cursor: pointer;
-            border: 1px solid #333338;
-            background: #1a1a1e;
-            color: #aaa;
-            border-radius: 8px;
-            transition: 0.15s;
-        }
-
-        .timer-filtros button:hover {
-            background: #222228;
-            color: #e0e0e0;
-        }
-
-        .timer-filtros button.ativo {
-            background: #2e2e33;
-            border-color: #666;
-            color: #fff;
-        }
-
-        .timer-grid-wrap {
-            display: flex;
-            justify-content: center;
-        }
-
-        .timer-grid {
-            display: grid;
-            grid-template-columns: repeat(13, minmax(0, 1fr));
-            gap: 4px;
-            width: 100%;
-            max-width: 520px;
-        }
-
-        .timer-cell {
-            aspect-ratio: 1;
-            border-radius: 2px;
-            background: #131316;
-            border: 1px solid #1e1e22;
-            box-sizing: border-box;
-            transition: 0.2s;
-        }
-
-        .timer-cell.passada {
-            background: #333338;
-            border-color: #3a3a40;
-        }
-
-        .timer-cell.ativa {
-            background: #2ea043;
-            border-color: #2ea043;
-        }
-
-        .timer-cell.atual {
-            background: #333338;
-            border: 2px solid #f5f5f5;
-        }
-
-        .timer-cell.atual.ativa {
-            background: #2ea043;
-            border-color: #f5f5f5;
-        }
-
-        .timer-legenda {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 14px;
-            font-size: 11px;
-            color: #666;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .timer-legenda .mini {
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
-            box-sizing: border-box;
-        }
-
-        .timer-legenda .mini.passada {
-            background: #333338;
-            border: 1px solid #3a3a40;
-        }
-
-        .timer-legenda .mini.ativa {
-            background: #2ea043;
-            border: 1px solid #2ea043;
-        }
-
-        .timer-legenda .mini.atual {
-            background: #333338;
-            border: 2px solid #f5f5f5;
-        }
-
-        
+        /* ===== Modo compacto ===== */
         body.modo-compacto .colapsavel-compacto { display: none; }
 
         .banner-parado, .banner-sprint {
@@ -670,12 +701,10 @@
         body.modo-leitura .btn-remover-linha,
         body.modo-leitura .btn-destravar,
         body.modo-leitura .btn-acao-foco,
-        body.modo-leitura .heatmap-filtros,
         body.modo-leitura .acoes-fim,
-        body.modo-leitura #barraAcoesTopo { display: none !important; }
-        body.modo-leitura .modules {
-            background: #17171a;
-        }
+        body.modo-leitura #barraAcoesTopo,
+        body.modo-leitura .prazo-atalhos,
+        body.modo-leitura .timer-filtros { display: none !important; }
     </style>
 </head>
 
@@ -692,8 +721,6 @@
         </header>
 
         <section class="modules">
-
-            <!-- TELA INICIAL (só aparece quando não há projeto ativo) -->
 
             <div id="telaInicial">
                 <span class="grande">🎯</span>
@@ -714,8 +741,6 @@
             </div>
 
 
-            <!-- CONTEÚDO DO PROJETO (oculto enquanto não há projeto) -->
-
             <div id="conteudoProjeto" style="display: contents;">
 
                 <div id="painelFoco">
@@ -733,33 +758,35 @@
                     </div>
                 </div>
 
-                            <div class="module-card timer-card">
-                <div class="timer-header">
-                    <div>
-                        <div class="timer-titulo">📅 Linha do tempo do projeto</div>
-                        <div class="timer-sub" id="timerSub">—</div>
+
+                <div class="module-card timer-card">
+                    <div class="timer-header">
+                        <div>
+                            <div class="timer-titulo">📅 Linha do tempo do projeto</div>
+                            <div class="timer-sub" id="timerSub">—</div>
+                        </div>
+                        <div class="timer-filtros" id="timerFiltros">
+                            <button type="button" data-meses="1">1 mês</button>
+                            <button type="button" data-meses="3">3 meses</button>
+                            <button type="button" data-meses="6">6 meses</button>
+                            <button type="button" data-meses="12" class="ativo">12 meses</button>
+                        </div>
                     </div>
-                    <div class="timer-filtros" id="timerFiltros">
-                        <button type="button" data-meses="1">1 mês</button>
-                        <button type="button" data-meses="3">3 meses</button>
-                        <button type="button" data-meses="6">6 meses</button>
-                        <button type="button" data-meses="12" class="ativo">12 meses</button>
+
+                    <div class="timer-grid-wrap">
+                        <div class="timer-grid" id="timerGrid"></div>
+                    </div>
+
+                    <div class="timer-legenda">
+                        <div class="mini passada"></div>
+                        <span>sem atividade</span>
+                        <div class="mini ativa"></div>
+                        <span>com atividade</span>
+                        <div class="mini atual"></div>
+                        <span>semana atual</span>
                     </div>
                 </div>
 
-                <div class="timer-grid-wrap">
-                    <div class="timer-grid" id="timerGrid"></div>
-                </div>
-
-                <div class="timer-legenda">
-                    <div class="mini passada"></div>
-                    <span>sem atividade</span>
-                    <div class="mini ativa"></div>
-                    <span>com atividade</span>
-                    <div class="mini atual"></div>
-                    <span>semana atual</span>
-                </div>
-            </div>
 
                 <div class="banner-sprint" id="bannerSprint" style="display:none;">
                     <div class="txt" id="bannerSprintTexto"></div>
@@ -840,7 +867,16 @@
                         </select>
 
                         <label class="campo-label">Prazo (opcional)</label>
-                        <input type="text" id="prazoProjeto" placeholder="Ex.: 15/12/2026">
+                        <div class="prazo-linha">
+                            <input type="date" id="prazoProjeto" class="prazo-input">
+                            <div class="prazo-atalhos">
+                                <button type="button" class="prazo-atalho" data-dias="7">+7d</button>
+                                <button type="button" class="prazo-atalho" data-dias="30">+30d</button>
+                                <button type="button" class="prazo-atalho" data-dias="90">+90d</button>
+                                <button type="button" class="prazo-atalho" data-dias="365">+1 ano</button>
+                                <button type="button" class="prazo-atalho prazo-limpar" data-dias="0">✕</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1194,10 +1230,6 @@
         ];
 
 
-        // ==================================================
-        // CARREGA ESTADO
-        // ==================================================
-
         let projetoAtivoExiste = false;
         let projeto = {};
 
@@ -1242,10 +1274,6 @@
         let mesesHeatmap = Number(localStorage.getItem(CHAVE_HEAT_MESES)) || 12;
 
 
-        // ==================================================
-        // HELPERS
-        // ==================================================
-
         function salvar() {
             projeto.ultimaEdicao = new Date().toISOString();
             localStorage.setItem(CHAVE_ATIVO, JSON.stringify(projeto));
@@ -1253,6 +1281,7 @@
             atualizarPulso();
             esconderBannerSeEditou();
             atualizarTituloAba();
+            renderTimerSemanas();
         }
 
         function registrarAtividade() {
@@ -1272,14 +1301,9 @@
             el.addEventListener("input", () => {
                 projeto[prop] = el.value;
                 salvar();
-                if (prop === "prazo") atualizarContagem();
             });
         }
 
-
-        // ==================================================
-        // TELA INICIAL VS CONTEÚDO
-        // ==================================================
 
         function renderEstado() {
             const telaInicial = document.getElementById("telaInicial");
@@ -1312,12 +1336,7 @@
         });
 
 
-        // ==================================================
-        // CABEÇALHO
-        // ==================================================
-
         autoSaveInput("nomeProjeto", "nome");
-        autoSaveInput("prazoProjeto", "prazo");
         autoSaveInput("focoPrincipal", "foco");
         autoSaveInput("sprintAtual", "sprint");
         autoSaveInput("ondeEstou", "ondeEstou");
@@ -1357,10 +1376,6 @@
         renderChips();
 
 
-        // ==================================================
-        // SELECT DO CICLO
-        // ==================================================
-
         (function montarCiclos() {
             const sel = document.getElementById("selCiclo");
             const anoAtual = new Date().getFullYear();
@@ -1380,10 +1395,6 @@
             });
         })();
 
-
-        // ==================================================
-        // SELECT DA CONEXÃO
-        // ==================================================
 
         (function montarConexoes() {
             const sel = document.getElementById("selConexao");
@@ -1412,8 +1423,70 @@
 
 
         // ==================================================
-        // PULSO + TÍTULO DA ABA
+        // PRAZO (date input + atalhos)
         // ==================================================
+
+        (function prazo() {
+
+            const input = document.getElementById("prazoProjeto");
+
+            function toISODate(d) {
+                return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+            }
+
+            function toBRSlash(iso) {
+                if (!iso) return "";
+                const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+                if (!m) return iso;
+                return `${m[3]}/${m[2]}/${m[1]}`;
+            }
+
+            if (projeto.prazo) {
+                const p = projeto.prazo.trim();
+                if (/^\d{4}-\d{2}-\d{2}$/.test(p)) {
+                    input.value = p;
+                } else if (/^\d{2}\/\d{2}\/\d{4}$/.test(p)) {
+                    const [d, m, a] = p.split("/");
+                    input.value = `${a}-${m}-${d}`;
+                    projeto.prazo = input.value;
+                }
+            }
+
+            input.addEventListener("change", () => {
+                const iso = input.value;
+                if (!iso) {
+                    projeto.prazo = "";
+                } else {
+                    projeto.prazo = toBRSlash(iso);
+                }
+                salvar();
+                atualizarContagem();
+                atualizarTituloAba();
+            });
+
+            document.querySelectorAll(".prazo-atalho").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const dias = Number(btn.dataset.dias);
+
+                    if (dias === 0) {
+                        input.value = "";
+                        projeto.prazo = "";
+                    } else {
+                        const d = new Date();
+                        d.setDate(d.getDate() + dias);
+                        const iso = toISODate(d);
+                        input.value = iso;
+                        projeto.prazo = toBRSlash(iso);
+                    }
+
+                    salvar();
+                    atualizarContagem();
+                    atualizarTituloAba();
+                });
+            });
+
+        })();
+
 
         function atualizarPulso() {
             const el = document.getElementById("pulsoProjeto");
@@ -1469,10 +1542,6 @@
         atualizarTituloAba();
 
 
-        // ==================================================
-        // BANNERS (parado + sprint)
-        // ==================================================
-
         function esconderBannerSeEditou() {
             localStorage.removeItem(CHAVE_BANNER_IGN);
             document.getElementById("bannerParado").style.display = "none";
@@ -1501,7 +1570,6 @@
         });
 
 
-        // Check-in semanal do sprint
         (function checarSprint() {
             if (!projeto.sprint || !projeto.sprintData) return;
             if (localStorage.getItem(CHAVE_SPRINT_IGN) === "true") return;
@@ -1534,8 +1602,6 @@
             document.getElementById("bannerSprint").style.display = "none";
         });
 
-
-        // Atualiza data do sprint quando o campo é editado
         document.getElementById("sprintAtual").addEventListener("change", () => {
             if (projeto.sprint && projeto.sprint.trim()) {
                 projeto.sprintData = new Date().toISOString();
@@ -1543,10 +1609,6 @@
             }
         });
 
-
-        // ==================================================
-        // CONTAGEM REGRESSIVA
-        // ==================================================
 
         function atualizarContagem() {
             const wrap = document.getElementById("contagemWrap");
@@ -1597,10 +1659,6 @@
         atualizarContagem();
 
 
-        // ==================================================
-        // FOCO
-        // ==================================================
-
         document.getElementById("btnEnviarFoco").addEventListener("click", () => {
             const texto = projeto.foco.trim();
             if (!texto) { alert("Escreva o foco principal antes."); return; }
@@ -1614,10 +1672,6 @@
             alert("Enviado como Prioridade 1 de hoje.");
         });
 
-
-        // ==================================================
-        // ETAPAS
-        // ==================================================
 
         function renderEtapas() {
             const container = document.getElementById("listaEtapas");
@@ -1678,10 +1732,6 @@
         atualizarProgresso();
 
 
-        // ==================================================
-        // ENTREGÁVEIS
-        // ==================================================
-
         function renderEntregaveis() {
             const container = document.getElementById("listaEntregaveis");
             container.innerHTML = "";
@@ -1720,10 +1770,6 @@
         renderEntregaveis();
 
 
-        // ==================================================
-        // BLOQUEIOS
-        // ==================================================
-
         function renderBloqueios() {
             const container = document.getElementById("listaBloqueios");
             container.innerHTML = "";
@@ -1755,10 +1801,6 @@
         });
         renderBloqueios();
 
-
-        // ==================================================
-        // PRÓXIMAS 3 AÇÕES
-        // ==================================================
 
         function renderAcoes() {
             const container = document.getElementById("listaAcoes");
@@ -1792,10 +1834,6 @@
         }
         renderAcoes();
 
-
-        // ==================================================
-        // LINKS
-        // ==================================================
 
         function renderLinks() {
             const container = document.getElementById("listaLinks");
@@ -1835,10 +1873,6 @@
         renderLinks();
 
 
-        // ==================================================
-        // DIÁRIO (TIMELINE)
-        // ==================================================
-
         function adicionarDiario(texto, automatico = false, tipo = "auto") {
             if (!texto.trim()) return;
             projeto.diario.unshift({
@@ -1876,7 +1910,7 @@
         renderDiario();
 
 
-              // ==================================================
+        // ==================================================
         // TIMER DE SEMANAS (Memento Mori)
         // ==================================================
 
@@ -1885,18 +1919,18 @@
             const grid = document.getElementById("timerGrid");
             const sub = document.getElementById("timerSub");
 
+            if (!grid) return;
+
             grid.innerHTML = "";
 
             const semanasMap = { 1: 4, 3: 13, 6: 26, 12: 52 };
             const totalSemanas = semanasMap[mesesHeatmap] || 52;
 
-            // Ajusta colunas conforme o total
             let colunas = 13;
             if (totalSemanas <= 4) colunas = 4;
             else if (totalSemanas <= 13) colunas = 13;
             grid.style.gridTemplateColumns = `repeat(${colunas}, minmax(0, 1fr))`;
 
-            // Início = data de criação do projeto
             const inicioProj = projeto.criadoEm
                 ? new Date(projeto.criadoEm)
                 : new Date();
@@ -1908,7 +1942,6 @@
             const diffMs = hoje - inicioProj;
             const semanasPassadas = Math.floor(diffMs / (7 * 86400000));
 
-            // Pra cada semana
             for (let i = 0; i < totalSemanas; i++) {
 
                 const cell = document.createElement("div");
@@ -1920,7 +1953,6 @@
                 const fimSemana = new Date(inicioSemana);
                 fimSemana.setDate(fimSemana.getDate() + 7);
 
-                // Soma atividade dentro da semana
                 let ativSemana = 0;
                 Object.keys(atividade).forEach(dia => {
                     const d = new Date(dia + "T00:00:00");
@@ -1930,18 +1962,15 @@
                 });
 
                 if (i < semanasPassadas) {
-                    // Já passou
                     if (ativSemana > 0) {
                         cell.classList.add("ativa");
                     } else {
                         cell.classList.add("passada");
                     }
                 } else if (i === semanasPassadas) {
-                    // Semana atual
                     cell.classList.add("atual");
                     if (ativSemana > 0) cell.classList.add("ativa");
                 }
-                // Futura = vazio
 
                 const inicioStr = `${String(inicioSemana.getDate()).padStart(2, "0")}/${String(inicioSemana.getMonth() + 1).padStart(2, "0")}`;
                 cell.title = `Semana ${i + 1} (${inicioStr}) — ${ativSemana} ação(ões)`;
@@ -1949,7 +1978,6 @@
                 grid.appendChild(cell);
             }
 
-            // Subtítulo
             const semanaAtual = Math.min(semanasPassadas + 1, totalSemanas);
             sub.textContent = `Semana ${semanaAtual} de ${totalSemanas}`;
         }
@@ -1969,9 +1997,6 @@
 
         renderTimerSemanas();
 
-        // ==================================================
-        // GUIA DO PROJETO
-        // ==================================================
 
         function renderGuia() {
             const container = document.getElementById("guiaConteudo");
@@ -1999,10 +2024,6 @@
         }
         renderGuia();
 
-
-        // ==================================================
-        // CHECAGEM RÁPIDA
-        // ==================================================
 
         const PERGUNTAS_CHECAGEM = [
             { k: "resultado", q: "Você sabe qual é o resultado final?" },
@@ -2059,10 +2080,6 @@
         renderChecagem();
 
 
-        // ==================================================
-        // ESTOU TRAVADO
-        // ==================================================
-
         const painelTravado = document.getElementById("travadoPainel");
         const textoTravado = document.getElementById("travadoTexto");
 
@@ -2079,10 +2096,6 @@
         document.getElementById("btnOutraSugestao").addEventListener("click", mostrarSugestao);
 
 
-        // ==================================================
-        // MODO COMPACTO + MODO LEITURA
-        // ==================================================
-
         let compacto = false;
         document.getElementById("btnCompacto").addEventListener("click", function () {
             compacto = !compacto;
@@ -2097,10 +2110,6 @@
             this.textContent = leitura ? "📖 Sair do leitura" : "📖 Modo leitura";
         });
 
-
-        // ==================================================
-        // MODO FOCO (com cronômetro)
-        // ==================================================
 
         let focoInicio = null;
         let focoInterval = null;
@@ -2137,7 +2146,6 @@
             document.body.classList.remove("modo-foco-projeto");
             if (focoInterval) { clearInterval(focoInterval); focoInterval = null; }
             focoInicio = null;
-            document.title = "Projeto";
             atualizarTituloAba();
         }
 
@@ -2175,10 +2183,6 @@
             }
         });
 
-
-        // ==================================================
-        // EXPORTAR / COPIAR ESTRUTURA
-        // ==================================================
 
         document.getElementById("btnExportar").addEventListener("click", () => {
             const conteudo = JSON.stringify(projeto, null, 2);
@@ -2236,10 +2240,6 @@
         });
 
 
-        // ==================================================
-        // CONCLUIR / ARQUIVAR
-        // ==================================================
-
         document.getElementById("btnConcluir").addEventListener("click", () => {
             if (!projeto.nome.trim()) { alert("Dê um nome ao projeto antes de concluir."); return; }
             if (!confirm("Concluir o projeto? Ele vai para os arquivados.")) return;
@@ -2281,10 +2281,6 @@
             location.reload();
         }
 
-
-        // ==================================================
-        // HISTÓRICO DE ARQUIVADOS
-        // ==================================================
 
         (function renderHistorico() {
             const container = document.getElementById("historicoProjetos");
