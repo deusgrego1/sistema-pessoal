@@ -7,6 +7,119 @@
     <title>Estudo</title>
 
     <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .campo-label {
+            display: block;
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 14px 0 8px;
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .chip {
+            padding: 7px 13px;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid #333338;
+            background: #1a1a1e;
+            color: #bbb;
+            border-radius: 16px;
+            transition: 0.15s;
+            user-select: none;
+        }
+
+        .chip:hover { background: #222228; color: #e0e0e0; }
+
+        .chip.selecionado {
+            background: #2e2e33;
+            border-color: #666;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        /* Status colorido */
+        .chip.status-estudando.selecionado {
+            background: #332e1a; border-color: #c9a44a; color: #e0d48a;
+        }
+        .chip.status-praticar.selecionado {
+            background: #1a2233; border-color: #5a8ad4; color: #a8c4e8;
+        }
+        .chip.status-dominado.selecionado {
+            background: #1f3320; border-color: #4caf50; color: #a5d6a7;
+        }
+        .chip.status-revisar.selecionado {
+            background: #331f1f; border-color: #d45a5a; color: #e08b8b;
+        }
+
+        .meta-bloco {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .meta-bloco input {
+            flex: 1;
+            margin-top: 0;
+        }
+
+        .meta-status {
+            color: #aaa;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .link-preview {
+            margin-top: 10px;
+        }
+
+        .link-preview a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border: 1px solid #2c3a55;
+            background: linear-gradient(135deg, #1a2235 0%, #232f4a 100%);
+            color: #dfe8ff;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.15s;
+        }
+
+        .link-preview a:hover {
+            border-color: #4a5c85;
+            transform: translateY(-1px);
+        }
+
+        .link-subpagina {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 18px;
+            background: #17171a;
+            border: 1px solid #252529;
+            border-radius: 16px;
+            color: inherit;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .link-subpagina:hover {
+            background: #1e1e22;
+            border-color: #3a3a40;
+        }
+
+        .link-subpagina h2 { font-size: 17px; margin-bottom: 5px; }
+        .link-subpagina p { color: #999; font-size: 13px; }
+    </style>
 </head>
 
 <body>
@@ -23,14 +136,36 @@
 
         <section class="modules">
 
+            <div class="module-card" style="align-items: flex-start;">
+                <div style="width: 100%;">
+                    <h2>Tipo de estudo</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
+                        Como você vai estudar hoje.
+                    </p>
+                    <div class="chips" id="chipsTipo"></div>
+                </div>
+            </div>
+
+
+            <div class="module-card" style="align-items: flex-start;">
+                <div style="width: 100%;">
+                    <h2>Meta semanal</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
+                        Quantas horas de estudo você quer fazer por semana.
+                    </p>
+                    <div class="meta-bloco">
+                        <input type="text" id="metaSemanal" placeholder="Ex.: 5h ou 5">
+                    </div>
+                    <p class="meta-status" id="metaStatus"></p>
+                </div>
+            </div>
+
+
             <div class="module-card">
                 <span class="icon">📌</span>
                 <div>
                     <h2>Tema</h2>
-                    <textarea
-                        placeholder="O que vou estudar?"
-                        rows="3"
-                    ></textarea>
+                    <textarea placeholder="O que vou estudar?" rows="3"></textarea>
                 </div>
             </div>
 
@@ -38,10 +173,7 @@
                 <span class="icon">🎯</span>
                 <div>
                     <h2>Objetivo do estudo</h2>
-                    <textarea
-                        placeholder="O que quero conseguir entender ou aprender?"
-                        rows="4"
-                    ></textarea>
+                    <textarea placeholder="O que quero conseguir entender ou aprender?" rows="4"></textarea>
                 </div>
             </div>
 
@@ -49,29 +181,92 @@
                 <span class="icon">📖</span>
                 <div>
                     <h2>Fonte / material</h2>
-                    <textarea
-                        placeholder="Livro, curso, vídeo, artigo, aula ou outro material."
-                        rows="3"
-                    ></textarea>
+                    <textarea placeholder="Livro, curso, vídeo, artigo, aula..." rows="3"></textarea>
                 </div>
             </div>
 
             <div class="module-card">
                 <span class="icon">⏱️</span>
                 <div>
-                    <h2>Tempo</h2>
-                    <input
-                        type="text"
-                        placeholder="Ex.: 1h30"
-                    >
+                    <h2>Tempo previsto</h2>
+                    <input type="text" placeholder="Ex.: 1h30">
                 </div>
             </div>
 
-           <a href="o-que-aprendi.html" class="module-card">
-                <span class="icon">🧠</span>
+
+            <!-- LINK DE REFERÊNCIA -->
+
+            <div class="module-card">
+                <span class="icon">🔗</span>
                 <div>
+                    <h2>Link de referência</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 4px;">
+                        Cole o link do vídeo, curso, artigo que vai usar.
+                    </p>
+                    <input
+                        type="text"
+                        id="linkReferencia"
+                        placeholder="https://..."
+                    >
+                    <div class="link-preview" id="linkPreview"></div>
+                </div>
+            </div>
+
+
+            <!-- STATUS DO ESTUDO -->
+
+            <div class="module-card" style="align-items: flex-start;">
+                <div style="width: 100%;">
+                    <h2>Status do estudo</h2>
+                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
+                        Em que ponto esse assunto está hoje.
+                    </p>
+                    <div class="chips" id="chipsStatus"></div>
+                </div>
+            </div>
+
+
+            <a href="o-que-aprendi.html" class="link-subpagina">
+                <span class="icon">🧠</span>
+                <div style="flex: 1;">
                     <h2>O que aprendi</h2>
                     <p>Registre, explique e aplique o que aprendeu.</p>
+                </div>
+                <span class="arrow">›</span>
+            </a>
+
+            <a href="biblioteca.html" class="link-subpagina">
+                <span class="icon">📚</span>
+                <div style="flex: 1;">
+                    <h2>Biblioteca de fontes</h2>
+                    <p>Cursos, livros, canais e materiais que você acompanha.</p>
+                </div>
+                <span class="arrow">›</span>
+            </a>
+
+            <a href="livros.html" class="link-subpagina">
+                <span class="icon">📖</span>
+                <div style="flex: 1;">
+                    <h2>Livros</h2>
+                    <p>Em progresso, pausados, concluídos.</p>
+                </div>
+                <span class="arrow">›</span>
+            </a>
+
+            <a href="citacoes.html" class="link-subpagina">
+                <span class="icon">💬</span>
+                <div style="flex: 1;">
+                    <h2>Citações</h2>
+                    <p>Frases que marcaram.</p>
+                </div>
+                <span class="arrow">›</span>
+            </a>
+
+            <a href="glossario.html" class="link-subpagina">
+                <span class="icon">📔</span>
+                <div style="flex: 1;">
+                    <h2>Glossário pessoal</h2>
+                    <p>Termos que você aprendeu, com suas palavras.</p>
                 </div>
                 <span class="arrow">›</span>
             </a>
@@ -85,6 +280,217 @@
     </main>
 
     <script src="../../js/app.js"></script>
-    
+
+    <script>
+        // ==================================================
+        // DATA (respeita ?data=)
+        // ==================================================
+
+        const hoje = new Date();
+        const anoHoje = hoje.getFullYear();
+        const mesHoje = String(hoje.getMonth() + 1).padStart(2, "0");
+        const diaHoje = String(hoje.getDate()).padStart(2, "0");
+        const dataHoje = `${anoHoje}-${mesHoje}-${diaHoje}`;
+
+        const paramsURL = new URLSearchParams(window.location.search);
+        const dataParam = paramsURL.get("data");
+        const dataAtual =
+            (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam))
+                ? dataParam
+                : dataHoje;
+
+
+        // Propaga ?data= para os links internos
+        if (dataAtual !== dataHoje) {
+            document.querySelectorAll(".link-subpagina").forEach(a => {
+                const href = a.getAttribute("href");
+                if (href && !href.includes("?data=")) {
+                    a.setAttribute("href", `${href}?data=${dataAtual}`);
+                }
+            });
+        }
+
+
+        // ==================================================
+        // TIPO DE ESTUDO
+        // ==================================================
+
+        const TIPOS = [
+            "📖 Livro",
+            "🎓 Curso",
+            "🎥 Vídeo",
+            "📝 Artigo",
+            "🎧 Podcast",
+            "🧪 Prática"
+        ];
+
+        const chaveTipo = `planejamento_${dataAtual}_estudo_tipo`;
+        const chipsTipo = document.getElementById("chipsTipo");
+        const tipoSalvo = localStorage.getItem(chaveTipo);
+
+        TIPOS.forEach(t => {
+            const chip = document.createElement("div");
+            chip.className = "chip";
+            chip.textContent = t;
+            if (tipoSalvo === t) chip.classList.add("selecionado");
+
+            chip.addEventListener("click", () => {
+                const jaSel = chip.classList.contains("selecionado");
+                chipsTipo.querySelectorAll(".chip").forEach(c => c.classList.remove("selecionado"));
+                if (jaSel) {
+                    localStorage.removeItem(chaveTipo);
+                } else {
+                    chip.classList.add("selecionado");
+                    localStorage.setItem(chaveTipo, t);
+                }
+            });
+
+            chipsTipo.appendChild(chip);
+        });
+
+
+        // ==================================================
+        // STATUS DO ESTUDO
+        // ==================================================
+
+        const STATUS = [
+            { valor: "estudando", label: "🟡 Estudando",       classe: "status-estudando" },
+            { valor: "praticar",  label: "🔵 Praticar",         classe: "status-praticar" },
+            { valor: "dominado",  label: "🟢 Dominado",         classe: "status-dominado" },
+            { valor: "revisar",   label: "🔴 Preciso revisar",  classe: "status-revisar" }
+        ];
+
+        const chaveStatus = `planejamento_${dataAtual}_estudo_status`;
+        const chipsStatus = document.getElementById("chipsStatus");
+        const statusSalvo = localStorage.getItem(chaveStatus);
+
+        STATUS.forEach(s => {
+            const chip = document.createElement("div");
+            chip.className = "chip " + s.classe;
+            chip.textContent = s.label;
+            if (statusSalvo === s.valor) chip.classList.add("selecionado");
+
+            chip.addEventListener("click", () => {
+                const jaSel = chip.classList.contains("selecionado");
+                chipsStatus.querySelectorAll(".chip").forEach(c => c.classList.remove("selecionado"));
+                if (jaSel) {
+                    localStorage.removeItem(chaveStatus);
+                } else {
+                    chip.classList.add("selecionado");
+                    localStorage.setItem(chaveStatus, s.valor);
+                }
+            });
+
+            chipsStatus.appendChild(chip);
+        });
+
+
+        // ==================================================
+        // LINK DE REFERÊNCIA
+        // ==================================================
+
+        const chaveLink = `planejamento_${dataAtual}_estudo_link`;
+        const campoLink = document.getElementById("linkReferencia");
+        const preview = document.getElementById("linkPreview");
+
+        // Carrega salvo (o app.js NÃO salva esse campo porque tem id próprio
+        // e a gente trata via chave custom)
+        campoLink.value = localStorage.getItem(chaveLink) || "";
+
+        function atualizarPreview() {
+            const url = campoLink.value.trim();
+            if (/^https?:\/\//i.test(url)) {
+                preview.innerHTML =
+                    `<a href="${url}" target="_blank" rel="noopener">🔗 Abrir link</a>`;
+            } else {
+                preview.innerHTML = "";
+            }
+        }
+
+        atualizarPreview();
+
+        campoLink.addEventListener("input", () => {
+            localStorage.setItem(chaveLink, campoLink.value);
+            atualizarPreview();
+        });
+
+
+        // ==================================================
+        // META SEMANAL
+        // ==================================================
+
+        const chaveMeta = "planejamento_estudo_meta_semanal";
+        const campoMeta = document.getElementById("metaSemanal");
+        const metaStatus = document.getElementById("metaStatus");
+
+        campoMeta.value = localStorage.getItem(chaveMeta) || "";
+
+        function extrairHoras(texto) {
+            if (!texto) return 0;
+            const match = texto.replace(",", ".").match(/(\d+(\.\d+)?)/);
+            return match ? Number(match[1]) : 0;
+        }
+
+        function calcularSemanaAtual() {
+
+            const d = new Date();
+            const dow = d.getDay();
+            const diff = (dow === 0) ? -6 : (1 - dow);
+            d.setDate(d.getDate() + diff);
+
+            let totalSegundos = 0;
+
+            for (let i = 0; i < 7; i++) {
+                const dt = new Date(d);
+                dt.setDate(dt.getDate() + i);
+                const iso = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
+
+                const tempo = localStorage.getItem(`planejamento_${iso}_estudo_3`);
+                if (tempo) {
+                    let h = 0, m = 0;
+                    const matchH = tempo.match(/(\d+)\s*h/i);
+                    const matchM = tempo.match(/(\d+)\s*min/i);
+                    if (matchH) h = Number(matchH[1]);
+                    if (matchM) m = Number(matchM[1]);
+                    if (!matchH && !matchM) {
+                        const so = tempo.match(/^(\d+(\.\d+)?)$/);
+                        if (so) h = Number(so[1]);
+                    }
+                    totalSegundos += (h * 3600) + (m * 60);
+                }
+            }
+
+            return totalSegundos / 3600;
+        }
+
+        function atualizarStatusMeta() {
+
+            const meta = extrairHoras(campoMeta.value);
+            const realizado = calcularSemanaAtual();
+
+            if (!meta) {
+                metaStatus.textContent = "";
+                return;
+            }
+
+            const pct = Math.round((realizado / meta) * 100);
+            const horasTexto = realizado.toFixed(1).replace(".", ",");
+
+            let cor = "#888";
+            if (pct >= 100) cor = "#4caf50";
+            else if (pct >= 60) cor = "#c9a44a";
+
+            metaStatus.innerHTML =
+                `Nesta semana: <strong style="color:${cor};">${horasTexto}h</strong> de ${meta}h (${pct}%)`;
+        }
+
+        campoMeta.addEventListener("input", () => {
+            localStorage.setItem(chaveMeta, campoMeta.value);
+            atualizarStatusMeta();
+        });
+
+        atualizarStatusMeta();
+    </script>
+
 </body>
 </html>
