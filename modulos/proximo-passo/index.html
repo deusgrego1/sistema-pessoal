@@ -7,6 +7,45 @@
     <title>Próximo Passo</title>
 
     <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .aviso-hub {
+            padding: 14px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 4px;
+        }
+
+        .aviso-pendencias {
+            background: #2a1f1a;
+            border: 1px solid #4a2f1f;
+            border-left: 3px solid #d4774a;
+            color: #e0a878;
+        }
+
+        .aviso-areas {
+            background: #1a2233;
+            border: 1px solid #2c3a55;
+            border-left: 3px solid #5a8ad4;
+            color: #a8c4e8;
+        }
+
+        .areas-lista {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .area-tag {
+            padding: 3px 10px;
+            background: #252f45;
+            border-radius: 10px;
+            font-size: 12px;
+            color: #c9daf5;
+        }
+    </style>
 </head>
 
 <body>
@@ -22,6 +61,8 @@
         </header>
 
         <section class="modules">
+
+            <div id="avisosHub"></div>
 
             <a href="agora.html" class="module-card">
                 <span class="icon">⚡</span>
@@ -75,6 +116,76 @@
         </a>
 
     </main>
+
+
+    <script>
+        // ==================================================
+        // CONTADOR DE PENDÊNCIAS
+        // ==================================================
+
+        (function contadorPendencias() {
+
+            let total = 0;
+
+            // Pendências do Dia
+            const pd = localStorage.getItem("planejamento_pp_dia_pendencias");
+            if (pd && pd.trim()) {
+                total += pd.split("\n").filter(l => l.trim()).length || 1;
+            }
+
+            // Pendências da Semana
+            const ps = localStorage.getItem("planejamento_pp_semana_pendencias");
+            if (ps && ps.trim()) {
+                total += ps.split("\n").filter(l => l.trim()).length || 1;
+            }
+
+            // Pendências do Mês (dentro da lista "parar" não; usamos os itens soltos)
+            // Não temos campo específico de pendências no mês — pulamos.
+
+            const areas = document.getElementById("avisosHub");
+
+            if (total > 0) {
+                const div = document.createElement("div");
+                div.className = "aviso-hub aviso-pendencias";
+                div.innerHTML = `⚠️ <strong>${total} pendência${total > 1 ? "s" : ""}</strong> em aberto nos próximos horizontes.`;
+                areas.appendChild(div);
+            }
+
+        })();
+
+
+        // ==================================================
+        // ÁREAS DE ATENÇÃO DO MÊS
+        // ==================================================
+
+        (function areasAtencao() {
+
+            // Busca a lista de experimentos do mês — não é área, mas
+            // vamos puxar as áreas de atenção que estão na chave
+            // "planejamento_pp_mes_areas_atencao" se existir.
+            // Como ainda não criamos esse campo no mes.html, deixamos vazio por ora.
+
+            const areas = localStorage.getItem("planejamento_pp_mes_areas_atencao");
+
+            if (!areas || !areas.trim()) return;
+
+            const lista = areas.split(",").map(a => a.trim()).filter(Boolean);
+
+            if (lista.length === 0) return;
+
+            const div = document.createElement("div");
+            div.className = "aviso-hub aviso-areas";
+            div.innerHTML = `
+                🧭 <strong>Áreas de atenção deste mês:</strong>
+                <div class="areas-lista">
+                    ${lista.map(a => `<span class="area-tag">${a}</span>`).join("")}
+                </div>
+            `;
+
+            document.getElementById("avisosHub").appendChild(div);
+
+        })();
+    </script>
 
 </body>
 </html>
