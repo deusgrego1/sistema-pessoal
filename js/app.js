@@ -188,8 +188,9 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
 
-        const barra =
-            document.createElement("div");
+        const barra = document.createElement("div");
+
+barra.className = "barra-navegacao-data";
 
 
         barra.style.cssText = `
