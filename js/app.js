@@ -1476,5 +1476,494 @@ document.addEventListener("DOMContentLoaded", () => {
             botaoFoco
         );
     }    
+
+    // ==================================================
+    // PAINEL LATERAL — PRIORIDADES DO DIA
+    // ==================================================
+
+    if (
+        !pathname.includes("/modulos/proximo-passo/")
+    ) {
+
+        const container =
+            document.querySelector("main.container");
+
+        if (container) {
+
+            const chavePrioridade1 =
+                `planejamento_${dataAtual}_prioridades_0`;
+
+            const chavePrioridade2 =
+                `planejamento_${dataAtual}_prioridades_2`;
+
+            const chavePrioridade3 =
+                `planejamento_${dataAtual}_prioridades_4`;
+
+
+            function obterPrioridades() {
+
+                return [
+                    localStorage.getItem(chavePrioridade1),
+                    localStorage.getItem(chavePrioridade2),
+                    localStorage.getItem(chavePrioridade3)
+                ].filter(
+                    prioridade =>
+                        prioridade &&
+                        prioridade.trim() !== ""
+                );
+
+            }
+
+
+            function criarPainelPrioridades() {
+
+                const prioridades =
+                    obterPrioridades();
+
+
+                // Não cria painel vazio
+                if (prioridades.length === 0) {
+                    return;
+                }
+
+
+                // Evita duplicação
+                if (
+                    document.querySelector(
+                        ".painel-prioridades-dia"
+                    )
+                ) {
+                    return;
+                }
+
+
+                const painel =
+                    document.createElement("aside");
+
+
+                painel.className =
+                    "painel-prioridades-dia";
+
+
+                painel.innerHTML = `
+
+                    <div class="prioridades-cabecalho">
+
+                        <div class="prioridades-icone">
+                            🎯
+                        </div>
+
+                        <div>
+
+                            <div class="prioridades-titulo">
+                                Prioridades
+                            </div>
+
+                            <div class="prioridades-subtitulo">
+                                Para hoje
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="prioridades-lista">
+
+                        ${
+                            prioridades
+                                .map(
+                                    (
+                                        prioridade,
+                                        indice
+                                    ) => `
+
+                                        <div
+                                            class="prioridade-item"
+                                        >
+
+                                            <div
+                                                class="prioridade-numero"
+                                            >
+                                                ${String(
+                                                    indice + 1
+                                                ).padStart(
+                                                    2,
+                                                    "0"
+                                                )}
+                                            </div>
+
+                                            <div
+                                                class="prioridade-texto"
+                                            >
+                                                ${prioridade}
+                                            </div>
+
+                                        </div>
+
+                                    `
+                                )
+                                .join("")
+                        }
+
+                    </div>
+
+
+                    <div class="prioridades-rodape">
+
+                        ${
+                            prioridades.length === 1
+                                ? "1 prioridade"
+                                : `${prioridades.length} prioridades`
+                        }
+
+                    </div>
+
+                `;
+
+
+                document.body.appendChild(
+                    painel
+                );
+
+
+                posicionarPainel(
+                    painel
+                );
+
+
+                window.addEventListener(
+                    "resize",
+                    () => {
+                        posicionarPainel(
+                            painel
+                        );
+                    }
+                );
+
+            }
+
+
+            function posicionarPainel(
+                painel
+            ) {
+
+                const larguraTela =
+                    window.innerWidth;
+
+
+                // Em telas menores,
+                // não ocupa a lateral
+                if (larguraTela < 1250) {
+
+                    painel.style.display =
+                        "none";
+
+                    return;
+                }
+
+
+                painel.style.display =
+                    "block";
+
+
+                const rect =
+                    container.getBoundingClientRect();
+
+
+                const larguraPainel =
+                    220;
+
+
+                const distancia =
+                    28;
+
+
+                const esquerda =
+                    rect.left -
+                    larguraPainel -
+                    distancia;
+
+
+                // Se não houver espaço
+                // suficiente à esquerda,
+                // esconde o painel
+                if (esquerda < 12) {
+
+                    painel.style.display =
+                        "none";
+
+                    return;
+                }
+
+
+                painel.style.left =
+                    `${esquerda}px`;
+
+            }
+
+
+            // ==================================================
+            // ESTILO DO PAINEL
+            // ==================================================
+
+            const estilo =
+                document.createElement("style");
+
+
+            estilo.textContent = `
+
+                .painel-prioridades-dia {
+
+                    position: fixed;
+
+                    top: 50%;
+
+                    transform:
+                        translateY(-50%);
+
+                    width: 220px;
+
+                    box-sizing: border-box;
+
+                    padding: 18px;
+
+                    background:
+                        rgba(23, 23, 26, 0.96);
+
+                    border:
+                        1px solid #29292e;
+
+                    border-radius:
+                        14px;
+
+                    box-shadow:
+                        0 14px 40px
+                        rgba(0, 0, 0, 0.28);
+
+                    backdrop-filter:
+                        blur(12px);
+
+                    -webkit-backdrop-filter:
+                        blur(12px);
+
+                    z-index: 900;
+
+                    color: #f5f5f5;
+
+                    animation:
+                        prioridadesEntrada
+                        0.35s ease;
+
+                }
+
+
+                .prioridades-cabecalho {
+
+                    display: flex;
+
+                    align-items: center;
+
+                    gap: 11px;
+
+                    padding-bottom: 15px;
+
+                    border-bottom:
+                        1px solid #29292e;
+
+                }
+
+
+                .prioridades-icone {
+
+                    width: 32px;
+
+                    height: 32px;
+
+                    display: flex;
+
+                    align-items: center;
+
+                    justify-content: center;
+
+                    border-radius: 9px;
+
+                    background:
+                        #202024;
+
+                    border:
+                        1px solid #303036;
+
+                    font-size: 15px;
+
+                }
+
+
+                .prioridades-titulo {
+
+                    font-size: 13px;
+
+                    font-weight: 600;
+
+                    letter-spacing:
+                        0.2px;
+
+                    color: #f5f5f5;
+
+                }
+
+
+                .prioridades-subtitulo {
+
+                    margin-top: 2px;
+
+                    font-size: 11px;
+
+                    color: #77777f;
+
+                }
+
+
+                .prioridades-lista {
+
+                    display: flex;
+
+                    flex-direction: column;
+
+                    gap: 15px;
+
+                    padding:
+                        17px 0 15px;
+
+                }
+
+
+                .prioridade-item {
+
+                    display: grid;
+
+                    grid-template-columns:
+                        25px 1fr;
+
+                    gap: 9px;
+
+                    align-items: start;
+
+                }
+
+
+                .prioridade-numero {
+
+                    padding-top: 1px;
+
+                    font-size: 10px;
+
+                    font-weight: 600;
+
+                    letter-spacing:
+                        0.5px;
+
+                    color: #77777f;
+
+                }
+
+
+                .prioridade-texto {
+
+                    font-size: 12.5px;
+
+                    line-height: 1.55;
+
+                    color: #d8d8dc;
+
+                    overflow-wrap:
+                        anywhere;
+
+                }
+
+
+                .prioridade-item:hover
+                .prioridade-texto {
+
+                    color: #ffffff;
+
+                }
+
+
+                .prioridades-rodape {
+
+                    padding-top: 12px;
+
+                    border-top:
+                        1px solid #29292e;
+
+                    font-size: 10px;
+
+                    color: #66666e;
+
+                    letter-spacing:
+                        0.2px;
+
+                }
+
+
+                @keyframes prioridadesEntrada {
+
+                    from {
+
+                        opacity: 0;
+
+                        transform:
+                            translate(
+                                -8px,
+                                -50%
+                            );
+
+                    }
+
+                    to {
+
+                        opacity: 1;
+
+                        transform:
+                            translate(
+                                0,
+                                -50%
+                            );
+
+                    }
+
+                }
+
+
+                @media (
+                    max-width: 1249px
+                ) {
+
+                    .painel-prioridades-dia {
+
+                        display: none;
+
+                    }
+
+                }
+
+            `;
+
+
+            document.head.appendChild(
+                estilo
+            );
+
+
+            // ==================================================
+            // CRIAR
+            // ==================================================
+
+            criarPainelPrioridades();
+
+        }
+
+    }
     
 });
