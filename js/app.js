@@ -1376,4 +1376,105 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
+    // ==================================================
+    // BOTÃO FLUTUANTE — FOCO
+    // ==================================================
+
+    if (
+        pathname.includes("/modulos/planejamento/") &&
+        pagina !== "historico"
+    ) {
+
+        const botaoFoco = document.createElement("a");
+
+        botaoFoco.href = "../../foco/";
+        botaoFoco.className = "botao-foco-flutuante";
+        botaoFoco.setAttribute(
+            "aria-label",
+            "Ir para Foco"
+        );
+
+        botaoFoco.innerHTML = `
+            <span class="icone-foco">🎯</span>
+            <span class="texto-foco">Foco</span>
+        `;
+
+        botaoFoco.style.cssText = `
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 9999;
+
+            display: flex;
+            align-items: center;
+
+            width: 44px;
+            height: 44px;
+
+            overflow: hidden;
+            white-space: nowrap;
+
+            text-decoration: none;
+
+            background: #17171a;
+            color: #f5f5f5;
+
+            border: 1px solid #2d2d32;
+            border-radius: 22px;
+
+            box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+
+            transition:
+                width 0.2s ease,
+                background 0.2s ease,
+                border-color 0.2s ease;
+        `;
+
+        const icone =
+            botaoFoco.querySelector(".icone-foco");
+
+        const texto =
+            botaoFoco.querySelector(".texto-foco");
+
+        icone.style.cssText = `
+            min-width: 44px;
+            text-align: center;
+            font-size: 18px;
+        `;
+
+        texto.style.cssText = `
+            font-size: 13px;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        `;
+
+        botaoFoco.addEventListener(
+            "mouseenter",
+            () => {
+
+                botaoFoco.style.width = "88px";
+                botaoFoco.style.background = "#202024";
+                botaoFoco.style.borderColor = "#44444a";
+
+                texto.style.opacity = "1";
+            }
+        );
+
+        botaoFoco.addEventListener(
+            "mouseleave",
+            () => {
+
+                botaoFoco.style.width = "44px";
+                botaoFoco.style.background = "#17171a";
+                botaoFoco.style.borderColor = "#2d2d32";
+
+                texto.style.opacity = "0";
+            }
+        );
+
+        document.body.appendChild(
+            botaoFoco
+        );
+    }    
+    
 });
