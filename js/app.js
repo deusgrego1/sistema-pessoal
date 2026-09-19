@@ -84,15 +84,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // BARRA DE NAVEGAÇÃO DE DATAS
     // ==================================================
 
-    if (
-        (
-            pathname.includes("/modulos/planejamento/") ||
-            pathname.includes("/modulos/revisao/")
-        ) &&
-        pagina !== "historico"
-    ) {
-        inserirBarraDatas(dataAtual, dataHoje);
-    }
+   if (
+    (pathname.includes("/modulos/planejamento/") ||
+     pathname.includes("/modulos/revisao/")) &&
+    pagina !== "historico" &&
+    !document.querySelector(".barra-navegacao-data")
+) {
+    inserirBarraDatas(dataAtual, dataHoje);
+}
 
 
     function inserirBarraDatas(dataAtual, dataHoje) {
