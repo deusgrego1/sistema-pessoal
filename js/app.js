@@ -1290,46 +1290,56 @@ document.addEventListener("DOMContentLoaded", () => {
     }    
 
    // ==================================================
-// PAINEL GLOBAL — PRIORIDADES DO DIA
+// PAINEL GLOBAL — TAREFAS DO TRABALHO
 // ==================================================
 
-if (!pathname.includes("/modulos/proximo-passo/")) {
+if (
+    !pathname.includes("/modulos/proximo-passo/") &&
+    pagina !== "trabalho" &&
+    pagina !== "historico"
+) {
 
-    const container =
+    const containerTarefas =
         document.querySelector("main.container") ||
         document.querySelector("main") ||
         document.body;
 
-    function obterPrioridades() {
 
-        return [0, 2, 4]
-            .map(indice =>
-                localStorage.getItem(
-                    `planejamento_${dataAtual}_prioridades_${indice}`
-                )
-            )
-            .filter(valor =>
-                valor &&
-                valor.trim() !== ""
-            );
-
+    function escapeHTMLTarefa(s) {
+        return String(s).replace(/[&<>"']/g, c => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        }[c]));
     }
 
 
-    function criarPainelPrioridades() {
+    function obterTarefasTrabalho() {
 
-        const prioridades =
-            obterPrioridades();
+        const raw = localStorage.getItem(
+            `planejamento_${dataAtual}_trabalho_1`
+        ) || "";
 
-        // Se não houver prioridades, não mostra
-        if (prioridades.length === 0) {
+        return raw
+            .split("\n")
+            .map(l => l.replace(/^[-*•]\s*/, "").trim())
+            .filter(Boolean);
+    }
+
+
+    function criarPainelTarefas() {
+
+        const tarefas = obterTarefasTrabalho();
+
+        if (tarefas.length === 0) {
             return;
         }
 
-        // Evita duplicação
         if (
             document.querySelector(
-                ".painel-prioridades-dia"
+                ".painel-tarefas-trabalho"
             )
         ) {
             return;
@@ -1340,71 +1350,61 @@ if (!pathname.includes("/modulos/proximo-passo/")) {
             document.createElement("aside");
 
         painel.className =
-            "painel-prioridades-dia";
+            "painel-tarefas-trabalho";
 
 
         painel.innerHTML = `
 
-            <div class="prioridades-cabecalho">
+            <div class="tarefas-cabecalho">
 
-                <div class="prioridades-icone">
-                    🎯
+                <div class="tarefas-icone">
+                    💼
                 </div>
 
                 <div>
-                    <div class="prioridades-titulo">
-                        Prioridades
+                    <div class="tarefas-titulo">
+                        Trabalho
                     </div>
 
-                    <div class="prioridades-subtitulo">
-                        Para hoje
+                    <div class="tarefas-subtitulo">
+                        Tarefas do dia
                     </div>
                 </div>
 
             </div>
 
 
-            <div class="prioridades-lista">
+            <div class="tarefas-lista">
 
                 ${
-                    prioridades
-                        .map(
-                            (prioridade, indice) => `
+                    tarefas
+                        .map(tarefa => `
 
-                                <div
-                                    class="prioridade-item"
-                                >
+                            <div class="tarefa-item">
 
-                                    <div
-                                        class="prioridade-numero"
-                                    >
-                                        ${String(
-                                            indice + 1
-                                        ).padStart(2, "0")}
-                                    </div>
-
-                                    <div
-                                        class="prioridade-texto"
-                                    >
-                                        ${prioridade}
-                                    </div>
-
+                                <div class="tarefa-marcador">
+                                    ○
                                 </div>
 
-                            `
-                        )
+                                <div class="tarefa-texto">
+                                    ${escapeHTMLTarefa(tarefa)}
+                                </div>
+
+                            </div>
+
+                        `)
                         .join("")
                 }
 
             </div>
 
 
-            <div class="prioridades-rodape">
+            <div class="tarefas-rodape">
 
                 ${
-                    prioridades.length === 1
-                        ? "1 prioridade"
-                        : `${prioridades.length} prioridades`
+                    tarefas.length === 1
+                        ? "1 tarefa"
+                        : `${tarefas.length} tarefas`
                 }
 
             </div>
@@ -1412,349 +1412,239 @@ if (!pathname.includes("/modulos/proximo-passo/")) {
         `;
 
 
-        document.body.appendChild(
-            painel
-        );
+        document.body.appendChild(painel);
 
-
-        posicionarPainel(
-            painel
-        );
+        posicionarPainelTarefas(painel);
 
 
         window.addEventListener(
             "resize",
             () => {
-                posicionarPainel(
-                    painel
-                );
+                posicionarPainelTarefas(painel);
             }
         );
 
     }
 
 
-    function posicionarPainel(
-        painel
-    ) {
+    function posicionarPainelTarefas(painel) {
 
         const larguraTela =
             window.innerWidth;
 
-
-        // Não ocupa espaço em telas pequenas
         if (larguraTela < 1250) {
-
-            painel.style.display =
-                "none";
-
+            painel.style.display = "none";
             return;
         }
 
 
         const rect =
-            container.getBoundingClientRect();
+            containerTarefas.getBoundingClientRect();
+
+        const larguraPainel = 220;
+        const distancia     = 28;
 
 
-        const larguraPainel =
-            220;
-
-        const distancia =
-            28;
-
-
-        let esquerda =
-            rect.left -
-            larguraPainel -
-            distancia;
+        // Aqui é o espelho do painel de prioridades:
+        // em vez de "left - painel", usamos "right + painel"
+        const esquerda =
+            rect.right + distancia;
 
 
-        // Se não couber à esquerda,
-        // tenta à direita
-        if (esquerda < 12) {
-
-            esquerda =
-                rect.right +
-                distancia;
-
-        }
-
-
-        // Se também não couber à direita,
-        // esconde
         if (
             esquerda + larguraPainel >
             larguraTela - 12
         ) {
-
-            painel.style.display =
-                "none";
-
+            painel.style.display = "none";
             return;
-
         }
 
 
-        painel.style.display =
-            "block";
-
-        painel.style.left =
-            `${esquerda}px`;
+        painel.style.display = "block";
+        painel.style.left = `${esquerda}px`;
 
     }
 
 
     // ==================================================
-    // ESTILO
+    // ESTILO (espelho do painel de prioridades)
     // ==================================================
 
-    const estilo =
+    const estiloTarefas =
         document.createElement("style");
 
+    estiloTarefas.textContent = `
 
-    estilo.textContent = `
-
-        .painel-prioridades-dia {
+        .painel-tarefas-trabalho {
 
             position: fixed;
-
             top: 50%;
-
-            transform:
-                translateY(-50%);
+            transform: translateY(-50%);
 
             width: 220px;
-
             box-sizing: border-box;
-
             padding: 18px;
 
-            background:
-                rgba(23, 23, 26, 0.97);
-
-            border:
-                1px solid #29292e;
-
-            border-radius:
-                14px;
+            background: rgba(23, 23, 26, 0.97);
+            border: 1px solid #29292e;
+            border-radius: 14px;
 
             box-shadow:
-                0 14px 40px
-                rgba(0, 0, 0, 0.28);
+                0 14px 40px rgba(0, 0, 0, 0.28);
 
-            backdrop-filter:
-                blur(12px);
-
-            -webkit-backdrop-filter:
-                blur(12px);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
 
             z-index: 9999;
-
             color: #f5f5f5;
 
             animation:
-                prioridadesEntrada
-                0.35s ease;
+                tarefasEntrada 0.35s ease;
 
         }
 
 
-        .prioridades-cabecalho {
+        .tarefas-cabecalho {
 
             display: flex;
-
             align-items: center;
-
             gap: 11px;
 
             padding-bottom: 15px;
 
-            border-bottom:
-                1px solid #29292e;
+            border-bottom: 1px solid #29292e;
 
         }
 
 
-        .prioridades-icone {
+        .tarefas-icone {
 
             width: 32px;
-
             height: 32px;
 
             display: flex;
-
             align-items: center;
-
             justify-content: center;
 
             border-radius: 9px;
 
-            background:
-                #202024;
-
-            border:
-                1px solid #303036;
+            background: #202024;
+            border: 1px solid #303036;
 
             font-size: 15px;
 
         }
 
 
-        .prioridades-titulo {
+        .tarefas-titulo {
 
             font-size: 13px;
-
             font-weight: 600;
-
             color: #f5f5f5;
 
         }
 
 
-        .prioridades-subtitulo {
+        .tarefas-subtitulo {
 
             margin-top: 2px;
-
             font-size: 11px;
-
             color: #77777f;
 
         }
 
 
-        .prioridades-lista {
+        .tarefas-lista {
 
             display: flex;
-
             flex-direction: column;
+            gap: 14px;
 
-            gap: 15px;
-
-            padding:
-                17px 0 15px;
+            padding: 17px 0 15px;
 
         }
 
 
-        .prioridade-item {
+        .tarefa-item {
 
             display: grid;
-
-            grid-template-columns:
-                25px 1fr;
-
+            grid-template-columns: 15px 1fr;
             gap: 9px;
-
             align-items: start;
 
         }
 
 
-        .prioridade-numero {
+        .tarefa-marcador {
 
             padding-top: 1px;
-
             font-size: 10px;
-
-            font-weight: 600;
-
-            letter-spacing: .5px;
-
             color: #77777f;
 
         }
 
 
-        .prioridade-texto {
+        .tarefa-texto {
 
             font-size: 12.5px;
-
             line-height: 1.55;
-
             color: #d8d8dc;
 
-            overflow-wrap:
-                anywhere;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
 
         }
 
 
-        .prioridade-item:hover
-        .prioridade-texto {
-
+        .tarefa-item:hover .tarefa-texto {
             color: #ffffff;
-
         }
 
 
-        .prioridades-rodape {
+        .tarefas-rodape {
 
             padding-top: 12px;
-
-            border-top:
-                1px solid #29292e;
+            border-top: 1px solid #29292e;
 
             font-size: 10px;
-
             color: #66666e;
 
         }
 
 
-        @keyframes prioridadesEntrada {
+        @keyframes tarefasEntrada {
 
             from {
-
                 opacity: 0;
-
-                transform:
-                    translate(
-                        -8px,
-                        -50%
-                    );
-
+                transform: translate(8px, -50%);
             }
 
             to {
-
                 opacity: 1;
-
-                transform:
-                    translate(
-                        0,
-                        -50%
-                    );
-
+                transform: translate(0, -50%);
             }
 
         }
 
 
-        @media (
-            max-width: 1249px
-        ) {
+        @media (max-width: 1249px) {
 
-            .painel-prioridades-dia {
-
+            .painel-tarefas-trabalho {
                 display: none;
-
             }
 
         }
 
     `;
 
-
-    document.head.appendChild(
-        estilo
-    );
+    document.head.appendChild(estiloTarefas);
 
 
     // ==================================================
     // INICIAR
     // ==================================================
 
-    criarPainelPrioridades();
+    criarPainelTarefas();
 
 }
     
