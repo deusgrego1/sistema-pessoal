@@ -422,7 +422,87 @@
         // TAREFAS VINDAS DO TRABALHO (?origem=trabalho)
         // ==================================================
         function carregarTarefasDoTrabalho() {
-            if (origemURL !== "trabalho") return;
+    if (origemURL !== "trabalho") return;
+
+    const chaveTarefasTrabalho = `planejamento_${dataAtual}_trabalho_tarefas`;
+    const raw = localStorage.getItem(chaveTarefasTrabalho);
+    if (!raw) return;
+
+    let tarefas = [];
+    try {
+        tarefas = JSON.parse(raw);
+    } catch (e) {
+        return;
+    }
+
+    if (!Array.isArray(tarefas) || tarefas.length === 0) return;
+
+    const card = document.getElementById("cardTarefasTrabalho");
+    const ul   = document.getElementById("listaTarefasTrabalho");
+    card.style.display = "";
+
+    const tarefaAtual = (tarefaFoco.value || "").trim();
+
+    tarefas.forEach(t => {
+        const texto = (t.texto || "").trim();
+        if (!texto) return;
+
+        const li = document.createElement("li");
+
+        // Emoji de prioridade
+        const prioIcone =
+            t.prioridade === "alta"  ? "🔴" :
+            t.prioridade === "media" ? "🟡" :
+            t.prioridade === "baixa" ? "🟢" : "";
+
+        const spanTexto = document.createElement("span");
+        spanTexto.className = "tarefa-texto";
+        spanTexto.textContent = `${prioIcone} ${texto}`.trim();
+
+        const spanAcao = document.createElement("span");
+        spanAcao.className = "tarefa-acao";
+
+        if (t.concluida) {
+            li.classList.add("usada");
+            li.style.opacity = "0.55";
+            spanAcao.textContent = "✓ concluída";
+        } else if (texto === tarefaAtual) {
+            li.classList.add("usada");
+            spanAcao.textContent = "✓ em uso";
+        } else {
+            spanAcao.textContent = "usar →";
+        }
+
+        li.appendChild(spanTexto);
+        li.appendChild(spanAcao);
+
+        // Só deixa clicar se não estiver concluída
+        if (!t.concluida) {
+            li.addEventListener("click", () => {
+                tarefaFoco.value = texto;
+                localStorage.setItem(chaveTarefa, texto);
+
+                ul.querySelectorAll("li").forEach(el => {
+                    if (el.dataset.concluida === "1") return;
+                    el.classList.remove("usada");
+                    const a = el.querySelector(".tarefa-acao");
+                    if (a) a.textContent = "usar →";
+                });
+
+                li.classList.add("usada");
+                spanAcao.textContent = "✓ em uso";
+
+                tarefaFoco.focus();
+                tarefaFoco.scrollIntoView({ behavior: "smooth", block: "center" });
+            });
+        } else {
+            li.dataset.concluida = "1";
+            li.style.cursor = "default";
+        }
+
+        ul.appendChild(li);
+    });
+}
 
             // Campo "Tarefas" da página Trabalho (índice 1 no schema)
             const chaveTarefasTrabalho = `planejamento_${dataAtual}_trabalho_1`;
