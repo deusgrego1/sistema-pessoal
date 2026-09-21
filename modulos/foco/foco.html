@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Foco</title>
-
     <link rel="stylesheet" href="../../css/style.css">
 
     <style>
@@ -29,8 +27,6 @@
             border-bottom: 1px solid #eee;
             font-size: 15px;
         }
-
-        /* Playlists */
 
         .playlists-linha {
             display: flex;
@@ -59,33 +55,58 @@
             transform: translateY(-1px);
         }
 
-        .playlist-link .sp-icon {
-            font-size: 14px;
-        }
-
-        /* Ajustes tema escuro para a página (ela era antiga e clara) */
+        .playlist-link .sp-icon { font-size: 14px; }
 
         .btn-pausa {
             background: #1a1a1e;
             border-color: #333338;
             color: #bbb;
         }
+        .btn-pausa:hover { background: #222228; color: #e0e0e0; }
+        .btn-pausa.ativo { background: #333; color: #fff; border-color: #55555c; }
 
-        .btn-pausa:hover {
-            background: #222228;
-            color: #e0e0e0;
-        }
+        .item-pausa { border-bottom: 1px solid #252529; color: #ccc; }
 
-        .btn-pausa.ativo {
-            background: #333;
-            color: #fff;
-            border-color: #55555c;
+        /* ---------- Tarefas vindas do Trabalho ---------- */
+        .lista-tarefas {
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
-
-        .item-pausa {
-            border-bottom: 1px solid #252529;
-            color: #ccc;
+        .lista-tarefas li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            margin-bottom: 6px;
+            background: #1c1c20;
+            border-left: 3px solid #333;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #d0d0d0;
+            transition: 0.15s;
         }
+        .lista-tarefas li:hover {
+            background: #25252b;
+            border-left-color: #4caf50;
+        }
+        .lista-tarefas li.usada {
+            border-left-color: #4caf50;
+            color: #888;
+        }
+        .lista-tarefas li .tarefa-texto {
+            flex: 1;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .lista-tarefas li .tarefa-acao {
+            color: #666;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+        .lista-tarefas li:hover .tarefa-acao { color: #4caf50; }
+        .lista-tarefas li.usada .tarefa-acao { color: #4caf50; }
     </style>
 </head>
 
@@ -96,31 +117,33 @@
         <header class="header">
             <p class="eyebrow">FOCO</p>
             <h1>🎯 Foco</h1>
-            <p class="subtitle">
-                Escolha uma ação e execute.
-            </p>
+            <p class="subtitle">Escolha uma ação e execute.</p>
         </header>
 
         <section class="modules">
 
             <!-- O QUE VOU FAZER -->
-
             <div class="module-card">
                 <span class="icon">🎯</span>
                 <div>
                     <h2>O que vou fazer?</h2>
-
-                    <input
-                        type="text"
-                        id="tarefaFoco"
-                        placeholder="Tarefa ou prioridade do dia"
-                    >
+                    <input type="text" id="tarefaFoco" placeholder="Tarefa ou prioridade do dia">
                 </div>
             </div>
 
+            <!-- TAREFAS DO TRABALHO (só aparece se ?origem=trabalho) -->
+            <div class="module-card" id="cardTarefasTrabalho" style="display: none;">
+                <span class="icon">📋</span>
+                <div style="width: 100%;">
+                    <h2>Tarefas do Trabalho</h2>
+                    <p style="color:#888; font-size:13px; margin-bottom:12px;">
+                        Clique em uma tarefa para definir como foco desta sessão.
+                    </p>
+                    <ul id="listaTarefasTrabalho" class="lista-tarefas"></ul>
+                </div>
+            </div>
 
             <!-- SESSÃO -->
-
             <div class="module-card">
                 <span class="icon">⏱️</span>
                 <div style="width: 100%;">
@@ -134,305 +157,151 @@
                         <option value="90">90 minutos</option>
                     </select>
 
-                    <p
-                        id="displayTimer"
-                        style="
-                            font-size: 52px;
-                            text-align: center;
-                            margin: 22px 0 10px;
-                            font-variant-numeric: tabular-nums;
-                            letter-spacing: 2px;
-                        "
-                    >
-                        50:00
-                    </p>
+                    <p id="displayTimer" style="
+                        font-size: 52px; text-align: center; margin: 22px 0 10px;
+                        font-variant-numeric: tabular-nums; letter-spacing: 2px;
+                    ">50:00</p>
 
-                    <div
-                        style="
-                            width: 100%;
-                            height: 8px;
-                            background: #252529;
-                            border-radius: 4px;
-                            overflow: hidden;
-                            margin-bottom: 20px;
-                        "
-                    >
-                        <div
-                            id="barraProgresso"
-                            style="
-                                height: 100%;
-                                width: 0%;
-                                background: #4caf50;
-                                transition: width 0.4s ease;
-                            "
-                        ></div>
+                    <div style="
+                        width: 100%; height: 8px; background: #252529;
+                        border-radius: 4px; overflow: hidden; margin-bottom: 20px;
+                    ">
+                        <div id="barraProgresso" style="
+                            height: 100%; width: 0%; background: #4caf50;
+                            transition: width 0.4s ease;
+                        "></div>
                     </div>
 
                     <div style="display: flex; gap: 10px;">
+                        <button type="button" id="btnIniciar" style="
+                            flex: 1; padding: 12px; font-size: 16px; cursor: pointer;
+                            border: 1px solid #333; border-radius: 8px;
+                            background: #333; color: #fff;
+                        ">▶️ Iniciar</button>
 
-                        <button
-                            type="button"
-                            id="btnIniciar"
-                            style="
-                                flex: 1;
-                                padding: 12px;
-                                font-size: 16px;
-                                cursor: pointer;
-                                border: 1px solid #333;
-                                border-radius: 8px;
-                                background: #333;
-                                color: #fff;
-                            "
-                        >
-                            ▶️ Iniciar
-                        </button>
-
-                        <button
-                            type="button"
-                            id="btnReiniciar"
-                            title="Reiniciar"
-                            style="
-                                padding: 12px 16px;
-                                font-size: 16px;
-                                cursor: pointer;
-                                border: 1px solid #333338;
-                                border-radius: 8px;
-                                background: #1a1a1e;
-                                color: #bbb;
-                            "
-                        >
-                            🔄
-                        </button>
-
+                        <button type="button" id="btnReiniciar" title="Reiniciar" style="
+                            padding: 12px 16px; font-size: 16px; cursor: pointer;
+                            border: 1px solid #333338; border-radius: 8px;
+                            background: #1a1a1e; color: #bbb;
+                        ">🔄</button>
                     </div>
-
-                    <!-- Ações ao terminar -->
 
                     <div id="acoesFim" style="display:none; margin-top: 14px;">
-                        <button
-                            type="button"
-                            id="btnNovoFoco"
-                            style="
-                                width: 100%;
-                                padding: 12px;
-                                font-size: 16px;
-                                cursor: pointer;
-                                border: 1px solid #333;
-                                border-radius: 8px;
-                                background: #333;
-                                color: #fff;
-                            "
-                        >
-                            ▶️ Iniciar novo foco
-                        </button>
+                        <button type="button" id="btnNovoFoco" style="
+                            width: 100%; padding: 12px; font-size: 16px; cursor: pointer;
+                            border: 1px solid #333; border-radius: 8px;
+                            background: #333; color: #fff;
+                        ">▶️ Iniciar novo foco</button>
                     </div>
 
-
-                    <!-- PLAYLISTS -->
-
-                    <p style="color: #777; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; text-align: center; margin-top: 22px;">
+                    <p style="color: #777; font-size: 11px; letter-spacing: 1px;
+                              text-transform: uppercase; text-align: center; margin-top: 22px;">
                         🎧 Trilha sonora
                     </p>
 
                     <div class="playlists-linha">
-                        <a
-                            href="https://open.spotify.com/playlist/6BpVYHnVFxJIKtaCKUXjH6?si=579a167debab47a2"
-                            target="_blank"
-                            rel="noopener"
-                            class="playlist-link"
-                        >
+                        <a href="https://open.spotify.com/playlist/6BpVYHnVFxJIKtaCKUXjH6?si=579a167debab47a2"
+                           target="_blank" rel="noopener" class="playlist-link">
                             <span class="sp-icon">🎧</span> Foco profundo
                         </a>
-
-                        <a
-                            href="https://open.spotify.com/playlist/2Al9G2jrWkwDlRFMZaw1GX?si=4fcea0b9a758469a"
-                            target="_blank"
-                            rel="noopener"
-                            class="playlist-link"
-                        >
+                        <a href="https://open.spotify.com/playlist/2Al9G2jrWkwDlRFMZaw1GX?si=4fcea0b9a758469a"
+                           target="_blank" rel="noopener" class="playlist-link">
                             <span class="sp-icon">🎵</span> Foco leve
                         </a>
                     </div>
-
                 </div>
             </div>
 
-
             <!-- DISTRAÇÕES -->
-
             <div class="module-card">
                 <span class="icon">🚫</span>
                 <div>
                     <h2>Distrações</h2>
-
                     <p style="color:#888; font-size:14px; margin-bottom:10px;">
                         Anote o que apareceu na cabeça e continue.
-                        <span
-                            id="contadorDistracoes"
-                            style="
-                                display: inline-block;
-                                margin-left: 6px;
-                                padding: 2px 8px;
-                                background: #252529;
-                                border-radius: 10px;
-                                font-size: 12px;
-                                color: #aaa;
-                            "
-                        >
-                            Hoje: 0
-                        </span>
+                        <span id="contadorDistracoes" style="
+                            display: inline-block; margin-left: 6px;
+                            padding: 2px 8px; background: #252529;
+                            border-radius: 10px; font-size: 12px; color: #aaa;
+                        ">Hoje: 0</span>
                     </p>
 
                     <div style="display: flex; gap: 8px;">
-
-                        <input
-                            type="text"
-                            id="inputDistracao"
-                            placeholder="Ex.: pesquisar câmera para celular"
-                            style="flex: 1;"
-                        >
-
-                        <button
-                            type="button"
-                            id="btnAddDistracao"
-                            style="
-                                padding: 8px 16px;
-                                font-size: 18px;
-                                cursor: pointer;
-                                border: 1px solid #333338;
-                                border-radius: 8px;
-                                background: #1a1a1e;
-                                color: #bbb;
-                            "
-                        >
-                            +
-                        </button>
-
+                        <input type="text" id="inputDistracao"
+                               placeholder="Ex.: pesquisar câmera para celular"
+                               style="flex: 1;">
+                        <button type="button" id="btnAddDistracao" style="
+                            padding: 8px 16px; font-size: 18px; cursor: pointer;
+                            border: 1px solid #333338; border-radius: 8px;
+                            background: #1a1a1e; color: #bbb;
+                        ">+</button>
                     </div>
 
-                    <ul
-                        id="listaDistracoes"
-                        style="
-                            list-style: none;
-                            padding: 0;
-                            margin-top: 14px;
-                        "
-                    ></ul>
+                    <ul id="listaDistracoes" style="list-style: none; padding: 0; margin-top: 14px;"></ul>
                 </div>
             </div>
 
-
             <!-- NOTAS -->
-
             <div class="module-card">
                 <span class="icon">📝</span>
                 <div>
                     <h2>Notas da sessão</h2>
-
-                    <textarea
-                        id="notasFoco"
-                        placeholder="Anotações enquanto executa."
-                        rows="5"
-                    ></textarea>
+                    <textarea id="notasFoco" placeholder="Anotações enquanto executa." rows="5"></textarea>
                 </div>
             </div>
 
-
             <!-- PAUSA -->
-
             <div class="module-card">
                 <span class="icon">⏸️</span>
                 <div style="width: 100%;">
                     <h2>Pausa</h2>
-
                     <p style="color:#888; font-size:14px; margin-bottom:14px;">
                         Escolha uma categoria e faça algo consciente.
                     </p>
 
                     <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom:18px;">
-
-                        <button type="button" class="btn-pausa" data-cat="curta">
-                            ⚡ Pausa curta
-                        </button>
-
-                        <button type="button" class="btn-pausa" data-cat="longa">
-                            🌿 Pausa longa
-                        </button>
-
-                        <button type="button" class="btn-pausa" data-cat="tarefas">
-                            🔄 Entre tarefas
-                        </button>
-
-                        <button type="button" class="btn-pausa" data-cat="semNada">
-                            🕳️ Sem fazer nada
-                        </button>
-
+                        <button type="button" class="btn-pausa" data-cat="curta">⚡ Pausa curta</button>
+                        <button type="button" class="btn-pausa" data-cat="longa">🌿 Pausa longa</button>
+                        <button type="button" class="btn-pausa" data-cat="tarefas">🔄 Entre tarefas</button>
+                        <button type="button" class="btn-pausa" data-cat="semNada">🕳️ Sem fazer nada</button>
                     </div>
 
                     <div id="listaPausas"></div>
 
-                    <button
-                        type="button"
-                        id="btnSorteio"
-                        style="
-                            margin-top: 16px;
-                            padding: 12px;
-                            width: 100%;
-                            font-size: 16px;
-                            cursor: pointer;
-                            border: 1px solid #333338;
-                            border-radius: 8px;
-                            background: #1a1a1e;
-                            color: #bbb;
-                        "
-                    >
-                        🎲 Escolher por mim
-                    </button>
+                    <button type="button" id="btnSorteio" style="
+                        margin-top: 16px; padding: 12px; width: 100%;
+                        font-size: 16px; cursor: pointer;
+                        border: 1px solid #333338; border-radius: 8px;
+                        background: #1a1a1e; color: #bbb;
+                    ">🎲 Escolher por mim</button>
 
-                    <div
-                        id="resultadoSorteio"
-                        style="
-                            margin-top: 14px;
-                            padding: 14px;
-                            border-radius: 8px;
-                            background: #1c1c20;
-                            border: 1px solid #252529;
-                            font-size: 16px;
-                            color: #e0e0e0;
-                            display: none;
-                        "
-                    ></div>
-
+                    <div id="resultadoSorteio" style="
+                        margin-top: 14px; padding: 14px; border-radius: 8px;
+                        background: #1c1c20; border: 1px solid #252529;
+                        font-size: 16px; color: #e0e0e0; display: none;
+                    "></div>
                 </div>
             </div>
 
         </section>
 
-        <a href="../../index.html" class="back-button">
-            ← Voltar para o início
-        </a>
+        <a href="../../index.html" class="back-button">← Voltar para o início</a>
 
     </main>
-
 
     <script>
         // ==================================================
         // DATA ATUAL
         // ==================================================
-
         const hoje = new Date();
-
         const ano = hoje.getFullYear();
         const mes = String(hoje.getMonth() + 1).padStart(2, "0");
         const dia = String(hoje.getDate()).padStart(2, "0");
-
         const dataAtual = `${ano}-${mes}-${dia}`;
-
 
         // ==================================================
         // CHAVES
         // ==================================================
-
         const chaveTarefa     = `planejamento_${dataAtual}_foco_tarefa`;
         const chaveTempo      = `planejamento_${dataAtual}_foco_tempo`;
         const chaveNotas      = `planejamento_${dataAtual}_foco_notas`;
@@ -440,45 +309,40 @@
         const chaveSessoes    = `planejamento_${dataAtual}_foco_sessoes`;
         const chaveEstado     = `planejamento_${dataAtual}_foco_estado`;
 
-
         // ==================================================
         // BIBLIOTECA DE PAUSAS
         // ==================================================
-
         const pausas = {
-
             curta: [
-                "💧 Beber água", "🚶 Caminhar pela casa", "👀 Descansar os olhos",
-                "🧘 Fazer respiração profunda", "🚽 Ir ao banheiro",
-                "🪟 Ir até uma janela e olhar para longe", "🤸 Alongar o corpo",
-                "🧍 Ficar alguns minutos em pé", "🧹 Organizar rapidamente a mesa",
-                "🗑️ Jogar algo fora", "🌿 Ir para uma área externa",
-                "😮‍💨 Fazer uma pausa sem tela", "🧼 Lavar o rosto",
-                "☀️ Tomar um pouco de sol", "🧠 Ficar alguns minutos em silêncio",
-                "📝 Anotar algo que está incomodando", "🎵 Ouvir uma música",
+                "💧 Beber água","🚶 Caminhar pela casa","👀 Descansar os olhos",
+                "🧘 Fazer respiração profunda","🚽 Ir ao banheiro",
+                "🪟 Ir até uma janela e olhar para longe","🤸 Alongar o corpo",
+                "🧍 Ficar alguns minutos em pé","🧹 Organizar rapidamente a mesa",
+                "🗑️ Jogar algo fora","🌿 Ir para uma área externa",
+                "😮‍💨 Fazer uma pausa sem tela","🧼 Lavar o rosto",
+                "☀️ Tomar um pouco de sol","🧠 Ficar alguns minutos em silêncio",
+                "📝 Anotar algo que está incomodando","🎵 Ouvir uma música",
                 "🐕 Interagir rapidamente com um animal de estimação",
-                "👕 Arrumar a roupa/ambiente", "🙏 Fazer uma oração curta"
+                "👕 Arrumar a roupa/ambiente","🙏 Fazer uma oração curta"
             ],
-
             longa: [
-                "🍽️ Fazer uma refeição", "🚿 Tomar banho", "🚶 Fazer uma caminhada",
-                "🎵 Ouvir música", "📖 Ler algumas páginas", "🧘 Meditar",
-                "🙏 Fazer um momento com Deus", "🏃 Fazer uma atividade física leve",
-                "☕ Preparar e tomar um café", "🌳 Ficar um tempo ao ar livre",
-                "🧹 Organizar o quarto", "🧺 Organizar roupas",
-                "🍳 Preparar alguma comida", "🗣️ Conversar com alguém",
-                "🎨 Fazer uma atividade criativa", "✍️ Escrever livremente",
-                "😴 Tirar um descanso breve", "🧩 Fazer um hobby",
-                "📵 Ficar longe do celular", "🌅 Simplesmente sentar e descansar"
+                "🍽️ Fazer uma refeição","🚿 Tomar banho","🚶 Fazer uma caminhada",
+                "🎵 Ouvir música","📖 Ler algumas páginas","🧘 Meditar",
+                "🙏 Fazer um momento com Deus","🏃 Fazer uma atividade física leve",
+                "☕ Preparar e tomar um café","🌳 Ficar um tempo ao ar livre",
+                "🧹 Organizar o quarto","🧺 Organizar roupas",
+                "🍳 Preparar alguma comida","🗣️ Conversar com alguém",
+                "🎨 Fazer uma atividade criativa","✍️ Escrever livremente",
+                "😴 Tirar um descanso breve","🧩 Fazer um hobby",
+                "📵 Ficar longe do celular","🌅 Simplesmente sentar e descansar"
             ],
-
             tarefas: [
-                "💾 Salvar o trabalho", "📁 Organizar os arquivos usados",
-                "📝 Registrar onde parou", "🎯 Definir a próxima ação",
-                "🧹 Limpar a mesa", "💧 Beber água", "🚶 Levantar e caminhar",
-                "👀 Descansar os olhos", "🧘 Respirar profundamente",
-                "📋 Conferir o que foi concluído", "🗑️ Fechar arquivos desnecessários",
-                "🖥️ Fechar programas que não serão usados", "📱 Guardar o celular",
+                "💾 Salvar o trabalho","📁 Organizar os arquivos usados",
+                "📝 Registrar onde parou","🎯 Definir a próxima ação",
+                "🧹 Limpar a mesa","💧 Beber água","🚶 Levantar e caminhar",
+                "👀 Descansar os olhos","🧘 Respirar profundamente",
+                "📋 Conferir o que foi concluído","🗑️ Fechar arquivos desnecessários",
+                "🖥️ Fechar programas que não serão usados","📱 Guardar o celular",
                 "🧠 Esvaziar a cabeça por alguns minutos",
                 "📝 Registrar uma ideia que surgiu",
                 "⏱️ Definir o próximo bloco de foco",
@@ -487,95 +351,148 @@
                 "🌿 Ir rapidamente para outro ambiente",
                 "▶️ Começar imediatamente a próxima ação"
             ],
-
             semNada: [
-                "📖 Ler um capítulo", "🎓 Fazer uma aula", "🧠 Estudar um conceito",
-                "📚 Pesquisar um assunto", "📝 Fazer anotações",
-                "🗣️ Praticar comunicação", "🇺🇸 Estudar inglês",
-                "💼 Estudar vendas", "📈 Estudar marketing",
-                "💻 Aprender uma habilidade", "🚶 Caminhar", "🏃 Fazer cardio",
-                "🤸 Alongar", "🏋️ Fazer um treino", "🧘 Relaxar o corpo",
-                "💡 Desenvolver uma ideia", "🎬 Criar uma ideia de conteúdo",
-                "✍️ Escrever", "🛠️ Trabalhar em um projeto pessoal",
+                "📖 Ler um capítulo","🎓 Fazer uma aula","🧠 Estudar um conceito",
+                "📚 Pesquisar um assunto","📝 Fazer anotações",
+                "🗣️ Praticar comunicação","🇺🇸 Estudar inglês",
+                "💼 Estudar vendas","📈 Estudar marketing",
+                "💻 Aprender uma habilidade","🚶 Caminhar","🏃 Fazer cardio",
+                "🤸 Alongar","🏋️ Fazer um treino","🧘 Relaxar o corpo",
+                "💡 Desenvolver uma ideia","🎬 Criar uma ideia de conteúdo",
+                "✍️ Escrever","🛠️ Trabalhar em um projeto pessoal",
                 "🔬 Fazer uma pesquisa útil"
             ]
-
         };
-
 
         // ==================================================
         // ELEMENTOS
         // ==================================================
-
-        const tarefaFoco       = document.getElementById("tarefaFoco");
-        const tempoFoco        = document.getElementById("tempoFoco");
-        const displayTimer     = document.getElementById("displayTimer");
-        const barraProgresso   = document.getElementById("barraProgresso");
-        const btnIniciar       = document.getElementById("btnIniciar");
-        const btnReiniciar     = document.getElementById("btnReiniciar");
-        const btnNovoFoco      = document.getElementById("btnNovoFoco");
-        const acoesFim         = document.getElementById("acoesFim");
-        const inputDistracao   = document.getElementById("inputDistracao");
-        const btnAddDistracao  = document.getElementById("btnAddDistracao");
-        const listaDistracoes  = document.getElementById("listaDistracoes");
+        const tarefaFoco         = document.getElementById("tarefaFoco");
+        const tempoFoco          = document.getElementById("tempoFoco");
+        const displayTimer       = document.getElementById("displayTimer");
+        const barraProgresso     = document.getElementById("barraProgresso");
+        const btnIniciar         = document.getElementById("btnIniciar");
+        const btnReiniciar       = document.getElementById("btnReiniciar");
+        const btnNovoFoco        = document.getElementById("btnNovoFoco");
+        const acoesFim           = document.getElementById("acoesFim");
+        const inputDistracao     = document.getElementById("inputDistracao");
+        const btnAddDistracao    = document.getElementById("btnAddDistracao");
+        const listaDistracoes    = document.getElementById("listaDistracoes");
         const contadorDistracoes = document.getElementById("contadorDistracoes");
-        const notasFoco        = document.getElementById("notasFoco");
-        const listaPausas      = document.getElementById("listaPausas");
-        const btnSorteio       = document.getElementById("btnSorteio");
-        const resultadoSorteio = document.getElementById("resultadoSorteio");
+        const notasFoco          = document.getElementById("notasFoco");
+        const listaPausas        = document.getElementById("listaPausas");
+        const btnSorteio         = document.getElementById("btnSorteio");
+        const resultadoSorteio   = document.getElementById("resultadoSorteio");
 
+        // ==================================================
+        // CARREGAR VALORES SALVOS
+        // ==================================================
+        tarefaFoco.value = localStorage.getItem(chaveTarefa) || "";
+        notasFoco.value  = localStorage.getItem(chaveNotas)  || "";
 
-       // ==================================================
-// CARREGAR VALORES SALVOS
-// ==================================================
+        const tempoSalvo = localStorage.getItem(chaveTempo);
+        if (tempoSalvo) tempoFoco.value = tempoSalvo;
 
-tarefaFoco.value = localStorage.getItem(chaveTarefa) || "";
-notasFoco.value  = localStorage.getItem(chaveNotas)  || "";
+        // ==================================================
+        // PARÂMETROS DA URL (?tarefa=, ?tempo=, ?origem=)
+        // ==================================================
+        const paramsURL = new URLSearchParams(window.location.search);
+        const tarefaURL = paramsURL.get("tarefa");
+        const tempoURL  = paramsURL.get("tempo");
+        const origemURL = paramsURL.get("origem");
 
-const tempoSalvo = localStorage.getItem(chaveTempo);
-if (tempoSalvo) tempoFoco.value = tempoSalvo;
+        if (tarefaURL) {
+            tarefaFoco.value = tarefaURL;
+            localStorage.setItem(chaveTarefa, tarefaURL);
+        }
 
+        if (tempoURL && ["5","15","25","30","50","90"].includes(tempoURL)) {
+            const existe = Array.from(tempoFoco.options).some(o => o.value === tempoURL);
+            if (!existe) {
+                const opt = document.createElement("option");
+                opt.value = tempoURL;
+                opt.textContent = tempoURL + " minutos";
+                tempoFoco.appendChild(opt);
+            }
+            tempoFoco.value = tempoURL;
+            localStorage.setItem(chaveTempo, tempoURL);
+        }
 
-// ==================================================
-// PARÂMETROS DA URL (?tarefa= e ?tempo=)
-// ==================================================
+        // ==================================================
+        // TAREFAS VINDAS DO TRABALHO (?origem=trabalho)
+        // ==================================================
+        function carregarTarefasDoTrabalho() {
+            if (origemURL !== "trabalho") return;
 
-const paramsURL = new URLSearchParams(window.location.search);
-const tarefaURL = paramsURL.get("tarefa");
-const tempoURL  = paramsURL.get("tempo");
+            // Campo "Tarefas" da página Trabalho (índice 1 no schema)
+            const chaveTarefasTrabalho = `planejamento_${dataAtual}_trabalho_1`;
+            const raw = localStorage.getItem(chaveTarefasTrabalho) || "";
+            const linhas = raw.split("\n").map(l => l.trim()).filter(Boolean);
 
-if (tarefaURL) {
-    tarefaFoco.value = tarefaURL;
-    localStorage.setItem(chaveTarefa, tarefaURL);
-}
+            if (linhas.length === 0) return;
 
-if (tempoURL && ["5", "15", "25", "30", "50", "90"].includes(tempoURL)) {
+            const card = document.getElementById("cardTarefasTrabalho");
+            const ul   = document.getElementById("listaTarefasTrabalho");
 
-    // Se o tempo da URL não existir no select, adiciona
-    const existe = Array.from(tempoFoco.options).some(o => o.value === tempoURL);
+            card.style.display = "";
 
-    if (!existe) {
-        const opt = document.createElement("option");
-        opt.value = tempoURL;
-        opt.textContent = tempoURL + " minutos";
-        tempoFoco.appendChild(opt);
-    }
+            const tarefaAtual = (tarefaFoco.value || "").trim();
 
-    tempoFoco.value = tempoURL;
-    localStorage.setItem(chaveTempo, tempoURL);
-}
+            linhas.forEach(linha => {
+                // Limpa marcadores tipo "- ", "* ", "• "
+                const texto = linha.replace(/^[-*•]\s*/, "").trim();
+                if (!texto) return;
 
+                const li = document.createElement("li");
+
+                const spanTexto = document.createElement("span");
+                spanTexto.className = "tarefa-texto";
+                spanTexto.textContent = texto;
+
+                const spanAcao = document.createElement("span");
+                spanAcao.className = "tarefa-acao";
+
+                if (texto === tarefaAtual) {
+                    li.classList.add("usada");
+                    spanAcao.textContent = "✓ em uso";
+                } else {
+                    spanAcao.textContent = "usar →";
+                }
+
+                li.appendChild(spanTexto);
+                li.appendChild(spanAcao);
+
+                li.addEventListener("click", () => {
+                    tarefaFoco.value = texto;
+                    localStorage.setItem(chaveTarefa, texto);
+
+                    // Reseta visual da lista
+                    ul.querySelectorAll("li").forEach(el => {
+                        el.classList.remove("usada");
+                        const a = el.querySelector(".tarefa-acao");
+                        if (a) a.textContent = "usar →";
+                    });
+
+                    li.classList.add("usada");
+                    spanAcao.textContent = "✓ em uso";
+
+                    tarefaFoco.focus();
+                    tarefaFoco.scrollIntoView({ behavior: "smooth", block: "center" });
+                });
+
+                ul.appendChild(li);
+            });
+        }
 
         // ==================================================
         // TIMER
         // ==================================================
-
-        let rodando          = false;
-        let duracaoTotal     = Number(tempoFoco.value) * 60;
+        let rodando           = false;
+        let duracaoTotal      = Number(tempoFoco.value) * 60;
         let segundosRestantes = duracaoTotal;
-        let inicioSessao     = null;
-        let intervalId       = null;
-        let wakeLock         = null;
+        let inicioSessao      = null;
+        let intervalId        = null;
+        let wakeLock          = null;
 
         function formatarTempo(segundos) {
             const m = String(Math.floor(segundos / 60)).padStart(2, "0");
@@ -583,9 +500,7 @@ if (tempoURL && ["5", "15", "25", "30", "50", "90"].includes(tempoURL)) {
             return `${m}:${s}`;
         }
 
-        function atualizarDisplay() {
-            displayTimer.textContent = formatarTempo(segundosRestantes);
-        }
+        function atualizarDisplay() { displayTimer.textContent = formatarTempo(segundosRestantes); }
 
         function atualizarBarra() {
             const pct = duracaoTotal > 0
@@ -600,11 +515,9 @@ if (tempoURL && ["5", "15", "25", "30", "50", "90"].includes(tempoURL)) {
                 : "Foco";
         }
 
-
         // ==================================================
         // ESTADO PERSISTENTE
         // ==================================================
-
         function salvarEstado() {
             localStorage.setItem(chaveEstado, JSON.stringify({
                 rodando, inicio: inicioSessao,
@@ -644,11 +557,9 @@ if (tempoURL && ["5", "15", "25", "30", "50", "90"].includes(tempoURL)) {
             }
         }
 
-
         // ==================================================
         // SOM / NOTIFICAÇÃO / WAKE LOCK
         // ==================================================
-
         function tocarBipe() {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -687,17 +598,12 @@ if (tempoURL && ["5", "15", "25", "30", "50", "90"].includes(tempoURL)) {
         }
 
         function liberarWakeLock() {
-            if (wakeLock) {
-                wakeLock.release().catch(() => {});
-                wakeLock = null;
-            }
+            if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
         }
-
 
         // ==================================================
         // REGISTRAR SESSÃO
         // ==================================================
-
         function registrarSessao(tarefa, duracaoSegundos) {
             let sessoes = [];
             try { sessoes = JSON.parse(localStorage.getItem(chaveSessoes)) || []; }
@@ -710,11 +616,9 @@ if (tempoURL && ["5", "15", "25", "30", "50", "90"].includes(tempoURL)) {
             localStorage.setItem(chaveSessoes, JSON.stringify(sessoes));
         }
 
-
         // ==================================================
         // CICLO
         // ==================================================
-
         function tick() {
             segundosRestantes--;
             if (segundosRestantes < 0) segundosRestantes = 0;
@@ -777,11 +681,9 @@ if (tempoURL && ["5", "15", "25", "30", "50", "90"].includes(tempoURL)) {
             tarefaFoco.focus();
         });
 
-
         // ==================================================
         // SALVAMENTO AUTOMÁTICO
         // ==================================================
-
         tarefaFoco.addEventListener("input", () => {
             localStorage.setItem(chaveTarefa, tarefaFoco.value);
         });
@@ -795,11 +697,9 @@ if (tempoURL && ["5", "15", "25", "30", "50", "90"].includes(tempoURL)) {
             if (!rodando) resetTimer();
         });
 
-
         // ==================================================
         // DISTRAÇÕES
         // ==================================================
-
         let distracoes = [];
         try {
             const salvas = localStorage.getItem(chaveDistancias);
@@ -871,11 +771,9 @@ if (tempoURL && ["5", "15", "25", "30", "50", "90"].includes(tempoURL)) {
             }
         });
 
-
         // ==================================================
         // PAUSAS
         // ==================================================
-
         let categoriaAtiva = "curta";
         const botoesPausa = document.querySelectorAll(".btn-pausa");
 
@@ -898,11 +796,9 @@ if (tempoURL && ["5", "15", "25", "30", "50", "90"].includes(tempoURL)) {
             btn.addEventListener("click", () => renderizarPausas(btn.dataset.cat));
         });
 
-
         // ==================================================
         // SORTEIO
         // ==================================================
-
         btnSorteio.addEventListener("click", () => {
             const listaAtual = pausas[categoriaAtiva] || [];
             if (listaAtual.length === 0) return;
@@ -912,22 +808,20 @@ if (tempoURL && ["5", "15", "25", "30", "50", "90"].includes(tempoURL)) {
                 `🎲 <strong>Faça agora:</strong><br><br>${escolhida}`;
         });
 
-
         // ==================================================
         // INICIALIZA
         // ==================================================
-
         restaurarEstado();
         atualizarDisplay();
         atualizarBarra();
         atualizarTitulo();
         renderizarDistracoes();
         renderizarPausas("curta");
+        carregarTarefasDoTrabalho();   // ⬅️ novo
 
         if (rodando) intervalId = setInterval(tick, 1000);
     </script>
 
-<script src="../../js/app.js"></script>
-    
+    <script src="../../js/app.js"></script>
 </body>
 </html>
