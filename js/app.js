@@ -1317,16 +1317,25 @@ if (
 
 
     function obterTarefasTrabalho() {
+    const raw = localStorage.getItem(
+        `planejamento_${dataAtual}_trabalho_tarefas`
+    );
+    if (!raw) return [];
 
-        const raw = localStorage.getItem(
-            `planejamento_${dataAtual}_trabalho_1`
-        ) || "";
-
-        return raw
-            .split("\n")
-            .map(l => l.replace(/^[-*•]\s*/, "").trim())
-            .filter(Boolean);
+    try {
+        const arr = JSON.parse(raw);
+        if (!Array.isArray(arr)) return [];
+        return arr
+            .filter(t => t && t.texto && t.texto.trim())
+            .map(t => ({
+                texto: t.texto.trim(),
+                prioridade: t.prioridade || "",
+                concluida: !!t.concluida
+            }));
+    } catch {
+        return [];
     }
+}
 
 
     function criarPainelTarefas() {
@@ -1374,25 +1383,28 @@ if (
             </div>
 
 
-            <div class="tarefas-lista">
+                        <div class="tarefas-lista">
 
                 ${
                     tarefas
-                        .map(tarefa => `
+                        .map(t => {
 
-                            <div class="tarefa-item">
+                            const prioIcone =
+                                t.prioridade === "alta"  ? "🔴" :
+                                t.prioridade === "media" ? "🟡" :
+                                t.prioridade === "baixa" ? "🟢" : "○";
 
-                                <div class="tarefa-marcador">
-                                    ○
+                            return `
+                                <div class="tarefa-item" ${t.concluida ? 'style="opacity:.55"' : ""}>
+                                    <div class="tarefa-marcador">
+                                        ${t.concluida ? "✓" : prioIcone}
+                                    </div>
+                                    <div class="tarefa-texto">
+                                        ${escapeHTMLTarefa(t.texto)}
+                                    </div>
                                 </div>
-
-                                <div class="tarefa-texto">
-                                    ${escapeHTMLTarefa(tarefa)}
-                                </div>
-
-                            </div>
-
-                        `)
+                            `;
+                        })
                         .join("")
                 }
 
