@@ -1439,43 +1439,30 @@ if (
     }
 
 
-    function posicionarPainelTarefas(painel) {
+    function posicionarPainel(painel) {
 
-        const larguraTela =
-            window.innerWidth;
+    const larguraTela = window.innerWidth;
 
-        if (larguraTela < 1250) {
-            painel.style.display = "none";
-            return;
-        }
-
-
-        const rect =
-            containerTarefas.getBoundingClientRect();
-
-        const larguraPainel = 220;
-        const distancia     = 28;
-
-
-        // Aqui é o espelho do painel de prioridades:
-        // em vez de "left - painel", usamos "right + painel"
-        const esquerda =
-            rect.right + distancia;
-
-
-        if (
-            esquerda + larguraPainel >
-            larguraTela - 12
-        ) {
-            painel.style.display = "none";
-            return;
-        }
-
-
-        painel.style.display = "block";
-        painel.style.left = `${esquerda}px`;
-
+    if (larguraTela < 1250) {
+        painel.style.display = "none";
+        return;
     }
+
+    const rect          = container.getBoundingClientRect();
+    const larguraPainel = 220;
+    const distancia     = 28;
+
+    const esquerda = rect.left - larguraPainel - distancia;
+
+    // Só aparece à esquerda. Se não couber, esconde.
+    if (esquerda < 12) {
+        painel.style.display = "none";
+        return;
+    }
+
+    painel.style.display = "block";
+    painel.style.left = `${esquerda}px`;
+}
 
 
     // ==================================================
