@@ -53,6 +53,39 @@
         .lista-tarefas li .tarefa-acao { color: #666; font-size: 12px; flex-shrink: 0; }
         .lista-tarefas li:hover .tarefa-acao { color: #4caf50; }
         .lista-tarefas li.usada .tarefa-acao { color: #4caf50; }
+
+        /* Painel lateral direito — Tarefas do Trabalho */
+#cardTarefasTrabalho.painel-lateral-direita {
+    position: fixed;
+    top: 50%;
+    right: 24px;
+    transform: translateY(-50%);
+    width: 260px;
+    max-height: 75vh;
+    overflow-y: auto;
+    z-index: 9999;
+    margin: 0;
+    border: 1px solid #2a2a30;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
+    animation: entradaDireita 0.35s ease;
+}
+
+@keyframes entradaDireita {
+    from { opacity: 0; transform: translate(8px, -50%); }
+    to   { opacity: 1; transform: translate(0, -50%); }
+}
+
+@media (max-width: 1100px) {
+    #cardTarefasTrabalho.painel-lateral-direita {
+        position: static;
+        transform: none;
+        width: 100%;
+        max-height: none;
+        margin-bottom: 20px;
+        animation: none;
+    }
+}
+        
     </style>
 </head>
 
@@ -388,6 +421,7 @@
             if (!card || !ul) return;
 
             card.style.display = "";
+card.classList.add("painel-lateral-direita");
             ul.innerHTML = "";
 
             const tarefaAtual = (tarefaFoco.value || "").trim();
