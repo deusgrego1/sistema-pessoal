@@ -889,18 +889,111 @@
         });
 
         // ==================================================
-        // INICIALIZA
-        // ==================================================
-        restaurarEstado();
-        atualizarDisplay();
-        atualizarBarra();
-        atualizarTitulo();
-        renderizarDistracoes();
-        renderizarPausas("curta");
-        carregarTarefasDoTrabalho();   // ⬅️ novo
+// TAREFAS DO TRABALHO (?origem=trabalho)
+// ==================================================
 
-        if (rodando) intervalId = setInterval(tick, 1000);
-    </script>
+function carregarTarefasDoTrabalho() {
+
+    if (origemURL !== "trabalho") return;
+
+    const chaveTarefasTrabalho =
+        `planejamento_${dataAtual}_trabalho_tarefas`;
+
+    const raw = localStorage.getItem(chaveTarefasTrabalho);
+    if (!raw) return;
+
+    let tarefas = [];
+    try {
+        tarefas = JSON.parse(raw);
+    } catch (e) {
+        return;
+    }
+
+    if (!Array.isArray(tarefas) || tarefas.length === 0) return;
+
+    const card = document.getElementById("cardTarefasTrabalho");
+    const ul   = document.getElementById("listaTarefasTrabalho");
+
+    if (!card || !ul) return;
+
+    card.style.display = "";
+    ul.innerHTML = "";
+
+    const tarefaAtual = (tarefaFoco.value || "").trim();
+
+    tarefas.forEach(t => {
+
+        const texto = (t.texto || "").trim();
+        if (!texto) return;
+
+        const li = document.createElement("li");
+
+        const prioIcone =
+            t.prioridade === "alta"  ? "🔴" :
+            t.prioridade === "media" ? "🟡" :
+            t.prioridade === "baixa" ? "🟢" : "○";
+
+        const spanTexto = document.createElement("span");
+        spanTexto.className = "tarefa-texto";
+        spanTexto.textContent = `${prioIcone} ${texto}`.trim();
+
+        const spanAcao = document.createElement("span");
+        spanAcao.className = "tarefa-acao";
+
+        if (t.concluida) {
+            li.classList.add("usada");
+            li.style.opacity = "0.55";
+            li.style.cursor = "default";
+            li.dataset.concluida = "1";
+            spanAcao.textContent = "✓ concluída";
+        } else if (texto === tarefaAtual) {
+            li.classList.add("usada");
+            spanAcao.textContent = "✓ em uso";
+        } else {
+            spanAcao.textContent = "usar →";
+        }
+
+        li.appendChild(spanTexto);
+        li.appendChild(spanAcao);
+
+        if (!t.concluida) {
+            li.addEventListener("click", () => {
+                tarefaFoco.value = texto;
+                localStorage.setItem(chaveTarefa, texto);
+
+                ul.querySelectorAll("li").forEach(el => {
+                    if (el.dataset.concluida === "1") return;
+                    el.classList.remove("usada");
+                    const a = el.querySelector(".tarefa-acao");
+                    if (a) a.textContent = "usar →";
+                });
+
+                li.classList.add("usada");
+                spanAcao.textContent = "✓ em uso";
+
+                tarefaFoco.focus();
+                tarefaFoco.scrollIntoView({ behavior: "smooth", block: "center" });
+            });
+        }
+
+        ul.appendChild(li);
+    });
+}
+
+
+// ==================================================
+// INICIALIZA
+// ==================================================
+
+restaurarEstado();
+atualizarDisplay();
+atualizarBarra();
+atualizarTitulo();
+renderizarDistracoes();
+renderizarPausas("curta");
+carregarTarefasDoTrabalho();   // ⬅️ chamada da função
+
+if (rodando) intervalId = setInterval(tick, 1000);
 
     <script src="../../js/app.js"></script>
 </body>
