@@ -15,96 +15,42 @@
             border-radius: 20px;
             background: #fff;
         }
-
-        .btn-pausa.ativo {
-            background: #333;
-            color: #fff;
-            border-color: #333;
-        }
-
-        .item-pausa {
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-            font-size: 15px;
-        }
+        .btn-pausa.ativo { background: #333; color: #fff; border-color: #333; }
+        .item-pausa { padding: 8px 0; border-bottom: 1px solid #eee; font-size: 15px; }
 
         .playlists-linha {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 14px;
+            display: flex; justify-content: center; flex-wrap: wrap;
+            gap: 8px; margin-top: 14px;
         }
-
         .playlist-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 7px 13px;
-            font-size: 12px;
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 7px 13px; font-size: 12px;
             border: 1px solid #2c3a55;
             background: linear-gradient(135deg, #1a2235 0%, #232f4a 100%);
-            color: #dfe8ff;
-            border-radius: 16px;
-            text-decoration: none;
+            color: #dfe8ff; border-radius: 16px; text-decoration: none;
             transition: 0.15s;
         }
-
-        .playlist-link:hover {
-            border-color: #4a5c85;
-            transform: translateY(-1px);
-        }
-
+        .playlist-link:hover { border-color: #4a5c85; transform: translateY(-1px); }
         .playlist-link .sp-icon { font-size: 14px; }
 
-        .btn-pausa {
-            background: #1a1a1e;
-            border-color: #333338;
-            color: #bbb;
-        }
+        .btn-pausa { background: #1a1a1e; border-color: #333338; color: #bbb; }
         .btn-pausa:hover { background: #222228; color: #e0e0e0; }
         .btn-pausa.ativo { background: #333; color: #fff; border-color: #55555c; }
-
         .item-pausa { border-bottom: 1px solid #252529; color: #ccc; }
 
-        /* ---------- Tarefas vindas do Trabalho ---------- */
-        .lista-tarefas {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+        /* Tarefas do Trabalho */
+        .lista-tarefas { list-style: none; padding: 0; margin: 0; }
         .lista-tarefas li {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 14px;
-            margin-bottom: 6px;
-            background: #1c1c20;
-            border-left: 3px solid #333;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            color: #d0d0d0;
-            transition: 0.15s;
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px; margin-bottom: 6px;
+            background: #1c1c20; border-left: 3px solid #333;
+            border-radius: 6px; cursor: pointer;
+            font-size: 14px; color: #d0d0d0; transition: 0.15s;
         }
-        .lista-tarefas li:hover {
-            background: #25252b;
-            border-left-color: #4caf50;
-        }
-        .lista-tarefas li.usada {
-            border-left-color: #4caf50;
-            color: #888;
-        }
-        .lista-tarefas li .tarefa-texto {
-            flex: 1;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-        .lista-tarefas li .tarefa-acao {
-            color: #666;
-            font-size: 12px;
-            flex-shrink: 0;
-        }
+        .lista-tarefas li:hover { background: #25252b; border-left-color: #4caf50; }
+        .lista-tarefas li.usada { border-left-color: #4caf50; color: #888; }
+        .lista-tarefas li .tarefa-texto { flex: 1; white-space: pre-wrap; word-break: break-word; }
+        .lista-tarefas li .tarefa-acao { color: #666; font-size: 12px; flex-shrink: 0; }
         .lista-tarefas li:hover .tarefa-acao { color: #4caf50; }
         .lista-tarefas li.usada .tarefa-acao { color: #4caf50; }
     </style>
@@ -131,7 +77,7 @@
                 </div>
             </div>
 
-            <!-- TAREFAS DO TRABALHO (só aparece se ?origem=trabalho) -->
+            <!-- TAREFAS DO TRABALHO -->
             <div class="module-card" id="cardTarefasTrabalho" style="display: none;">
                 <span class="icon">📋</span>
                 <div style="width: 100%;">
@@ -290,6 +236,9 @@
     </main>
 
     <script>
+    (function () {
+        "use strict";
+
         // ==================================================
         // DATA ATUAL
         // ==================================================
@@ -310,7 +259,7 @@
         const chaveEstado     = `planejamento_${dataAtual}_foco_estado`;
 
         // ==================================================
-        // BIBLIOTECA DE PAUSAS
+        // PAUSAS
         // ==================================================
         const pausas = {
             curta: [
@@ -394,7 +343,7 @@
         if (tempoSalvo) tempoFoco.value = tempoSalvo;
 
         // ==================================================
-        // PARÂMETROS DA URL (?tarefa=, ?tempo=, ?origem=)
+        // URL
         // ==================================================
         const paramsURL = new URLSearchParams(window.location.search);
         const tarefaURL = paramsURL.get("tarefa");
@@ -419,120 +368,55 @@
         }
 
         // ==================================================
-        // TAREFAS VINDAS DO TRABALHO (?origem=trabalho)
+        // TAREFAS DO TRABALHO
         // ==================================================
         function carregarTarefasDoTrabalho() {
-    if (origemURL !== "trabalho") return;
+            if (origemURL !== "trabalho") return;
 
-    const chaveTarefasTrabalho = `planejamento_${dataAtual}_trabalho_tarefas`;
-    const raw = localStorage.getItem(chaveTarefasTrabalho);
-    if (!raw) return;
+            const chaveTarefasTrabalho = `planejamento_${dataAtual}_trabalho_tarefas`;
+            const raw = localStorage.getItem(chaveTarefasTrabalho);
+            if (!raw) return;
 
-    let tarefas = [];
-    try {
-        tarefas = JSON.parse(raw);
-    } catch (e) {
-        return;
-    }
+            let tarefas = [];
+            try { tarefas = JSON.parse(raw); }
+            catch (e) { return; }
 
-    if (!Array.isArray(tarefas) || tarefas.length === 0) return;
-
-    const card = document.getElementById("cardTarefasTrabalho");
-    const ul   = document.getElementById("listaTarefasTrabalho");
-    card.style.display = "";
-
-    const tarefaAtual = (tarefaFoco.value || "").trim();
-
-    tarefas.forEach(t => {
-        const texto = (t.texto || "").trim();
-        if (!texto) return;
-
-        const li = document.createElement("li");
-
-        // Emoji de prioridade
-        const prioIcone =
-            t.prioridade === "alta"  ? "🔴" :
-            t.prioridade === "media" ? "🟡" :
-            t.prioridade === "baixa" ? "🟢" : "";
-
-        const spanTexto = document.createElement("span");
-        spanTexto.className = "tarefa-texto";
-        spanTexto.textContent = `${prioIcone} ${texto}`.trim();
-
-        const spanAcao = document.createElement("span");
-        spanAcao.className = "tarefa-acao";
-
-        if (t.concluida) {
-            li.classList.add("usada");
-            li.style.opacity = "0.55";
-            spanAcao.textContent = "✓ concluída";
-        } else if (texto === tarefaAtual) {
-            li.classList.add("usada");
-            spanAcao.textContent = "✓ em uso";
-        } else {
-            spanAcao.textContent = "usar →";
-        }
-
-        li.appendChild(spanTexto);
-        li.appendChild(spanAcao);
-
-        // Só deixa clicar se não estiver concluída
-        if (!t.concluida) {
-            li.addEventListener("click", () => {
-                tarefaFoco.value = texto;
-                localStorage.setItem(chaveTarefa, texto);
-
-                ul.querySelectorAll("li").forEach(el => {
-                    if (el.dataset.concluida === "1") return;
-                    el.classList.remove("usada");
-                    const a = el.querySelector(".tarefa-acao");
-                    if (a) a.textContent = "usar →";
-                });
-
-                li.classList.add("usada");
-                spanAcao.textContent = "✓ em uso";
-
-                tarefaFoco.focus();
-                tarefaFoco.scrollIntoView({ behavior: "smooth", block: "center" });
-            });
-        } else {
-            li.dataset.concluida = "1";
-            li.style.cursor = "default";
-        }
-
-        ul.appendChild(li);
-    });
-}
-
-            // Campo "Tarefas" da página Trabalho (índice 1 no schema)
-            const chaveTarefasTrabalho = `planejamento_${dataAtual}_trabalho_1`;
-            const raw = localStorage.getItem(chaveTarefasTrabalho) || "";
-            const linhas = raw.split("\n").map(l => l.trim()).filter(Boolean);
-
-            if (linhas.length === 0) return;
+            if (!Array.isArray(tarefas) || tarefas.length === 0) return;
 
             const card = document.getElementById("cardTarefasTrabalho");
             const ul   = document.getElementById("listaTarefasTrabalho");
+            if (!card || !ul) return;
 
             card.style.display = "";
+            ul.innerHTML = "";
 
             const tarefaAtual = (tarefaFoco.value || "").trim();
 
-            linhas.forEach(linha => {
-                // Limpa marcadores tipo "- ", "* ", "• "
-                const texto = linha.replace(/^[-*•]\s*/, "").trim();
+            tarefas.forEach(t => {
+                const texto = (t.texto || "").trim();
                 if (!texto) return;
 
                 const li = document.createElement("li");
 
+                const prioIcone =
+                    t.prioridade === "alta"  ? "🔴" :
+                    t.prioridade === "media" ? "🟡" :
+                    t.prioridade === "baixa" ? "🟢" : "○";
+
                 const spanTexto = document.createElement("span");
                 spanTexto.className = "tarefa-texto";
-                spanTexto.textContent = texto;
+                spanTexto.textContent = `${prioIcone} ${texto}`.trim();
 
                 const spanAcao = document.createElement("span");
                 spanAcao.className = "tarefa-acao";
 
-                if (texto === tarefaAtual) {
+                if (t.concluida) {
+                    li.classList.add("usada");
+                    li.style.opacity = "0.55";
+                    li.style.cursor = "default";
+                    li.dataset.concluida = "1";
+                    spanAcao.textContent = "✓ concluída";
+                } else if (texto === tarefaAtual) {
                     li.classList.add("usada");
                     spanAcao.textContent = "✓ em uso";
                 } else {
@@ -542,23 +426,25 @@
                 li.appendChild(spanTexto);
                 li.appendChild(spanAcao);
 
-                li.addEventListener("click", () => {
-                    tarefaFoco.value = texto;
-                    localStorage.setItem(chaveTarefa, texto);
+                if (!t.concluida) {
+                    li.addEventListener("click", () => {
+                        tarefaFoco.value = texto;
+                        localStorage.setItem(chaveTarefa, texto);
 
-                    // Reseta visual da lista
-                    ul.querySelectorAll("li").forEach(el => {
-                        el.classList.remove("usada");
-                        const a = el.querySelector(".tarefa-acao");
-                        if (a) a.textContent = "usar →";
+                        ul.querySelectorAll("li").forEach(el => {
+                            if (el.dataset.concluida === "1") return;
+                            el.classList.remove("usada");
+                            const a = el.querySelector(".tarefa-acao");
+                            if (a) a.textContent = "usar →";
+                        });
+
+                        li.classList.add("usada");
+                        spanAcao.textContent = "✓ em uso";
+
+                        tarefaFoco.focus();
+                        tarefaFoco.scrollIntoView({ behavior: "smooth", block: "center" });
                     });
-
-                    li.classList.add("usada");
-                    spanAcao.textContent = "✓ em uso";
-
-                    tarefaFoco.focus();
-                    tarefaFoco.scrollIntoView({ behavior: "smooth", block: "center" });
-                });
+                }
 
                 ul.appendChild(li);
             });
@@ -574,37 +460,29 @@
         let intervalId        = null;
         let wakeLock          = null;
 
-        function formatarTempo(segundos) {
-            const m = String(Math.floor(segundos / 60)).padStart(2, "0");
-            const s = String(segundos % 60).padStart(2, "0");
-            return `${m}:${s}`;
+        function formatarTempo(s) {
+            const m = String(Math.floor(s / 60)).padStart(2, "0");
+            const ss = String(s % 60).padStart(2, "0");
+            return `${m}:${ss}`;
         }
-
         function atualizarDisplay() { displayTimer.textContent = formatarTempo(segundosRestantes); }
-
         function atualizarBarra() {
             const pct = duracaoTotal > 0
-                ? ((duracaoTotal - segundosRestantes) / duracaoTotal) * 100
-                : 0;
+                ? ((duracaoTotal - segundosRestantes) / duracaoTotal) * 100 : 0;
             barraProgresso.style.width = pct + "%";
         }
-
         function atualizarTitulo() {
             document.title = rodando
                 ? `⏱️ ${formatarTempo(segundosRestantes)} — Foco`
                 : "Foco";
         }
 
-        // ==================================================
-        // ESTADO PERSISTENTE
-        // ==================================================
         function salvarEstado() {
             localStorage.setItem(chaveEstado, JSON.stringify({
                 rodando, inicio: inicioSessao,
                 duracao: duracaoTotal, restante: segundosRestantes
             }));
         }
-
         function limparEstado() { localStorage.removeItem(chaveEstado); }
 
         function restaurarEstado() {
@@ -637,9 +515,6 @@
             }
         }
 
-        // ==================================================
-        // SOM / NOTIFICAÇÃO / WAKE LOCK
-        // ==================================================
         function tocarBipe() {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -652,38 +527,25 @@
                 o.start(); o.stop(ctx.currentTime + 1);
             } catch (e) {}
         }
-
         function pedirPermissaoNotificacao() {
             if ("Notification" in window && Notification.permission === "default") {
                 Notification.requestPermission();
             }
         }
-
         function mostrarNotificacao() {
             if ("Notification" in window && Notification.permission === "granted") {
-                try {
-                    new Notification("⏱️ Sessão concluída!", {
-                        body: "Faça uma pausa consciente."
-                    });
-                } catch (e) {}
+                try { new Notification("⏱️ Sessão concluída!", { body: "Faça uma pausa consciente." }); }
+                catch (e) {}
             }
         }
-
         async function ativarWakeLock() {
-            try {
-                if ("wakeLock" in navigator) {
-                    wakeLock = await navigator.wakeLock.request("screen");
-                }
-            } catch (e) {}
+            try { if ("wakeLock" in navigator) wakeLock = await navigator.wakeLock.request("screen"); }
+            catch (e) {}
         }
-
         function liberarWakeLock() {
             if (wakeLock) { wakeLock.release().catch(() => {}); wakeLock = null; }
         }
 
-        // ==================================================
-        // REGISTRAR SESSÃO
-        // ==================================================
         function registrarSessao(tarefa, duracaoSegundos) {
             let sessoes = [];
             try { sessoes = JSON.parse(localStorage.getItem(chaveSessoes)) || []; }
@@ -696,9 +558,6 @@
             localStorage.setItem(chaveSessoes, JSON.stringify(sessoes));
         }
 
-        // ==================================================
-        // CICLO
-        // ==================================================
         function tick() {
             segundosRestantes--;
             if (segundosRestantes < 0) segundosRestantes = 0;
@@ -714,18 +573,14 @@
                 salvarEstado(); liberarWakeLock(); atualizarTitulo();
                 return;
             }
-
             if (segundosRestantes <= 0) segundosRestantes = duracaoTotal;
-
             rodando = true;
             inicioSessao = Date.now() - (duracaoTotal - segundosRestantes) * 1000;
             btnIniciar.textContent = "⏸️ Pausar";
             acoesFim.style.display = "none";
-
             pedirPermissaoNotificacao();
             ativarWakeLock();
             salvarEstado(); atualizarTitulo();
-
             intervalId = setInterval(tick, 1000);
         }
 
@@ -756,10 +611,7 @@
 
         btnIniciar.addEventListener("click", iniciarTimer);
         btnReiniciar.addEventListener("click", resetTimer);
-        btnNovoFoco.addEventListener("click", () => {
-            resetTimer();
-            tarefaFoco.focus();
-        });
+        btnNovoFoco.addEventListener("click", () => { resetTimer(); tarefaFoco.focus(); });
 
         // ==================================================
         // SALVAMENTO AUTOMÁTICO
@@ -767,11 +619,9 @@
         tarefaFoco.addEventListener("input", () => {
             localStorage.setItem(chaveTarefa, tarefaFoco.value);
         });
-
         notasFoco.addEventListener("input", () => {
             localStorage.setItem(chaveNotas, notasFoco.value);
         });
-
         tempoFoco.addEventListener("change", () => {
             localStorage.setItem(chaveTempo, tempoFoco.value);
             if (!rodando) resetTimer();
@@ -789,11 +639,9 @@
         function salvarDistracoes() {
             localStorage.setItem(chaveDistancias, JSON.stringify(distracoes));
         }
-
         function atualizarContadorDistracoes() {
             contadorDistracoes.textContent = `Hoje: ${distracoes.length}`;
         }
-
         function renderizarDistracoes() {
             listaDistracoes.innerHTML = "";
             distracoes.forEach((texto, indice) => {
@@ -832,7 +680,6 @@
             });
             atualizarContadorDistracoes();
         }
-
         function adicionarDistracao() {
             const texto = inputDistracao.value.trim();
             if (!texto) return;
@@ -842,7 +689,6 @@
             inputDistracao.value = "";
             inputDistracao.focus();
         }
-
         btnAddDistracao.addEventListener("click", adicionarDistracao);
         inputDistracao.addEventListener("keydown", (evento) => {
             if (evento.key === "Enter") {
@@ -871,7 +717,6 @@
                 btn.classList.toggle("ativo", btn.dataset.cat === categoria);
             });
         }
-
         botoesPausa.forEach(btn => {
             btn.addEventListener("click", () => renderizarPausas(btn.dataset.cat));
         });
@@ -884,118 +729,26 @@
             if (listaAtual.length === 0) return;
             const escolhida = listaAtual[Math.floor(Math.random() * listaAtual.length)];
             resultadoSorteio.style.display = "block";
-            resultadoSorteio.innerHTML =
-                `🎲 <strong>Faça agora:</strong><br><br>${escolhida}`;
+            resultadoSorteio.innerHTML = `🎲 <strong>Faça agora:</strong><br><br>${escolhida}`;
         });
 
-        
         // ==================================================
-// TAREFAS DO TRABALHO (?origem=trabalho)
-// ==================================================
+        // INICIALIZA
+        // ==================================================
+        restaurarEstado();
+        atualizarDisplay();
+        atualizarBarra();
+        atualizarTitulo();
+        renderizarDistracoes();
+        renderizarPausas("curta");
+        carregarTarefasDoTrabalho();
 
-function carregarTarefasDoTrabalho() {
+        if (rodando) intervalId = setInterval(tick, 1000);
 
-    if (origemURL !== "trabalho") return;
-
-    const chaveTarefasTrabalho =
-        `planejamento_${dataAtual}_trabalho_tarefas`;
-
-    const raw = localStorage.getItem(chaveTarefasTrabalho);
-    if (!raw) return;
-
-    let tarefas = [];
-    try {
-        tarefas = JSON.parse(raw);
-    } catch (e) {
-        return;
-    }
-
-    if (!Array.isArray(tarefas) || tarefas.length === 0) return;
-
-    const card = document.getElementById("cardTarefasTrabalho");
-    const ul   = document.getElementById("listaTarefasTrabalho");
-
-    if (!card || !ul) return;
-
-    card.style.display = "";
-    ul.innerHTML = "";
-
-    const tarefaAtual = (tarefaFoco.value || "").trim();
-
-    tarefas.forEach(t => {
-
-        const texto = (t.texto || "").trim();
-        if (!texto) return;
-
-        const li = document.createElement("li");
-
-        const prioIcone =
-            t.prioridade === "alta"  ? "🔴" :
-            t.prioridade === "media" ? "🟡" :
-            t.prioridade === "baixa" ? "🟢" : "○";
-
-        const spanTexto = document.createElement("span");
-        spanTexto.className = "tarefa-texto";
-        spanTexto.textContent = `${prioIcone} ${texto}`.trim();
-
-        const spanAcao = document.createElement("span");
-        spanAcao.className = "tarefa-acao";
-
-        if (t.concluida) {
-            li.classList.add("usada");
-            li.style.opacity = "0.55";
-            li.style.cursor = "default";
-            li.dataset.concluida = "1";
-            spanAcao.textContent = "✓ concluída";
-        } else if (texto === tarefaAtual) {
-            li.classList.add("usada");
-            spanAcao.textContent = "✓ em uso";
-        } else {
-            spanAcao.textContent = "usar →";
-        }
-
-        li.appendChild(spanTexto);
-        li.appendChild(spanAcao);
-
-        if (!t.concluida) {
-            li.addEventListener("click", () => {
-                tarefaFoco.value = texto;
-                localStorage.setItem(chaveTarefa, texto);
-
-                ul.querySelectorAll("li").forEach(el => {
-                    if (el.dataset.concluida === "1") return;
-                    el.classList.remove("usada");
-                    const a = el.querySelector(".tarefa-acao");
-                    if (a) a.textContent = "usar →";
-                });
-
-                li.classList.add("usada");
-                spanAcao.textContent = "✓ em uso";
-
-                tarefaFoco.focus();
-                tarefaFoco.scrollIntoView({ behavior: "smooth", block: "center" });
-            });
-        }
-
-        ul.appendChild(li);
-    });
-}
-
-
-// ==================================================
-// INICIALIZA
-// ==================================================
-
-restaurarEstado();
-atualizarDisplay();
-atualizarBarra();
-atualizarTitulo();
-renderizarDistracoes();
-renderizarPausas("curta");
-carregarTarefasDoTrabalho();   // ⬅️ chamada da função
-
-if (rodando) intervalId = setInterval(tick, 1000);
+    })();
+    </script>
 
     <script src="../../js/app.js"></script>
+
 </body>
 </html>
