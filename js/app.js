@@ -1197,7 +1197,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const botaoFoco = document.createElement("a");
 
-        botaoFoco.href = "../foco/foco.html";
+            botaoFoco.href = pagina === "trabalho"
+        ? "../foco/foco.html?origem=trabalho"
+        : "../foco/foco.html";
         botaoFoco.className = "botao-foco-flutuante";
         botaoFoco.setAttribute(
             "aria-label",
