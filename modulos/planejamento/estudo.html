@@ -57,6 +57,14 @@
         }
         .campo-label:first-child { margin-top: 0; }
 
+        .secao-titulo {
+            font-size: 11px; color: #4caf50;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            font-weight: 600; padding: 14px 0 4px;
+            border-top: 1px solid #252529; margin-top: 14px;
+        }
+        .secao-titulo:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+
         .chips { display: flex; flex-wrap: wrap; gap: 6px; }
         .chip {
             padding: 7px 13px; font-size: 12px; cursor: pointer;
@@ -77,24 +85,11 @@
         .progresso > div { height: 100%; background: #4caf50; transition: width 0.3s ease; }
         .progresso-texto { font-size: 12px; color: #888; margin-top: 4px; }
 
+        .progresso-slider { width: 100%; margin: 6px 0 4px; accent-color: #4caf50; }
+
         .bloco-estudo {
             border: 1px solid #252529; border-radius: 10px;
             padding: 16px; margin-bottom: 16px; background: #19191d;
-        }
-                .secao-titulo {
-            font-size: 11px;
-            color: #4caf50;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-weight: 600;
-            padding: 14px 0 4px;
-            border-top: 1px solid #252529;
-            margin-top: 14px;
-        }
-        .secao-titulo:first-of-type {
-            border-top: none;
-            padding-top: 0;
-            margin-top: 0;
         }
         .bloco-cabecalho {
             display: flex; justify-content: space-between;
@@ -137,6 +132,30 @@
             -webkit-box-orient: vertical; overflow: hidden;
         }
         .rec-card-autor { font-size: 11px; color: #888; }
+
+        .rec-artigo-card {
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 8px; padding: 12px; cursor: pointer;
+            transition: 0.15s; display: flex; flex-direction: column; gap: 6px;
+        }
+        .rec-artigo-card:hover { background: #24242a; border-color: #5a8ad4; }
+        .rec-artigo-titulo {
+            font-size: 13px; color: #eaeaea; font-weight: 600;
+            line-height: 1.35;
+            display: -webkit-box; -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .rec-artigo-meta {
+            display: flex; gap: 6px; flex-wrap: wrap;
+            font-size: 11px; color: #777;
+        }
+        .rec-artigo-fonte {
+            display: inline-block;
+            padding: 2px 7px; background: #252529;
+            border-radius: 8px; color: #a8c4e8; font-size: 10px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .rec-artigo-stats { font-size: 11px; color: #888; }
 
         .bib-stats {
             display: flex; gap: 20px; flex-wrap: wrap;
@@ -252,9 +271,7 @@
         }
         .btn-marcar:hover { background: #223a22; border-color: #4caf50; }
 
-        .momentos-lista {
-            margin-top: 10px; display: flex; flex-direction: column; gap: 6px;
-        }
+        .momentos-lista { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
         .momento-item {
             display: flex; gap: 10px; align-items: flex-start;
             padding: 8px 12px;
@@ -298,16 +315,11 @@
         .rec-video-meta { font-size: 11px; color: #888; }
 
         .rec-video-dur {
-            position: absolute;
-            bottom: 3px; right: 3px;
-            background: rgba(0,0,0,0.82);
-            color: #fff;
-            padding: 1px 5px;
-            font-size: 10px;
-            border-radius: 3px;
-            font-variant-numeric: tabular-nums;
+            position: absolute; bottom: 3px; right: 3px;
+            background: rgba(0,0,0,0.82); color: #fff;
+            padding: 1px 5px; font-size: 10px;
+            border-radius: 3px; font-variant-numeric: tabular-nums;
         }
-
         .rec-video-fav {
             position: absolute; top: 6px; right: 6px;
             background: rgba(0,0,0,0.6);
@@ -322,10 +334,7 @@
         .rec-video-fav.favoritado { background: #d45a5a; border-color: #d45a5a; color: #fff; }
 
         .rec-video-stats { font-size: 11px; color: #777; margin-top: 3px; }
-        .rec-video-stats .linha {
-            display: flex; gap: 6px; flex-wrap: wrap;
-            font-size: 11px; color: #777;
-        }
+        .rec-video-stats .linha { display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; color: #777; }
         .rec-video-stats .sep { color: #444; }
 
         .video-historico-wrap {
@@ -357,10 +366,8 @@
         .checkbox-legenda {
             display: inline-flex; align-items: center; gap: 6px;
             font-size: 12px; color: #aaa;
-            cursor: pointer;
-            padding: 6px 10px;
-            border: 1px solid #333338;
-            border-radius: 16px;
+            cursor: pointer; padding: 6px 10px;
+            border: 1px solid #333338; border-radius: 16px;
             user-select: none;
         }
         .checkbox-legenda:hover { color: #ddd; }
@@ -369,10 +376,7 @@
         .area-3frases { display: flex; flex-direction: column; gap: 6px; }
         .area-3frases input { font-size: 13px; }
 
-        .trechos-lista {
-            margin-top: 8px;
-            display: flex; flex-direction: column; gap: 6px;
-        }
+        .trechos-lista { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
         .trecho-item {
             display: flex; gap: 10px; align-items: flex-start;
             padding: 8px 12px;
@@ -395,11 +399,7 @@
             transition: 0.15s;
         }
         .btn-adicionar-trecho:hover { background: #232f4a; border-color: #4a5c85; }
-        .progresso-slider {
-            width: 100%; margin: 6px 0 4px;
-            accent-color: #4caf50;
-        }
-        
+
         .botao-foco-flutuante {
             position: fixed; right: 24px; bottom: 24px; z-index: 9999;
             display: flex; align-items: center;
@@ -411,9 +411,7 @@
             transition: width 0.2s ease;
         }
         .botao-foco-flutuante:hover { width: 88px; }
-        .botao-foco-flutuante .icone-foco {
-            min-width: 44px; text-align: center; font-size: 18px;
-        }
+        .botao-foco-flutuante .icone-foco { min-width: 44px; text-align: center; font-size: 18px; }
         .botao-foco-flutuante .texto-foco {
             font-size: 13px; opacity: 0;
             transition: opacity 0.15s ease; white-space: nowrap;
@@ -543,7 +541,7 @@
         });
     }
 
-        function renderSubAbas() {
+    function renderSubAbas() {
         let abas = [];
         if (estado.tipo === "livro" || estado.tipo === "video" || estado.tipo === "artigo") {
             abas = [
@@ -571,7 +569,7 @@
         });
     }
 
-        function renderConteudo() {
+    function renderConteudo() {
         if (estado.tipo === "livro"  && estado.subAba === "estudar")    return renderEstudarLivro();
         if (estado.tipo === "livro"  && estado.subAba === "biblioteca") return renderBibliotecaLivro();
         if (estado.tipo === "video"  && estado.subAba === "estudar")    return renderEstudarVideo();
@@ -695,82 +693,6 @@
         });
         return ytApiPromise;
     }
-
-        // ==================================================
-    // AUXILIARES DE ARTIGO
-    // ==================================================
-    async function buscarMetadadosArtigo(url) {
-        const api = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
-        const r = await fetch(api);
-        if (!r.ok) throw new Error("Microlink falhou");
-        const j = await r.json();
-        const d = j.data || {};
-        return {
-            titulo:     d.title || "",
-            autor:      d.author || "",
-            publicacao: d.publisher || d.provider || "",
-            descricao:  d.description || "",
-            imagem:     d.image?.url || "",
-        };
-    }
-
-    async function baixarConteudoArtigo(url) {
-        const r = await fetch(`https://r.jina.ai/${url}`);
-        if (!r.ok) throw new Error("Jina falhou");
-        return await r.text();
-    }
-
-    const SnapshotDB = (() => {
-        const DB_NAME = "estudo_snapshots";
-        const STORE = "artigos";
-        let dbPromise = null;
-
-        function abrir() {
-            if (dbPromise) return dbPromise;
-            dbPromise = new Promise((resolve, reject) => {
-                const req = indexedDB.open(DB_NAME, 1);
-                req.onupgradeneeded = () => {
-                    const db = req.result;
-                    if (!db.objectStoreNames.contains(STORE)) {
-                        db.createObjectStore(STORE, { keyPath: "id" });
-                    }
-                };
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
-            });
-            return dbPromise;
-        }
-
-        return {
-            async salvar(id, texto, meta = {}) {
-                const db = await abrir();
-                return new Promise((resolve, reject) => {
-                    const tx = db.transaction(STORE, "readwrite");
-                    tx.objectStore(STORE).put({ id, texto, meta, criadoEm: Date.now() });
-                    tx.oncomplete = () => resolve(true);
-                    tx.onerror = () => reject(tx.error);
-                });
-            },
-            async obter(id) {
-                const db = await abrir();
-                return new Promise((resolve, reject) => {
-                    const tx = db.transaction(STORE, "readonly");
-                    const req = tx.objectStore(STORE).get(id);
-                    req.onsuccess = () => resolve(req.result || null);
-                    req.onerror = () => reject(req.error);
-                });
-            },
-            async remover(id) {
-                const db = await abrir();
-                return new Promise((resolve, reject) => {
-                    const tx = db.transaction(STORE, "readwrite");
-                    tx.objectStore(STORE).delete(id);
-                    tx.oncomplete = () => resolve(true);
-                    tx.onerror = () => reject(tx.error);
-                });
-            },
-        };
-    })();
 
     async function aplicarPlayer(blockId, videoId, velocidade) {
         if (!videoId) return;
@@ -903,6 +825,245 @@
             };
         });
     }
+    // ==================================================
+    // AUXILIARES DE ARTIGO
+    // ==================================================
+    async function buscarMetadadosArtigo(url) {
+        const api = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
+        const r = await fetch(api);
+        if (!r.ok) throw new Error("Microlink falhou");
+        const j = await r.json();
+        const d = j.data || {};
+        return {
+            titulo:     d.title || "",
+            autor:      d.author || "",
+            publicacao: d.publisher || d.provider || "",
+            descricao:  d.description || "",
+            imagem:     d.image?.url || "",
+        };
+    }
+
+    async function baixarConteudoArtigo(url) {
+        const r = await fetch(`https://r.jina.ai/${url}`);
+        if (!r.ok) throw new Error("Jina falhou");
+        return await r.text();
+    }
+
+    const SnapshotDB = (() => {
+        const DB_NAME = "estudo_snapshots";
+        const STORE = "artigos";
+        let dbPromise = null;
+
+        function abrir() {
+            if (dbPromise) return dbPromise;
+            dbPromise = new Promise((resolve, reject) => {
+                const req = indexedDB.open(DB_NAME, 1);
+                req.onupgradeneeded = () => {
+                    const db = req.result;
+                    if (!db.objectStoreNames.contains(STORE)) {
+                        db.createObjectStore(STORE, { keyPath: "id" });
+                    }
+                };
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+            return dbPromise;
+        }
+
+        return {
+            async salvar(id, texto, meta = {}) {
+                const db = await abrir();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(STORE, "readwrite");
+                    tx.objectStore(STORE).put({ id, texto, meta, criadoEm: Date.now() });
+                    tx.oncomplete = () => resolve(true);
+                    tx.onerror = () => reject(tx.error);
+                });
+            },
+            async obter(id) {
+                const db = await abrir();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(STORE, "readonly");
+                    const req = tx.objectStore(STORE).get(id);
+                    req.onsuccess = () => resolve(req.result || null);
+                    req.onerror = () => reject(req.error);
+                });
+            },
+            async remover(id) {
+                const db = await abrir();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(STORE, "readwrite");
+                    tx.objectStore(STORE).delete(id);
+                    tx.oncomplete = () => resolve(true);
+                    tx.onerror = () => reject(tx.error);
+                });
+            },
+        };
+    })();
+
+    // ==================================================
+    // BUSCA DE ARTIGOS — 5 fontes
+    // ==================================================
+    const FONTES_ARTIGO = [
+        { id: "hn",     label: "🟠 HN" },
+        { id: "reddit", label: "🔴 Reddit" },
+        { id: "medium", label: "⚫ Medium" },
+        { id: "gdelt",  label: "🟢 GDELT" },
+        { id: "devto",  label: "🟣 Dev.to" },
+    ];
+
+    const PRESETS_ARTIGO = {
+        tudo:      ["hn", "reddit", "medium", "gdelt", "devto"],
+        noticias:  ["gdelt"],
+        pratico:   ["hn", "medium", "devto"],
+        discussao: ["reddit", "hn"],
+    };
+
+    const CHAVE_FONTES_ARTIGO = "estudo_artigo_fontes_ativas";
+
+    function obterFontesAtivas() {
+        try {
+            const arr = JSON.parse(localStorage.getItem(CHAVE_FONTES_ARTIGO));
+            if (Array.isArray(arr) && arr.length) return arr;
+        } catch {}
+        return [...PRESETS_ARTIGO.tudo];
+    }
+    function salvarFontesAtivas(arr) {
+        localStorage.setItem(CHAVE_FONTES_ARTIGO, JSON.stringify(arr));
+    }
+
+    async function fetchComFallback(url) {
+        try {
+            const r = await fetch(url);
+            if (r.ok) return r;
+        } catch (e) { /* tenta proxy */ }
+        const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+        return await fetch(proxy);
+    }
+
+    function normalizarTag(txt) {
+        return txt.toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/\s+/g, "-")
+            .replace(/[^a-z0-9-]/g, "");
+    }
+
+    async function buscarHN(query) {
+        const url = `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(query)}&tags=story&hitsPerPage=10`;
+        const r = await fetchComFallback(url);
+        const j = await r.json();
+        return (j.hits || []).filter(h => h.title && h.url).map(h => {
+            let dominio = "";
+            try { dominio = new URL(h.url).hostname.replace(/^www\./, ""); } catch {}
+            return {
+                titulo: h.title, url: h.url, autor: h.author || "",
+                publicado: h.created_at || "",
+                fonte: dominio, origem: "HN",
+                pontos: h.points || 0, comentarios: h.num_comments || 0,
+            };
+        });
+    }
+
+    async function buscarReddit(query) {
+        const url = `https://www.reddit.com/search.json?q=${encodeURIComponent(query)}&sort=relevance&limit=10`;
+        const r = await fetchComFallback(url);
+        const j = await r.json();
+        return (j.data?.children || []).map(c => c.data).filter(d => d.title).map(d => ({
+            titulo: d.title,
+            url: `https://reddit.com${d.permalink}`,
+            autor: `u/${d.author}`,
+            publicado: new Date((d.created_utc || 0) * 1000).toISOString(),
+            fonte: `r/${d.subreddit}`,
+            origem: "Reddit",
+            pontos: d.score || 0,
+            comentarios: d.num_comments || 0,
+        }));
+    }
+
+    async function buscarMedium(query) {
+        const tag = normalizarTag(query);
+        if (!tag) return [];
+        const url = `https://medium.com/feed/tag/${tag}`;
+        const r = await fetchComFallback(url);
+        const xml = await r.text();
+        const doc = new DOMParser().parseFromString(xml, "text/xml");
+        const items = doc.getElementsByTagName("item");
+        return Array.from(items).slice(0, 10).map(item => {
+            const titulo = item.getElementsByTagName("title")[0]?.textContent || "";
+            const link   = item.getElementsByTagName("link")[0]?.textContent || "";
+            const autor  = item.getElementsByTagName("dc:creator")[0]?.textContent || "";
+            const data   = item.getElementsByTagName("pubDate")[0]?.textContent || "";
+            return {
+                titulo, url: link, autor,
+                publicado: data ? new Date(data).toISOString() : "",
+                fonte: "medium.com", origem: "Medium",
+                pontos: 0, comentarios: 0,
+            };
+        }).filter(a => a.titulo && a.url);
+    }
+
+    async function buscarGDELT(query) {
+        const url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(query)}&mode=artlist&format=json&maxrecords=10&sort=hybridrel`;
+        const r = await fetchComFallback(url);
+        const j = await r.json();
+        return (j.articles || []).map(a => {
+            let iso = "";
+            if (a.seendate) {
+                const s = String(a.seendate);
+                iso = `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}T${s.slice(8,10)}:${s.slice(10,12)}:00Z`;
+            }
+            return {
+                titulo: a.title || "", url: a.url || "", autor: "",
+                publicado: iso,
+                fonte: a.domain || "", origem: "GDELT",
+                pontos: 0, comentarios: 0,
+            };
+        }).filter(a => a.titulo && a.url);
+    }
+
+    async function buscarDevto(query) {
+        const tag = normalizarTag(query);
+        if (!tag) return [];
+        const url = `https://dev.to/api/articles?tag=${encodeURIComponent(tag)}&top=30&per_page=10`;
+        const r = await fetchComFallback(url);
+        const arr = await r.json();
+        if (!Array.isArray(arr)) return [];
+        return arr.map(a => ({
+            titulo: a.title, url: a.url,
+            autor: a.user?.name || "",
+            publicado: a.published_at || "",
+            fonte: "dev.to", origem: "Dev.to",
+            pontos: a.positive_reactions_count || 0,
+            comentarios: a.comments_count || 0,
+        }));
+    }
+
+    async function buscarArtigosPorTema(query, fontesAtivas) {
+        const mapa = {
+            hn: buscarHN, reddit: buscarReddit, medium: buscarMedium,
+            gdelt: buscarGDELT, devto: buscarDevto,
+        };
+
+        const promessas = fontesAtivas.map(id => {
+            const fn = mapa[id];
+            if (!fn) return Promise.resolve([]);
+            return fn(query).catch(e => {
+                console.warn(`[${id}] falhou:`, e);
+                return [];
+            });
+        });
+
+        const resultados = await Promise.all(promessas);
+
+        const intercalado = [];
+        const maxPorFonte = Math.max(...resultados.map(r => r.length), 0);
+        for (let i = 0; i < maxPorFonte; i++) {
+            for (const lista of resultados) {
+                if (lista[i]) intercalado.push(lista[i]);
+            }
+        }
+        return intercalado.slice(0, 10);
+    }
 
     // ==================================================
     // LIVRO → ESTUDAR
@@ -956,7 +1117,7 @@
         const atual = Number(b.paginaAtual) || 0;
         const pct = total > 0 ? Math.min(100, Math.round((atual / total) * 100)) : 0;
 
-                elBloco.innerHTML = `
+        elBloco.innerHTML = `
             <div class="bloco-cabecalho">
                 <span class="bloco-titulo">Livro ${idx + 1}</span>
                 <button class="bloco-remover" data-rem="${b.id}" title="Remover">×</button>
@@ -1117,8 +1278,8 @@
             box.innerHTML = `<div style="color:#888;font-size:13px;">Buscando…</div>`;
 
             try {
-                console.log("Buscando livros:", q, url);
-                const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=6&country=BR`;
+                const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=6&country=US`;
+                console.log("Google Books:", url);
                 const r = await fetch(url);
                 const data = await r.json();
 
@@ -1184,6 +1345,7 @@
                     });
                 });
             } catch (e) {
+                console.error(e);
                 box.innerHTML = `<div style="color:#888;font-size:13px;">Erro ao buscar.</div>`;
             }
         });
@@ -1250,7 +1412,7 @@
         const velocidadeAtual = b.velocidade || "1";
         const velocidades = ["1", "1.25", "1.5", "1.75", "2"];
 
-                elBloco.innerHTML = `
+        elBloco.innerHTML = `
             <div class="bloco-cabecalho">
                 <span class="bloco-titulo">Vídeo ${idx + 1}</span>
                 <button class="bloco-remover" data-rem="${b.id}" title="Remover">×</button>
@@ -1441,7 +1603,7 @@
                 `).join("") || `<div style="color:#666;font-size:12px;">Nenhum momento marcado. Use o botão acima durante o play.</div>`}
             </div>
         `;
-        // ---------- Salvar alterações dos campos ----------
+
         elBloco.querySelectorAll("[data-campo]").forEach(input => {
             input.addEventListener("input", () => {
                 const campo = input.dataset.campo;
@@ -1475,7 +1637,6 @@
             });
         });
 
-        // ---------- Buscar metadados ----------
         const btnMeta = elBloco.querySelector("[data-buscar-meta]");
         if (btnMeta) {
             btnMeta.addEventListener("click", async () => {
@@ -1508,7 +1669,6 @@
             });
         }
 
-        // ---------- Velocidade ----------
         elBloco.querySelectorAll("[data-vel] .chip").forEach(chip => {
             chip.addEventListener("click", () => {
                 const v = chip.dataset.v;
@@ -1527,7 +1687,6 @@
             });
         });
 
-        // ---------- Marcar momento ----------
         const btnMarcar = elBloco.querySelector("[data-marcar]");
         if (btnMarcar) {
             btnMarcar.addEventListener("click", () => {
@@ -1546,7 +1705,6 @@
             });
         }
 
-        // ---------- Momentos: pular / remover ----------
         elBloco.querySelectorAll("[data-pular]").forEach(span => {
             span.addEventListener("click", () => {
                 const idx = Number(span.dataset.pular);
@@ -1571,7 +1729,6 @@
             });
         });
 
-        // ---------- Vale reassistir ----------
         elBloco.querySelectorAll('[data-boolean="valeReassistir"] .chip').forEach(chip => {
             chip.addEventListener("click", () => {
                 const v = chip.dataset.bool === "1";
@@ -1586,7 +1743,6 @@
             });
         });
 
-        // ---------- Validade ----------
         elBloco.querySelectorAll("[data-validade] .chip").forEach(chip => {
             chip.addEventListener("click", () => {
                 const v = chip.dataset.v;
@@ -1601,7 +1757,6 @@
             });
         });
 
-        // ---------- Confiabilidade ----------
         elBloco.querySelectorAll("[data-confianca] .chip").forEach(chip => {
             chip.addEventListener("click", () => {
                 const c = chip.dataset.c;
@@ -1616,7 +1771,6 @@
             });
         });
 
-        // ---------- Remover bloco ----------
         elBloco.querySelector("[data-rem]").addEventListener("click", () => {
             const blocos = Storage.blocos.ler("video", dataAtual).filter(x => x.id !== b.id);
             Storage.blocos.salvar("video", dataAtual, blocos);
@@ -1627,7 +1781,6 @@
             render();
         });
 
-        // ---------- Google ----------
         elBloco.querySelector("[data-google-video]")?.addEventListener("click", () => {
             const blocos = Storage.blocos.ler("video", dataAtual);
             const it = blocos.find(x => x.id === b.id);
@@ -1636,7 +1789,6 @@
             window.open(`https://www.google.com/search?q=${encodeURIComponent(q + " vídeo")}`, "_blank");
         });
 
-        // ---------- Histórico de buscas ----------
         const histSelect = elBloco.querySelector(`#hist_${b.id}`);
         if (histSelect) {
             obterHistoricoBuscas().forEach(t => {
@@ -1662,7 +1814,6 @@
             if (histSelect) histSelect.innerHTML = '<option value="">📚 Histórico de buscas…</option>';
         });
 
-        // ---------- Carregar filtros salvos ----------
         const salvos = obterFiltrosSalvos();
         const selOrdem   = elBloco.querySelector('[data-filtro-recomendar="ordem"]');
         const selDur     = elBloco.querySelector('[data-filtro-recomendar="duracao"]');
@@ -1673,7 +1824,6 @@
         if (salvos.periodo) selPeriodo.value = salvos.periodo;
         if (salvos.legenda) chkLegenda.checked = true;
 
-        // ---------- Recomendar vídeos ----------
         async function recomendarVideos(ineditos) {
             const blocos = Storage.blocos.ler("video", dataAtual);
             const it = blocos.find(x => x.id === b.id);
@@ -1732,7 +1882,6 @@
 
                 acoesExtra.style.display = "flex";
 
-                // Favoritar
                 box.querySelectorAll(".rec-video-fav").forEach(coracao => {
                     coracao.addEventListener("click", (ev) => {
                         ev.stopPropagation();
@@ -1767,7 +1916,6 @@
                     });
                 });
 
-                // Clique no card
                 box.querySelectorAll(".rec-video-card").forEach(card => {
                     card.addEventListener("click", () => {
                         const vid = card.dataset.vid;
@@ -1792,7 +1940,6 @@
         elBloco.querySelector("[data-recomendar-video]")?.addEventListener("click", () => recomendarVideos(false));
         elBloco.querySelector("[data-recomendar-video-novo]")?.addEventListener("click", () => recomendarVideos(true));
 
-        // ---------- Abrir todos no YouTube ----------
         elBloco.querySelector("[data-abrir-todos]")?.addEventListener("click", () => {
             const lista = elBloco._ultimaRecomendacao || [];
             if (!lista.length) return alert("Nenhuma recomendação ativa.");
@@ -1802,7 +1949,6 @@
             });
         });
 
-        // ---------- Salvar filtros atuais ----------
         elBloco.querySelector("[data-salvar-filtros]")?.addEventListener("click", () => {
             salvarFiltros({
                 ordem:   selOrdem.value,
@@ -1813,7 +1959,6 @@
             alert("✅ Filtros salvos como padrão.");
         });
 
-        // ---------- Aplicar player ----------
         setTimeout(() => {
             if (b.videoId) aplicarPlayer(b.id, b.videoId, b.velocidade);
             registrarVideoNaBiblioteca(b);
@@ -1831,13 +1976,10 @@
             id: uid("blk"),
             tema: "", titulo: "", autor: "", publicacao: "",
             url: "", confiabilidade: "",
-            porQueSalvei: "",
-            tempoLeitura: "", progresso: 0,
-            metaHoje: "", tempoPrevisto: "",
+            tempoPrevisto: "", progresso: 0,
             trechos: [],
             resumo1: "", resumo2: "", resumo3: "",
             oQueFazer: "", proximaAcao: "",
-            publicado: "", validade: "",
             snapshotId: "",
             criadoEm: Date.now(),
         });
@@ -1887,6 +2029,21 @@
             <label class="campo-label">Tema</label>
             <input type="text" data-campo="tema" value="${esc(b.tema)}" placeholder="Ex.: marketing digital">
 
+            <label class="campo-label">🔎 Buscar artigos sobre o tema</label>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center;">
+                <span style="font-size:11px;color:#777;">Modo:</span>
+                <button type="button" class="chip" data-preset-artigo="tudo">🎯 Tudo</button>
+                <button type="button" class="chip" data-preset-artigo="noticias">📰 Notícias</button>
+                <button type="button" class="chip" data-preset-artigo="pratico">🧠 Prático</button>
+                <button type="button" class="chip" data-preset-artigo="discussao">💬 Discussão</button>
+            </div>
+            <div class="chips" id="fontes_${b.id}" style="margin-bottom:8px;"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-secundario" data-recomendar-artigo="1">📄 Recomendar</button>
+                <button class="btn-secundario" data-google-artigo="1">🔍 Google</button>
+            </div>
+            <div class="recomendacoes" id="reca_${b.id}" style="display:none;"></div>
+
             <label class="campo-label">Link do artigo</label>
             <div class="linha-dupla">
                 <input type="text" data-campo="url" value="${esc(b.url)}" placeholder="https://...">
@@ -1919,8 +2076,9 @@
                 <div class="chip${b.confiabilidade === "baixa" ? " selecionado" : ""}" data-c="baixa">🔴 Não confio</div>
             </div>
 
-                       <label class="campo-label">Tempo previsto (quanto vou dedicar)</label>
+            <label class="campo-label">Tempo previsto (quanto vou dedicar)</label>
             <input type="text" data-campo="tempoPrevisto" value="${esc(b.tempoPrevisto)}" placeholder="Ex.: 10 min">
+
             <div class="secao-titulo" style="margin-top:22px;">📖 Lendo</div>
 
             <label class="campo-label">Progresso</label>
@@ -1956,10 +2114,8 @@
 
             <label class="campo-label">Próxima ação</label>
             <input type="text" data-campo="proximaAcao" value="${esc(b.proximaAcao)}" placeholder="Ex.: pesquisar o autor">
-
         `;
 
-        // ---------- Salvar campos ----------
         elBloco.querySelectorAll("[data-campo]").forEach(input => {
             input.addEventListener("input", () => {
                 const campo = input.dataset.campo;
@@ -1983,7 +2139,6 @@
             });
         });
 
-        // ---------- Buscar metadados ----------
         elBloco.querySelector("[data-buscar-meta-artigo]")?.addEventListener("click", async () => {
             const blocos = Storage.blocos.ler("artigo", dataAtual);
             const i = blocos.findIndex(x => x.id === b.id);
@@ -2012,7 +2167,6 @@
             render();
         });
 
-        // ---------- Abrir link ----------
         elBloco.querySelector("[data-abrir-artigo]")?.addEventListener("click", () => {
             const blocos = Storage.blocos.ler("artigo", dataAtual);
             const it = blocos.find(x => x.id === b.id);
@@ -2020,7 +2174,6 @@
             window.open(it.url, "_blank", "noopener");
         });
 
-        // ---------- Salvar snapshot ----------
         elBloco.querySelector("[data-salvar-snapshot]")?.addEventListener("click", async () => {
             const blocos = Storage.blocos.ler("artigo", dataAtual);
             const it = blocos.find(x => x.id === b.id);
@@ -2053,7 +2206,6 @@
             }
         });
 
-        // ---------- Ver snapshot ----------
         if (b.snapshotId) {
             const btnVer = elBloco.querySelector("[data-ver-snapshot]");
             if (btnVer) {
@@ -2067,7 +2219,6 @@
             }
         }
 
-        // ---------- Confiabilidade ----------
         elBloco.querySelectorAll("[data-confianca-artigo] .chip").forEach(chip => {
             chip.addEventListener("click", () => {
                 const c = chip.dataset.c;
@@ -2082,8 +2233,6 @@
             });
         });
 
-
-        // ---------- Adicionar trecho ----------
         elBloco.querySelector("[data-add-trecho]")?.addEventListener("click", () => {
             const texto = prompt("Cole o trecho exato:");
             if (!texto) return;
@@ -2097,7 +2246,6 @@
             render();
         });
 
-        // ---------- Remover trecho ----------
         elBloco.querySelectorAll("[data-trecho-rem]").forEach(btn => {
             btn.addEventListener("click", () => {
                 const idx = Number(btn.dataset.trechoRem);
@@ -2110,17 +2258,124 @@
             });
         });
 
-        // ---------- Remover bloco ----------
         elBloco.querySelector("[data-rem]").addEventListener("click", () => {
             const blocos = Storage.blocos.ler("artigo", dataAtual).filter(x => x.id !== b.id);
             Storage.blocos.salvar("artigo", dataAtual, blocos);
             render();
         });
 
+        // ---------- Google ----------
+        elBloco.querySelector("[data-google-artigo]")?.addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("artigo", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            const q = (it?.tema || "").trim();
+            if (!q) return alert("Preencha o tema primeiro.");
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(q + " artigo")}`, "_blank");
+        });
+
+        // ---------- Fontes (chips de toggles) ----------
+        const fontesWrap = elBloco.querySelector(`#fontes_${b.id}`);
+        let fontesAtivas = obterFontesAtivas();
+
+        function renderChipsFontes() {
+            fontesWrap.innerHTML = FONTES_ARTIGO.map(f => {
+                const ativo = fontesAtivas.includes(f.id);
+                return `<div class="chip${ativo ? " selecionado" : ""}" data-fonte="${f.id}">${f.label}</div>`;
+            }).join("");
+
+            fontesWrap.querySelectorAll(".chip").forEach(chip => {
+                chip.addEventListener("click", () => {
+                    const id = chip.dataset.fonte;
+                    const i = fontesAtivas.indexOf(id);
+                    if (i >= 0) fontesAtivas.splice(i, 1);
+                    else fontesAtivas.push(id);
+                    if (fontesAtivas.length === 0) fontesAtivas = ["hn"];
+                    salvarFontesAtivas(fontesAtivas);
+                    renderChipsFontes();
+                });
+            });
+        }
+        renderChipsFontes();
+
+        elBloco.querySelectorAll("[data-preset-artigo]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const preset = btn.dataset.presetArtigo;
+                fontesAtivas = [...PRESETS_ARTIGO[preset]];
+                salvarFontesAtivas(fontesAtivas);
+                renderChipsFontes();
+            });
+        });
+
+        elBloco.querySelector("[data-recomendar-artigo]")?.addEventListener("click", async () => {
+            const blocos = Storage.blocos.ler("artigo", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            const q = (it?.tema || "").trim();
+            if (!q) return alert("Preencha o tema primeiro.");
+
+            const box = elBloco.querySelector(`#reca_${b.id}`);
+            box.style.display = "grid";
+            box.innerHTML = `<div style="color:#888;font-size:13px;">Buscando em ${fontesAtivas.length} fonte(s)…</div>`;
+
+            try {
+                const lista = await buscarArtigosPorTema(q, fontesAtivas);
+                if (!lista.length) {
+                    box.innerHTML = `<div style="color:#888;font-size:13px;">Nada encontrado. Tente outro modo ou o Google.</div>`;
+                    return;
+                }
+
+                box.innerHTML = lista.map(a => {
+                    const dataRel = formatarDataRelativa(a.publicado);
+                    const stats = [];
+                    if (a.pontos)      stats.push(`▲ ${a.pontos}`);
+                    if (a.comentarios) stats.push(`💬 ${a.comentarios}`);
+                    if (dataRel)       stats.push(dataRel);
+                    return `
+                        <div class="rec-artigo-card"
+                             data-art-titulo="${esc(a.titulo)}"
+                             data-art-url="${esc(a.url)}"
+                             data-art-fonte="${esc(a.fonte)}"
+                             data-art-autor="${esc(a.autor)}">
+                            <div class="rec-artigo-meta">
+                                <span class="rec-artigo-fonte">${esc(a.origem)}</span>
+                                ${a.fonte ? `<span>· ${esc(a.fonte)}</span>` : ""}
+                                ${a.autor ? `<span>· ${esc(a.autor)}</span>` : ""}
+                            </div>
+                            <div class="rec-artigo-titulo">${esc(a.titulo)}</div>
+                            ${stats.length ? `<div class="rec-artigo-stats">${stats.join(" · ")}</div>` : ""}
+                        </div>
+                    `;
+                }).join("");
+
+                box.querySelectorAll(".rec-artigo-card").forEach(card => {
+                    card.addEventListener("click", () => {
+                        const t = card.dataset.artTitulo;
+                        const l = card.dataset.artUrl;
+                        const f = card.dataset.artFonte;
+                        const au = card.dataset.artAutor;
+
+                        const blocos2 = Storage.blocos.ler("artigo", dataAtual);
+                        const i = blocos2.findIndex(x => x.id === b.id);
+                        if (i < 0) return;
+                        blocos2[i].titulo = t;
+                        blocos2[i].url = l;
+                        blocos2[i].publicacao = f;
+                        blocos2[i].autor = au;
+                        Storage.blocos.salvar("artigo", dataAtual, blocos2);
+
+                        registrarArtigoNaBiblioteca(blocos2[i]);
+                        render();
+                    });
+                });
+            } catch (e) {
+                console.error(e);
+                box.innerHTML = `<div style="color:#888;font-size:13px;">Erro ao buscar. Tente o Google.</div>`;
+            }
+        });
+
         setTimeout(() => registrarArtigoNaBiblioteca(b), 0);
         return elBloco;
     }
-    
+
     // ==================================================
     // BIBLIOTECA LIVRO
     // ==================================================
@@ -2400,7 +2655,7 @@
             publicacao: item.publicacao,
             url: item.url,
             progresso: pct,
-                        tempoLeitura: item.tempoPrevisto || item.tempoLeitura || "",
+            tempoLeitura: item.tempoPrevisto || item.tempoLeitura || "",
             confiabilidade: item.confiabilidade || "",
             status: pct >= 100 ? "concluido" : "lendo",
             pct,
@@ -2489,13 +2744,11 @@
                         tema: b.tema || "", titulo: b.titulo || "", autor: b.autor || "",
                         publicacao: b.publicacao || "", url: b.url || "",
                         confiabilidade: b.confiabilidade || "",
-                        porQueSalvei: "", tempoLeitura: b.tempoLeitura || "",
+                        tempoPrevisto: b.tempoLeitura || "",
                         progresso: b.progresso || 0,
-                        metaHoje: "", tempoPrevisto: "",
                         trechos: [],
                         resumo1: "", resumo2: "", resumo3: "",
                         oQueFazer: "", proximaAcao: "",
-                        publicado: "", validade: "",
                         snapshotId: "",
                         criadoEm: Date.now(),
                     });
@@ -2506,7 +2759,7 @@
             });
         });
     }
-    
+
     // ==================================================
     // APRENDIZADOS
     // ==================================================
@@ -2697,3 +2950,4 @@
 </script>
 </body>
 </html>
+    
