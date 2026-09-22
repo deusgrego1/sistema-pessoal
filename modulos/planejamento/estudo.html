@@ -369,6 +369,37 @@
         .area-3frases { display: flex; flex-direction: column; gap: 6px; }
         .area-3frases input { font-size: 13px; }
 
+        .trechos-lista {
+            margin-top: 8px;
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        .trecho-item {
+            display: flex; gap: 10px; align-items: flex-start;
+            padding: 8px 12px;
+            background: #1c1c20; border-left: 3px solid #5a8ad4;
+            border-radius: 6px; font-size: 13px; color: #d0d0d0;
+        }
+        .trecho-texto { flex: 1; white-space: pre-wrap; }
+        .trecho-ref { font-size: 11px; color: #777; font-style: italic; margin-top: 3px; }
+        .trecho-remover {
+            background: none; border: none; color: #666;
+            font-size: 16px; cursor: pointer; padding: 0 4px; flex-shrink: 0;
+        }
+        .trecho-remover:hover { color: #d45a5a; }
+        .btn-adicionar-trecho {
+            margin-top: 8px;
+            padding: 7px 14px; font-size: 13px;
+            background: #1a2233; color: #a8c4e8;
+            border: 1px solid #2c3a55; border-radius: 20px;
+            cursor: pointer; font-family: inherit;
+            transition: 0.15s;
+        }
+        .btn-adicionar-trecho:hover { background: #232f4a; border-color: #4a5c85; }
+        .progresso-slider {
+            width: 100%; margin: 6px 0 4px;
+            accent-color: #4caf50;
+        }
+        
         .botao-foco-flutuante {
             position: fixed; right: 24px; bottom: 24px; z-index: 9999;
             display: flex; align-items: center;
@@ -512,9 +543,9 @@
         });
     }
 
-    function renderSubAbas() {
+        function renderSubAbas() {
         let abas = [];
-        if (estado.tipo === "livro" || estado.tipo === "video") {
+        if (estado.tipo === "livro" || estado.tipo === "video" || estado.tipo === "artigo") {
             abas = [
                 { id: "estudar",    label: "📝 Estudar hoje" },
                 { id: "biblioteca", label: "📚 Biblioteca" },
@@ -540,11 +571,13 @@
         });
     }
 
-    function renderConteudo() {
+        function renderConteudo() {
         if (estado.tipo === "livro"  && estado.subAba === "estudar")    return renderEstudarLivro();
         if (estado.tipo === "livro"  && estado.subAba === "biblioteca") return renderBibliotecaLivro();
         if (estado.tipo === "video"  && estado.subAba === "estudar")    return renderEstudarVideo();
         if (estado.tipo === "video"  && estado.subAba === "biblioteca") return renderBibliotecaVideo();
+        if (estado.tipo === "artigo" && estado.subAba === "estudar")    return renderEstudarArtigo();
+        if (estado.tipo === "artigo" && estado.subAba === "biblioteca") return renderBibliotecaArtigo();
         if (estado.tipo === "aprendizados")                             return renderAprendizados();
         return renderEmConstrucao();
     }
@@ -662,6 +695,82 @@
         });
         return ytApiPromise;
     }
+
+        // ==================================================
+    // AUXILIARES DE ARTIGO
+    // ==================================================
+    async function buscarMetadadosArtigo(url) {
+        const api = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
+        const r = await fetch(api);
+        if (!r.ok) throw new Error("Microlink falhou");
+        const j = await r.json();
+        const d = j.data || {};
+        return {
+            titulo:     d.title || "",
+            autor:      d.author || "",
+            publicacao: d.publisher || d.provider || "",
+            descricao:  d.description || "",
+            imagem:     d.image?.url || "",
+        };
+    }
+
+    async function baixarConteudoArtigo(url) {
+        const r = await fetch(`https://r.jina.ai/${url}`);
+        if (!r.ok) throw new Error("Jina falhou");
+        return await r.text();
+    }
+
+    const SnapshotDB = (() => {
+        const DB_NAME = "estudo_snapshots";
+        const STORE = "artigos";
+        let dbPromise = null;
+
+        function abrir() {
+            if (dbPromise) return dbPromise;
+            dbPromise = new Promise((resolve, reject) => {
+                const req = indexedDB.open(DB_NAME, 1);
+                req.onupgradeneeded = () => {
+                    const db = req.result;
+                    if (!db.objectStoreNames.contains(STORE)) {
+                        db.createObjectStore(STORE, { keyPath: "id" });
+                    }
+                };
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+            return dbPromise;
+        }
+
+        return {
+            async salvar(id, texto, meta = {}) {
+                const db = await abrir();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(STORE, "readwrite");
+                    tx.objectStore(STORE).put({ id, texto, meta, criadoEm: Date.now() });
+                    tx.oncomplete = () => resolve(true);
+                    tx.onerror = () => reject(tx.error);
+                });
+            },
+            async obter(id) {
+                const db = await abrir();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(STORE, "readonly");
+                    const req = tx.objectStore(STORE).get(id);
+                    req.onsuccess = () => resolve(req.result || null);
+                    req.onerror = () => reject(req.error);
+                });
+            },
+            async remover(id) {
+                const db = await abrir();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(STORE, "readwrite");
+                    tx.objectStore(STORE).delete(id);
+                    tx.oncomplete = () => resolve(true);
+                    tx.onerror = () => reject(tx.error);
+                });
+            },
+        };
+    })();
 
     async function aplicarPlayer(blockId, videoId, velocidade) {
         if (!videoId) return;
@@ -1714,6 +1823,348 @@
     }
 
     // ==================================================
+    // ARTIGO → ESTUDAR
+    // ==================================================
+    function addBlocoArtigo() {
+        const blocos = Storage.blocos.ler("artigo", dataAtual);
+        blocos.push({
+            id: uid("blk"),
+            tema: "", titulo: "", autor: "", publicacao: "",
+            url: "", confiabilidade: "",
+            porQueSalvei: "",
+            tempoLeitura: "", progresso: 0,
+            metaHoje: "", tempoPrevisto: "",
+            trechos: [],
+            resumo1: "", resumo2: "", resumo3: "",
+            oQueFazer: "", proximaAcao: "",
+            publicado: "", validade: "",
+            snapshotId: "",
+            criadoEm: Date.now(),
+        });
+        Storage.blocos.salvar("artigo", dataAtual, blocos);
+        render();
+    }
+
+    function renderEstudarArtigo() {
+        const blocos = Storage.blocos.ler("artigo", dataAtual);
+        const wrap = el("conteudo");
+        wrap.innerHTML = "";
+
+        if (blocos.length === 0) {
+            const vazio = document.createElement("div");
+            vazio.className = "vazio";
+            vazio.innerHTML = `
+                <p>Nenhum artigo registrado hoje ainda.</p>
+                <button class="btn-primario" id="btnAddArtigo">+ Adicionar artigo</button>
+            `;
+            wrap.appendChild(vazio);
+            vazio.querySelector("#btnAddArtigo").addEventListener("click", addBlocoArtigo);
+            return;
+        }
+
+        blocos.forEach((b, i) => wrap.appendChild(renderBlocoArtigo(b, i)));
+
+        const addWrap = document.createElement("div");
+        addWrap.style.marginTop = "10px";
+        addWrap.innerHTML = `<button class="btn-secundario" id="btnAddArtigo">+ Adicionar outro artigo hoje</button>`;
+        wrap.appendChild(addWrap);
+        addWrap.querySelector("#btnAddArtigo").addEventListener("click", addBlocoArtigo);
+    }
+
+    function renderBlocoArtigo(b, idx) {
+        const elBloco = document.createElement("div");
+        elBloco.className = "bloco-estudo";
+        elBloco.dataset.id = b.id;
+
+        elBloco.innerHTML = `
+            <div class="bloco-cabecalho">
+                <span class="bloco-titulo">Artigo ${idx + 1}</span>
+                <button class="bloco-remover" data-rem="${b.id}" title="Remover">×</button>
+            </div>
+
+            <div class="secao-titulo">📋 Antes de ler</div>
+
+            <label class="campo-label">Tema</label>
+            <input type="text" data-campo="tema" value="${esc(b.tema)}" placeholder="Ex.: marketing digital">
+
+            <label class="campo-label">Link do artigo</label>
+            <div class="linha-dupla">
+                <input type="text" data-campo="url" value="${esc(b.url)}" placeholder="https://...">
+                <button class="btn-secundario" data-buscar-meta-artigo="1">🔄 Buscar dados</button>
+            </div>
+            <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-secundario" data-abrir-artigo="1">🔗 Abrir</button>
+                <button class="btn-secundario" data-salvar-snapshot="1">📥 Salvar conteúdo</button>
+                <button class="btn-secundario" data-ver-snapshot="1" style="display:none;">📄 Ver cópia salva</button>
+            </div>
+
+            <label class="campo-label">Título</label>
+            <input type="text" data-campo="titulo" value="${esc(b.titulo)}" placeholder="(puxado automaticamente)">
+
+            <div class="linha-dupla">
+                <div>
+                    <label class="campo-label">Autor</label>
+                    <input type="text" data-campo="autor" value="${esc(b.autor)}" placeholder="(puxado)">
+                </div>
+                <div>
+                    <label class="campo-label">Publicação</label>
+                    <input type="text" data-campo="publicacao" value="${esc(b.publicacao)}" placeholder="(puxado)">
+                </div>
+            </div>
+
+            <label class="campo-label">Confiabilidade da publicação</label>
+            <div class="chips" data-confianca-artigo="${b.id}">
+                <div class="chip${b.confiabilidade === "alta" ? " selecionado" : ""}" data-c="alta">🟢 Confio</div>
+                <div class="chip${b.confiabilidade === "neutra" ? " selecionado" : ""}" data-c="neutra">🟡 Neutro</div>
+                <div class="chip${b.confiabilidade === "baixa" ? " selecionado" : ""}" data-c="baixa">🔴 Não confio</div>
+            </div>
+
+            <label class="campo-label">Por que salvei isso?</label>
+            <textarea data-campo="porQueSalvei" rows="2" placeholder="1 linha — filtra o que vale a pena">${esc(b.porQueSalvei)}</textarea>
+
+            <div class="linha-dupla">
+                <div>
+                    <label class="campo-label">Tempo de leitura</label>
+                    <input type="text" data-campo="tempoLeitura" value="${esc(b.tempoLeitura)}" placeholder="Ex.: 8 min">
+                </div>
+                <div>
+                    <label class="campo-label">Meta de hoje</label>
+                    <input type="text" data-campo="metaHoje" value="${esc(b.metaHoje)}" placeholder="Ex.: terminar">
+                </div>
+            </div>
+
+            <label class="campo-label">Tempo previsto</label>
+            <input type="text" data-campo="tempoPrevisto" value="${esc(b.tempoPrevisto)}" placeholder="Ex.: 10 min">
+
+            <div class="secao-titulo" style="margin-top:22px;">📖 Lendo</div>
+
+            <label class="campo-label">Progresso</label>
+            <input type="range" class="progresso-slider" min="0" max="100" step="5" value="${b.progresso || 0}" data-campo="progresso">
+            <div class="progresso"><div style="width:${b.progresso || 0}%"></div></div>
+            <div class="progresso-texto">${b.progresso || 0}% lido</div>
+
+            <label class="campo-label">📌 Trechos marcados</label>
+            <div class="trechos-lista" data-trechos="${b.id}">
+                ${(b.trechos || []).map((t, i) => `
+                    <div class="trecho-item">
+                        <div class="trecho-texto">
+                            "${esc(t.texto || "")}"
+                            ${t.ref ? `<div class="trecho-ref">${esc(t.ref)}</div>` : ""}
+                        </div>
+                        <button class="trecho-remover" data-trecho-rem="${i}">×</button>
+                    </div>
+                `).join("") || `<div style="color:#666;font-size:12px;">Nenhum trecho marcado.</div>`}
+            </div>
+            <button class="btn-adicionar-trecho" data-add-trecho="1">➕ Adicionar trecho</button>
+
+            <div class="secao-titulo" style="margin-top:22px;">✅ Depois de ler</div>
+
+            <label class="campo-label">Resumo em 3 frases</label>
+            <div class="area-3frases">
+                <input type="text" data-campo="resumo1" value="${esc(b.resumo1)}" placeholder="1. …">
+                <input type="text" data-campo="resumo2" value="${esc(b.resumo2)}" placeholder="2. …">
+                <input type="text" data-campo="resumo3" value="${esc(b.resumo3)}" placeholder="3. …">
+            </div>
+
+            <label class="campo-label">O que vou fazer com isso</label>
+            <textarea data-campo="oQueFazer" rows="2">${esc(b.oQueFazer)}</textarea>
+
+            <label class="campo-label">Próxima ação</label>
+            <input type="text" data-campo="proximaAcao" value="${esc(b.proximaAcao)}" placeholder="Ex.: pesquisar o autor">
+
+            <div class="linha-dupla">
+                <div>
+                    <label class="campo-label">Publicado em</label>
+                    <input type="text" data-campo="publicado" value="${esc(b.publicado)}" placeholder="Ex.: 12/03/2026">
+                </div>
+                <div>
+                    <label class="campo-label">Ainda é válido?</label>
+                    <div class="chips" data-validade-artigo="${b.id}">
+                        <div class="chip${b.validade === "vale" ? " selecionado" : ""}" data-v="vale">✅</div>
+                        <div class="chip${b.validade === "parcial" ? " selecionado" : ""}" data-v="parcial">⚠️</div>
+                        <div class="chip${b.validade === "desatualizado" ? " selecionado" : ""}" data-v="desatualizado">❌</div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // ---------- Salvar campos ----------
+        elBloco.querySelectorAll("[data-campo]").forEach(input => {
+            input.addEventListener("input", () => {
+                const campo = input.dataset.campo;
+                const blocos = Storage.blocos.ler("artigo", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i < 0) return;
+
+                if (campo === "progresso") {
+                    blocos[i].progresso = Number(input.value);
+                    elBloco.querySelector(".progresso > div").style.width = input.value + "%";
+                    elBloco.querySelector(".progresso-texto").textContent = input.value + "% lido";
+                } else {
+                    blocos[i][campo] = input.value;
+                }
+                Storage.blocos.salvar("artigo", dataAtual, blocos);
+
+                if (campo === "url" || campo === "titulo" || campo === "autor" || campo === "publicacao" || campo === "progresso") {
+                    const at = Storage.blocos.ler("artigo", dataAtual).find(x => x.id === b.id);
+                    if (at) registrarArtigoNaBiblioteca(at);
+                }
+            });
+        });
+
+        // ---------- Buscar metadados ----------
+        elBloco.querySelector("[data-buscar-meta-artigo]")?.addEventListener("click", async () => {
+            const blocos = Storage.blocos.ler("artigo", dataAtual);
+            const i = blocos.findIndex(x => x.id === b.id);
+            if (i < 0) return;
+            const url = (blocos[i].url || "").trim();
+            if (!/^https?:\/\//i.test(url)) return alert("Cole uma URL válida.");
+
+            const btn = elBloco.querySelector("[data-buscar-meta-artigo]");
+            btn.textContent = "🔄 Buscando…";
+            btn.disabled = true;
+
+            try {
+                const meta = await buscarMetadadosArtigo(url);
+                const blocos2 = Storage.blocos.ler("artigo", dataAtual);
+                const j = blocos2.findIndex(x => x.id === b.id);
+                if (j >= 0) {
+                    if (meta.titulo)     blocos2[j].titulo     = meta.titulo;
+                    if (meta.autor)      blocos2[j].autor      = meta.autor;
+                    if (meta.publicacao) blocos2[j].publicacao = meta.publicacao;
+                    Storage.blocos.salvar("artigo", dataAtual, blocos2);
+                }
+            } catch (e) {
+                console.warn(e);
+                alert("Não consegui puxar automaticamente. Preencha manual.");
+            }
+            render();
+        });
+
+        // ---------- Abrir link ----------
+        elBloco.querySelector("[data-abrir-artigo]")?.addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("artigo", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            if (!it || !it.url) return alert("Cole o link primeiro.");
+            window.open(it.url, "_blank", "noopener");
+        });
+
+        // ---------- Salvar snapshot ----------
+        elBloco.querySelector("[data-salvar-snapshot]")?.addEventListener("click", async () => {
+            const blocos = Storage.blocos.ler("artigo", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            if (!it || !it.url) return alert("Cole o link primeiro.");
+
+            const btn = elBloco.querySelector("[data-salvar-snapshot]");
+            btn.textContent = "📥 Baixando…";
+            btn.disabled = true;
+
+            try {
+                const texto = await baixarConteudoArtigo(it.url);
+                const snapId = it.url;
+                await SnapshotDB.salvar(snapId, texto, {
+                    titulo: it.titulo, autor: it.autor, url: it.url,
+                });
+                const blocos2 = Storage.blocos.ler("artigo", dataAtual);
+                const j = blocos2.findIndex(x => x.id === b.id);
+                if (j >= 0) {
+                    blocos2[j].snapshotId = snapId;
+                    Storage.blocos.salvar("artigo", dataAtual, blocos2);
+                }
+                alert("✅ Cópia salva localmente.");
+                render();
+            } catch (e) {
+                console.error(e);
+                alert("Não consegui salvar. Veja o Console.");
+            } finally {
+                btn.textContent = "📥 Salvar conteúdo";
+                btn.disabled = false;
+            }
+        });
+
+        // ---------- Ver snapshot ----------
+        if (b.snapshotId) {
+            const btnVer = elBloco.querySelector("[data-ver-snapshot]");
+            if (btnVer) {
+                btnVer.style.display = "";
+                btnVer.addEventListener("click", async () => {
+                    const snap = await SnapshotDB.obter(b.snapshotId);
+                    if (!snap) return alert("Cópia não encontrada.");
+                    const w = window.open("", "_blank");
+                    w.document.write(`<pre style="white-space:pre-wrap;font-family:sans-serif;padding:20px;max-width:800px;margin:auto;">${snap.texto.replace(/[<>&]/g, c => ({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]))}</pre>`);
+                });
+            }
+        }
+
+        // ---------- Confiabilidade ----------
+        elBloco.querySelectorAll("[data-confianca-artigo] .chip").forEach(chip => {
+            chip.addEventListener("click", () => {
+                const c = chip.dataset.c;
+                elBloco.querySelectorAll("[data-confianca-artigo] .chip").forEach(x =>
+                    x.classList.toggle("selecionado", x === chip));
+                const blocos = Storage.blocos.ler("artigo", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i >= 0) {
+                    blocos[i].confiabilidade = c;
+                    Storage.blocos.salvar("artigo", dataAtual, blocos);
+                }
+            });
+        });
+
+        // ---------- Validade ----------
+        elBloco.querySelectorAll("[data-validade-artigo] .chip").forEach(chip => {
+            chip.addEventListener("click", () => {
+                const v = chip.dataset.v;
+                elBloco.querySelectorAll("[data-validade-artigo] .chip").forEach(x =>
+                    x.classList.toggle("selecionado", x === chip));
+                const blocos = Storage.blocos.ler("artigo", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i >= 0) {
+                    blocos[i].validade = v;
+                    Storage.blocos.salvar("artigo", dataAtual, blocos);
+                }
+            });
+        });
+
+        // ---------- Adicionar trecho ----------
+        elBloco.querySelector("[data-add-trecho]")?.addEventListener("click", () => {
+            const texto = prompt("Cole o trecho exato:");
+            if (!texto) return;
+            const ref = prompt("Referência (opcional — ex.: § 3):") || "";
+            const blocos = Storage.blocos.ler("artigo", dataAtual);
+            const i = blocos.findIndex(x => x.id === b.id);
+            if (i < 0) return;
+            blocos[i].trechos = blocos[i].trechos || [];
+            blocos[i].trechos.push({ texto, ref });
+            Storage.blocos.salvar("artigo", dataAtual, blocos);
+            render();
+        });
+
+        // ---------- Remover trecho ----------
+        elBloco.querySelectorAll("[data-trecho-rem]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const idx = Number(btn.dataset.trechoRem);
+                const blocos = Storage.blocos.ler("artigo", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i < 0) return;
+                blocos[i].trechos.splice(idx, 1);
+                Storage.blocos.salvar("artigo", dataAtual, blocos);
+                render();
+            });
+        });
+
+        // ---------- Remover bloco ----------
+        elBloco.querySelector("[data-rem]").addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("artigo", dataAtual).filter(x => x.id !== b.id);
+            Storage.blocos.salvar("artigo", dataAtual, blocos);
+            render();
+        });
+
+        setTimeout(() => registrarArtigoNaBiblioteca(b), 0);
+        return elBloco;
+    }
+    
+    // ==================================================
     // BIBLIOTECA LIVRO
     // ==================================================
     function registrarNaBiblioteca(item, pct) {
@@ -1973,6 +2424,132 @@
         });
     }
 
+    // ==================================================
+    // BIBLIOTECA ARTIGO
+    // ==================================================
+    function registrarArtigoNaBiblioteca(item) {
+        if (!item.titulo && !item.tema && !item.url) return;
+        const id = item.url || (item.titulo + "|" + item.tema).toLowerCase();
+        if (!id) return;
+
+        const existente = Storage.biblioteca.listar("artigo").find(x => x.id === id);
+        const pct = Math.min(100, Number(item.progresso) || 0);
+
+        Storage.biblioteca.adicionar("artigo", {
+            id,
+            tema: item.tema,
+            titulo: item.titulo || item.tema || "(sem título)",
+            autor: item.autor,
+            publicacao: item.publicacao,
+            url: item.url,
+            progresso: pct,
+            tempoLeitura: item.tempoLeitura,
+            confiabilidade: item.confiabilidade || "",
+            status: pct >= 100 ? "concluido" : "lendo",
+            pct,
+            capa: existente?.capa || "",
+        });
+    }
+
+    function renderBibliotecaArtigo() {
+        const wrap = el("conteudo");
+        const todos = Storage.biblioteca.listar("artigo");
+        let lista = [...todos];
+
+        if (estado.bibBusca.trim()) {
+            const q = estado.bibBusca.toLowerCase();
+            lista = lista.filter(b =>
+                (b.titulo || "").toLowerCase().includes(q) ||
+                (b.tema || "").toLowerCase().includes(q) ||
+                (b.publicacao || "").toLowerCase().includes(q));
+        }
+
+        if (estado.bibOrdem === "recente")        lista.sort((a, b) => (b.atualizadoEm || 0) - (a.atualizadoEm || 0));
+        else if (estado.bibOrdem === "titulo")    lista.sort((a, b) => (a.titulo || "").localeCompare(b.titulo || ""));
+        else if (estado.bibOrdem === "progresso") lista.sort((a, b) => (b.pct || 0) - (a.pct || 0));
+
+        const total     = todos.length;
+        const lendo     = todos.filter(b => b.status !== "concluido").length;
+        const concluido = todos.filter(b => b.status === "concluido").length;
+
+        wrap.innerHTML = `
+            <div class="bib-stats">
+                <div><strong>${total}</strong> ${total === 1 ? "artigo" : "artigos"}</div>
+                <div>·</div>
+                <div><strong>${lendo}</strong> lendo</div>
+                <div>·</div>
+                <div><strong>${concluido}</strong> concluídos</div>
+            </div>
+            <div class="bib-controles">
+                <input type="search" class="bib-busca" id="bibBusca" placeholder="🔍 Buscar por título, tema ou publicação" value="${esc(estado.bibBusca)}">
+                <button class="btn-secundario" data-ordem="recente">Recentes</button>
+                <button class="btn-secundario" data-ordem="titulo">A-Z</button>
+                <button class="btn-secundario" data-ordem="progresso">Progresso</button>
+            </div>
+            <div id="bibGradeWrap"></div>
+        `;
+
+        wrap.querySelectorAll("[data-ordem]").forEach(b => {
+            if (b.dataset.ordem === estado.bibOrdem) b.classList.add("btn-primario");
+            b.addEventListener("click", () => { estado.bibOrdem = b.dataset.ordem; render(); });
+        });
+
+        wrap.querySelector("#bibBusca").addEventListener("input", e => {
+            estado.bibBusca = e.target.value;
+            renderBibliotecaArtigo();
+            const i = wrap.querySelector("#bibBusca");
+            if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); }
+        });
+
+        const gradeWrap = wrap.querySelector("#bibGradeWrap");
+        if (lista.length === 0) {
+            gradeWrap.innerHTML = `<div class="vazio">Nenhum artigo na biblioteca ainda.</div>`;
+            return;
+        }
+
+        gradeWrap.innerHTML = `<div class="bib-grade">${lista.map(b => `
+            <div class="bib-item" data-id="${esc(b.id)}" style="aspect-ratio:auto;">
+                <div style="width:100%;aspect-ratio:16/9;background:#252529;border-radius:6px;margin-bottom:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#555;font-size:26px;">
+                    📄
+                </div>
+                <div class="bib-titulo">${esc(b.titulo || "(sem título)")}</div>
+                <div class="bib-tema">${esc(b.publicacao || "")}${b.publicacao && b.autor ? " · " : ""}${esc(b.autor || "")}</div>
+                <div class="progresso"><div style="width:${b.pct || 0}%"></div></div>
+                <div class="progresso-texto">${b.pct || 0}% · ${esc(b.tempoLeitura || "")}</div>
+            </div>
+        `).join("")}</div>`;
+
+        gradeWrap.querySelectorAll(".bib-item").forEach(item => {
+            item.addEventListener("click", () => {
+                const id = item.dataset.id;
+                const b = Storage.biblioteca.listar("artigo").find(x => x.id === id);
+                if (!b) return;
+                const blocos = Storage.blocos.ler("artigo", dataAtual);
+                const jaExiste = blocos.some(x => (b.url && x.url === b.url));
+                if (!jaExiste) {
+                    blocos.push({
+                        id: uid("blk"),
+                        tema: b.tema || "", titulo: b.titulo || "", autor: b.autor || "",
+                        publicacao: b.publicacao || "", url: b.url || "",
+                        confiabilidade: b.confiabilidade || "",
+                        porQueSalvei: "", tempoLeitura: b.tempoLeitura || "",
+                        progresso: b.progresso || 0,
+                        metaHoje: "", tempoPrevisto: "",
+                        trechos: [],
+                        resumo1: "", resumo2: "", resumo3: "",
+                        oQueFazer: "", proximaAcao: "",
+                        publicado: "", validade: "",
+                        snapshotId: "",
+                        criadoEm: Date.now(),
+                    });
+                    Storage.blocos.salvar("artigo", dataAtual, blocos);
+                }
+                estado.subAba = "estudar";
+                render();
+            });
+        });
+    }
+    
     // ==================================================
     // APRENDIZADOS
     // ==================================================
