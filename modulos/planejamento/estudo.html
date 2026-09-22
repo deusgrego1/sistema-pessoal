@@ -766,14 +766,37 @@
                         const t = card.dataset.recTitulo;
                         const a = card.dataset.recAutor;
                         const l = card.dataset.recLink;
-                        const blocos2 = Storage.blocos.ler("livro", dataAtual);
+                                                const blocos2 = Storage.blocos.ler("livro", dataAtual);
                         const i = blocos2.findIndex(x => x.id === b.id);
                         if (i >= 0) {
                             blocos2[i].titulo = t;
                             blocos2[i].autor = a;
                             blocos2[i].link = l;
+
+                            const pc = Number(card.dataset.recPaginas) || 0;
+                            if (pc) blocos2[i].totalPaginas = String(pc);
+
                             Storage.blocos.salvar("livro", dataAtual, blocos2);
                         }
+
+                        // Guarda a capa também na biblioteca
+                        const capa = card.dataset.recCapa || "";
+                        if (capa) {
+                            const id = blocos2[i]?.koodoId || blocos2[i]?.link || (t + "|" + (blocos2[i]?.tema || "")).toLowerCase();
+                            Storage.biblioteca.adicionar("livro", {
+                                id,
+                                tema: blocos2[i]?.tema || "",
+                                titulo: t,
+                                autor: a,
+                                link: l,
+                                capa,
+                                totalPaginas: blocos2[i]?.totalPaginas || "",
+                                paginaAtual: blocos2[i]?.paginaAtual || "",
+                                pct: 0,
+                                status: "lendo",
+                            });
+                        }
+
                         render();
                     });
                 });
