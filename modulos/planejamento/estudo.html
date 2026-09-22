@@ -400,6 +400,8 @@
         }
         .btn-adicionar-trecho:hover { background: #232f4a; border-color: #4a5c85; }
 
+        .cookie-input { font-family: monospace; font-size: 11px; }
+
         .botao-foco-flutuante {
             position: fixed; right: 24px; bottom: 24px; z-index: 9999;
             display: flex; align-items: center;
@@ -420,7 +422,7 @@
     </style>
 </head>
 
-<body>
+    <body>
 <main class="container">
 
     <header class="header">
@@ -825,7 +827,8 @@
             };
         });
     }
-    // ==================================================
+
+        // ==================================================
     // AUXILIARES DE ARTIGO
     // ==================================================
     async function buscarMetadadosArtigo(url) {
@@ -843,7 +846,82 @@
         };
     }
 
+    // ==================================================
+    // COOKIES DO MEDIUM (aceita JSON, header e Netscape)
+    // ==================================================
+    const CHAVE_MEDIUM_COOKIES = "estudo_medium_cookies";
+
+    function normalizarCookiesMedium(raw) {
+        if (!raw) return "";
+        raw = String(raw).trim();
+
+        // Formato JSON
+        if (raw.startsWith("[") || raw.startsWith("{")) {
+            try {
+                const obj = JSON.parse(raw);
+                const arr = Array.isArray(obj) ? obj : [obj];
+                return arr
+                    .filter(c => c && c.name && c.value)
+                    .map(c => `${c.name}=${c.value}`)
+                    .join("; ");
+            } catch (e) {}
+        }
+
+        // Formato Netscape (separado por TAB)
+        if (raw.includes("\t") || raw.includes("\n")) {
+            const linhas = raw.split(/\r?\n/);
+            const partes = [];
+            linhas.forEach(l => {
+                const cols = l.split("\t");
+                if (cols.length >= 7) {
+                    const nome = cols[5].trim();
+                    const valor = cols[6].trim();
+                    if (nome && valor) partes.push(`${nome}=${valor}`);
+                }
+            });
+            if (partes.length) return partes.join("; ");
+        }
+
+        // Já é header pronto
+        return raw;
+    }
+
+    function obterCookiesMedium() {
+        try { return localStorage.getItem(CHAVE_MEDIUM_COOKIES) || ""; }
+        catch { return ""; }
+    }
+
+    function salvarCookiesMedium(raw) {
+        const normalizado = normalizarCookiesMedium(raw);
+        localStorage.setItem(CHAVE_MEDIUM_COOKIES, normalizado);
+        return normalizado;
+    }
+
+    // Baixa conteúdo de artigo (usa cookies do Medium quando aplicável)
     async function baixarConteudoArtigo(url) {
+        // Se for Medium e tiver cookies salvos, tenta primeiro
+        if (url.includes("medium.com") && obterCookiesMedium()) {
+            try {
+                const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+                const r = await fetch(proxy, {
+                    headers: { "Cookie": obterCookiesMedium() },
+                });
+                if (r.ok) {
+                    const html = await r.text();
+                    const doc = new DOMParser().parseFromString(html, "text/html");
+                    const article = doc.querySelector("article") || doc.body;
+                    const texto = article.innerText || "";
+                    if (texto.length > 500) {
+                        console.log("✅ Conteúdo do Medium baixado com cookies (" + texto.length + " chars)");
+                        return texto;
+                    }
+                }
+            } catch (e) {
+                console.warn("Medium com cookies falhou, caindo pro Jina:", e);
+            }
+        }
+
+        // Fallback: Jina
         const r = await fetch(`https://r.jina.ai/${url}`);
         if (!r.ok) throw new Error("Jina falhou");
         return await r.text();
@@ -1065,7 +1143,7 @@
         return intercalado.slice(0, 10);
     }
 
-    // ==================================================
+       // ==================================================
     // LIVRO → ESTUDAR
     // ==================================================
     function renderEstudarLivro() {
@@ -2055,6 +2133,16 @@
                 <button class="btn-secundario" data-ver-snapshot="1" style="display:none;">📄 Ver cópia salva</button>
             </div>
 
+            <label class="campo-label">🍪 Cookies do Medium (opcional — para artigos pagos)</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <input type="text" id="mediumCookies_${b.id}" class="cookie-input" value="${esc(obterCookiesMedium())}" placeholder="Cole aqui os cookies exportados" style="flex:1;">
+                <button class="btn-secundario" type="button" data-salvar-cookies="1">💾 Salvar</button>
+                <button class="btn-secundario" type="button" data-limpar-cookies="1">🗑️</button>
+            </div>
+            <p style="font-size:11px;color:#666;margin-top:4px;">
+                Cole o texto exportado pelo EditThisCookie — o app normaliza sozinho.
+            </p>
+
             <label class="campo-label">Título</label>
             <input type="text" data-campo="titulo" value="${esc(b.titulo)}" placeholder="(puxado automaticamente)">
 
@@ -2219,6 +2307,24 @@
             }
         }
 
+        // ---------- Cookies do Medium ----------
+        elBloco.querySelector("[data-salvar-cookies]")?.addEventListener("click", () => {
+            const campo = elBloco.querySelector(`#mediumCookies_${b.id}`);
+            const valor = campo.value.trim();
+            if (!valor) return alert("Cole os cookies primeiro.");
+            const salvo = salvarCookiesMedium(valor);
+            campo.value = salvo;
+            alert("✅ Cookies salvos. Agora os artigos pagos do Medium devem funcionar.");
+        });
+
+        elBloco.querySelector("[data-limpar-cookies]")?.addEventListener("click", () => {
+            if (!confirm("Remover os cookies do Medium?")) return;
+            localStorage.removeItem(CHAVE_MEDIUM_COOKIES);
+            const campo = elBloco.querySelector(`#mediumCookies_${b.id}`);
+            if (campo) campo.value = "";
+            alert("Cookies removidos.");
+        });
+
         elBloco.querySelectorAll("[data-confianca-artigo] .chip").forEach(chip => {
             chip.addEventListener("click", () => {
                 const c = chip.dataset.c;
@@ -2376,7 +2482,7 @@
         return elBloco;
     }
 
-    // ==================================================
+        // ==================================================
     // BIBLIOTECA LIVRO
     // ==================================================
     function registrarNaBiblioteca(item, pct) {
@@ -2950,4 +3056,3 @@
 </script>
 </body>
 </html>
-    
