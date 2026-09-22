@@ -142,7 +142,7 @@
             border-radius: 10px; font-size: 13px; color: #888;
         }
         .bib-stats strong { color: #eaeaea; font-weight: 600; }
-        
+
         .bib-controles {
             display: flex; gap: 8px; flex-wrap: wrap;
             margin-bottom: 16px; align-items: center;
@@ -591,7 +591,7 @@
             }
         });
 
-        // ---------- botões +N (fora do forEach acima!) ----------
+        // ---------- botões +N ----------
         elBloco.querySelectorAll("[data-add]").forEach(btn => {
             btn.addEventListener("click", () => {
                 const add      = Number(btn.dataset.add) || 0;
@@ -740,7 +740,7 @@
     // ==================================================
     // BIBLIOTECA
     // ==================================================
-       function registrarNaBiblioteca(item, pct) {
+    function registrarNaBiblioteca(item, pct) {
         if (!item.titulo && !item.tema) return;
         const id = item.koodoId || item.link || (item.titulo + "|" + item.tema).toLowerCase();
         const existente = Storage.biblioteca.listar("livro").find(x => x.id === id);
@@ -748,10 +748,9 @@
         const agoraConcluido = pct >= 100;
         const jaConcluido    = existente?.status === "concluido";
 
-        // Status: pausado é preservado; lendo/concluído atualizam com o progresso
         let novoStatus = existente?.status || "lendo";
-        if (agoraConcluido)                        novoStatus = "concluido";
-        else if (novoStatus === "concluido")       novoStatus = "lendo";
+        if (agoraConcluido)                  novoStatus = "concluido";
+        else if (novoStatus === "concluido") novoStatus = "lendo";
 
         const patch = {
             id,
@@ -767,7 +766,6 @@
             capa: existente?.capa || "",
         };
 
-        // Marca/desmarca a data de conclusão
         if (agoraConcluido && !jaConcluido)      patch.concluidoEm = Date.now();
         else if (!agoraConcluido && jaConcluido) patch.concluidoEm = null;
 
@@ -776,9 +774,13 @@
 
     function renderBibliotecaLivro() {
         const wrap = el("conteudo");
-        let lista = Storage.biblioteca.listar("livro");
+        const todos = Storage.biblioteca.listar("livro");
+        let lista = [...todos];
 
-        if (estado.bibFiltro !== "todos") lista = lista.filter(b => b.status === estado.bibFiltro);
+        if (estado.bibFiltro !== "todos") {
+            lista = lista.filter(b => b.status === estado.bibFiltro);
+        }
+
         if (estado.bibBusca.trim()) {
             const q = estado.bibBusca.toLowerCase();
             lista = lista.filter(b =>
@@ -787,15 +789,33 @@
             );
         }
 
-        if (estado.bibOrdem === "recente")     lista.sort((a, b) => (b.atualizadoEm || 0) - (a.atualizadoEm || 0));
-        else if (estado.bibOrdem === "titulo") lista.sort((a, b) => (a.titulo || "").localeCompare(b.titulo || ""));
+        if (estado.bibOrdem === "recente")        lista.sort((a, b) => (b.atualizadoEm || 0) - (a.atualizadoEm || 0));
+        else if (estado.bibOrdem === "titulo")    lista.sort((a, b) => (a.titulo || "").localeCompare(b.titulo || ""));
         else if (estado.bibOrdem === "progresso") lista.sort((a, b) => (b.pct || 0) - (a.pct || 0));
 
+        const anoAtual = new Date().getFullYear();
+        const totalLivros   = todos.length;
+        const lendo         = todos.filter(b => b.status === "lendo").length;
+        const concluidosAno = todos.filter(b => {
+            if (b.status !== "concluido") return false;
+            const ts = b.concluidoEm || b.atualizadoEm;
+            return ts && new Date(ts).getFullYear() === anoAtual;
+        }).length;
+
         wrap.innerHTML = `
+            <div class="bib-stats">
+                <div><strong>${totalLivros}</strong> ${totalLivros === 1 ? "livro" : "livros"}</div>
+                <div>·</div>
+                <div><strong>${lendo}</strong> lendo</div>
+                <div>·</div>
+                <div><strong>${concluidosAno}</strong> concluídos em ${anoAtual}</div>
+            </div>
+
             <div class="bib-controles">
                 <input type="search" class="bib-busca" id="bibBusca" placeholder="🔍 Buscar por título ou tema" value="${esc(estado.bibBusca)}">
                 <button class="btn-secundario" data-filtro="todos">Todos</button>
                 <button class="btn-secundario" data-filtro="lendo">Lendo</button>
+                <button class="btn-secundario" data-filtro="pausado">Pausados</button>
                 <button class="btn-secundario" data-filtro="concluido">Concluídos</button>
                 <button class="btn-secundario" data-ordem="recente">Recentes</button>
                 <button class="btn-secundario" data-ordem="titulo">A-Z</button>
@@ -813,8 +833,7 @@
             b.addEventListener("click", () => { estado.bibOrdem = b.dataset.ordem; render(); });
         });
 
-        const buscaEl = wrap.querySelector("#bibBusca");
-        buscaEl.addEventListener("input", e => {
+        wrap.querySelector("#bibBusca").addEventListener("input", e => {
             estado.bibBusca = e.target.value;
             renderBibliotecaLivro();
             const i = wrap.querySelector("#bibBusca");
@@ -823,7 +842,7 @@
 
         const gradeWrap = wrap.querySelector("#bibGradeWrap");
         if (lista.length === 0) {
-            gradeWrap.innerHTML = `<div class="vazio">Nenhum livro na biblioteca ainda.</div>`;
+            gradeWrap.innerHTML = `<div class="vazio">Nenhum livro ${estado.bibFiltro !== "todos" ? "neste filtro" : "na biblioteca ainda"}.</div>`;
             return;
         }
 
