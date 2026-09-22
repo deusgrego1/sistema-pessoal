@@ -1173,6 +1173,13 @@
                 }
                 Storage.blocos.salvar("video", dataAtual, blocos);
 
+                                // Registra/atualiza na biblioteca quando muda algo relevante
+                if (campo === "url" || campo === "titulo" || campo === "canal" ||
+                    campo === "minutoTexto" || campo === "duracaoTexto") {
+                    const atualizado = Storage.blocos.ler("video", dataAtual).find(x => x.id === b.id);
+                    if (atualizado) registrarVideoNaBiblioteca(atualizado);
+                }
+                
                 // atualiza barra se for tempo
                 if (campo === "duracaoTexto" || campo === "minutoTexto") {
                     const tot = blocos[i].duracaoSeg || 0;
@@ -1404,8 +1411,9 @@
         });
 
         // ---------- aplicar player (após o DOM estar no documento) ----------
-        setTimeout(() => {
+                setTimeout(() => {
             if (b.videoId) aplicarPlayer(b.id, b.videoId, b.velocidade);
+            registrarVideoNaBiblioteca(b);
         }, 0);
 
         return elBloco;
