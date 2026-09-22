@@ -523,7 +523,7 @@
     // AUXILIARES DE VÍDEO
     // ==================================================
     const players = {}; // id do bloco → YT.Player
-    const YOUTUBE_API_KEY = "AIzaSyDbG4INL9LbMBDhjPVlzxAVsdTiHU4F7xo";
+    const YOUTUBE_API_KEY = "AIzaSyABf2DPiURgyGfRHH8aPzm8QBOuDRt838U";
 
     function extrairVideoId(url) {
         if (!url) return "";
@@ -600,11 +600,16 @@
         };
     }
 
-    // Busca via YouTube Data API v3
+       // Busca via YouTube Data API v3 (com variação a cada clique)
     async function buscarVideosPorTema(query) {
         if (!YOUTUBE_API_KEY) throw new Error("Chave do YouTube ausente");
 
-        const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=6&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}&regionCode=BR&relevanceLanguage=pt`;
+        // Sortear uma "ordenação" a cada clique → resultados diferentes
+        const ordens = ["relevance", "viewCount", "date", "rating"];
+        const ordem = ordens[Math.floor(Math.random() * ordens.length)];
+
+        // Buscar bem mais que 6 para ter de onde sortear
+        const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=25&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}&regionCode=BR&relevanceLanguage=pt&order=${ordem}`;
         const r = await fetch(url);
         if (!r.ok) {
             const err = await r.json().catch(() => ({}));
@@ -612,8 +617,15 @@
             throw new Error("YouTube API falhou");
         }
         const j = await r.json();
-        const items = j.items || [];
+        let items = j.items || [];
         if (!items.length) return [];
+
+        // Embaralhar (Fisher-Yates) e pegar 6 aleatórios
+        for (let i = items.length - 1; i > 0; i--) {
+            const k = Math.floor(Math.random() * (i + 1));
+            [items[i], items[k]] = [items[k], items[i]];
+        }
+        items = items.slice(0, 6);
 
         const ids = items.map(x => x.id.videoId).join(",");
         let duracoes = {};
