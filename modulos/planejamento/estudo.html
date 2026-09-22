@@ -996,7 +996,8 @@
             window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, "_blank");
         });
 
-        elBloco.querySelector("[data-recomendar]").addEventListener("click", async () => {
+        elBloco.addEventListener("click", async (ev) => {
+            if (!ev.target.closest("[data-recomendar]")) return;
             const blocos = Storage.blocos.ler("livro", dataAtual);
             const it = blocos.find(x => x.id === b.id);
             const q = (it?.tema || it?.titulo || "").trim();
