@@ -135,6 +135,14 @@
         }
         .rec-card-autor { font-size: 11px; color: #888; }
 
+        .bib-stats {
+            display: flex; gap: 20px; flex-wrap: wrap;
+            padding: 12px 16px; margin-bottom: 14px;
+            background: #19191d; border: 1px solid #252529;
+            border-radius: 10px; font-size: 13px; color: #888;
+        }
+        .bib-stats strong { color: #eaeaea; font-weight: 600; }
+        
         .bib-controles {
             display: flex; gap: 8px; flex-wrap: wrap;
             margin-bottom: 16px; align-items: center;
@@ -732,11 +740,20 @@
     // ==================================================
     // BIBLIOTECA
     // ==================================================
-    function registrarNaBiblioteca(item, pct) {
+       function registrarNaBiblioteca(item, pct) {
         if (!item.titulo && !item.tema) return;
         const id = item.koodoId || item.link || (item.titulo + "|" + item.tema).toLowerCase();
         const existente = Storage.biblioteca.listar("livro").find(x => x.id === id);
-        Storage.biblioteca.adicionar("livro", {
+
+        const agoraConcluido = pct >= 100;
+        const jaConcluido    = existente?.status === "concluido";
+
+        // Status: pausado é preservado; lendo/concluído atualizam com o progresso
+        let novoStatus = existente?.status || "lendo";
+        if (agoraConcluido)                        novoStatus = "concluido";
+        else if (novoStatus === "concluido")       novoStatus = "lendo";
+
+        const patch = {
             id,
             tema: item.tema,
             titulo: item.titulo || item.tema,
@@ -746,9 +763,15 @@
             paginaAtual: item.paginaAtual,
             totalPaginas: item.totalPaginas,
             pct,
-            status: pct >= 100 ? "concluido" : "lendo",
+            status: novoStatus,
             capa: existente?.capa || "",
-        });
+        };
+
+        // Marca/desmarca a data de conclusão
+        if (agoraConcluido && !jaConcluido)      patch.concluidoEm = Date.now();
+        else if (!agoraConcluido && jaConcluido) patch.concluidoEm = null;
+
+        Storage.biblioteca.adicionar("livro", patch);
     }
 
     function renderBibliotecaLivro() {
