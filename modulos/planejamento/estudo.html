@@ -13,26 +13,20 @@
             gap: 10px;
         }
         .resumo-card {
-            background: #1c1c20;
-            border: 1px solid #2a2a30;
-            border-radius: 10px;
-            padding: 14px 16px;
-            cursor: pointer;
-            transition: 0.15s;
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 10px; padding: 14px 16px;
+            cursor: pointer; transition: 0.15s;
         }
         .resumo-card:hover { background: #222228; border-color: #3a3a40; }
         .resumo-rotulo {
             color: #777; font-size: 11px; text-transform: uppercase;
             letter-spacing: 0.5px; display: block; margin-bottom: 6px;
         }
-        .resumo-valor {
-            color: #fff; font-size: 24px; font-weight: 600; line-height: 1;
-        }
+        .resumo-valor { color: #fff; font-size: 24px; font-weight: 600; line-height: 1; }
 
         .tipos-barra { display: flex; flex-wrap: wrap; gap: 8px; }
         .tipo-pill {
-            position: relative;
-            padding: 9px 16px; font-size: 13px; cursor: pointer;
+            position: relative; padding: 9px 16px; font-size: 13px; cursor: pointer;
             border: 1px solid #333338; background: #17171a; color: #aaa;
             border-radius: 20px; transition: 0.15s;
         }
@@ -71,10 +65,7 @@
             user-select: none;
         }
         .chip:hover { background: #222228; color: #e0e0e0; }
-        .chip.selecionado {
-            background: #2e2e33; border-color: #666;
-            color: #fff; font-weight: 600;
-        }
+        .chip.selecionado { background: #2e2e33; border-color: #666; color: #fff; font-weight: 600; }
         .chip.impacto-alto.selecionado   { background:#331f1f;border-color:#d45a5a;color:#e08b8b; }
         .chip.impacto-medio.selecionado  { background:#332e1a;border-color:#c9a44a;color:#e0d48a; }
         .chip.impacto-baixo.selecionado  { background:#1f3320;border-color:#4caf50;color:#a5d6a7; }
@@ -83,10 +74,7 @@
             width: 100%; height: 8px; background: #252529;
             border-radius: 4px; overflow: hidden; margin: 8px 0;
         }
-        .progresso > div {
-            height: 100%; background: #4caf50;
-            transition: width 0.3s ease;
-        }
+        .progresso > div { height: 100%; background: #4caf50; transition: width 0.3s ease; }
         .progresso-texto { font-size: 12px; color: #888; margin-top: 4px; }
 
         .bloco-estudo {
@@ -197,18 +185,12 @@
             font-size: 14px; color: #e0e0e0; line-height: 1.5;
             margin-bottom: 10px; white-space: pre-wrap;
         }
-        .ap-fonte {
-            font-size: 12px; color: #777;
-            font-style: italic; margin-bottom: 10px;
-        }
+        .ap-fonte { font-size: 12px; color: #777; font-style: italic; margin-bottom: 10px; }
         .ap-rodape {
             display: flex; gap: 6px; flex-wrap: wrap;
             align-items: center; font-size: 11px;
         }
-        .ap-rodape .tag {
-            padding: 3px 8px; background: #252529;
-            border-radius: 10px; color: #aaa;
-        }
+        .ap-rodape .tag { padding: 3px 8px; background: #252529; border-radius: 10px; color: #aaa; }
 
         .em-construcao {
             text-align: center; padding: 40px 20px;
@@ -216,59 +198,45 @@
         }
         .em-construcao .icone { font-size: 36px; margin-bottom: 10px; }
 
-        .vazio {
-            text-align: center; padding: 30px 20px;
-            color: #777; font-size: 14px;
-        }
+        .vazio { text-align: center; padding: 30px 20px; color: #777; font-size: 14px; }
         .btn-primario {
             padding: 10px 18px; font-size: 14px;
             background: #333; color: #fff;
             border: 1px solid #55555c; border-radius: 10px;
-            cursor: pointer; font-family: inherit;
-            transition: 0.15s;
+            cursor: pointer; font-family: inherit; transition: 0.15s;
         }
         .btn-primario:hover { background: #3a3a40; }
         .btn-secundario {
             padding: 8px 14px; font-size: 13px;
             background: #1a1a1e; color: #bbb;
             border: 1px solid #333338; border-radius: 20px;
-            cursor: pointer; font-family: inherit;
-            transition: 0.15s;
+            cursor: pointer; font-family: inherit; transition: 0.15s;
         }
         .btn-secundario:hover { color: #e0e0e0; border-color: #44444a; }
 
         .video-player-wrap {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 16/9;
-            background: #000;
-            border-radius: 10px;
-            overflow: hidden;
+            position: relative; width: 100%; aspect-ratio: 16/9;
+            background: #000; border-radius: 10px; overflow: hidden;
             margin: 8px 0 12px;
         }
         .video-player-wrap iframe,
         .video-player-wrap > div {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
+            position: absolute; inset: 0; width: 100%; height: 100%;
         }
         .video-velocidade {
-            display: flex; gap: 6px; flex-wrap: wrap;
-            margin: 8px 0 12px;
+            display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0 12px;
         }
-        .video-velocidade .chip {
-            font-variant-numeric: tabular-nums;
-        }
+        .video-velocidade .chip { font-variant-numeric: tabular-nums; }
+
         .btn-marcar {
             display: inline-flex; align-items: center; gap: 8px;
             padding: 10px 16px; font-size: 14px;
             background: #1a2a1a; color: #a5d6a7;
             border: 1px solid #2e5a2e; border-radius: 20px;
-            cursor: pointer; font-family: inherit;
-            transition: 0.15s;
+            cursor: pointer; font-family: inherit; transition: 0.15s;
         }
         .btn-marcar:hover { background: #223a22; border-color: #4caf50; }
+
         .momentos-lista {
             margin-top: 10px; display: flex; flex-direction: column; gap: 6px;
         }
@@ -296,12 +264,13 @@
             display: flex; gap: 10px; padding: 8px;
             background: #1c1c20; border: 1px solid #2a2a30;
             border-radius: 8px; cursor: pointer; transition: 0.15s;
+            position: relative;
         }
         .rec-video-card:hover { background: #24242a; border-color: #3a3a40; }
         .rec-video-thumb {
             width: 100px; height: 56px; flex-shrink: 0;
             background: #252529; border-radius: 4px;
-            overflow: hidden;
+            overflow: hidden; position: relative;
         }
         .rec-video-thumb img { width: 100%; height: 100%; object-fit: cover; }
         .rec-video-info { flex: 1; min-width: 0; }
@@ -312,6 +281,75 @@
             -webkit-box-orient: vertical; overflow: hidden;
         }
         .rec-video-meta { font-size: 11px; color: #888; }
+
+        .rec-video-dur {
+            position: absolute;
+            bottom: 3px; right: 3px;
+            background: rgba(0,0,0,0.82);
+            color: #fff;
+            padding: 1px 5px;
+            font-size: 10px;
+            border-radius: 3px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .rec-video-fav {
+            position: absolute; top: 6px; right: 6px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 50%;
+            width: 26px; height: 26px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 13px; color: #ddd;
+            transition: 0.15s;
+        }
+        .rec-video-fav:hover { background: rgba(0,0,0,0.85); }
+        .rec-video-fav.favoritado { background: #d45a5a; border-color: #d45a5a; color: #fff; }
+
+        .rec-video-stats { font-size: 11px; color: #777; margin-top: 3px; }
+        .rec-video-stats .linha {
+            display: flex; gap: 6px; flex-wrap: wrap;
+            font-size: 11px; color: #777;
+        }
+        .rec-video-stats .sep { color: #444; }
+
+        .video-historico-wrap {
+            display: flex; gap: 6px; align-items: center;
+            margin-bottom: 8px;
+        }
+        .video-historico-wrap select { flex: 1; }
+        .video-historico-wrap button {
+            padding: 6px 10px; font-size: 12px;
+            background: #1a1a1e; color: #888;
+            border: 1px solid #333338; border-radius: 6px;
+            cursor: pointer;
+        }
+        .video-historico-wrap button:hover { color: #d45a5a; }
+
+        .video-filtros {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .video-filtros select { width: 100%; }
+
+        .video-acoes-extra {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .checkbox-legenda {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 12px; color: #aaa;
+            cursor: pointer;
+            padding: 6px 10px;
+            border: 1px solid #333338;
+            border-radius: 16px;
+            user-select: none;
+        }
+        .checkbox-legenda:hover { color: #ddd; }
+        .checkbox-legenda input { margin: 0; }
 
         .area-3frases { display: flex; flex-direction: column; gap: 6px; }
         .area-3frases input { font-size: 13px; }
@@ -405,7 +443,7 @@
     }
 
     // ==================================================
-    // RESUMO
+    // RESUMO / TIPOS / SUB-ABAS / CONTEÚDO
     // ==================================================
     function renderResumo() {
         const blocosHoje = TIPOS.reduce(
@@ -441,9 +479,6 @@
         });
     }
 
-    // ==================================================
-    // TIPOS
-    // ==================================================
     function renderTipos() {
         const lista = [...TIPOS, ABAS_APRENDIZADOS];
         el("tiposBarra").innerHTML = lista.map(t => {
@@ -462,12 +497,8 @@
         });
     }
 
-    // ==================================================
-    // SUB-ABAS
-    // ==================================================
     function renderSubAbas() {
         let abas = [];
-
         if (estado.tipo === "livro" || estado.tipo === "video") {
             abas = [
                 { id: "estudar",    label: "📝 Estudar hoje" },
@@ -494,9 +525,6 @@
         });
     }
 
-    // ==================================================
-    // CONTEÚDO
-    // ==================================================
     function renderConteudo() {
         if (estado.tipo === "livro"  && estado.subAba === "estudar")    return renderEstudarLivro();
         if (estado.tipo === "livro"  && estado.subAba === "biblioteca") return renderBibliotecaLivro();
@@ -522,7 +550,7 @@
     // ==================================================
     // AUXILIARES DE VÍDEO
     // ==================================================
-    const players = {}; // id do bloco → YT.Player
+    const players = {};
     const YOUTUBE_API_KEY = "AIzaSyABf2DPiURgyGfRHH8aPzm8QBOuDRt838U";
 
     function extrairVideoId(url) {
@@ -550,6 +578,61 @@
         if (partes.length === 2) return partes[0]*60 + partes[1];
         if (partes.length === 1) return partes[0];
         return 0;
+    }
+
+    function formatarDuracaoCurta(seg) {
+        seg = Number(seg) || 0;
+        if (seg < 60) return `${seg}s`;
+        const min = Math.round(seg / 60);
+        if (min < 60) return `${min} min`;
+        const h = Math.floor(seg / 3600);
+        const m = Math.round((seg % 3600) / 60);
+        return m > 0 ? `${h}h ${m}min` : `${h}h`;
+    }
+
+    function formatarVisualizacoes(n) {
+        n = Number(n) || 0;
+        if (n >= 1e9) return (n/1e9).toFixed(1).replace(".", ",") + " bi";
+        if (n >= 1e6) return (n/1e6).toFixed(1).replace(".", ",") + " mi";
+        if (n >= 1e3) return Math.floor(n/1e3) + " mil";
+        return String(n);
+    }
+
+    function formatarDataRelativa(iso) {
+        if (!iso) return "";
+        const d = new Date(iso);
+        const diff = Math.floor((new Date() - d) / 1000);
+        if (diff < 60) return "agora";
+        if (diff < 3600) return `há ${Math.floor(diff/60)} min`;
+        if (diff < 86400) return `há ${Math.floor(diff/3600)} h`;
+        if (diff < 86400*30) return `há ${Math.floor(diff/86400)} d`;
+        if (diff < 86400*365) return `há ${Math.floor(diff/86400/30)} meses`;
+        return `há ${Math.floor(diff/86400/365)} ano(s)`;
+    }
+
+    const videosVistos = new Set();
+    const CHAVE_HISTORICO = "estudo_video_historico_buscas";
+    const CHAVE_FILTROS   = "estudo_video_filtros_preferidos";
+
+    function obterHistoricoBuscas() {
+        try { return JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || []; }
+        catch { return []; }
+    }
+    function salvarBuscaNoHistorico(tema) {
+        if (!tema) return;
+        let h = obterHistoricoBuscas().filter(t => t.toLowerCase() !== tema.toLowerCase());
+        h.unshift(tema);
+        h = h.slice(0, 8);
+        localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(h));
+    }
+    function limparHistoricoBuscas() { localStorage.removeItem(CHAVE_HISTORICO); }
+
+    function obterFiltrosSalvos() {
+        try { return JSON.parse(localStorage.getItem(CHAVE_FILTROS)) || {}; }
+        catch { return {}; }
+    }
+    function salvarFiltros(opts) {
+        localStorage.setItem(CHAVE_FILTROS, JSON.stringify(opts));
     }
 
     let ytApiPromise = null;
@@ -584,7 +667,6 @@
         });
     }
 
-    // Metadados via oEmbed oficial do YouTube (funciona sem chave, sem CORS)
     async function buscarMetadadosYouTube(videoId) {
         const url = `https://www.youtube.com/oembed?url=${encodeURIComponent(
             `https://www.youtube.com/watch?v=${videoId}`
@@ -600,16 +682,28 @@
         };
     }
 
-       // Busca via YouTube Data API v3 (com variação a cada clique)
-    async function buscarVideosPorTema(query) {
+    async function buscarVideosPorTema(query, opts = {}) {
         if (!YOUTUBE_API_KEY) throw new Error("Chave do YouTube ausente");
 
-        // Sortear uma "ordenação" a cada clique → resultados diferentes
-        const ordens = ["relevance", "viewCount", "date", "rating"];
-        const ordem = ordens[Math.floor(Math.random() * ordens.length)];
+        const ordem    = opts.ordem    || "relevance";
+        const duracao  = opts.duracao  || "any";
+        const periodo  = opts.periodo  || "any";
+        const ineditos = !!opts.ineditos;
+        const legenda  = !!opts.legenda;
 
-        // Buscar bem mais que 6 para ter de onde sortear
-        const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=25&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}&regionCode=BR&relevanceLanguage=pt&order=${ordem}`;
+        let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=25&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}&regionCode=BR&relevanceLanguage=pt&order=${ordem}`;
+
+        if (duracao !== "any") url += `&videoDuration=${duracao}`;
+        if (legenda) url += `&videoCaption=closedCaption`;
+
+        if (periodo !== "any") {
+            const dias = { "24h": 1, "semana": 7, "mes": 30, "ano": 365 }[periodo] || 0;
+            if (dias) {
+                const desde = new Date(Date.now() - dias * 86400000);
+                url += `&publishedAfter=${desde.toISOString()}`;
+            }
+        }
+
         const r = await fetch(url);
         if (!r.ok) {
             const err = await r.json().catch(() => ({}));
@@ -620,24 +714,44 @@
         let items = j.items || [];
         if (!items.length) return [];
 
-        // Embaralhar (Fisher-Yates) e pegar 6 aleatórios
+        if (ineditos) {
+            const novos = items.filter(x => !videosVistos.has(x.id.videoId));
+            if (novos.length >= 3) items = novos;
+            else videosVistos.clear();
+        }
+
         for (let i = items.length - 1; i > 0; i--) {
             const k = Math.floor(Math.random() * (i + 1));
             [items[i], items[k]] = [items[k], items[i]];
         }
         items = items.slice(0, 6);
+        items.forEach(x => videosVistos.add(x.id.videoId));
 
-        const ids = items.map(x => x.id.videoId).join(",");
-        let duracoes = {};
+        const ids      = items.map(x => x.id.videoId).join(",");
+        const canalIds = [...new Set(items.map(x => x.snippet.channelId))].join(",");
+
+        let detalhes = {}, canais = {};
         try {
             const r2 = await fetch(
-                `https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${ids}&key=${YOUTUBE_API_KEY}`
+                `https://www.googleapis.com/youtube/v3/videos?part=contentDetails,statistics&id=${ids}&key=${YOUTUBE_API_KEY}`
             );
             const j2 = await r2.json();
             (j2.items || []).forEach(v => {
-                duracoes[v.id] = v.contentDetails.duration;
+                detalhes[v.id] = {
+                    duracao: v.contentDetails?.duration,
+                    views:   Number(v.statistics?.viewCount || 0),
+                    likes:   Number(v.statistics?.likeCount || 0),
+                };
             });
-        } catch (e) { /* durações opcionais */ }
+
+            const r3 = await fetch(
+                `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${canalIds}&key=${YOUTUBE_API_KEY}`
+            );
+            const j3 = await r3.json();
+            (j3.items || []).forEach(c => {
+                canais[c.id] = Number(c.statistics?.subscriberCount || 0);
+            });
+        } catch (e) {}
 
         function isoParaSegundos(iso) {
             if (!iso) return 0;
@@ -646,13 +760,24 @@
             return (Number(m[1])||0)*3600 + (Number(m[2])||0)*60 + (Number(m[3])||0);
         }
 
-        return items.map(it => ({
-            vid:    it.id.videoId,
-            titulo: it.snippet.title,
-            canal:  it.snippet.channelTitle,
-            dur:    duracoes[it.id.videoId] ? formatarDuracao(isoParaSegundos(duracoes[it.id.videoId])) : "",
-            thumb:  it.snippet.thumbnails?.medium?.url || it.snippet.thumbnails?.default?.url || "",
-        }));
+        return items.map(it => {
+            const d = detalhes[it.id.videoId] || {};
+            const seg = d.duracao ? isoParaSegundos(d.duracao) : 0;
+            return {
+                vid:       it.id.videoId,
+                titulo:    it.snippet.title,
+                canal:     it.snippet.channelTitle,
+                canalId:   it.snippet.channelId,
+                publicado: it.snippet.publishedAt,
+                durSeg:    seg,
+                dur:       seg ? formatarDuracao(seg) : "",
+                durCurta:  seg ? formatarDuracaoCurta(seg) : "",
+                views:     d.views || 0,
+                likes:     d.likes || 0,
+                subs:      canais[it.snippet.channelId] || 0,
+                thumb:     it.snippet.thumbnails?.medium?.url || it.snippet.thumbnails?.default?.url || "",
+            };
+        });
     }
 
     // ==================================================
@@ -813,13 +938,10 @@
                 const add      = Number(btn.dataset.add) || 0;
                 const inputPag = elBloco.querySelector('[data-campo="paginaAtual"]');
                 const inputTot = elBloco.querySelector('[data-campo="totalPaginas"]');
-
                 const atual = parseInt(inputPag.value, 10) || 0;
                 const total = parseInt(inputTot.value, 10) || 0;
-
                 let nova = atual + add;
                 if (total > 0 && nova > total) nova = total;
-
                 inputPag.value = nova;
 
                 const blocos = Storage.blocos.ler("livro", dataAtual);
@@ -828,18 +950,15 @@
                     blocos[i].paginaAtual = String(nova);
                     Storage.blocos.salvar("livro", dataAtual, blocos);
                 }
-
                 const pct = total > 0 ? Math.min(100, Math.round((nova / total) * 100)) : 0;
                 elBloco.querySelector(".progresso > div").style.width = pct + "%";
                 elBloco.querySelector(".progresso-texto").textContent = `${nova} / ${total} · ${pct}%`;
-
                 if (i >= 0) registrarNaBiblioteca(blocos[i], pct);
             });
         });
 
         elBloco.querySelector("[data-rem]").addEventListener("click", () => {
-            const blocos = Storage.blocos.ler("livro", dataAtual)
-                .filter(x => x.id !== b.id);
+            const blocos = Storage.blocos.ler("livro", dataAtual).filter(x => x.id !== b.id);
             Storage.blocos.salvar("livro", dataAtual, blocos);
             render();
         });
@@ -847,10 +966,7 @@
         elBloco.querySelector("[data-koodo]").addEventListener("click", () => {
             const blocos = Storage.blocos.ler("livro", dataAtual);
             const it = blocos.find(x => x.id === b.id);
-            if (!it || !it.koodoId) {
-                alert("Cole o ID do Koodo primeiro.");
-                return;
-            }
+            if (!it || !it.koodoId) { alert("Cole o ID do Koodo primeiro."); return; }
             const titulo = encodeURIComponent(it.titulo || it.tema || "livro");
             const url = `https://web.koodoreader.com/#/epub/${it.koodoId}?title=${titulo}&file=${it.koodoId}`;
             window.open(url, "_blank", "noopener");
@@ -940,7 +1056,6 @@
                         render();
                     });
                 });
-
             } catch (e) {
                 box.innerHTML = `<div style="color:#888;font-size:13px;">Erro ao buscar.</div>`;
             }
@@ -1142,13 +1257,59 @@
             </div>
 
             <label class="campo-label">🔎 Buscar mais vídeos sobre o tema</label>
+            <div class="video-historico-wrap">
+                <select id="hist_${b.id}">
+                    <option value="">📚 Histórico de buscas…</option>
+                </select>
+                <button type="button" data-limpar-hist="1" title="Limpar histórico">🗑️</button>
+            </div>
+            <div class="video-filtros">
+                <div>
+                    <label class="campo-label" style="margin-top:0;">Ordenar por</label>
+                    <select data-filtro-recomendar="ordem">
+                        <option value="relevance">Relevância</option>
+                        <option value="viewCount">Mais vistos</option>
+                        <option value="date">Mais recentes</option>
+                        <option value="rating">Melhor avaliados</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="campo-label" style="margin-top:0;">Duração</label>
+                    <select data-filtro-recomendar="duracao">
+                        <option value="any">Qualquer</option>
+                        <option value="short">Curto (&lt; 4 min)</option>
+                        <option value="medium">Médio (4–20 min)</option>
+                        <option value="long">Longo (&gt; 20 min)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="campo-label" style="margin-top:0;">Período</label>
+                    <select data-filtro-recomendar="periodo">
+                        <option value="any">Qualquer</option>
+                        <option value="24h">Últimas 24h</option>
+                        <option value="semana">Última semana</option>
+                        <option value="mes">Último mês</option>
+                        <option value="ano">Último ano</option>
+                    </select>
+                </div>
+            </div>
+            <label class="checkbox-legenda" style="margin-bottom:10px;">
+                <input type="checkbox" data-filtro-recomendar="legenda">
+                <span>📝 Só com legenda</span>
+            </label>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
                 <button class="btn-secundario" data-recomendar-video="1">🎥 Recomendar vídeos</button>
+                <button class="btn-secundario" data-recomendar-video-novo="1">🆕 Só inéditos</button>
                 <button class="btn-secundario" data-google-video="1">📄 Google</button>
+            </div>
+            <div class="video-acoes-extra" id="acoes_extra_${b.id}" style="display:none;">
+                <button class="btn-secundario" data-abrir-todos="1">↗️ Abrir todos no YouTube</button>
+                <button class="btn-secundario" data-salvar-filtros="1">💾 Salvar filtros atuais</button>
             </div>
             <div class="recomendacoes" id="recv_${b.id}" style="display:none;"></div>
         `;
 
+        // ---------- Salvar alterações dos campos ----------
         elBloco.querySelectorAll("[data-campo]").forEach(input => {
             input.addEventListener("input", () => {
                 const campo = input.dataset.campo;
@@ -1182,6 +1343,7 @@
             });
         });
 
+        // ---------- Buscar metadados ----------
         const btnMeta = elBloco.querySelector("[data-buscar-meta]");
         if (btnMeta) {
             btnMeta.addEventListener("click", async () => {
@@ -1205,22 +1367,21 @@
                     if (j >= 0) {
                         if (meta.titulo) blocos2[j].titulo = meta.titulo;
                         if (meta.canal)  blocos2[j].canal  = meta.canal;
-                        if (meta.duracaoSeg) blocos2[j].duracaoSeg = meta.duracaoSeg;
                         Storage.blocos.salvar("video", dataAtual, blocos2);
                     }
                 } catch (e) {
-                    console.warn("oEmbed falhou, seguindo manual", e);
+                    console.warn("oEmbed falhou", e);
                 }
                 render();
             });
         }
 
+        // ---------- Velocidade ----------
         elBloco.querySelectorAll("[data-vel] .chip").forEach(chip => {
             chip.addEventListener("click", () => {
                 const v = chip.dataset.v;
                 elBloco.querySelectorAll("[data-vel] .chip").forEach(c =>
-                    c.classList.toggle("selecionado", c === chip)
-                );
+                    c.classList.toggle("selecionado", c === chip));
                 const blocos = Storage.blocos.ler("video", dataAtual);
                 const i = blocos.findIndex(x => x.id === b.id);
                 if (i >= 0) {
@@ -1234,6 +1395,7 @@
             });
         });
 
+        // ---------- Marcar momento ----------
         const btnMarcar = elBloco.querySelector("[data-marcar]");
         if (btnMarcar) {
             btnMarcar.addEventListener("click", () => {
@@ -1252,6 +1414,7 @@
             });
         }
 
+        // ---------- Momentos: pular / remover ----------
         elBloco.querySelectorAll("[data-pular]").forEach(span => {
             span.addEventListener("click", () => {
                 const idx = Number(span.dataset.pular);
@@ -1276,12 +1439,12 @@
             });
         });
 
+        // ---------- Vale reassistir ----------
         elBloco.querySelectorAll('[data-boolean="valeReassistir"] .chip').forEach(chip => {
             chip.addEventListener("click", () => {
                 const v = chip.dataset.bool === "1";
                 elBloco.querySelectorAll('[data-boolean="valeReassistir"] .chip').forEach(c =>
-                    c.classList.toggle("selecionado", c === chip)
-                );
+                    c.classList.toggle("selecionado", c === chip));
                 const blocos = Storage.blocos.ler("video", dataAtual);
                 const i = blocos.findIndex(x => x.id === b.id);
                 if (i >= 0) {
@@ -1291,12 +1454,12 @@
             });
         });
 
+        // ---------- Validade ----------
         elBloco.querySelectorAll("[data-validade] .chip").forEach(chip => {
             chip.addEventListener("click", () => {
                 const v = chip.dataset.v;
                 elBloco.querySelectorAll("[data-validade] .chip").forEach(c =>
-                    c.classList.toggle("selecionado", c === chip)
-                );
+                    c.classList.toggle("selecionado", c === chip));
                 const blocos = Storage.blocos.ler("video", dataAtual);
                 const i = blocos.findIndex(x => x.id === b.id);
                 if (i >= 0) {
@@ -1306,12 +1469,12 @@
             });
         });
 
+        // ---------- Confiabilidade ----------
         elBloco.querySelectorAll("[data-confianca] .chip").forEach(chip => {
             chip.addEventListener("click", () => {
                 const c = chip.dataset.c;
                 elBloco.querySelectorAll("[data-confianca] .chip").forEach(x =>
-                    x.classList.toggle("selecionado", x === chip)
-                );
+                    x.classList.toggle("selecionado", x === chip));
                 const blocos = Storage.blocos.ler("video", dataAtual);
                 const i = blocos.findIndex(x => x.id === b.id);
                 if (i >= 0) {
@@ -1321,9 +1484,9 @@
             });
         });
 
+        // ---------- Remover bloco ----------
         elBloco.querySelector("[data-rem]").addEventListener("click", () => {
-            const blocos = Storage.blocos.ler("video", dataAtual)
-                .filter(x => x.id !== b.id);
+            const blocos = Storage.blocos.ler("video", dataAtual).filter(x => x.id !== b.id);
             Storage.blocos.salvar("video", dataAtual, blocos);
             if (players[b.id]) {
                 try { players[b.id].destroy(); } catch(e) {}
@@ -1332,6 +1495,7 @@
             render();
         });
 
+        // ---------- Google ----------
         elBloco.querySelector("[data-google-video]")?.addEventListener("click", () => {
             const blocos = Storage.blocos.ler("video", dataAtual);
             const it = blocos.find(x => x.id === b.id);
@@ -1340,36 +1504,138 @@
             window.open(`https://www.google.com/search?q=${encodeURIComponent(q + " vídeo")}`, "_blank");
         });
 
-        elBloco.querySelector("[data-recomendar-video]")?.addEventListener("click", async () => {
+        // ---------- Histórico de buscas ----------
+        const histSelect = elBloco.querySelector(`#hist_${b.id}`);
+        if (histSelect) {
+            obterHistoricoBuscas().forEach(t => {
+                const opt = document.createElement("option");
+                opt.value = t;
+                opt.textContent = t;
+                histSelect.appendChild(opt);
+            });
+            histSelect.addEventListener("change", () => {
+                if (!histSelect.value) return;
+                const blocos = Storage.blocos.ler("video", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i >= 0) {
+                    blocos[i].tema = histSelect.value;
+                    Storage.blocos.salvar("video", dataAtual, blocos);
+                    elBloco.querySelector('[data-campo="tema"]').value = histSelect.value;
+                }
+            });
+        }
+        elBloco.querySelector("[data-limpar-hist]")?.addEventListener("click", () => {
+            if (!confirm("Limpar todo o histórico de buscas?")) return;
+            limparHistoricoBuscas();
+            if (histSelect) histSelect.innerHTML = '<option value="">📚 Histórico de buscas…</option>';
+        });
+
+        // ---------- Carregar filtros salvos ----------
+        const salvos = obterFiltrosSalvos();
+        const selOrdem   = elBloco.querySelector('[data-filtro-recomendar="ordem"]');
+        const selDur     = elBloco.querySelector('[data-filtro-recomendar="duracao"]');
+        const selPeriodo = elBloco.querySelector('[data-filtro-recomendar="periodo"]');
+        const chkLegenda = elBloco.querySelector('[data-filtro-recomendar="legenda"]');
+        if (salvos.ordem)   selOrdem.value   = salvos.ordem;
+        if (salvos.duracao) selDur.value     = salvos.duracao;
+        if (salvos.periodo) selPeriodo.value = salvos.periodo;
+        if (salvos.legenda) chkLegenda.checked = true;
+
+        // ---------- Recomendar vídeos ----------
+        async function recomendarVideos(ineditos) {
             const blocos = Storage.blocos.ler("video", dataAtual);
             const it = blocos.find(x => x.id === b.id);
             const q = (it?.tema || "").trim();
             if (!q) return alert("Preencha o tema primeiro.");
 
+            const ordem   = selOrdem.value;
+            const duracao = selDur.value;
+            const periodo = selPeriodo.value;
+            const legenda = chkLegenda.checked;
+
             const box = elBloco.querySelector(`#recv_${b.id}`);
+            const acoesExtra = elBloco.querySelector(`#acoes_extra_${b.id}`);
             box.style.display = "grid";
             box.innerHTML = `<div style="color:#888;font-size:13px;">Buscando…</div>`;
 
             try {
-                const lista = await buscarVideosPorTema(q);
+                const lista = await buscarVideosPorTema(q, { ordem, duracao, periodo, ineditos, legenda });
+                salvarBuscaNoHistorico(q);
+
                 if (!lista.length) {
-                    box.innerHTML = `<div style="color:#888;font-size:13px;">Nada encontrado. Tente o Google.</div>`;
+                    box.innerHTML = `<div style="color:#888;font-size:13px;">Nada encontrado. Tente outro filtro ou o Google.</div>`;
+                    acoesExtra.style.display = "none";
                     return;
                 }
-                box.innerHTML = lista.map(v => `
+
+                elBloco._ultimaRecomendacao = lista;
+
+                box.innerHTML = lista.map(v => {
+                    const jaFav = Storage.biblioteca.listar("video").some(x => x.id === v.vid);
+                    return `
                     <div class="rec-video-card"
                          data-vid="${esc(v.vid)}"
                          data-vtitulo="${esc(v.titulo)}"
                          data-vcanal="${esc(v.canal)}"
                          data-vdur="${esc(v.dur)}">
-                        <div class="rec-video-thumb"><img src="${esc(v.thumb)}" alt=""></div>
+                        <div class="rec-video-thumb">
+                            <img src="${esc(v.thumb)}" alt="">
+                            ${v.dur ? `<span class="rec-video-dur">${esc(v.dur)}</span>` : ""}
+                        </div>
                         <div class="rec-video-info">
                             <div class="rec-video-titulo">${esc(v.titulo)}</div>
-                            <div class="rec-video-meta">${esc(v.canal)}${v.dur ? " · " + esc(v.dur) : ""}</div>
+                            <div class="rec-video-meta">${esc(v.canal)}${v.subs ? " · " + formatarVisualizacoes(v.subs) + " inscritos" : ""}</div>
+                            <div class="rec-video-stats">
+                                <div class="linha">
+                                    <span>👁️ ${formatarVisualizacoes(v.views)}</span>
+                                    <span class="sep">·</span>
+                                    <span>${formatarDataRelativa(v.publicado)}</span>
+                                    ${v.durCurta ? `<span class="sep">·</span><span>${v.durCurta}</span>` : ""}
+                                </div>
+                            </div>
                         </div>
+                        <div class="rec-video-fav${jaFav ? " favoritado" : ""}" data-fav="${esc(v.vid)}" title="Favoritar">${jaFav ? "❤️" : "🤍"}</div>
                     </div>
-                `).join("");
+                `;}).join("");
 
+                acoesExtra.style.display = "flex";
+
+                // Favoritar
+                box.querySelectorAll(".rec-video-fav").forEach(coracao => {
+                    coracao.addEventListener("click", (ev) => {
+                        ev.stopPropagation();
+                        const vid = coracao.dataset.fav;
+                        const item = lista.find(x => x.vid === vid);
+                        if (!item) return;
+                        const existente = Storage.biblioteca.listar("video").find(x => x.id === vid);
+                        if (existente) {
+                            Storage.biblioteca.remover("video", vid);
+                            coracao.classList.remove("favoritado");
+                            coracao.textContent = "🤍";
+                        } else {
+                            Storage.biblioteca.adicionar("video", {
+                                id: vid,
+                                tema: q,
+                                titulo: item.titulo,
+                                canal: item.canal,
+                                videoId: vid,
+                                url: `https://www.youtube.com/watch?v=${vid}`,
+                                duracaoSeg: item.durSeg,
+                                minutoAtual: 0,
+                                thumb: item.thumb,
+                                pct: 0,
+                                status: "assistindo",
+                                valeReassistir: false,
+                                confiabilidade: "",
+                                capa: "",
+                            });
+                            coracao.classList.add("favoritado");
+                            coracao.textContent = "❤️";
+                        }
+                    });
+                });
+
+                // Clique no card
                 box.querySelectorAll(".rec-video-card").forEach(card => {
                     card.addEventListener("click", () => {
                         const vid = card.dataset.vid;
@@ -1387,9 +1653,35 @@
                 });
             } catch (e) {
                 box.innerHTML = `<div style="color:#888;font-size:13px;">Erro ao buscar. Tente o Google.</div>`;
+                acoesExtra.style.display = "none";
             }
+        }
+
+        elBloco.querySelector("[data-recomendar-video]")?.addEventListener("click", () => recomendarVideos(false));
+        elBloco.querySelector("[data-recomendar-video-novo]")?.addEventListener("click", () => recomendarVideos(true));
+
+        // ---------- Abrir todos no YouTube ----------
+        elBloco.querySelector("[data-abrir-todos]")?.addEventListener("click", () => {
+            const lista = elBloco._ultimaRecomendacao || [];
+            if (!lista.length) return alert("Nenhuma recomendação ativa.");
+            if (!confirm(`Abrir ${lista.length} abas no YouTube?`)) return;
+            lista.forEach((v, idx) => {
+                setTimeout(() => window.open(`https://www.youtube.com/watch?v=${v.vid}`, "_blank"), idx * 150);
+            });
         });
 
+        // ---------- Salvar filtros atuais ----------
+        elBloco.querySelector("[data-salvar-filtros]")?.addEventListener("click", () => {
+            salvarFiltros({
+                ordem:   selOrdem.value,
+                duracao: selDur.value,
+                periodo: selPeriodo.value,
+                legenda: chkLegenda.checked,
+            });
+            alert("✅ Filtros salvos como padrão.");
+        });
+
+        // ---------- Aplicar player ----------
         setTimeout(() => {
             if (b.videoId) aplicarPlayer(b.id, b.videoId, b.velocidade);
             registrarVideoNaBiblioteca(b);
@@ -1414,17 +1706,10 @@
         else if (novoStatus === "concluido") novoStatus = "lendo";
 
         const patch = {
-            id,
-            tema: item.tema,
-            titulo: item.titulo || item.tema,
-            autor: item.autor,
-            koodoId: item.koodoId,
-            link: item.link,
-            paginaAtual: item.paginaAtual,
-            totalPaginas: item.totalPaginas,
-            pct,
-            status: novoStatus,
-            capa: existente?.capa || "",
+            id, tema: item.tema, titulo: item.titulo || item.tema,
+            autor: item.autor, koodoId: item.koodoId, link: item.link,
+            paginaAtual: item.paginaAtual, totalPaginas: item.totalPaginas,
+            pct, status: novoStatus, capa: existente?.capa || "",
         };
 
         if (agoraConcluido && !jaConcluido)      patch.concluidoEm = Date.now();
@@ -1438,16 +1723,12 @@
         const todos = Storage.biblioteca.listar("livro");
         let lista = [...todos];
 
-        if (estado.bibFiltro !== "todos") {
-            lista = lista.filter(b => b.status === estado.bibFiltro);
-        }
-
+        if (estado.bibFiltro !== "todos") lista = lista.filter(b => b.status === estado.bibFiltro);
         if (estado.bibBusca.trim()) {
             const q = estado.bibBusca.toLowerCase();
             lista = lista.filter(b =>
                 (b.titulo || "").toLowerCase().includes(q) ||
-                (b.tema || "").toLowerCase().includes(q)
-            );
+                (b.tema || "").toLowerCase().includes(q));
         }
 
         if (estado.bibOrdem === "recente")        lista.sort((a, b) => (b.atualizadoEm || 0) - (a.atualizadoEm || 0));
@@ -1471,7 +1752,6 @@
                 <div>·</div>
                 <div><strong>${concluidosAno}</strong> concluídos em ${anoAtual}</div>
             </div>
-
             <div class="bib-controles">
                 <input type="search" class="bib-busca" id="bibBusca" placeholder="🔍 Buscar por título ou tema" value="${esc(estado.bibBusca)}">
                 <button class="btn-secundario" data-filtro="todos">Todos</button>
@@ -1522,33 +1802,24 @@
                 const id = item.dataset.id;
                 const b = Storage.biblioteca.listar("livro").find(x => x.id === id);
                 if (!b) return;
-
                 const blocos = Storage.blocos.ler("livro", dataAtual);
-
                 const jaExiste = blocos.some(x =>
                     (b.koodoId && x.koodoId === b.koodoId) ||
                     (b.link    && x.link    === b.link) ||
                     ((b.titulo || "").toLowerCase() === (x.titulo || "").toLowerCase() &&
-                     (b.tema   || "").toLowerCase() === (x.tema   || "").toLowerCase())
-                );
-
+                     (b.tema   || "").toLowerCase() === (x.tema   || "").toLowerCase()));
                 if (!jaExiste) {
                     blocos.push({
                         id: uid("blk"),
-                        tema: b.tema || "",
-                        titulo: b.titulo || "",
-                        autor: b.autor || "",
-                        paginaAtual: b.paginaAtual || "",
-                        totalPaginas: b.totalPaginas || "",
-                        capitulo: "",
-                        metaHoje: "", tempoPrevisto: "",
+                        tema: b.tema || "", titulo: b.titulo || "", autor: b.autor || "",
+                        paginaAtual: b.paginaAtual || "", totalPaginas: b.totalPaginas || "",
+                        capitulo: "", metaHoje: "", tempoPrevisto: "",
                         oQueAprendi: "", comoAplicar: "", proximaAcao: "",
                         link: b.link || "", koodoId: b.koodoId || "",
                         status: "", criadoEm: Date.now(),
                     });
                     Storage.blocos.salvar("livro", dataAtual, blocos);
                 }
-
                 estado.subAba = "estudar";
                 render();
             });
@@ -1562,24 +1833,17 @@
         if (!item.titulo && !item.tema) return;
         const id = item.videoId || item.url || (item.titulo + "|" + item.tema).toLowerCase();
         if (!id) return;
-
         const existente = Storage.biblioteca.listar("video").find(x => x.id === id);
         const pct = item.duracaoSeg > 0
             ? Math.min(100, Math.round((item.minutoAtual / item.duracaoSeg) * 100))
             : 0;
 
         Storage.biblioteca.adicionar("video", {
-            id,
-            tema: item.tema,
-            titulo: item.titulo || item.tema,
-            canal: item.canal,
-            videoId: item.videoId,
-            url: item.url,
-            duracaoSeg: item.duracaoSeg,
-            minutoAtual: item.minutoAtual,
+            id, tema: item.tema, titulo: item.titulo || item.tema,
+            canal: item.canal, videoId: item.videoId, url: item.url,
+            duracaoSeg: item.duracaoSeg, minutoAtual: item.minutoAtual,
             thumb: item.videoId ? `https://i.ytimg.com/vi/${item.videoId}/mqdefault.jpg` : "",
-            pct,
-            status: pct >= 100 ? "concluido" : "assistindo",
+            pct, status: pct >= 100 ? "concluido" : "assistindo",
             valeReassistir: item.valeReassistir || false,
             confiabilidade: item.confiabilidade || "",
             capa: existente?.capa || "",
@@ -1596,8 +1860,7 @@
             lista = lista.filter(b =>
                 (b.titulo || "").toLowerCase().includes(q) ||
                 (b.tema  || "").toLowerCase().includes(q) ||
-                (b.canal || "").toLowerCase().includes(q)
-            );
+                (b.canal || "").toLowerCase().includes(q));
         }
 
         if (estado.bibOrdem === "recente")        lista.sort((a, b) => (b.atualizadoEm || 0) - (a.atualizadoEm || 0));
@@ -1616,7 +1879,6 @@
                 <div>·</div>
                 <div><strong>${revisitar}</strong> ${revisitar === 1 ? "vale revisitar" : "valem revisitar"}</div>
             </div>
-
             <div class="bib-controles">
                 <input type="search" class="bib-busca" id="bibBusca" placeholder="🔍 Buscar por título, tema ou canal" value="${esc(estado.bibBusca)}">
                 <button class="btn-secundario" data-ordem="recente">Recentes</button>
@@ -1661,40 +1923,27 @@
                 const id = item.dataset.id;
                 const b = Storage.biblioteca.listar("video").find(x => x.id === id);
                 if (!b) return;
-
                 const blocos = Storage.blocos.ler("video", dataAtual);
-
                 const jaExiste = blocos.some(x =>
                     (b.videoId && x.videoId === b.videoId) ||
-                    (b.url     && x.url     === b.url)
-                );
-
+                    (b.url     && x.url     === b.url));
                 if (!jaExiste) {
                     blocos.push({
                         id: uid("blk"),
-                        tema: b.tema || "",
-                        titulo: b.titulo || "",
-                        canal: b.canal || "",
-                        plataforma: "YouTube",
-                        objetivo: "",
-                        url: b.url || "",
-                        videoId: b.videoId || "",
-                        duracaoSeg: b.duracaoSeg || 0,
+                        tema: b.tema || "", titulo: b.titulo || "", canal: b.canal || "",
+                        plataforma: "YouTube", objetivo: "", url: b.url || "",
+                        videoId: b.videoId || "", duracaoSeg: b.duracaoSeg || 0,
                         minutoAtual: b.minutoAtual || 0,
-                        metaHoje: "", tempoPrevisto: "",
-                        velocidade: "1",
+                        metaHoje: "", tempoPrevisto: "", velocidade: "1",
                         resumo1: "", resumo2: "", resumo3: "",
                         oQueFazer: "", proximaAcao: "",
                         valeReassistir: b.valeReassistir || false,
                         publicado: "", validade: "",
                         confiabilidade: b.confiabilidade || "",
-                        ideias: "",
-                        momentos: [],
-                        criadoEm: Date.now(),
+                        ideias: "", momentos: [], criadoEm: Date.now(),
                     });
                     Storage.blocos.salvar("video", dataAtual, blocos);
                 }
-
                 estado.subAba = "estudar";
                 render();
             });
@@ -1773,8 +2022,7 @@
             const impInfo = IMPACTOS_AP.find(t => t.id === a.impacto)?.label || "";
             const stInfo = STATUS_AP.find(t => t.id === a.status)?.label || "";
             const areas = (a.areas || []).map(x =>
-                AREAS_AP.find(ar => ar.id === x)?.label || x
-            ).join(" · ");
+                AREAS_AP.find(ar => ar.id === x)?.label || x).join(" · ");
             return `
                 <div class="ap-card">
                     <div class="ap-linha-1">
@@ -1810,25 +2058,18 @@
                     <span class="bloco-titulo">Novo aprendizado</span>
                     <button class="bloco-remover" id="fecharForm">×</button>
                 </div>
-
                 <label class="campo-label">Texto do aprendizado</label>
                 <textarea id="apTexto" rows="3" placeholder="Frase, insight, técnica…"></textarea>
-
                 <label class="campo-label">Fonte (opcional)</label>
                 <input type="text" id="apFonte" placeholder='Ex.: "Marketing 4.0, pág. 47"'>
-
                 <label class="campo-label">Tipo</label>
                 <div class="chips" id="chipsTipoAp"></div>
-
                 <label class="campo-label">Áreas de aplicação</label>
                 <div class="chips" id="chipsAreasAp"></div>
-
                 <label class="campo-label">Impacto se aplicado</label>
                 <div class="chips" id="chipsImpactoAp"></div>
-
                 <label class="campo-label">Status</label>
                 <div class="chips" id="chipsStatusAp"></div>
-
                 <div style="margin-top:16px;text-align:right;">
                     <button class="btn-primario" id="salvarAp">Salvar</button>
                 </div>
