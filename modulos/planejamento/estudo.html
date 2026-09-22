@@ -3,27 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Estudo</title>
-
     <link rel="stylesheet" href="../../css/style.css">
 
     <style>
+        /* ---------- Resumo ---------- */
+        .resumo-estudo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+        }
+        .resumo-card {
+            background: #1c1c20;
+            border: 1px solid #2a2a30;
+            border-radius: 10px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .resumo-card:hover { background: #222228; border-color: #3a3a40; }
+        .resumo-rotulo {
+            color: #777; font-size: 11px; text-transform: uppercase;
+            letter-spacing: 0.5px; display: block; margin-bottom: 6px;
+        }
+        .resumo-valor {
+            color: #fff; font-size: 24px; font-weight: 600; line-height: 1;
+        }
+        .resumo-valor small { font-size: 12px; color: #888; font-weight: 400; }
+
+        /* ---------- Barra de tipos ---------- */
+        .tipos-barra {
+            display: flex; flex-wrap: wrap; gap: 8px;
+        }
+        .tipo-pill {
+            position: relative;
+            padding: 9px 16px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #333338;
+            background: #17171a;
+            color: #aaa;
+            border-radius: 20px;
+            transition: 0.15s;
+        }
+        .tipo-pill:hover { color: #ddd; border-color: #44444a; }
+        .tipo-pill.ativo {
+            background: #333; color: #fff; border-color: #55555c;
+        }
+        .tipo-pill .ponto {
+            display: inline-block;
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #4caf50;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        /* ---------- Sub-abas (linha embaixo) ---------- */
+        .sub-abas {
+            display: flex; gap: 20px;
+            border-bottom: 1px solid #252529;
+            margin-bottom: 18px;
+        }
+        .sub-aba {
+            padding: 8px 0;
+            font-size: 13px;
+            color: #888;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: 0.15s;
+        }
+        .sub-aba:hover { color: #ccc; }
+        .sub-aba.ativa {
+            color: #fff;
+            border-bottom-color: #4caf50;
+        }
+
+        /* ---------- Form / campos ---------- */
         .campo-label {
             display: block;
-            font-size: 11px;
-            color: #888;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin: 14px 0 8px;
+            font-size: 11px; color: #888;
+            letter-spacing: 1px; text-transform: uppercase;
+            margin: 14px 0 6px;
         }
+        .campo-label:first-child { margin-top: 0; }
 
-        .chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
+        /* ---------- Chips ---------- */
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; }
         .chip {
             padding: 7px 13px;
             font-size: 12px;
@@ -35,462 +101,976 @@
             transition: 0.15s;
             user-select: none;
         }
-
         .chip:hover { background: #222228; color: #e0e0e0; }
-
         .chip.selecionado {
-            background: #2e2e33;
-            border-color: #666;
-            color: #fff;
-            font-weight: 600;
+            background: #2e2e33; border-color: #666; color: #fff; font-weight: 600;
+        }
+        .chip.impacto-alto.selecionado   { background:#331f1f;border-color:#d45a5a;color:#e08b8b; }
+        .chip.impacto-medio.selecionado  { background:#332e1a;border-color:#c9a44a;color:#e0d48a; }
+        .chip.impacto-baixo.selecionado  { background:#1f3320;border-color:#4caf50;color:#a5d6a7; }
+
+        /* ---------- Barra de progresso ---------- */
+        .progresso {
+            width: 100%; height: 8px; background: #252529;
+            border-radius: 4px; overflow: hidden; margin: 8px 0;
+        }
+        .progresso > div {
+            height: 100%; background: #4caf50;
+            transition: width 0.3s ease;
+        }
+        .progresso-texto {
+            font-size: 12px; color: #888; margin-top: 4px;
         }
 
-        /* Status colorido */
-        .chip.status-estudando.selecionado {
-            background: #332e1a; border-color: #c9a44a; color: #e0d48a;
-        }
-        .chip.status-praticar.selecionado {
-            background: #1a2233; border-color: #5a8ad4; color: #a8c4e8;
-        }
-        .chip.status-dominado.selecionado {
-            background: #1f3320; border-color: #4caf50; color: #a5d6a7;
-        }
-        .chip.status-revisar.selecionado {
-            background: #331f1f; border-color: #d45a5a; color: #e08b8b;
-        }
-
-        .meta-bloco {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .meta-bloco input {
-            flex: 1;
-            margin-top: 0;
-        }
-
-        .meta-status {
-            color: #aaa;
-            font-size: 13px;
-            margin-top: 8px;
-        }
-
-        .link-preview {
-            margin-top: 10px;
-        }
-
-        .link-preview a {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 14px;
-            border: 1px solid #2c3a55;
-            background: linear-gradient(135deg, #1a2235 0%, #232f4a 100%);
-            color: #dfe8ff;
+        /* ---------- Bloco de estudo ---------- */
+        .bloco-estudo {
+            border: 1px solid #252529;
             border-radius: 10px;
-            text-decoration: none;
-            font-size: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
+            background: #19191d;
+        }
+        .bloco-cabecalho {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 12px;
+        }
+        .bloco-titulo { font-size: 12px; color: #777;
+            text-transform: uppercase; letter-spacing: 1px; }
+        .bloco-remover {
+            background: none; border: none; color: #666;
+            font-size: 20px; cursor: pointer; padding: 0 6px;
+        }
+        .bloco-remover:hover { color: #d45a5a; }
+
+        .linha-dupla { display: flex; gap: 10px; }
+        .linha-dupla > * { flex: 1; }
+
+        /* ---------- Recomendações Google Books ---------- */
+        .recomendacoes {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+        }
+        .rec-card {
+            background: #1c1c20;
+            border: 1px solid #2a2a30;
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            transition: 0.15s;
+            display: flex; gap: 10px;
+        }
+        .rec-card:hover { background: #24242a; border-color: #3a3a40; }
+        .rec-card img {
+            width: 44px; height: 64px; object-fit: cover;
+            border-radius: 4px; flex-shrink: 0; background: #252529;
+        }
+        .rec-card-info { flex: 1; min-width: 0; }
+        .rec-card-titulo {
+            font-size: 12px; color: #eaeaea; font-weight: 600;
+            margin-bottom: 4px; line-height: 1.3;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .rec-card-autor { font-size: 11px; color: #888; }
+
+        /* ---------- Biblioteca ---------- */
+        .bib-controles {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            margin-bottom: 16px; align-items: center;
+        }
+        .bib-busca {
+            flex: 1; min-width: 180px;
+            padding: 8px 14px;
+            background: #17171a; border: 1px solid #333338;
+            color: #eaeaea; border-radius: 20px;
+            font-size: 13px; outline: none;
+            font-family: inherit;
+        }
+        .bib-busca:focus { border-color: #55555c; }
+        .bib-grade {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 14px;
+        }
+        .bib-item {
+            background: #1c1c20;
+            border: 1px solid #2a2a30;
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
             transition: 0.15s;
         }
+        .bib-item:hover {
+            background: #24242a; border-color: #4caf50;
+            transform: translateY(-2px);
+        }
+        .bib-capa {
+            width: 100%; aspect-ratio: 2/3;
+            background: #252529; border-radius: 6px;
+            margin-bottom: 10px; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            color: #555; font-size: 28px;
+        }
+        .bib-capa img { width: 100%; height: 100%; object-fit: cover; }
+        .bib-titulo {
+            font-size: 13px; color: #eaeaea; font-weight: 600;
+            line-height: 1.3; margin-bottom: 4px;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .bib-tema { font-size: 11px; color: #777; margin-bottom: 6px; }
 
-        .link-preview a:hover {
-            border-color: #4a5c85;
-            transform: translateY(-1px);
+        /* ---------- Aprendizados ---------- */
+        .ap-card {
+            background: #1c1c20;
+            border-left: 3px solid #333;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+        .ap-linha-1 {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            font-size: 11px; color: #888; margin-bottom: 8px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .ap-texto {
+            font-size: 14px; color: #e0e0e0; line-height: 1.5;
+            margin-bottom: 10px; white-space: pre-wrap;
+        }
+        .ap-fonte {
+            font-size: 12px; color: #777; font-style: italic;
+            margin-bottom: 10px;
+        }
+        .ap-rodape {
+            display: flex; gap: 6px; flex-wrap: wrap;
+            align-items: center; font-size: 11px;
+        }
+        .ap-rodape .tag {
+            padding: 3px 8px; background: #252529;
+            border-radius: 10px; color: #aaa;
         }
 
-        .link-subpagina {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 18px;
-            background: #17171a;
-            border: 1px solid #252529;
-            border-radius: 16px;
-            color: inherit;
+        .em-construcao {
+            text-align: center; padding: 40px 20px;
+            color: #666; font-size: 14px;
+        }
+        .em-construcao .icone { font-size: 36px; margin-bottom: 10px; }
+
+        .vazio {
+            text-align: center; padding: 30px 20px;
+            color: #777; font-size: 14px;
+        }
+        .btn-primario {
+            padding: 10px 18px; font-size: 14px;
+            background: #333; color: #fff;
+            border: 1px solid #55555c; border-radius: 10px;
+            cursor: pointer; font-family: inherit;
+            transition: 0.15s;
+        }
+        .btn-primario:hover { background: #3a3a40; }
+        .btn-secundario {
+            padding: 8px 14px; font-size: 13px;
+            background: #1a1a1e; color: #bbb;
+            border: 1px solid #333338; border-radius: 20px;
+            cursor: pointer; font-family: inherit;
+            transition: 0.15s;
+        }
+        .btn-secundario:hover { color: #e0e0e0; border-color: #44444a; }
+
+        /* Botão flutuante */
+        .botao-foco-flutuante {
+            position: fixed; right: 24px; bottom: 24px; z-index: 9999;
+            display: flex; align-items: center;
+            width: 44px; height: 44px; overflow: hidden;
             text-decoration: none;
-            transition: 0.2s;
+            background: #17171a; color: #f5f5f5;
+            border: 1px solid #2d2d32; border-radius: 22px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+            transition: width 0.2s ease;
         }
-
-        .link-subpagina:hover {
-            background: #1e1e22;
-            border-color: #3a3a40;
+        .botao-foco-flutuante:hover { width: 88px; }
+        .botao-foco-flutuante .icone-foco {
+            min-width: 44px; text-align: center; font-size: 18px;
         }
-
-        .link-subpagina h2 { font-size: 17px; margin-bottom: 5px; }
-        .link-subpagina p { color: #999; font-size: 13px; }
+        .botao-foco-flutuante .texto-foco {
+            font-size: 13px; opacity: 0;
+            transition: opacity 0.15s ease; white-space: nowrap;
+        }
+        .botao-foco-flutuante:hover .texto-foco { opacity: 1; }
     </style>
 </head>
 
 <body>
+<main class="container">
 
-    <main class="container">
+    <header class="header">
+        <p class="eyebrow">PLANEJAMENTO</p>
+        <h1>📚 Estudo</h1>
+        <p class="subtitle">Estude hoje, retome o que parou, veja o que aprendeu.</p>
+    </header>
 
-        <header class="header">
-            <p class="eyebrow">PLANEJAMENTO</p>
-            <h1>📚 Estudo</h1>
-            <p class="subtitle">
-                Defina o que você vai estudar e por quê.
+    <section class="modules">
+
+        <!-- RESUMO -->
+        <div class="resumo-estudo" id="resumoEstudo"></div>
+
+        <!-- BARRA DE TIPOS -->
+        <div class="tipos-barra" id="tiposBarra"></div>
+
+        <!-- CONTEÚDO DINÂMICO -->
+        <div class="module-card" style="align-items:flex-start;">
+            <div style="width:100%;">
+                <div class="sub-abas" id="subAbas"></div>
+                <div id="conteudo"></div>
+            </div>
+        </div>
+
+    </section>
+
+    <a href="index.html" class="back-button">← Voltar para Planejamento</a>
+</main>
+
+<a href="../foco/foco.html" class="botao-foco-flutuante" aria-label="Ir para Foco">
+    <span class="icone-foco">🎯</span>
+    <span class="texto-foco">Foco</span>
+</a>
+
+<script src="../../js/storage.js"></script>
+<script>
+    "use strict";
+
+    // ---------- DATA ----------
+    const hoje = new Date();
+    const pad = n => String(n).padStart(2, "0");
+    const dataHoje = `${hoje.getFullYear()}-${pad(hoje.getMonth()+1)}-${pad(hoje.getDate())}`;
+    const paramsURL = new URLSearchParams(location.search);
+    const dataParam = paramsURL.get("data");
+    const dataAtual = (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam)) ? dataParam : dataHoje;
+
+    // ---------- MIGRAÇÃO ----------
+    Storage.migrar();
+
+    // ---------- ESTADO ----------
+    const TIPOS = [
+        { id: "livro",     label: "📖 Livro" },
+        { id: "video",     label: "🎥 Vídeo" },
+        { id: "artigo",    label: "📄 Artigo" },
+        { id: "pratica",   label: "🛠️ Prática" },
+        { id: "curso",     label: "🎓 Curso" },
+    ];
+    const ABAS_APRENDIZADOS = { id: "aprendizados", label: "🧠 Aprendizados" };
+
+    const estado = {
+        tipo: "livro",
+        subAba: "estudar",
+        bibFiltro: "todos",
+        bibOrdem: "recente",
+        bibBusca: "",
+        apBusca: "",
+        apTipo: "",
+        apImpacto: "",
+        apStatus: "",
+    };
+
+    // ---------- HELPERS ----------
+    const esc = Storage.escapeHTML;
+
+    function el(id) { return document.getElementById(id); }
+    function uid(p) { return `${p}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`; }
+
+    function temConteudoHoje(tipo) {
+        return Storage.blocos.ler(tipo, dataAtual).length > 0;
+    }
+
+    // ==================================================
+    // RENDER: RESUMO
+    // ==================================================
+    function renderResumo() {
+        const blocosHoje = TIPOS.reduce(
+            (acc, t) => acc + Storage.blocos.ler(t.id, dataAtual).length, 0
+        );
+        const emAndamento = Storage.biblioteca.listar("livro")
+            .filter(b => b.status !== "concluido").length;
+        const apsAtivos = Storage.aprendizados.listar()
+            .filter(a => a.status !== "descartado").length;
+
+        el("resumoEstudo").innerHTML = `
+            <div class="resumo-card" data-ir="estudar">
+                <span class="resumo-rotulo">Estudos hoje</span>
+                <span class="resumo-valor">${blocosHoje}</span>
+            </div>
+            <div class="resumo-card" data-ir="biblioteca">
+                <span class="resumo-rotulo">Em andamento</span>
+                <span class="resumo-valor">${emAndamento}</span>
+            </div>
+            <div class="resumo-card" data-ir="aprendizados">
+                <span class="resumo-rotulo">Aprendizados ativos</span>
+                <span class="resumo-valor">${apsAtivos}</span>
+            </div>
+        `;
+
+        el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
+            card.addEventListener("click", () => {
+                const ir = card.dataset.ir;
+                if (ir === "aprendizados") {
+                    estado.tipo = "aprendizados";
+                } else {
+                    estado.tipo = "livro";
+                    estado.subAba = ir;
+                }
+                render();
+            });
+        });
+    }
+
+    // ==================================================
+    // RENDER: BARRA DE TIPOS
+    // ==================================================
+    function renderTipos() {
+        const lista = [...TIPOS, ABAS_APRENDIZADOS];
+        el("tiposBarra").innerHTML = lista.map(t => {
+            const ativo = estado.tipo === t.id ? " ativo" : "";
+            const tem = TIPOS.some(x => x.id === t.id) && temConteudoHoje(t.id);
+            const ponto = tem ? `<span class="ponto"></span>` : "";
+            return `<div class="tipo-pill${ativo}" data-tipo="${t.id}">${t.label}${ponto}</div>`;
+        }).join("");
+
+        el("tiposBarra").querySelectorAll(".tipo-pill").forEach(p => {
+            p.addEventListener("click", () => {
+                estado.tipo = p.dataset.tipo;
+                estado.subAba = "estudar";
+                render();
+            });
+        });
+    }
+
+    // ==================================================
+    // RENDER: SUB-ABAS
+    // ==================================================
+    function renderSubAbas() {
+        let abas = [];
+        if (estado.tipo === "livro") {
+            abas = [
+                { id: "estudar",    label: "📝 Estudar hoje" },
+                { id: "biblioteca", label: "📚 Biblioteca" },
+            ];
+        } else if (estado.tipo === "aprendizados") {
+            abas = [];
+        } else {
+            abas = [{ id: "estudar", label: "📝 Estudar hoje" }];
+        }
+
+        if (abas.length === 0) {
+            el("subAbas").innerHTML = "";
+            return;
+        }
+
+        if (!abas.some(a => a.id === estado.subAba)) {
+            estado.subAba = abas[0].id;
+        }
+
+        el("subAbas").innerHTML = abas.map(a =>
+            `<div class="sub-aba${estado.subAba === a.id ? " ativa" : ""}" data-aba="${a.id}">${a.label}</div>`
+        ).join("");
+
+        el("subAbas").querySelectorAll(".sub-aba").forEach(s => {
+            s.addEventListener("click", () => {
+                estado.subAba = s.dataset.aba;
+                render();
+            });
+        });
+    }
+
+    // ==================================================
+    // RENDER: CONTEÚDO
+    // ==================================================
+    function renderConteudo() {
+        if (estado.tipo === "livro" && estado.subAba === "estudar")     return renderEstudarLivro();
+        if (estado.tipo === "livro" && estado.subAba === "biblioteca")  return renderBibliotecaLivro();
+        if (estado.tipo === "aprendizados")                             return renderAprendizados();
+        return renderEmConstrucao();
+    }
+
+    function renderEmConstrucao() {
+        const tipoInfo = TIPOS.find(t => t.id === estado.tipo) || { label: "?" };
+        el("conteudo").innerHTML = `
+            <div class="em-construcao">
+                <div class="icone">🚧</div>
+                <div><strong>${tipoInfo.label}</strong> está em construção.</div>
+                <p style="margin-top:8px; font-size:13px;">
+                    Os campos específicos deste tipo serão adicionados na próxima parte.
+                </p>
+            </div>
+        `;
+    }
+
+    // ==================================================
+    // LIVRO → ESTUDAR
+    // ==================================================
+    function renderEstudarLivro() {
+        const blocos = Storage.blocos.ler("livro", dataAtual);
+        const wrap = el("conteudo");
+
+        wrap.innerHTML = "";
+
+        if (blocos.length === 0) {
+            const vazio = document.createElement("div");
+            vazio.className = "vazio";
+            vazio.innerHTML = `
+                <p>Nenhum livro registrado hoje ainda.</p>
+                <button class="btn-primario" id="btnAddLivro">+ Adicionar livro</button>
+            `;
+            wrap.appendChild(vazio);
+            vazio.querySelector("#btnAddLivro").addEventListener("click", addBlocoLivro);
+            return;
+        }
+
+        blocos.forEach((b, i) => wrap.appendChild(renderBlocoLivro(b, i)));
+
+        const addWrap = document.createElement("div");
+        addWrap.style.marginTop = "10px";
+        addWrap.innerHTML = `<button class="btn-secundario" id="btnAddLivro">+ Adicionar outro livro hoje</button>`;
+        wrap.appendChild(addWrap);
+        addWrap.querySelector("#btnAddLivro").addEventListener("click", addBlocoLivro);
+    }
+
+    function addBlocoLivro() {
+        const blocos = Storage.blocos.ler("livro", dataAtual);
+        blocos.push({
+            id: uid("blk"),
+            tema: "", titulo: "", autor: "",
+            paginaAtual: "", totalPaginas: "", capitulo: "",
+            metaHoje: "", tempoPrevisto: "",
+            oQueAprendi: "", comoAplicar: "", proximaAcao: "",
+            link: "", koodoId: "", status: "",
+            criadoEm: Date.now(),
+        });
+        Storage.blocos.salvar("livro", dataAtual, blocos);
+        render();
+    }
+
+    function renderBlocoLivro(b, idx) {
+        const el = document.createElement("div");
+        el.className = "bloco-estudo";
+
+        const total = Number(b.totalPaginas) || 0;
+        const atual = Number(b.paginaAtual) || 0;
+        const pct = total > 0 ? Math.min(100, Math.round((atual / total) * 100)) : 0;
+
+        el.innerHTML = `
+            <div class="bloco-cabecalho">
+                <span class="bloco-titulo">Livro ${idx + 1}</span>
+                <button class="bloco-remover" data-rem="${b.id}" title="Remover">×</button>
+            </div>
+
+            <label class="campo-label">Tema</label>
+            <input type="text" data-campo="tema" value="${esc(b.tema)}" placeholder="Ex.: marketing digital">
+
+            <label class="campo-label">Título do livro</label>
+            <input type="text" data-campo="titulo" value="${esc(b.titulo)}" placeholder="Ex.: Marketing 4.0">
+
+            <label class="campo-label">Autor</label>
+            <input type="text" data-campo="autor" value="${esc(b.autor)}" placeholder="Ex.: Philip Kotler">
+
+            <div class="linha-dupla">
+                <div>
+                    <label class="campo-label">Página atual</label>
+                    <input type="number" data-campo="paginaAtual" value="${esc(b.paginaAtual)}" min="0">
+                </div>
+                <div>
+                    <label class="campo-label">Total de páginas</label>
+                    <input type="number" data-campo="totalPaginas" value="${esc(b.totalPaginas)}" min="0">
+                </div>
+            </div>
+
+            <div class="progresso"><div style="width:${pct}%"></div></div>
+            <div class="progresso-texto">${atual} / ${total} · ${pct}%</div>
+
+            <label class="campo-label">Capítulo / seção atual</label>
+            <input type="text" data-campo="capitulo" value="${esc(b.capitulo)}" placeholder="Ex.: Cap. 3 — Funil">
+
+            <div class="linha-dupla">
+                <div>
+                    <label class="campo-label">Meta de hoje</label>
+                    <input type="text" data-campo="metaHoje" value="${esc(b.metaHoje)}" placeholder="Ex.: ler 20 páginas">
+                </div>
+                <div>
+                    <label class="campo-label">Tempo previsto</label>
+                    <input type="text" data-campo="tempoPrevisto" value="${esc(b.tempoPrevisto)}" placeholder="Ex.: 30 min">
+                </div>
+            </div>
+
+            <label class="campo-label">O que aprendi</label>
+            <textarea data-campo="oQueAprendi" rows="4">${esc(b.oQueAprendi)}</textarea>
+
+            <label class="campo-label">Como aplicar</label>
+            <textarea data-campo="comoAplicar" rows="2">${esc(b.comoAplicar)}</textarea>
+
+            <label class="campo-label">Próxima ação</label>
+            <input type="text" data-campo="proximaAcao" value="${esc(b.proximaAcao)}" placeholder="Ex.: voltar da pág. 47">
+
+            <label class="campo-label">ID do Koodo (opcional)</label>
+            <div class="linha-dupla">
+                <input type="text" data-campo="koodoId" value="${esc(b.koodoId)}" placeholder="Ex.: 1790017854107">
+                <button class="btn-secundario" data-koodo="1">📖 Abrir no Koodo</button>
+            </div>
+            <p style="font-size:11px;color:#666;margin-top:4px;">
+                Abra o livro no Koodo → copie o número depois de <code>#/epub/</code>
             </p>
-        </header>
 
-        <section class="modules">
-
-            <div class="module-card" style="align-items: flex-start;">
-                <div style="width: 100%;">
-                    <h2>Tipo de estudo</h2>
-                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
-                        Como você vai estudar hoje.
-                    </p>
-                    <div class="chips" id="chipsTipo"></div>
-                </div>
+            <label class="campo-label">🔎 Buscar material sobre o tema</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-secundario" data-recomendar="1">📚 Recomendar livros</button>
+                <button class="btn-secundario" data-google="1">📄 Google</button>
             </div>
+            <div class="recomendacoes" id="rec_${b.id}" style="display:none;"></div>
+        `;
 
-
-            <div class="module-card" style="align-items: flex-start;">
-                <div style="width: 100%;">
-                    <h2>Meta semanal</h2>
-                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
-                        Quantas horas de estudo você quer fazer por semana.
-                    </p>
-                    <div class="meta-bloco">
-                        <input type="text" id="metaSemanal" placeholder="Ex.: 5h ou 5">
-                    </div>
-                    <p class="meta-status" id="metaStatus"></p>
-                </div>
-            </div>
-
-
-            <div class="module-card">
-                <span class="icon">📌</span>
-                <div>
-                    <h2>Tema</h2>
-                    <textarea placeholder="O que vou estudar?" rows="3"></textarea>
-                </div>
-            </div>
-
-            <div class="module-card">
-                <span class="icon">🎯</span>
-                <div>
-                    <h2>Objetivo do estudo</h2>
-                    <textarea placeholder="O que quero conseguir entender ou aprender?" rows="4"></textarea>
-                </div>
-            </div>
-
-            <div class="module-card">
-                <span class="icon">📖</span>
-                <div>
-                    <h2>Fonte / material</h2>
-                    <textarea placeholder="Livro, curso, vídeo, artigo, aula..." rows="3"></textarea>
-                </div>
-            </div>
-
-            <div class="module-card">
-                <span class="icon">⏱️</span>
-                <div>
-                    <h2>Tempo previsto</h2>
-                    <input type="text" placeholder="Ex.: 1h30">
-                </div>
-            </div>
-
-
-            <!-- LINK DE REFERÊNCIA -->
-
-            <div class="module-card">
-                <span class="icon">🔗</span>
-                <div>
-                    <h2>Link de referência</h2>
-                    <p style="color:#888; font-size:13px; margin: 6px 0 4px;">
-                        Cole o link do vídeo, curso, artigo que vai usar.
-                    </p>
-                    <input
-                        type="text"
-                        id="linkReferencia"
-                        placeholder="https://..."
-                    >
-                    <div class="link-preview" id="linkPreview"></div>
-                </div>
-            </div>
-
-
-            <!-- STATUS DO ESTUDO -->
-
-            <div class="module-card" style="align-items: flex-start;">
-                <div style="width: 100%;">
-                    <h2>Status do estudo</h2>
-                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
-                        Em que ponto esse assunto está hoje.
-                    </p>
-                    <div class="chips" id="chipsStatus"></div>
-                </div>
-            </div>
-
-
-            <a href="o-que-aprendi.html" class="link-subpagina">
-                <span class="icon">🧠</span>
-                <div style="flex: 1;">
-                    <h2>O que aprendi</h2>
-                    <p>Registre, explique e aplique o que aprendeu.</p>
-                </div>
-                <span class="arrow">›</span>
-            </a>
-
-            <a href="biblioteca.html" class="link-subpagina">
-                <span class="icon">📚</span>
-                <div style="flex: 1;">
-                    <h2>Biblioteca de fontes</h2>
-                    <p>Cursos, livros, canais e materiais que você acompanha.</p>
-                </div>
-                <span class="arrow">›</span>
-            </a>
-
-            <a href="livros.html" class="link-subpagina">
-                <span class="icon">📖</span>
-                <div style="flex: 1;">
-                    <h2>Livros</h2>
-                    <p>Em progresso, pausados, concluídos.</p>
-                </div>
-                <span class="arrow">›</span>
-            </a>
-
-            <a href="citacoes.html" class="link-subpagina">
-                <span class="icon">💬</span>
-                <div style="flex: 1;">
-                    <h2>Citações</h2>
-                    <p>Frases que marcaram.</p>
-                </div>
-                <span class="arrow">›</span>
-            </a>
-
-            <a href="glossario.html" class="link-subpagina">
-                <span class="icon">📔</span>
-                <div style="flex: 1;">
-                    <h2>Glossário pessoal</h2>
-                    <p>Termos que você aprendeu, com suas palavras.</p>
-                </div>
-                <span class="arrow">›</span>
-            </a>
-
-        </section>
-
-        <a href="index.html" class="back-button">
-            ← Voltar para Planejamento
-        </a>
-
-    </main>
-
-    <script src="../../js/app.js"></script>
-
-    <script>
-        // ==================================================
-        // DATA (respeita ?data=)
-        // ==================================================
-
-        const hoje = new Date();
-        const anoHoje = hoje.getFullYear();
-        const mesHoje = String(hoje.getMonth() + 1).padStart(2, "0");
-        const diaHoje = String(hoje.getDate()).padStart(2, "0");
-        const dataHoje = `${anoHoje}-${mesHoje}-${diaHoje}`;
-
-        const paramsURL = new URLSearchParams(window.location.search);
-        const dataParam = paramsURL.get("data");
-        const dataAtual =
-            (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam))
-                ? dataParam
-                : dataHoje;
-
-
-        // Propaga ?data= para os links internos
-        if (dataAtual !== dataHoje) {
-            document.querySelectorAll(".link-subpagina").forEach(a => {
-                const href = a.getAttribute("href");
-                if (href && !href.includes("?data=")) {
-                    a.setAttribute("href", `${href}?data=${dataAtual}`);
-                }
-            });
-        }
-
-
-        // ==================================================
-        // TIPO DE ESTUDO
-        // ==================================================
-
-        const TIPOS = [
-            "📖 Livro",
-            "🎓 Curso",
-            "🎥 Vídeo",
-            "📝 Artigo",
-            "🎧 Podcast",
-            "🧪 Prática"
-        ];
-
-        const chaveTipo = `planejamento_${dataAtual}_estudo_tipo`;
-        const chipsTipo = document.getElementById("chipsTipo");
-        const tipoSalvo = localStorage.getItem(chaveTipo);
-
-        TIPOS.forEach(t => {
-            const chip = document.createElement("div");
-            chip.className = "chip";
-            chip.textContent = t;
-            if (tipoSalvo === t) chip.classList.add("selecionado");
-
-            chip.addEventListener("click", () => {
-                const jaSel = chip.classList.contains("selecionado");
-                chipsTipo.querySelectorAll(".chip").forEach(c => c.classList.remove("selecionado"));
-                if (jaSel) {
-                    localStorage.removeItem(chaveTipo);
-                } else {
-                    chip.classList.add("selecionado");
-                    localStorage.setItem(chaveTipo, t);
+        // ----- bind: salvar alterações -----
+        el.querySelectorAll("[data-campo]").forEach(input => {
+            input.addEventListener("input", () => {
+                const campo = input.dataset.campo;
+                const blocos = Storage.blocos.ler("livro", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i >= 0) {
+                    blocos[i][campo] = input.value;
+                    Storage.blocos.salvar("livro", dataAtual, blocos);
                 }
             });
 
-            chipsTipo.appendChild(chip);
-        });
-
-
-        // ==================================================
-        // STATUS DO ESTUDO
-        // ==================================================
-
-        const STATUS = [
-            { valor: "estudando", label: "🟡 Estudando",       classe: "status-estudando" },
-            { valor: "praticar",  label: "🔵 Praticar",         classe: "status-praticar" },
-            { valor: "dominado",  label: "🟢 Dominado",         classe: "status-dominado" },
-            { valor: "revisar",   label: "🔴 Preciso revisar",  classe: "status-revisar" }
-        ];
-
-        const chaveStatus = `planejamento_${dataAtual}_estudo_status`;
-        const chipsStatus = document.getElementById("chipsStatus");
-        const statusSalvo = localStorage.getItem(chaveStatus);
-
-        STATUS.forEach(s => {
-            const chip = document.createElement("div");
-            chip.className = "chip " + s.classe;
-            chip.textContent = s.label;
-            if (statusSalvo === s.valor) chip.classList.add("selecionado");
-
-            chip.addEventListener("click", () => {
-                const jaSel = chip.classList.contains("selecionado");
-                chipsStatus.querySelectorAll(".chip").forEach(c => c.classList.remove("selecionado"));
-                if (jaSel) {
-                    localStorage.removeItem(chaveStatus);
-                } else {
-                    chip.classList.add("selecionado");
-                    localStorage.setItem(chaveStatus, s.valor);
-                }
-            });
-
-            chipsStatus.appendChild(chip);
-        });
-
-
-        // ==================================================
-        // LINK DE REFERÊNCIA
-        // ==================================================
-
-        const chaveLink = `planejamento_${dataAtual}_estudo_link`;
-        const campoLink = document.getElementById("linkReferencia");
-        const preview = document.getElementById("linkPreview");
-
-        // Carrega salvo (o app.js NÃO salva esse campo porque tem id próprio
-        // e a gente trata via chave custom)
-        campoLink.value = localStorage.getItem(chaveLink) || "";
-
-        function atualizarPreview() {
-            const url = campoLink.value.trim();
-            if (/^https?:\/\//i.test(url)) {
-                preview.innerHTML =
-                    `<a href="${url}" target="_blank" rel="noopener">🔗 Abrir link</a>`;
-            } else {
-                preview.innerHTML = "";
+            // Atualiza barra quando página/total muda
+            if (input.dataset.campo === "paginaAtual" || input.dataset.campo === "totalPaginas") {
+                input.addEventListener("input", () => {
+                    const blocos = Storage.blocos.ler("livro", dataAtual);
+                    const it = blocos.find(x => x.id === b.id);
+                    if (!it) return;
+                    const tot = Number(it.totalPaginas) || 0;
+                    const at = Number(it.paginaAtual) || 0;
+                    const p = tot > 0 ? Math.min(100, Math.round((at / tot) * 100)) : 0;
+                    el.querySelector(".progresso > div").style.width = p + "%";
+                    el.querySelector(".progresso-texto").textContent = `${at} / ${tot} · ${p}%`;
+                    registrarNaBiblioteca(it, p);
+                });
             }
-        }
-
-        atualizarPreview();
-
-        campoLink.addEventListener("input", () => {
-            localStorage.setItem(chaveLink, campoLink.value);
-            atualizarPreview();
         });
 
+        // ----- remover -----
+        el.querySelector("[data-rem]").addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("livro", dataAtual)
+                .filter(x => x.id !== b.id);
+            Storage.blocos.salvar("livro", dataAtual, blocos);
+            render();
+        });
 
-        // ==================================================
-        // META SEMANAL
-        // ==================================================
-
-        const chaveMeta = "planejamento_estudo_meta_semanal";
-        const campoMeta = document.getElementById("metaSemanal");
-        const metaStatus = document.getElementById("metaStatus");
-
-        campoMeta.value = localStorage.getItem(chaveMeta) || "";
-
-        function extrairHoras(texto) {
-            if (!texto) return 0;
-            const match = texto.replace(",", ".").match(/(\d+(\.\d+)?)/);
-            return match ? Number(match[1]) : 0;
-        }
-
-        function calcularSemanaAtual() {
-
-            const d = new Date();
-            const dow = d.getDay();
-            const diff = (dow === 0) ? -6 : (1 - dow);
-            d.setDate(d.getDate() + diff);
-
-            let totalSegundos = 0;
-
-            for (let i = 0; i < 7; i++) {
-                const dt = new Date(d);
-                dt.setDate(dt.getDate() + i);
-                const iso = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
-
-                const tempo = localStorage.getItem(`planejamento_${iso}_estudo_3`);
-                if (tempo) {
-                    let h = 0, m = 0;
-                    const matchH = tempo.match(/(\d+)\s*h/i);
-                    const matchM = tempo.match(/(\d+)\s*min/i);
-                    if (matchH) h = Number(matchH[1]);
-                    if (matchM) m = Number(matchM[1]);
-                    if (!matchH && !matchM) {
-                        const so = tempo.match(/^(\d+(\.\d+)?)$/);
-                        if (so) h = Number(so[1]);
-                    }
-                    totalSegundos += (h * 3600) + (m * 60);
-                }
-            }
-
-            return totalSegundos / 3600;
-        }
-
-        function atualizarStatusMeta() {
-
-            const meta = extrairHoras(campoMeta.value);
-            const realizado = calcularSemanaAtual();
-
-            if (!meta) {
-                metaStatus.textContent = "";
+        // ----- abrir Koodo -----
+        el.querySelector("[data-koodo]").addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("livro", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            if (!it || !it.koodoId) {
+                alert("Cole o ID do Koodo primeiro.");
                 return;
             }
-
-            const pct = Math.round((realizado / meta) * 100);
-            const horasTexto = realizado.toFixed(1).replace(".", ",");
-
-            let cor = "#888";
-            if (pct >= 100) cor = "#4caf50";
-            else if (pct >= 60) cor = "#c9a44a";
-
-            metaStatus.innerHTML =
-                `Nesta semana: <strong style="color:${cor};">${horasTexto}h</strong> de ${meta}h (${pct}%)`;
-        }
-
-        campoMeta.addEventListener("input", () => {
-            localStorage.setItem(chaveMeta, campoMeta.value);
-            atualizarStatusMeta();
+            const titulo = encodeURIComponent(it.titulo || it.tema || "livro");
+            const url = `https://web.koodoreader.com/#/epub/${it.koodoId}?title=${titulo}&file=${it.koodoId}`;
+            window.open(url, "_blank", "noopener");
         });
 
-        atualizarStatusMeta();
-    </script>
+        // ----- google -----
+        el.querySelector("[data-google]").addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("livro", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            const q = (it?.tema || it?.titulo || "").trim();
+            if (!q) return alert("Preencha o tema primeiro.");
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, "_blank");
+        });
 
+        // ----- recomendar livros -----
+        el.querySelector("[data-recomendar]").addEventListener("click", async () => {
+            const blocos = Storage.blocos.ler("livro", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            const q = (it?.tema || it?.titulo || "").trim();
+            if (!q) return alert("Preencha o tema primeiro.");
+
+            const box = el.querySelector(`#rec_${b.id}`);
+            box.style.display = "grid";
+            box.innerHTML = `<div style="color:#888;font-size:13px;">Buscando…</div>`;
+
+            try {
+                const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=6`;
+                const r = await fetch(url);
+                const data = await r.json();
+
+                if (!data.items || data.items.length === 0) {
+                    box.innerHTML = `<div style="color:#888;font-size:13px;">Nada encontrado.</div>`;
+                    return;
+                }
+
+                box.innerHTML = data.items.map(item => {
+                    const v = item.volumeInfo || {};
+                    const capa = v.imageLinks?.thumbnail || "";
+                    const titulo = v.title || "";
+                    const autores = (v.authors || []).join(", ");
+                    return `
+                        <div class="rec-card" data-rec-titulo="${esc(titulo)}" data-rec-autor="${esc(autores)}" data-rec-link="${esc(v.infoLink || "")}">
+                            ${capa ? `<img src="${esc(capa)}" alt="">` : `<div style="width:44px;height:64px;background:#252529;border-radius:4px;"></div>`}
+                            <div class="rec-card-info">
+                                <div class="rec-card-titulo">${esc(titulo)}</div>
+                                <div class="rec-card-autor">${esc(autores)}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join("");
+
+                // clique numa recomendação → preenche
+                box.querySelectorAll(".rec-card").forEach(card => {
+                    card.addEventListener("click", () => {
+                        const t = card.dataset.recTitulo;
+                        const a = card.dataset.recAutor;
+                        const l = card.dataset.recLink;
+                        const blocos2 = Storage.blocos.ler("livro", dataAtual);
+                        const i = blocos2.findIndex(x => x.id === b.id);
+                        if (i >= 0) {
+                            blocos2[i].titulo = t;
+                            blocos2[i].autor = a;
+                            blocos2[i].link = l;
+                            Storage.blocos.salvar("livro", dataAtual, blocos2);
+                        }
+                        render();
+                    });
+                });
+
+            } catch (e) {
+                box.innerHTML = `<div style="color:#888;font-size:13px;">Erro ao buscar.</div>`;
+            }
+        });
+
+        return el;
+    }
+
+    // ==================================================
+    // LIVRO → BIBLIOTECA
+    // ==================================================
+    function registrarNaBiblioteca(item, pct) {
+        if (!item.titulo && !item.tema) return;
+        const id = item.koodoId || item.link || (item.titulo + "|" + item.tema).toLowerCase();
+        Storage.biblioteca.adicionar("livro", {
+            id,
+            tema: item.tema,
+            titulo: item.titulo || item.tema,
+            autor: item.autor,
+            koodoId: item.koodoId,
+            link: item.link,
+            paginaAtual: item.paginaAtual,
+            totalPaginas: item.totalPaginas,
+            pct,
+            status: pct >= 100 ? "concluido" : "lendo",
+            capa: "", // preenchido depois se recomendar
+        });
+    }
+
+    function renderBibliotecaLivro() {
+        const wrap = el("conteudo");
+        let lista = Storage.biblioteca.listar("livro");
+
+        // filtro
+        if (estado.bibFiltro !== "todos") {
+            lista = lista.filter(b => b.status === estado.bibFiltro);
+        }
+
+        // busca
+        if (estado.bibBusca.trim()) {
+            const q = estado.bibBusca.toLowerCase();
+            lista = lista.filter(b =>
+                (b.titulo || "").toLowerCase().includes(q) ||
+                (b.tema || "").toLowerCase().includes(q)
+            );
+        }
+
+        // ordem
+        if (estado.bibOrdem === "recente") {
+            lista.sort((a, b) => (b.atualizadoEm || 0) - (a.atualizadoEm || 0));
+        } else if (estado.bibOrdem === "titulo") {
+            lista.sort((a, b) => (a.titulo || "").localeCompare(b.titulo || ""));
+        } else if (estado.bibOrdem === "progresso") {
+            lista.sort((a, b) => (b.pct || 0) - (a.pct || 0));
+        }
+
+        wrap.innerHTML = `
+            <div class="bib-controles">
+                <input type="search" class="bib-busca" id="bibBusca" placeholder="🔍 Buscar por título ou tema" value="${esc(estado.bibBusca)}">
+                <button class="btn-secundario" data-filtro="todos">Todos</button>
+                <button class="btn-secundario" data-filtro="lendo">Lendo</button>
+                <button class="btn-secundario" data-filtro="concluido">Concluídos</button>
+                <button class="btn-secundario" data-ordem="recente">Recentes</button>
+                <button class="btn-secundario" data-ordem="titulo">A-Z</button>
+                <button class="btn-secundario" data-ordem="progresso">Progresso</button>
+            </div>
+            <div id="bibGradeWrap"></div>
+        `;
+
+        // marca ativos
+        wrap.querySelectorAll("[data-filtro]").forEach(b => {
+            if (b.dataset.filtro === estado.bibFiltro) b.classList.add("btn-primario");
+            b.addEventListener("click", () => { estado.bibFiltro = b.dataset.filtro; render(); });
+        });
+        wrap.querySelectorAll("[data-ordem]").forEach(b => {
+            if (b.dataset.ordem === estado.bibOrdem) b.classList.add("btn-primario");
+            b.addEventListener("click", () => { estado.bibOrdem = b.dataset.ordem; render(); });
+        });
+
+        wrap.querySelector("#bibBusca").addEventListener("input", e => {
+            estado.bibBusca = e.target.value;
+            renderBibliotecaLivro();
+            // refoca
+            const i = wrap.querySelector("#bibBusca");
+            if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); }
+        });
+
+        const gradeWrap = wrap.querySelector("#bibGradeWrap");
+        if (lista.length === 0) {
+            gradeWrap.innerHTML = `<div class="vazio">Nenhum livro na biblioteca ainda.</div>`;
+            return;
+        }
+
+        gradeWrap.innerHTML = `<div class="bib-grade">${lista.map(b => `
+            <div class="bib-item" data-id="${esc(b.id)}">
+                <div class="bib-capa">${b.capa ? `<img src="${esc(b.capa)}" alt="">` : "📖"}</div>
+                <div class="bib-titulo">${esc(b.titulo || "(sem título)")}</div>
+                <div class="bib-tema">${esc(b.tema || "")}</div>
+                <div class="progresso"><div style="width:${b.pct || 0}%"></div></div>
+                <div class="progresso-texto">${b.paginaAtual || 0} / ${b.totalPaginas || "?"} · ${b.pct || 0}%</div>
+            </div>
+        `).join("")}</div>`;
+
+        // clique → retoma estudo
+        gradeWrap.querySelectorAll(".bib-item").forEach(item => {
+            item.addEventListener("click", () => {
+                const id = item.dataset.id;
+                const b = Storage.biblioteca.listar("livro").find(x => x.id === id);
+                if (!b) return;
+                const blocos = Storage.blocos.ler("livro", dataAtual);
+                blocos.push({
+                    id: uid("blk"),
+                    tema: b.tema || "",
+                    titulo: b.titulo || "",
+                    autor: b.autor || "",
+                    paginaAtual: b.paginaAtual || "",
+                    totalPaginas: b.totalPaginas || "",
+                    capitulo: "",
+                    metaHoje: "", tempoPrevisto: "",
+                    oQueAprendi: "", comoAplicar: "", proximaAcao: "",
+                    link: b.link || "", koodoId: b.koodoId || "",
+                    status: "", criadoEm: Date.now(),
+                });
+                Storage.blocos.salvar("livro", dataAtual, blocos);
+                estado.subAba = "estudar";
+                render();
+            });
+        });
+    }
+
+    // ==================================================
+    // APRENDIZADOS
+    // ==================================================
+    const TIPOS_AP = [
+        { id: "insight",   label: "💡 Insight" },
+        { id: "citacao",   label: "📖 Citação" },
+        { id: "tecnica",   label: "🛠️ Técnica" },
+        { id: "principio", label: "🧭 Princípio" },
+        { id: "dado",      label: "📊 Dado" },
+        { id: "historia",  label: "📚 História" },
+    ];
+    const AREAS_AP = [
+        { id: "trabalho",        label: "💼 Trabalho" },
+        { id: "negocio",         label: "💰 Negócio" },
+        { id: "estudo",          label: "🧠 Estudo" },
+        { id: "corpo",           label: "🏋️ Corpo" },
+        { id: "espiritualidade", label: "🙏 Espiritualidade" },
+        { id: "relacoes",        label: "👥 Relações" },
+        { id: "projetos",        label: "🎯 Projetos" },
+    ];
+    const IMPACTOS_AP = [
+        { id: "alto",  label: "🔴 Alto" },
+        { id: "medio", label: "🟡 Médio" },
+        { id: "baixo", label: "🟢 Baixo" },
+    ];
+    const STATUS_AP = [
+        { id: "capturado",    label: "📥 Capturado" },
+        { id: "testando",     label: "🧪 Testando" },
+        { id: "aplicado",     label: "✅ Aplicado" },
+        { id: "virou_habito", label: "🏆 Virou hábito" },
+        { id: "descartado",   label: "❌ Descartado" },
+    ];
+
+    function renderAprendizados() {
+        const wrap = el("conteudo");
+        let lista = Storage.aprendizados.listar();
+
+        if (estado.apBusca.trim()) {
+            const q = estado.apBusca.toLowerCase();
+            lista = lista.filter(a => (a.texto || "").toLowerCase().includes(q));
+        }
+        if (estado.apTipo)    lista = lista.filter(a => a.tipo === estado.apTipo);
+        if (estado.apImpacto) lista = lista.filter(a => a.impacto === estado.apImpacto);
+        if (estado.apStatus)  lista = lista.filter(a => a.status === estado.apStatus);
+
+        lista.sort((a, b) => (b.criadoEm || 0) - (a.criadoEm || 0));
+
+        wrap.innerHTML = `
+            <div class="bib-controles">
+                <input type="search" class="bib-busca" id="apBusca" placeholder="🔍 Buscar aprendizados" value="${esc(estado.apBusca)}">
+                <button class="btn-primario" id="btnNovoAp">+ Novo aprendizado</button>
+            </div>
+            <div id="listaAp"></div>
+            <div id="formAp" style="display:none;margin-top:16px;"></div>
+        `;
+
+        wrap.querySelector("#apBusca").addEventListener("input", e => {
+            estado.apBusca = e.target.value;
+            renderAprendizados();
+            const i = wrap.querySelector("#apBusca");
+            if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); }
+        });
+
+        wrap.querySelector("#btnNovoAp").addEventListener("click", () => abrirFormAp());
+
+        const listaEl = wrap.querySelector("#listaAp");
+        if (lista.length === 0) {
+            listaEl.innerHTML = `<div class="vazio">Nenhum aprendizado registrado.</div>`;
+            return;
+        }
+
+        listaEl.innerHTML = lista.map(a => {
+            const tipoInfo = TIPOS_AP.find(t => t.id === a.tipo)?.label || "";
+            const impInfo = IMPACTOS_AP.find(t => t.id === a.impacto)?.label || "";
+            const stInfo = STATUS_AP.find(t => t.id === a.status)?.label || "";
+            const areas = (a.areas || []).map(x =>
+                AREAS_AP.find(ar => ar.id === x)?.label || x
+            ).join(" · ");
+            return `
+                <div class="ap-card">
+                    <div class="ap-linha-1">
+                        <span>${esc(tipoInfo)}</span>
+                        ${impInfo ? `<span>· ${esc(impInfo)}</span>` : ""}
+                        ${areas ? `<span>· ${esc(areas)}</span>` : ""}
+                    </div>
+                    <div class="ap-texto">${esc(a.texto || "")}</div>
+                    ${a.fonte ? `<div class="ap-fonte">— ${esc(a.fonte)}</div>` : ""}
+                    <div class="ap-rodape">
+                        ${stInfo ? `<span class="tag">${esc(stInfo)}</span>` : ""}
+                        <button class="btn-secundario" data-rm="${a.id}" style="margin-left:auto;">remover</button>
+                    </div>
+                </div>
+            `;
+        }).join("");
+
+        listaEl.querySelectorAll("[data-rm]").forEach(b => {
+            b.addEventListener("click", () => {
+                Storage.aprendizados.remover(b.dataset.rm);
+                render();
+            });
+        });
+    }
+
+    function abrirFormAp() {
+        const box = el("formAp");
+        box.style.display = "block";
+
+        box.innerHTML = `
+            <div class="bloco-estudo">
+                <div class="bloco-cabecalho">
+                    <span class="bloco-titulo">Novo aprendizado</span>
+                    <button class="bloco-remover" id="fecharForm">×</button>
+                </div>
+
+                <label class="campo-label">Texto do aprendizado</label>
+                <textarea id="apTexto" rows="3" placeholder="Frase, insight, técnica…"></textarea>
+
+                <label class="campo-label">Fonte (opcional)</label>
+                <input type="text" id="apFonte" placeholder='Ex.: "Marketing 4.0, pág. 47"'>
+
+                <label class="campo-label">Tipo</label>
+                <div class="chips" id="chipsTipoAp"></div>
+
+                <label class="campo-label">Áreas de aplicação</label>
+                <div class="chips" id="chipsAreasAp"></div>
+
+                <label class="campo-label">Impacto se aplicado</label>
+                <div class="chips" id="chipsImpactoAp"></div>
+
+                <label class="campo-label">Status</label>
+                <div class="chips" id="chipsStatusAp"></div>
+
+                <div style="margin-top:16px;text-align:right;">
+                    <button class="btn-primario" id="salvarAp">Salvar</button>
+                </div>
+            </div>
+        `;
+
+        // chips com estado local
+        const tmp = { tipo: "", areas: [], impacto: "", status: "" };
+
+        function renderChips(container, lista, multi, campo, classe) {
+            container.innerHTML = lista.map(item =>
+                `<div class="chip ${classe || ""}" data-id="${item.id}">${item.label}</div>`
+            ).join("");
+            container.querySelectorAll(".chip").forEach(c => {
+                c.addEventListener("click", () => {
+                    const id = c.dataset.id;
+                    if (multi) {
+                        const i = tmp[campo].indexOf(id);
+                        if (i >= 0) tmp[campo].splice(i, 1);
+                        else tmp[campo].push(id);
+                        c.classList.toggle("selecionado");
+                    } else {
+                        container.querySelectorAll(".chip").forEach(x => x.classList.remove("selecionado"));
+                        c.classList.add("selecionado");
+                        tmp[campo] = id;
+                    }
+                });
+            });
+        }
+
+        renderChips(box.querySelector("#chipsTipoAp"),    TIPOS_AP,    false, "tipo");
+        renderChips(box.querySelector("#chipsAreasAp"),   AREAS_AP,    true,  "areas");
+        renderChips(box.querySelector("#chipsImpactoAp"), IMPACTOS_AP, false, "impacto", "impacto-");
+        renderChips(box.querySelector("#chipsStatusAp"),  STATUS_AP,   false, "status");
+
+        box.querySelector("#fecharForm").addEventListener("click", () => {
+            box.style.display = "none";
+            box.innerHTML = "";
+        });
+
+        box.querySelector("#salvarAp").addEventListener("click", () => {
+            const texto = box.querySelector("#apTexto").value.trim();
+            if (!texto) return alert("Escreva o aprendizado.");
+            Storage.aprendizados.adicionar({
+                texto,
+                fonte: box.querySelector("#apFonte").value.trim(),
+                tipo: tmp.tipo,
+                areas: tmp.areas,
+                impacto: tmp.impacto,
+                status: tmp.status || "capturado",
+            });
+            box.style.display = "none";
+            box.innerHTML = "";
+            render();
+        });
+    }
+
+    // ==================================================
+    // RENDER GERAL
+    // ==================================================
+    function render() {
+        renderResumo();
+        renderTipos();
+        renderSubAbas();
+        renderConteudo();
+    }
+
+    render();
+</script>
 </body>
 </html>
