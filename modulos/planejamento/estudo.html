@@ -237,6 +237,92 @@
         }
         .btn-secundario:hover { color: #e0e0e0; border-color: #44444a; }
 
+                /* ---------- Vídeo ---------- */
+        .video-player-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 8px 0 12px;
+        }
+        .video-player-wrap iframe,
+        .video-player-wrap > div {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .video-velocidade {
+            display: flex; gap: 6px; flex-wrap: wrap;
+            margin: 8px 0 12px;
+        }
+        .video-velocidade .chip {
+            font-variant-numeric: tabular-nums;
+        }
+        .btn-marcar {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 16px; font-size: 14px;
+            background: #1a2a1a; color: #a5d6a7;
+            border: 1px solid #2e5a2e; border-radius: 20px;
+            cursor: pointer; font-family: inherit;
+            transition: 0.15s;
+        }
+        .btn-marcar:hover { background: #223a22; border-color: #4caf50; }
+        .momentos-lista {
+            margin-top: 10px; display: flex; flex-direction: column; gap: 6px;
+        }
+        .momento-item {
+            display: flex; gap: 10px; align-items: flex-start;
+            padding: 8px 12px;
+            background: #1c1c20; border-left: 3px solid #4caf50;
+            border-radius: 6px; font-size: 13px; color: #d0d0d0;
+        }
+        .momento-tempo {
+            font-variant-numeric: tabular-nums;
+            color: #4caf50; font-weight: 600; flex-shrink: 0;
+            cursor: pointer;
+        }
+        .momento-tempo:hover { text-decoration: underline; }
+        .momento-texto { flex: 1; white-space: pre-wrap; }
+        .momento-remover {
+            background: none; border: none; color: #666;
+            font-size: 16px; cursor: pointer; padding: 0 4px;
+            flex-shrink: 0;
+        }
+        .momento-remover:hover { color: #d45a5a; }
+
+        .rec-video-card {
+            display: flex; gap: 10px; padding: 8px;
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 8px; cursor: pointer; transition: 0.15s;
+        }
+        .rec-video-card:hover { background: #24242a; border-color: #3a3a40; }
+        .rec-video-thumb {
+            width: 100px; height: 56px; flex-shrink: 0;
+            background: #252529; border-radius: 4px;
+            overflow: hidden;
+        }
+        .rec-video-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .rec-video-info { flex: 1; min-width: 0; }
+        .rec-video-titulo {
+            font-size: 12px; color: #eaeaea; font-weight: 600;
+            line-height: 1.3; margin-bottom: 4px;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .rec-video-meta { font-size: 11px; color: #888; }
+
+        .area-3frases { display: flex; flex-direction: column; gap: 6px; }
+        .area-3frases input {
+            font-size: 13px;
+        }
+
+        .vetor-triplo {
+            display: flex; gap: 8px; flex-wrap: wrap;
+        }
+        
         .botao-foco-flutuante {
             position: fixed; right: 24px; bottom: 24px; z-index: 9999;
             display: flex; align-items: center;
@@ -437,6 +523,144 @@
         `;
     }
 
+        // ==================================================
+    // AUXILIARES DE VÍDEO
+    // ==================================================
+    const players = {}; // id do bloco → YT.Player
+
+    function extrairVideoId(url) {
+        if (!url) return "";
+        const s = url.trim();
+        // padrão: youtu.be/ID, youtube.com/watch?v=ID, youtube.com/embed/ID, youtube.com/shorts/ID
+        const m = s.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
+        if (m) return m[1];
+        // se for só o ID puro
+        if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
+        return "";
+    }
+
+    function formatarDuracao(seg) {
+        const s = Number(seg) || 0;
+        const h = Math.floor(s / 3600);
+        const m = Math.floor((s % 3600) / 60);
+        const ss = Math.floor(s % 60);
+        if (h > 0) return `${h}:${String(m).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;
+        return `${m}:${String(ss).padStart(2,"0")}`;
+    }
+
+    function parseDuracao(txt) {
+        if (!txt) return 0;
+        const partes = String(txt).split(":").map(n => parseInt(n, 10) || 0);
+        if (partes.length === 3) return partes[0]*3600 + partes[1]*60 + partes[2];
+        if (partes.length === 2) return partes[0]*60 + partes[1];
+        if (partes.length === 1) return partes[0];
+        return 0;
+    }
+
+    let ytApiPromise = null;
+    function carregarYTAPI() {
+        if (ytApiPromise) return ytApiPromise;
+        ytApiPromise = new Promise(resolve => {
+            if (window.YT && window.YT.Player) return resolve();
+            window.onYouTubeIframeAPIReady = () => resolve();
+            const s = document.createElement("script");
+            s.src = "https://www.youtube.com/iframe_api";
+            document.head.appendChild(s);
+        });
+        return ytApiPromise;
+    }
+
+    async function aplicarPlayer(blockId, videoId, velocidade) {
+        if (!videoId) return;
+        await carregarYTAPI();
+        if (players[blockId]) {
+            try { players[blockId].destroy(); } catch(e) {}
+        }
+        players[blockId] = new window.YT.Player(`yt_${blockId}`, {
+            videoId,
+            playerVars: { rel: 0, modestbranding: 1, hl: "pt" },
+            events: {
+                onReady: (ev) => {
+                    if (velocidade && ev.target.setPlaybackRate) {
+                        try { ev.target.setPlaybackRate(Number(velocidade)); } catch(e) {}
+                    }
+                }
+            }
+        });
+    }
+
+    // Busca metadados via InnerTube (sem chave, sem cota)
+    async function buscarMetadadosYouTube(videoId) {
+        const body = {
+            context: {
+                client: {
+                    clientName: "WEB",
+                    clientVersion: "2.20240101.00.00",
+                    hl: "pt",
+                    gl: "BR"
+                }
+            },
+            videoId
+        };
+        const r = await fetch("https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&prettyPrint=false", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+        });
+        const j = await r.json();
+        const vd = j?.videoDetails || {};
+        return {
+            titulo: vd.title || "",
+            canal: vd.author || "",
+            duracaoSeg: Number(vd.lengthSeconds) || 0,
+            thumb: vd.thumbnail?.thumbnails?.slice(-1)[0]?.url || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
+        };
+    }
+
+    // Busca vídeos por tema (InnerTube search)
+    async function buscarVideosPorTema(query) {
+        const body = {
+            context: {
+                client: {
+                    clientName: "WEB",
+                    clientVersion: "2.20240101.00.00",
+                    hl: "pt",
+                    gl: "BR"
+                }
+            },
+            query
+        };
+        const r = await fetch("https://www.youtube.com/youtubei/v1/search?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&prettyPrint=false", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+        });
+        const j = await r.json();
+
+        const out = [];
+        try {
+            const sections = j.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents || [];
+            for (const sec of sections) {
+                const items = sec?.itemSectionRenderer?.contents || [];
+                for (const it of items) {
+                    const v = it.videoRenderer;
+                    if (!v) continue;
+                    const vid = v.videoId;
+                    const titulo = v.title?.runs?.[0]?.text || "";
+                    const canal  = v.ownerText?.runs?.[0]?.text || "";
+                    const dur    = v.lengthText?.simpleText || "";
+                    const thumb  = v.thumbnail?.thumbnails?.slice(-1)[0]?.url || `https://i.ytimg.com/vi/${vid}/mqdefault.jpg`;
+                    out.push({ vid, titulo, canal, dur, thumb });
+                    if (out.length >= 6) break;
+                }
+                if (out.length >= 6) break;
+            }
+        } catch (e) {
+            console.warn("parse InnerTube falhou", e);
+        }
+        return out;
+    }
+   
     // ==================================================
     // LIVRO → ESTUDAR
     // ==================================================
@@ -737,6 +961,461 @@
         return elBloco;
     }
 
+    // ==================================================
+    // VÍDEO → ESTUDAR
+    // ==================================================
+    function addBlocoVideo() {
+        const blocos = Storage.blocos.ler("video", dataAtual);
+        blocos.push({
+            id: uid("blk"),
+            tema: "", titulo: "", canal: "", plataforma: "YouTube",
+            objetivo: "", url: "", videoId: "",
+            duracaoSeg: 0, minutoAtual: 0,
+            metaHoje: "", tempoPrevisto: "",
+            velocidade: "1",
+            resumo1: "", resumo2: "", resumo3: "",
+            oQueFazer: "", proximaAcao: "",
+            valeReassistir: false,
+            publicado: "", validade: "",
+            confiabilidade: "",
+            ideias: "",
+            momentos: [],
+            criadoEm: Date.now(),
+        });
+        Storage.blocos.salvar("video", dataAtual, blocos);
+        render();
+    }
+
+    function renderEstudarVideo() {
+        const blocos = Storage.blocos.ler("video", dataAtual);
+        const wrap = el("conteudo");
+        wrap.innerHTML = "";
+
+        if (blocos.length === 0) {
+            const vazio = document.createElement("div");
+            vazio.className = "vazio";
+            vazio.innerHTML = `
+                <p>Nenhum vídeo registrado hoje ainda.</p>
+                <button class="btn-primario" id="btnAddVideo">+ Adicionar vídeo</button>
+            `;
+            wrap.appendChild(vazio);
+            vazio.querySelector("#btnAddVideo").addEventListener("click", addBlocoVideo);
+            return;
+        }
+
+        blocos.forEach((b, i) => wrap.appendChild(renderBlocoVideo(b, i)));
+
+        const addWrap = document.createElement("div");
+        addWrap.style.marginTop = "10px";
+        addWrap.innerHTML = `<button class="btn-secundario" id="btnAddVideo">+ Adicionar outro vídeo hoje</button>`;
+        wrap.appendChild(addWrap);
+        addWrap.querySelector("#btnAddVideo").addEventListener("click", addBlocoVideo);
+    }
+
+    function renderBlocoVideo(b, idx) {
+        const elBloco = document.createElement("div");
+        elBloco.className = "bloco-estudo";
+        elBloco.dataset.id = b.id;
+
+        const velocidadeAtual = b.velocidade || "1";
+        const velocidades = ["1", "1.25", "1.5", "1.75", "2"];
+
+        elBloco.innerHTML = `
+            <div class="bloco-cabecalho">
+                <span class="bloco-titulo">Vídeo ${idx + 1}</span>
+                <button class="bloco-remover" data-rem="${b.id}" title="Remover">×</button>
+            </div>
+
+            <label class="campo-label">Tema</label>
+            <input type="text" data-campo="tema" value="${esc(b.tema)}" placeholder="Ex.: marketing digital">
+
+            <label class="campo-label">Link do vídeo (YouTube)</label>
+            <div class="linha-dupla">
+                <input type="text" data-campo="url" value="${esc(b.url)}" placeholder="https://youtube.com/watch?v=...">
+                <button class="btn-secundario" data-buscar-meta="1">🔄 Buscar dados</button>
+            </div>
+
+            <label class="campo-label">Título</label>
+            <input type="text" data-campo="titulo" value="${esc(b.titulo)}" placeholder="(puxado automaticamente)">
+
+            <div class="linha-dupla">
+                <div>
+                    <label class="campo-label">Canal</label>
+                    <input type="text" data-campo="canal" value="${esc(b.canal)}" placeholder="(puxado)">
+                </div>
+                <div>
+                    <label class="campo-label">Plataforma</label>
+                    <input type="text" data-campo="plataforma" value="${esc(b.plataforma)}" placeholder="YouTube">
+                </div>
+            </div>
+
+            <label class="campo-label">Objetivo do vídeo</label>
+            <input type="text" data-campo="objetivo" value="${esc(b.objetivo)}" placeholder="Ex.: aprender passo a passo do funil">
+
+            ${b.videoId ? `
+                <div class="video-player-wrap">
+                    <div id="yt_${b.id}"></div>
+                </div>
+
+                <label class="campo-label">Velocidade de reprodução</label>
+                <div class="video-velocidade" data-vel="${b.id}">
+                    ${velocidades.map(v => `
+                        <div class="chip${v === velocidadeAtual ? " selecionado" : ""}" data-v="${v}">${v}x</div>
+                    `).join("")}
+                </div>
+
+                <button class="btn-marcar" data-marcar="${b.id}">⏱️ Marcar momento</button>
+            ` : `
+                <div style="padding:14px;background:#19191d;border:1px dashed #333;border-radius:10px;margin:10px 0;text-align:center;color:#666;font-size:13px;">
+                    Cole o link do vídeo e clique em <strong>🔄 Buscar dados</strong> para carregar o player.
+                </div>
+            `}
+
+            <div class="linha-dupla">
+                <div>
+                    <label class="campo-label">Duração total</label>
+                    <input type="text" data-campo="duracaoTexto" value="${b.duracaoSeg ? formatarDuracao(b.duracaoSeg) : ""}" placeholder="Ex.: 45:00">
+                </div>
+                <div>
+                    <label class="campo-label">Minuto atual</label>
+                    <input type="text" data-campo="minutoTexto" value="${b.minutoAtual ? formatarDuracao(b.minutoAtual) : ""}" placeholder="Ex.: 12:40">
+                </div>
+            </div>
+
+            <div class="progresso">
+                <div style="width:${b.duracaoSeg > 0 ? Math.min(100, Math.round((b.minutoAtual / b.duracaoSeg) * 100)) : 0}%"></div>
+            </div>
+            <div class="progresso-texto">${b.duracaoSeg > 0 ? `${formatarDuracao(b.minutoAtual)} / ${formatarDuracao(b.duracaoSeg)} · ${Math.min(100, Math.round((b.minutoAtual / b.duracaoSeg) * 100))}%` : "—"}</div>
+
+            <div class="linha-dupla">
+                <div>
+                    <label class="campo-label">Meta de hoje</label>
+                    <input type="text" data-campo="metaHoje" value="${esc(b.metaHoje)}" placeholder="Ex.: assistir 20 min">
+                </div>
+                <div>
+                    <label class="campo-label">Tempo previsto</label>
+                    <input type="text" data-campo="tempoPrevisto" value="${esc(b.tempoPrevisto)}" placeholder="Ex.: 20 min">
+                </div>
+            </div>
+
+            <label class="campo-label">Resumo em 3 frases</label>
+            <div class="area-3frases">
+                <input type="text" data-campo="resumo1" value="${esc(b.resumo1)}" placeholder="1. …">
+                <input type="text" data-campo="resumo2" value="${esc(b.resumo2)}" placeholder="2. …">
+                <input type="text" data-campo="resumo3" value="${esc(b.resumo3)}" placeholder="3. …">
+            </div>
+
+            <label class="campo-label">O que vou fazer com isso</label>
+            <textarea data-campo="oQueFazer" rows="2">${esc(b.oQueFazer)}</textarea>
+
+            <label class="campo-label">Próxima ação</label>
+            <input type="text" data-campo="proximaAcao" value="${esc(b.proximaAcao)}" placeholder="Ex.: retomar no 12:40">
+
+            <div class="linha-dupla">
+                <div>
+                    <label class="campo-label">Vale reassistir?</label>
+                    <div class="chips" data-boolean="valeReassistir">
+                        <div class="chip${b.valeReassistir ? " selecionado" : ""}" data-bool="1">Sim</div>
+                        <div class="chip${!b.valeReassistir ? " selecionado" : ""}" data-bool="0">Não</div>
+                    </div>
+                </div>
+                <div>
+                    <label class="campo-label">Publicado em</label>
+                    <input type="text" data-campo="publicado" value="${esc(b.publicado)}" placeholder="Ex.: 12/03/2026">
+                </div>
+            </div>
+
+            <label class="campo-label">Ainda é válido?</label>
+            <div class="chips" data-validade="${b.id}">
+                <div class="chip${b.validade === "vale" ? " selecionado" : ""}" data-v="vale">✅ Vale</div>
+                <div class="chip${b.validade === "parcial" ? " selecionado" : ""}" data-v="parcial">⚠️ Parcial</div>
+                <div class="chip${b.validade === "desatualizado" ? " selecionado" : ""}" data-v="desatualizado">❌ Desatualizado</div>
+            </div>
+
+            <label class="campo-label">Confiabilidade do canal</label>
+            <div class="chips" data-confianca="${b.id}">
+                <div class="chip${b.confiabilidade === "alta" ? " selecionado" : ""}" data-c="alta">🟢 Confio</div>
+                <div class="chip${b.confiabilidade === "neutra" ? " selecionado" : ""}" data-c="neutra">🟡 Neutro</div>
+                <div class="chip${b.confiabilidade === "baixa" ? " selecionado" : ""}" data-c="baixa">🔴 Não confio</div>
+            </div>
+
+            <label class="campo-label">Ideias para criar</label>
+            <textarea data-campo="ideias" rows="2">${esc(b.ideias)}</textarea>
+
+            <label class="campo-label">⏱️ Momentos marcados</label>
+            <div class="momentos-lista" data-momentos="${b.id}">
+                ${(b.momentos || []).map((m, i) => `
+                    <div class="momento-item">
+                        <span class="momento-tempo" data-pular="${i}">${formatarDuracao(m.t)}</span>
+                        <span class="momento-texto">${esc(m.texto || "")}</span>
+                        <button class="momento-remover" data-mom-rem="${i}">×</button>
+                    </div>
+                `).join("") || `<div style="color:#666;font-size:12px;">Nenhum momento marcado. Use o botão acima durante o play.</div>`}
+            </div>
+
+            <label class="campo-label">🔎 Buscar mais vídeos sobre o tema</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-secundario" data-recomendar-video="1">🎥 Recomendar vídeos</button>
+                <button class="btn-secundario" data-google-video="1">📄 Google</button>
+            </div>
+            <div class="recomendacoes" id="recv_${b.id}" style="display:none;"></div>
+        `;
+
+        // ---------- salvar alterações ----------
+        elBloco.querySelectorAll("[data-campo]").forEach(input => {
+            input.addEventListener("input", () => {
+                const campo = input.dataset.campo;
+                const blocos = Storage.blocos.ler("video", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i < 0) return;
+
+                if (campo === "duracaoTexto") {
+                    blocos[i].duracaoSeg = parseDuracao(input.value);
+                } else if (campo === "minutoTexto") {
+                    blocos[i].minutoAtual = parseDuracao(input.value);
+                } else {
+                    blocos[i][campo] = input.value;
+                }
+                Storage.blocos.salvar("video", dataAtual, blocos);
+
+                // atualiza barra se for tempo
+                if (campo === "duracaoTexto" || campo === "minutoTexto") {
+                    const tot = blocos[i].duracaoSeg || 0;
+                    const at  = blocos[i].minutoAtual || 0;
+                    const p = tot > 0 ? Math.min(100, Math.round((at / tot) * 100)) : 0;
+                    elBloco.querySelector(".progresso > div").style.width = p + "%";
+                    elBloco.querySelector(".progresso-texto").textContent =
+                        tot > 0 ? `${formatarDuracao(at)} / ${formatarDuracao(tot)} · ${p}%` : "—";
+                }
+            });
+        });
+
+        // ---------- buscar metadados ----------
+        const btnMeta = elBloco.querySelector("[data-buscar-meta]");
+        if (btnMeta) {
+            btnMeta.addEventListener("click", async () => {
+                const blocos = Storage.blocos.ler("video", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i < 0) return;
+                const url = blocos[i].url || "";
+                const vid = extrairVideoId(url);
+                if (!vid) return alert("Cole um link de YouTube válido.");
+
+                blocos[i].videoId = vid;
+                Storage.blocos.salvar("video", dataAtual, blocos);
+
+                btnMeta.textContent = "🔄 Buscando…";
+                btnMeta.disabled = true;
+
+                try {
+                    const meta = await buscarMetadadosYouTube(vid);
+                    const blocos2 = Storage.blocos.ler("video", dataAtual);
+                    const j = blocos2.findIndex(x => x.id === b.id);
+                    if (j >= 0) {
+                        if (meta.titulo) blocos2[j].titulo = meta.titulo;
+                        if (meta.canal)  blocos2[j].canal  = meta.canal;
+                        if (meta.duracaoSeg) blocos2[j].duracaoSeg = meta.duracaoSeg;
+                        Storage.blocos.salvar("video", dataAtual, blocos2);
+                    }
+                } catch (e) {
+                    console.warn("InnerTube metadados falhou, seguindo manual", e);
+                }
+                render();
+            });
+        }
+
+        // ---------- velocidade ----------
+        elBloco.querySelectorAll("[data-vel] .chip").forEach(chip => {
+            chip.addEventListener("click", () => {
+                const v = chip.dataset.v;
+                elBloco.querySelectorAll("[data-vel] .chip").forEach(c =>
+                    c.classList.toggle("selecionado", c === chip)
+                );
+                const blocos = Storage.blocos.ler("video", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i >= 0) {
+                    blocos[i].velocidade = v;
+                    Storage.blocos.salvar("video", dataAtual, blocos);
+                }
+                const p = players[b.id];
+                if (p && p.setPlaybackRate) {
+                    try { p.setPlaybackRate(Number(v)); } catch(e) {}
+                }
+            });
+        });
+
+        // ---------- marcar momento ----------
+        const btnMarcar = elBloco.querySelector("[data-marcar]");
+        if (btnMarcar) {
+            btnMarcar.addEventListener("click", () => {
+                const p = players[b.id];
+                let t = 0;
+                try { t = Math.floor(p?.getCurrentTime?.() || 0); } catch(e) {}
+                const texto = prompt(`Momento em ${formatarDuracao(t)} — o que aconteceu aqui?`, "");
+                if (!texto) return;
+                const blocos = Storage.blocos.ler("video", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i < 0) return;
+                blocos[i].momentos = blocos[i].momentos || [];
+                blocos[i].momentos.push({ t, texto });
+                Storage.blocos.salvar("video", dataAtual, blocos);
+                render();
+            });
+        }
+
+        // ---------- momentos: clicar pra pular, remover ----------
+        elBloco.querySelectorAll("[data-pular]").forEach(span => {
+            span.addEventListener("click", () => {
+                const idx = Number(span.dataset.pular);
+                const p = players[b.id];
+                if (p && p.seekTo) {
+                    const blocos = Storage.blocos.ler("video", dataAtual);
+                    const it = blocos.find(x => x.id === b.id);
+                    const m = it?.momentos?.[idx];
+                    if (m) { p.seekTo(m.t, true); p.playVideo?.(); }
+                }
+            });
+        });
+        elBloco.querySelectorAll("[data-mom-rem]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const idx = Number(btn.dataset.momRem);
+                const blocos = Storage.blocos.ler("video", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i < 0) return;
+                blocos[i].momentos.splice(idx, 1);
+                Storage.blocos.salvar("video", dataAtual, blocos);
+                render();
+            });
+        });
+
+        // ---------- vale reassistir (boolean) ----------
+        elBloco.querySelectorAll('[data-boolean="valeReassistir"] .chip').forEach(chip => {
+            chip.addEventListener("click", () => {
+                const v = chip.dataset.bool === "1";
+                elBloco.querySelectorAll('[data-boolean="valeReassistir"] .chip').forEach(c =>
+                    c.classList.toggle("selecionado", c === chip)
+                );
+                const blocos = Storage.blocos.ler("video", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i >= 0) {
+                    blocos[i].valeReassistir = v;
+                    Storage.blocos.salvar("video", dataAtual, blocos);
+                }
+            });
+        });
+
+        // ---------- validade ----------
+        elBloco.querySelectorAll("[data-validade] .chip").forEach(chip => {
+            chip.addEventListener("click", () => {
+                const v = chip.dataset.v;
+                elBloco.querySelectorAll("[data-validade] .chip").forEach(c =>
+                    c.classList.toggle("selecionado", c === chip)
+                );
+                const blocos = Storage.blocos.ler("video", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i >= 0) {
+                    blocos[i].validade = v;
+                    Storage.blocos.salvar("video", dataAtual, blocos);
+                }
+            });
+        });
+
+        // ---------- confiabilidade ----------
+        elBloco.querySelectorAll("[data-confianca] .chip").forEach(chip => {
+            chip.addEventListener("click", () => {
+                const c = chip.dataset.c;
+                elBloco.querySelectorAll("[data-confianca] .chip").forEach(x =>
+                    x.classList.toggle("selecionado", x === chip)
+                );
+                const blocos = Storage.blocos.ler("video", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i >= 0) {
+                    blocos[i].confiabilidade = c;
+                    Storage.blocos.salvar("video", dataAtual, blocos);
+                }
+            });
+        });
+
+        // ---------- remover bloco ----------
+        elBloco.querySelector("[data-rem]").addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("video", dataAtual)
+                .filter(x => x.id !== b.id);
+            Storage.blocos.salvar("video", dataAtual, blocos);
+            if (players[b.id]) {
+                try { players[b.id].destroy(); } catch(e) {}
+                delete players[b.id];
+            }
+            render();
+        });
+
+        // ---------- google ----------
+        elBloco.querySelector("[data-google-video]")?.addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("video", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            const q = (it?.tema || it?.titulo || "").trim();
+            if (!q) return alert("Preencha o tema primeiro.");
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(q + " vídeo")}`, "_blank");
+        });
+
+        // ---------- recomendar vídeos via InnerTube ----------
+        elBloco.querySelector("[data-recomendar-video]")?.addEventListener("click", async () => {
+            const blocos = Storage.blocos.ler("video", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            const q = (it?.tema || "").trim();
+            if (!q) return alert("Preencha o tema primeiro.");
+
+            const box = elBloco.querySelector(`#recv_${b.id}`);
+            box.style.display = "grid";
+            box.innerHTML = `<div style="color:#888;font-size:13px;">Buscando…</div>`;
+
+            try {
+                const lista = await buscarVideosPorTema(q);
+                if (!lista.length) {
+                    box.innerHTML = `<div style="color:#888;font-size:13px;">Nada encontrado.</div>`;
+                    return;
+                }
+                box.innerHTML = lista.map(v => `
+                    <div class="rec-video-card"
+                         data-vid="${esc(v.vid)}"
+                         data-vtitulo="${esc(v.titulo)}"
+                         data-vcanal="${esc(v.canal)}"
+                         data-vdur="${esc(v.dur)}">
+                        <div class="rec-video-thumb"><img src="${esc(v.thumb)}" alt=""></div>
+                        <div class="rec-video-info">
+                            <div class="rec-video-titulo">${esc(v.titulo)}</div>
+                            <div class="rec-video-meta">${esc(v.canal)}${v.dur ? " · " + esc(v.dur) : ""}</div>
+                        </div>
+                    </div>
+                `).join("");
+
+                box.querySelectorAll(".rec-video-card").forEach(card => {
+                    card.addEventListener("click", () => {
+                        const vid = card.dataset.vid;
+                        const blocos2 = Storage.blocos.ler("video", dataAtual);
+                        const i = blocos2.findIndex(x => x.id === b.id);
+                        if (i < 0) return;
+                        blocos2[i].videoId = vid;
+                        blocos2[i].url = `https://www.youtube.com/watch?v=${vid}`;
+                        blocos2[i].titulo = card.dataset.vtitulo;
+                        blocos2[i].canal  = card.dataset.vcanal;
+                        blocos2[i].duracaoSeg = parseDuracao(card.dataset.vdur);
+                        Storage.blocos.salvar("video", dataAtual, blocos2);
+                        render();
+                    });
+                });
+            } catch (e) {
+                box.innerHTML = `<div style="color:#888;font-size:13px;">Erro ao buscar (a API interna do YouTube pode ter mudado).</div>`;
+            }
+        });
+
+        // ---------- aplicar player (após o DOM estar no documento) ----------
+        setTimeout(() => {
+            if (b.videoId) aplicarPlayer(b.id, b.videoId, b.velocidade);
+        }, 0);
+
+        return elBloco;
+    }
+    
     // ==================================================
     // BIBLIOTECA
     // ==================================================
