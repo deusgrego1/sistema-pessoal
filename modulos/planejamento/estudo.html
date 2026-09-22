@@ -237,7 +237,6 @@
         }
         .btn-secundario:hover { color: #e0e0e0; border-color: #44444a; }
 
-                /* ---------- Vídeo ---------- */
         .video-player-wrap {
             position: relative;
             width: 100%;
@@ -315,14 +314,8 @@
         .rec-video-meta { font-size: 11px; color: #888; }
 
         .area-3frases { display: flex; flex-direction: column; gap: 6px; }
-        .area-3frases input {
-            font-size: 13px;
-        }
+        .area-3frases input { font-size: 13px; }
 
-        .vetor-triplo {
-            display: flex; gap: 8px; flex-wrap: wrap;
-        }
-        
         .botao-foco-flutuante {
             position: fixed; right: 24px; bottom: 24px; z-index: 9999;
             display: flex; align-items: center;
@@ -472,15 +465,10 @@
     // ==================================================
     // SUB-ABAS
     // ==================================================
-        function renderSubAbas() {
+    function renderSubAbas() {
         let abas = [];
 
-        if (estado.tipo === "livro") {
-            abas = [
-                { id: "estudar",    label: "📝 Estudar hoje" },
-                { id: "biblioteca", label: "📚 Biblioteca" },
-            ];
-        } else if (estado.tipo === "video") {
+        if (estado.tipo === "livro" || estado.tipo === "video") {
             abas = [
                 { id: "estudar",    label: "📝 Estudar hoje" },
                 { id: "biblioteca", label: "📚 Biblioteca" },
@@ -509,7 +497,7 @@
     // ==================================================
     // CONTEÚDO
     // ==================================================
-       function renderConteudo() {
+    function renderConteudo() {
         if (estado.tipo === "livro"  && estado.subAba === "estudar")    return renderEstudarLivro();
         if (estado.tipo === "livro"  && estado.subAba === "biblioteca") return renderBibliotecaLivro();
         if (estado.tipo === "video"  && estado.subAba === "estudar")    return renderEstudarVideo();
@@ -518,7 +506,20 @@
         return renderEmConstrucao();
     }
 
-        // ==================================================
+    function renderEmConstrucao() {
+        const tipoInfo = TIPOS.find(t => t.id === estado.tipo) || { label: "?" };
+        el("conteudo").innerHTML = `
+            <div class="em-construcao">
+                <div class="icone">🚧</div>
+                <div><strong>${tipoInfo.label}</strong> está em construção.</div>
+                <p style="margin-top:8px; font-size:13px;">
+                    Os campos específicos deste tipo serão adicionados na próxima parte.
+                </p>
+            </div>
+        `;
+    }
+
+    // ==================================================
     // AUXILIARES DE VÍDEO
     // ==================================================
     const players = {}; // id do bloco → YT.Player
@@ -526,10 +527,8 @@
     function extrairVideoId(url) {
         if (!url) return "";
         const s = url.trim();
-        // padrão: youtu.be/ID, youtube.com/watch?v=ID, youtube.com/embed/ID, youtube.com/shorts/ID
         const m = s.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
         if (m) return m[1];
-        // se for só o ID puro
         if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
         return "";
     }
@@ -584,78 +583,50 @@
         });
     }
 
-    // Busca metadados via InnerTube (sem chave, sem cota)
+    // Metadados via oEmbed oficial do YouTube (funciona sem chave, sem CORS)
     async function buscarMetadadosYouTube(videoId) {
-        const body = {
-            context: {
-                client: {
-                    clientName: "WEB",
-                    clientVersion: "2.20240101.00.00",
-                    hl: "pt",
-                    gl: "BR"
-                }
-            },
-            videoId
-        };
-        const r = await fetch("https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&prettyPrint=false", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body)
-        });
+        const url = `https://www.youtube.com/oembed?url=${encodeURIComponent(
+            `https://www.youtube.com/watch?v=${videoId}`
+        )}&format=json`;
+        const r = await fetch(url);
+        if (!r.ok) throw new Error("oEmbed falhou");
         const j = await r.json();
-        const vd = j?.videoDetails || {};
         return {
-            titulo: vd.title || "",
-            canal: vd.author || "",
-            duracaoSeg: Number(vd.lengthSeconds) || 0,
-            thumb: vd.thumbnail?.thumbnails?.slice(-1)[0]?.url || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`
+            titulo: j.title || "",
+            canal: j.author_name || "",
+            thumb: j.thumbnail_url || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+            duracaoSeg: 0,
         };
     }
 
-    // Busca vídeos por tema (InnerTube search)
+    // Busca via Piped API (sem chave, sem CORS)
     async function buscarVideosPorTema(query) {
-        const body = {
-            context: {
-                client: {
-                    clientName: "WEB",
-                    clientVersion: "2.20240101.00.00",
-                    hl: "pt",
-                    gl: "BR"
-                }
-            },
-            query
-        };
-        const r = await fetch("https://www.youtube.com/youtubei/v1/search?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&prettyPrint=false", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(body)
-        });
-        const j = await r.json();
+        const instancias = [
+            "https://pipedapi.kavin.rocks",
+            "https://api.piped.yt",
+            "https://pipedapi.adminforge.de",
+        ];
 
-        const out = [];
-        try {
-            const sections = j.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents || [];
-            for (const sec of sections) {
-                const items = sec?.itemSectionRenderer?.contents || [];
-                for (const it of items) {
-                    const v = it.videoRenderer;
-                    if (!v) continue;
-                    const vid = v.videoId;
-                    const titulo = v.title?.runs?.[0]?.text || "";
-                    const canal  = v.ownerText?.runs?.[0]?.text || "";
-                    const dur    = v.lengthText?.simpleText || "";
-                    const thumb  = v.thumbnail?.thumbnails?.slice(-1)[0]?.url || `https://i.ytimg.com/vi/${vid}/mqdefault.jpg`;
-                    out.push({ vid, titulo, canal, dur, thumb });
-                    if (out.length >= 6) break;
-                }
-                if (out.length >= 6) break;
-            }
-        } catch (e) {
-            console.warn("parse InnerTube falhou", e);
+        let itens = [];
+        for (const base of instancias) {
+            try {
+                const r = await fetch(`${base}/search?q=${encodeURIComponent(query)}&filter=videos`);
+                if (!r.ok) continue;
+                const j = await r.json();
+                itens = j.items || [];
+                if (itens.length) break;
+            } catch (e) { /* tenta a próxima */ }
         }
-        return out;
+
+        return itens.slice(0, 6).map(v => ({
+            vid:    (v.url || "").replace("/watch?v=", ""),
+            titulo: v.title || "",
+            canal:  v.uploaderName || "",
+            dur:    v.duration > 0 ? formatarDuracao(v.duration) : "",
+            thumb:  v.thumbnail || `https://i.ytimg.com/vi/${(v.url||"").replace("/watch?v=","")}/mqdefault.jpg`,
+        }));
     }
-   
+
     // ==================================================
     // LIVRO → ESTUDAR
     // ==================================================
@@ -783,7 +754,6 @@
             <div class="recomendacoes" id="rec_${b.id}" style="display:none;"></div>
         `;
 
-        // ---------- salvar alterações dos campos ----------
         elBloco.querySelectorAll("[data-campo]").forEach(input => {
             input.addEventListener("input", () => {
                 const campo = input.dataset.campo;
@@ -810,7 +780,6 @@
             }
         });
 
-        // ---------- botões +N ----------
         elBloco.querySelectorAll("[data-add]").forEach(btn => {
             btn.addEventListener("click", () => {
                 const add      = Number(btn.dataset.add) || 0;
@@ -840,7 +809,6 @@
             });
         });
 
-        // ---------- remover ----------
         elBloco.querySelector("[data-rem]").addEventListener("click", () => {
             const blocos = Storage.blocos.ler("livro", dataAtual)
                 .filter(x => x.id !== b.id);
@@ -848,7 +816,6 @@
             render();
         });
 
-        // ---------- abrir Koodo ----------
         elBloco.querySelector("[data-koodo]").addEventListener("click", () => {
             const blocos = Storage.blocos.ler("livro", dataAtual);
             const it = blocos.find(x => x.id === b.id);
@@ -861,7 +828,6 @@
             window.open(url, "_blank", "noopener");
         });
 
-        // ---------- google ----------
         elBloco.querySelector("[data-google]").addEventListener("click", () => {
             const blocos = Storage.blocos.ler("livro", dataAtual);
             const it = blocos.find(x => x.id === b.id);
@@ -870,7 +836,6 @@
             window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, "_blank");
         });
 
-        // ---------- recomendar livros ----------
         elBloco.querySelector("[data-recomendar]").addEventListener("click", async () => {
             const blocos = Storage.blocos.ler("livro", dataAtual);
             const it = blocos.find(x => x.id === b.id);
@@ -1156,7 +1121,6 @@
             <div class="recomendacoes" id="recv_${b.id}" style="display:none;"></div>
         `;
 
-        // ---------- salvar alterações ----------
         elBloco.querySelectorAll("[data-campo]").forEach(input => {
             input.addEventListener("input", () => {
                 const campo = input.dataset.campo;
@@ -1173,14 +1137,12 @@
                 }
                 Storage.blocos.salvar("video", dataAtual, blocos);
 
-                                // Registra/atualiza na biblioteca quando muda algo relevante
                 if (campo === "url" || campo === "titulo" || campo === "canal" ||
                     campo === "minutoTexto" || campo === "duracaoTexto") {
                     const atualizado = Storage.blocos.ler("video", dataAtual).find(x => x.id === b.id);
                     if (atualizado) registrarVideoNaBiblioteca(atualizado);
                 }
-                
-                // atualiza barra se for tempo
+
                 if (campo === "duracaoTexto" || campo === "minutoTexto") {
                     const tot = blocos[i].duracaoSeg || 0;
                     const at  = blocos[i].minutoAtual || 0;
@@ -1192,7 +1154,6 @@
             });
         });
 
-        // ---------- buscar metadados ----------
         const btnMeta = elBloco.querySelector("[data-buscar-meta]");
         if (btnMeta) {
             btnMeta.addEventListener("click", async () => {
@@ -1220,13 +1181,12 @@
                         Storage.blocos.salvar("video", dataAtual, blocos2);
                     }
                 } catch (e) {
-                    console.warn("InnerTube metadados falhou, seguindo manual", e);
+                    console.warn("oEmbed falhou, seguindo manual", e);
                 }
                 render();
             });
         }
 
-        // ---------- velocidade ----------
         elBloco.querySelectorAll("[data-vel] .chip").forEach(chip => {
             chip.addEventListener("click", () => {
                 const v = chip.dataset.v;
@@ -1246,7 +1206,6 @@
             });
         });
 
-        // ---------- marcar momento ----------
         const btnMarcar = elBloco.querySelector("[data-marcar]");
         if (btnMarcar) {
             btnMarcar.addEventListener("click", () => {
@@ -1265,7 +1224,6 @@
             });
         }
 
-        // ---------- momentos: clicar pra pular, remover ----------
         elBloco.querySelectorAll("[data-pular]").forEach(span => {
             span.addEventListener("click", () => {
                 const idx = Number(span.dataset.pular);
@@ -1290,7 +1248,6 @@
             });
         });
 
-        // ---------- vale reassistir (boolean) ----------
         elBloco.querySelectorAll('[data-boolean="valeReassistir"] .chip').forEach(chip => {
             chip.addEventListener("click", () => {
                 const v = chip.dataset.bool === "1";
@@ -1306,7 +1263,6 @@
             });
         });
 
-        // ---------- validade ----------
         elBloco.querySelectorAll("[data-validade] .chip").forEach(chip => {
             chip.addEventListener("click", () => {
                 const v = chip.dataset.v;
@@ -1322,7 +1278,6 @@
             });
         });
 
-        // ---------- confiabilidade ----------
         elBloco.querySelectorAll("[data-confianca] .chip").forEach(chip => {
             chip.addEventListener("click", () => {
                 const c = chip.dataset.c;
@@ -1338,7 +1293,6 @@
             });
         });
 
-        // ---------- remover bloco ----------
         elBloco.querySelector("[data-rem]").addEventListener("click", () => {
             const blocos = Storage.blocos.ler("video", dataAtual)
                 .filter(x => x.id !== b.id);
@@ -1350,7 +1304,6 @@
             render();
         });
 
-        // ---------- google ----------
         elBloco.querySelector("[data-google-video]")?.addEventListener("click", () => {
             const blocos = Storage.blocos.ler("video", dataAtual);
             const it = blocos.find(x => x.id === b.id);
@@ -1359,7 +1312,6 @@
             window.open(`https://www.google.com/search?q=${encodeURIComponent(q + " vídeo")}`, "_blank");
         });
 
-        // ---------- recomendar vídeos via InnerTube ----------
         elBloco.querySelector("[data-recomendar-video]")?.addEventListener("click", async () => {
             const blocos = Storage.blocos.ler("video", dataAtual);
             const it = blocos.find(x => x.id === b.id);
@@ -1373,7 +1325,7 @@
             try {
                 const lista = await buscarVideosPorTema(q);
                 if (!lista.length) {
-                    box.innerHTML = `<div style="color:#888;font-size:13px;">Nada encontrado.</div>`;
+                    box.innerHTML = `<div style="color:#888;font-size:13px;">Nada encontrado. Tente o Google.</div>`;
                     return;
                 }
                 box.innerHTML = lista.map(v => `
@@ -1406,21 +1358,20 @@
                     });
                 });
             } catch (e) {
-                box.innerHTML = `<div style="color:#888;font-size:13px;">Erro ao buscar (a API interna do YouTube pode ter mudado).</div>`;
+                box.innerHTML = `<div style="color:#888;font-size:13px;">Erro ao buscar. Tente o Google.</div>`;
             }
         });
 
-        // ---------- aplicar player (após o DOM estar no documento) ----------
-                setTimeout(() => {
+        setTimeout(() => {
             if (b.videoId) aplicarPlayer(b.id, b.videoId, b.velocidade);
             registrarVideoNaBiblioteca(b);
         }, 0);
 
         return elBloco;
     }
-    
+
     // ==================================================
-    // BIBLIOTECA
+    // BIBLIOTECA LIVRO
     // ==================================================
     function registrarNaBiblioteca(item, pct) {
         if (!item.titulo && !item.tema) return;
@@ -1543,21 +1494,33 @@
                 const id = item.dataset.id;
                 const b = Storage.biblioteca.listar("livro").find(x => x.id === id);
                 if (!b) return;
+
                 const blocos = Storage.blocos.ler("livro", dataAtual);
-                blocos.push({
-                    id: uid("blk"),
-                    tema: b.tema || "",
-                    titulo: b.titulo || "",
-                    autor: b.autor || "",
-                    paginaAtual: b.paginaAtual || "",
-                    totalPaginas: b.totalPaginas || "",
-                    capitulo: "",
-                    metaHoje: "", tempoPrevisto: "",
-                    oQueAprendi: "", comoAplicar: "", proximaAcao: "",
-                    link: b.link || "", koodoId: b.koodoId || "",
-                    status: "", criadoEm: Date.now(),
-                });
-                Storage.blocos.salvar("livro", dataAtual, blocos);
+
+                const jaExiste = blocos.some(x =>
+                    (b.koodoId && x.koodoId === b.koodoId) ||
+                    (b.link    && x.link    === b.link) ||
+                    ((b.titulo || "").toLowerCase() === (x.titulo || "").toLowerCase() &&
+                     (b.tema   || "").toLowerCase() === (x.tema   || "").toLowerCase())
+                );
+
+                if (!jaExiste) {
+                    blocos.push({
+                        id: uid("blk"),
+                        tema: b.tema || "",
+                        titulo: b.titulo || "",
+                        autor: b.autor || "",
+                        paginaAtual: b.paginaAtual || "",
+                        totalPaginas: b.totalPaginas || "",
+                        capitulo: "",
+                        metaHoje: "", tempoPrevisto: "",
+                        oQueAprendi: "", comoAplicar: "", proximaAcao: "",
+                        link: b.link || "", koodoId: b.koodoId || "",
+                        status: "", criadoEm: Date.now(),
+                    });
+                    Storage.blocos.salvar("livro", dataAtual, blocos);
+                }
+
                 estado.subAba = "estudar";
                 render();
             });
@@ -1565,7 +1528,7 @@
     }
 
     // ==================================================
-    // VÍDEO → BIBLIOTECA
+    // BIBLIOTECA VÍDEO
     // ==================================================
     function registrarVideoNaBiblioteca(item) {
         if (!item.titulo && !item.tema) return;
@@ -1591,6 +1554,7 @@
             status: pct >= 100 ? "concluido" : "assistindo",
             valeReassistir: item.valeReassistir || false,
             confiabilidade: item.confiabilidade || "",
+            capa: existente?.capa || "",
         });
     }
 
@@ -1639,8 +1603,7 @@
             b.addEventListener("click", () => { estado.bibOrdem = b.dataset.ordem; render(); });
         });
 
-        const buscaEl = wrap.querySelector("#bibBusca");
-        buscaEl.addEventListener("input", e => {
+        wrap.querySelector("#bibBusca").addEventListener("input", e => {
             estado.bibBusca = e.target.value;
             renderBibliotecaVideo();
             const i = wrap.querySelector("#bibBusca");
@@ -1665,42 +1628,51 @@
             </div>
         `).join("")}</div>`;
 
-        // Clique → reabre no bloco do dia
         gradeWrap.querySelectorAll(".bib-item").forEach(item => {
             item.addEventListener("click", () => {
                 const id = item.dataset.id;
                 const b = Storage.biblioteca.listar("video").find(x => x.id === id);
                 if (!b) return;
+
                 const blocos = Storage.blocos.ler("video", dataAtual);
-                blocos.push({
-                    id: uid("blk"),
-                    tema: b.tema || "",
-                    titulo: b.titulo || "",
-                    canal: b.canal || "",
-                    plataforma: "YouTube",
-                    objetivo: "",
-                    url: b.url || "",
-                    videoId: b.videoId || "",
-                    duracaoSeg: b.duracaoSeg || 0,
-                    minutoAtual: b.minutoAtual || 0,
-                    metaHoje: "", tempoPrevisto: "",
-                    velocidade: "1",
-                    resumo1: "", resumo2: "", resumo3: "",
-                    oQueFazer: "", proximaAcao: "",
-                    valeReassistir: b.valeReassistir || false,
-                    publicado: "", validade: "",
-                    confiabilidade: b.confiabilidade || "",
-                    ideias: "",
-                    momentos: [],
-                    criadoEm: Date.now(),
-                });
-                Storage.blocos.salvar("video", dataAtual, blocos);
+
+                const jaExiste = blocos.some(x =>
+                    (b.videoId && x.videoId === b.videoId) ||
+                    (b.url     && x.url     === b.url)
+                );
+
+                if (!jaExiste) {
+                    blocos.push({
+                        id: uid("blk"),
+                        tema: b.tema || "",
+                        titulo: b.titulo || "",
+                        canal: b.canal || "",
+                        plataforma: "YouTube",
+                        objetivo: "",
+                        url: b.url || "",
+                        videoId: b.videoId || "",
+                        duracaoSeg: b.duracaoSeg || 0,
+                        minutoAtual: b.minutoAtual || 0,
+                        metaHoje: "", tempoPrevisto: "",
+                        velocidade: "1",
+                        resumo1: "", resumo2: "", resumo3: "",
+                        oQueFazer: "", proximaAcao: "",
+                        valeReassistir: b.valeReassistir || false,
+                        publicado: "", validade: "",
+                        confiabilidade: b.confiabilidade || "",
+                        ideias: "",
+                        momentos: [],
+                        criadoEm: Date.now(),
+                    });
+                    Storage.blocos.salvar("video", dataAtual, blocos);
+                }
+
                 estado.subAba = "estudar";
                 render();
             });
         });
     }
-    
+
     // ==================================================
     // APRENDIZADOS
     // ==================================================
