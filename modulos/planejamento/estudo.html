@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="../../css/style.css">
 
     <style>
-        /* ---------- Resumo ---------- */
         .resumo-estudo {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -29,87 +28,57 @@
         .resumo-valor {
             color: #fff; font-size: 24px; font-weight: 600; line-height: 1;
         }
-        .resumo-valor small { font-size: 12px; color: #888; font-weight: 400; }
 
-        /* ---------- Barra de tipos ---------- */
-        .tipos-barra {
-            display: flex; flex-wrap: wrap; gap: 8px;
-        }
+        .tipos-barra { display: flex; flex-wrap: wrap; gap: 8px; }
         .tipo-pill {
             position: relative;
-            padding: 9px 16px;
-            font-size: 13px;
-            cursor: pointer;
-            border: 1px solid #333338;
-            background: #17171a;
-            color: #aaa;
-            border-radius: 20px;
-            transition: 0.15s;
+            padding: 9px 16px; font-size: 13px; cursor: pointer;
+            border: 1px solid #333338; background: #17171a; color: #aaa;
+            border-radius: 20px; transition: 0.15s;
         }
         .tipo-pill:hover { color: #ddd; border-color: #44444a; }
-        .tipo-pill.ativo {
-            background: #333; color: #fff; border-color: #55555c;
-        }
+        .tipo-pill.ativo { background: #333; color: #fff; border-color: #55555c; }
         .tipo-pill .ponto {
-            display: inline-block;
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            background: #4caf50;
-            margin-left: 6px;
-            vertical-align: middle;
+            display: inline-block; width: 6px; height: 6px;
+            border-radius: 50%; background: #4caf50;
+            margin-left: 6px; vertical-align: middle;
         }
 
-        /* ---------- Sub-abas (linha embaixo) ---------- */
         .sub-abas {
             display: flex; gap: 20px;
-            border-bottom: 1px solid #252529;
-            margin-bottom: 18px;
+            border-bottom: 1px solid #252529; margin-bottom: 18px;
         }
         .sub-aba {
-            padding: 8px 0;
-            font-size: 13px;
-            color: #888;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
+            padding: 8px 0; font-size: 13px; color: #888;
+            cursor: pointer; border-bottom: 2px solid transparent;
             transition: 0.15s;
         }
         .sub-aba:hover { color: #ccc; }
-        .sub-aba.ativa {
-            color: #fff;
-            border-bottom-color: #4caf50;
-        }
+        .sub-aba.ativa { color: #fff; border-bottom-color: #4caf50; }
 
-        /* ---------- Form / campos ---------- */
         .campo-label {
-            display: block;
-            font-size: 11px; color: #888;
+            display: block; font-size: 11px; color: #888;
             letter-spacing: 1px; text-transform: uppercase;
             margin: 14px 0 6px;
         }
         .campo-label:first-child { margin-top: 0; }
 
-        /* ---------- Chips ---------- */
         .chips { display: flex; flex-wrap: wrap; gap: 6px; }
         .chip {
-            padding: 7px 13px;
-            font-size: 12px;
-            cursor: pointer;
-            border: 1px solid #333338;
-            background: #1a1a1e;
-            color: #bbb;
-            border-radius: 16px;
-            transition: 0.15s;
+            padding: 7px 13px; font-size: 12px; cursor: pointer;
+            border: 1px solid #333338; background: #1a1a1e;
+            color: #bbb; border-radius: 16px; transition: 0.15s;
             user-select: none;
         }
         .chip:hover { background: #222228; color: #e0e0e0; }
         .chip.selecionado {
-            background: #2e2e33; border-color: #666; color: #fff; font-weight: 600;
+            background: #2e2e33; border-color: #666;
+            color: #fff; font-weight: 600;
         }
         .chip.impacto-alto.selecionado   { background:#331f1f;border-color:#d45a5a;color:#e08b8b; }
         .chip.impacto-medio.selecionado  { background:#332e1a;border-color:#c9a44a;color:#e0d48a; }
         .chip.impacto-baixo.selecionado  { background:#1f3320;border-color:#4caf50;color:#a5d6a7; }
 
-        /* ---------- Barra de progresso ---------- */
         .progresso {
             width: 100%; height: 8px; background: #252529;
             border-radius: 4px; overflow: hidden; margin: 8px 0;
@@ -118,24 +87,20 @@
             height: 100%; background: #4caf50;
             transition: width 0.3s ease;
         }
-        .progresso-texto {
-            font-size: 12px; color: #888; margin-top: 4px;
-        }
+        .progresso-texto { font-size: 12px; color: #888; margin-top: 4px; }
 
-        /* ---------- Bloco de estudo ---------- */
         .bloco-estudo {
-            border: 1px solid #252529;
-            border-radius: 10px;
-            padding: 16px;
-            margin-bottom: 16px;
-            background: #19191d;
+            border: 1px solid #252529; border-radius: 10px;
+            padding: 16px; margin-bottom: 16px; background: #19191d;
         }
         .bloco-cabecalho {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 12px;
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 12px;
         }
-        .bloco-titulo { font-size: 12px; color: #777;
-            text-transform: uppercase; letter-spacing: 1px; }
+        .bloco-titulo {
+            font-size: 12px; color: #777;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
         .bloco-remover {
             background: none; border: none; color: #666;
             font-size: 20px; cursor: pointer; padding: 0 6px;
@@ -145,7 +110,6 @@
         .linha-dupla { display: flex; gap: 10px; }
         .linha-dupla > * { flex: 1; }
 
-        /* ---------- Recomendações Google Books ---------- */
         .recomendacoes {
             margin-top: 10px;
             display: grid;
@@ -153,13 +117,9 @@
             gap: 10px;
         }
         .rec-card {
-            background: #1c1c20;
-            border: 1px solid #2a2a30;
-            border-radius: 8px;
-            padding: 10px;
-            cursor: pointer;
-            transition: 0.15s;
-            display: flex; gap: 10px;
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 8px; padding: 10px; cursor: pointer;
+            transition: 0.15s; display: flex; gap: 10px;
         }
         .rec-card:hover { background: #24242a; border-color: #3a3a40; }
         .rec-card img {
@@ -175,17 +135,15 @@
         }
         .rec-card-autor { font-size: 11px; color: #888; }
 
-        /* ---------- Biblioteca ---------- */
         .bib-controles {
             display: flex; gap: 8px; flex-wrap: wrap;
             margin-bottom: 16px; align-items: center;
         }
         .bib-busca {
             flex: 1; min-width: 180px;
-            padding: 8px 14px;
-            background: #17171a; border: 1px solid #333338;
-            color: #eaeaea; border-radius: 20px;
-            font-size: 13px; outline: none;
+            padding: 8px 14px; background: #17171a;
+            border: 1px solid #333338; color: #eaeaea;
+            border-radius: 20px; font-size: 13px; outline: none;
             font-family: inherit;
         }
         .bib-busca:focus { border-color: #55555c; }
@@ -195,11 +153,8 @@
             gap: 14px;
         }
         .bib-item {
-            background: #1c1c20;
-            border: 1px solid #2a2a30;
-            border-radius: 10px;
-            padding: 12px;
-            cursor: pointer;
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 10px; padding: 12px; cursor: pointer;
             transition: 0.15s;
         }
         .bib-item:hover {
@@ -207,9 +162,8 @@
             transform: translateY(-2px);
         }
         .bib-capa {
-            width: 100%; aspect-ratio: 2/3;
-            background: #252529; border-radius: 6px;
-            margin-bottom: 10px; overflow: hidden;
+            width: 100%; aspect-ratio: 2/3; background: #252529;
+            border-radius: 6px; margin-bottom: 10px; overflow: hidden;
             display: flex; align-items: center; justify-content: center;
             color: #555; font-size: 28px;
         }
@@ -222,13 +176,9 @@
         }
         .bib-tema { font-size: 11px; color: #777; margin-bottom: 6px; }
 
-        /* ---------- Aprendizados ---------- */
         .ap-card {
-            background: #1c1c20;
-            border-left: 3px solid #333;
-            border-radius: 8px;
-            padding: 14px;
-            margin-bottom: 10px;
+            background: #1c1c20; border-left: 3px solid #333;
+            border-radius: 8px; padding: 14px; margin-bottom: 10px;
         }
         .ap-linha-1 {
             display: flex; gap: 8px; flex-wrap: wrap;
@@ -240,8 +190,8 @@
             margin-bottom: 10px; white-space: pre-wrap;
         }
         .ap-fonte {
-            font-size: 12px; color: #777; font-style: italic;
-            margin-bottom: 10px;
+            font-size: 12px; color: #777;
+            font-style: italic; margin-bottom: 10px;
         }
         .ap-rodape {
             display: flex; gap: 6px; flex-wrap: wrap;
@@ -279,7 +229,6 @@
         }
         .btn-secundario:hover { color: #e0e0e0; border-color: #44444a; }
 
-        /* Botão flutuante */
         .botao-foco-flutuante {
             position: fixed; right: 24px; bottom: 24px; z-index: 9999;
             display: flex; align-items: center;
@@ -312,21 +261,14 @@
     </header>
 
     <section class="modules">
-
-        <!-- RESUMO -->
         <div class="resumo-estudo" id="resumoEstudo"></div>
-
-        <!-- BARRA DE TIPOS -->
         <div class="tipos-barra" id="tiposBarra"></div>
-
-        <!-- CONTEÚDO DINÂMICO -->
         <div class="module-card" style="align-items:flex-start;">
             <div style="width:100%;">
                 <div class="sub-abas" id="subAbas"></div>
                 <div id="conteudo"></div>
             </div>
         </div>
-
     </section>
 
     <a href="index.html" class="back-button">← Voltar para Planejamento</a>
@@ -341,7 +283,6 @@
 <script>
     "use strict";
 
-    // ---------- DATA ----------
     const hoje = new Date();
     const pad = n => String(n).padStart(2, "0");
     const dataHoje = `${hoje.getFullYear()}-${pad(hoje.getMonth()+1)}-${pad(hoje.getDate())}`;
@@ -349,16 +290,14 @@
     const dataParam = paramsURL.get("data");
     const dataAtual = (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam)) ? dataParam : dataHoje;
 
-    // ---------- MIGRAÇÃO ----------
     Storage.migrar();
 
-    // ---------- ESTADO ----------
     const TIPOS = [
-        { id: "livro",     label: "📖 Livro" },
-        { id: "video",     label: "🎥 Vídeo" },
-        { id: "artigo",    label: "📄 Artigo" },
-        { id: "pratica",   label: "🛠️ Prática" },
-        { id: "curso",     label: "🎓 Curso" },
+        { id: "livro",   label: "📖 Livro" },
+        { id: "video",   label: "🎥 Vídeo" },
+        { id: "artigo",  label: "📄 Artigo" },
+        { id: "pratica", label: "🛠️ Prática" },
+        { id: "curso",   label: "🎓 Curso" },
     ];
     const ABAS_APRENDIZADOS = { id: "aprendizados", label: "🧠 Aprendizados" };
 
@@ -369,23 +308,17 @@
         bibOrdem: "recente",
         bibBusca: "",
         apBusca: "",
-        apTipo: "",
-        apImpacto: "",
-        apStatus: "",
     };
 
-    // ---------- HELPERS ----------
     const esc = Storage.escapeHTML;
-
     function el(id) { return document.getElementById(id); }
     function uid(p) { return `${p}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`; }
-
     function temConteudoHoje(tipo) {
         return Storage.blocos.ler(tipo, dataAtual).length > 0;
     }
 
     // ==================================================
-    // RENDER: RESUMO
+    // RESUMO
     // ==================================================
     function renderResumo() {
         const blocosHoje = TIPOS.reduce(
@@ -414,19 +347,15 @@
         el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             card.addEventListener("click", () => {
                 const ir = card.dataset.ir;
-                if (ir === "aprendizados") {
-                    estado.tipo = "aprendizados";
-                } else {
-                    estado.tipo = "livro";
-                    estado.subAba = ir;
-                }
+                if (ir === "aprendizados") estado.tipo = "aprendizados";
+                else { estado.tipo = "livro"; estado.subAba = ir; }
                 render();
             });
         });
     }
 
     // ==================================================
-    // RENDER: BARRA DE TIPOS
+    // TIPOS
     // ==================================================
     function renderTipos() {
         const lista = [...TIPOS, ABAS_APRENDIZADOS];
@@ -447,7 +376,7 @@
     }
 
     // ==================================================
-    // RENDER: SUB-ABAS
+    // SUB-ABAS
     // ==================================================
     function renderSubAbas() {
         let abas = [];
@@ -462,14 +391,8 @@
             abas = [{ id: "estudar", label: "📝 Estudar hoje" }];
         }
 
-        if (abas.length === 0) {
-            el("subAbas").innerHTML = "";
-            return;
-        }
-
-        if (!abas.some(a => a.id === estado.subAba)) {
-            estado.subAba = abas[0].id;
-        }
+        if (abas.length === 0) { el("subAbas").innerHTML = ""; return; }
+        if (!abas.some(a => a.id === estado.subAba)) estado.subAba = abas[0].id;
 
         el("subAbas").innerHTML = abas.map(a =>
             `<div class="sub-aba${estado.subAba === a.id ? " ativa" : ""}" data-aba="${a.id}">${a.label}</div>`
@@ -484,12 +407,12 @@
     }
 
     // ==================================================
-    // RENDER: CONTEÚDO
+    // CONTEÚDO
     // ==================================================
     function renderConteudo() {
-        if (estado.tipo === "livro" && estado.subAba === "estudar")     return renderEstudarLivro();
-        if (estado.tipo === "livro" && estado.subAba === "biblioteca")  return renderBibliotecaLivro();
-        if (estado.tipo === "aprendizados")                             return renderAprendizados();
+        if (estado.tipo === "livro" && estado.subAba === "estudar")    return renderEstudarLivro();
+        if (estado.tipo === "livro" && estado.subAba === "biblioteca") return renderBibliotecaLivro();
+        if (estado.tipo === "aprendizados")                            return renderAprendizados();
         return renderEmConstrucao();
     }
 
@@ -512,7 +435,6 @@
     function renderEstudarLivro() {
         const blocos = Storage.blocos.ler("livro", dataAtual);
         const wrap = el("conteudo");
-
         wrap.innerHTML = "";
 
         if (blocos.length === 0) {
@@ -552,14 +474,14 @@
     }
 
     function renderBlocoLivro(b, idx) {
-        const el = document.createElement("div");
-        el.className = "bloco-estudo";
+        const elBloco = document.createElement("div");
+        elBloco.className = "bloco-estudo";
 
         const total = Number(b.totalPaginas) || 0;
         const atual = Number(b.paginaAtual) || 0;
         const pct = total > 0 ? Math.min(100, Math.round((atual / total) * 100)) : 0;
 
-        el.innerHTML = `
+        elBloco.innerHTML = `
             <div class="bloco-cabecalho">
                 <span class="bloco-titulo">Livro ${idx + 1}</span>
                 <button class="bloco-remover" data-rem="${b.id}" title="Remover">×</button>
@@ -574,11 +496,11 @@
             <label class="campo-label">Autor</label>
             <input type="text" data-campo="autor" value="${esc(b.autor)}" placeholder="Ex.: Philip Kotler">
 
-                       <div class="linha-dupla">
+            <div class="linha-dupla">
                 <div>
                     <label class="campo-label">Página atual</label>
                     <input type="number" data-campo="paginaAtual" value="${esc(b.paginaAtual)}" min="0">
-                    <div class="chips" style="margin-top:6px;" data-somar="${b.id}">
+                    <div class="chips" style="margin-top:6px;">
                         <div class="chip" data-add="5">+5</div>
                         <div class="chip" data-add="10">+10</div>
                         <div class="chip" data-add="15">+15</div>
@@ -634,8 +556,8 @@
             <div class="recomendacoes" id="rec_${b.id}" style="display:none;"></div>
         `;
 
-        // ----- bind: salvar alterações -----
-        el.querySelectorAll("[data-campo]").forEach(input => {
+        // ---------- salvar alterações dos campos ----------
+        elBloco.querySelectorAll("[data-campo]").forEach(input => {
             input.addEventListener("input", () => {
                 const campo = input.dataset.campo;
                 const blocos = Storage.blocos.ler("livro", dataAtual);
@@ -646,7 +568,6 @@
                 }
             });
 
-            // Atualiza barra quando página/total muda
             if (input.dataset.campo === "paginaAtual" || input.dataset.campo === "totalPaginas") {
                 input.addEventListener("input", () => {
                     const blocos = Storage.blocos.ler("livro", dataAtual);
@@ -655,30 +576,28 @@
                     const tot = Number(it.totalPaginas) || 0;
                     const at = Number(it.paginaAtual) || 0;
                     const p = tot > 0 ? Math.min(100, Math.round((at / tot) * 100)) : 0;
-                    el.querySelector(".progresso > div").style.width = p + "%";
-                    el.querySelector(".progresso-texto").textContent = `${at} / ${tot} · ${p}%`;
+                    elBloco.querySelector(".progresso > div").style.width = p + "%";
+                    elBloco.querySelector(".progresso-texto").textContent = `${at} / ${tot} · ${p}%`;
                     registrarNaBiblioteca(it, p);
                 });
             }
+        });
 
-                // Botões +5, +10, +15, +20
-        el.querySelectorAll("[data-add]").forEach(btn => {
+        // ---------- botões +N (fora do forEach acima!) ----------
+        elBloco.querySelectorAll("[data-add]").forEach(btn => {
             btn.addEventListener("click", () => {
-                const add    = Number(btn.dataset.add) || 0;
-                const inputPag = el.querySelector('[data-campo="paginaAtual"]');
-                const inputTot = el.querySelector('[data-campo="totalPaginas"]');
+                const add      = Number(btn.dataset.add) || 0;
+                const inputPag = elBloco.querySelector('[data-campo="paginaAtual"]');
+                const inputTot = elBloco.querySelector('[data-campo="totalPaginas"]');
 
-                // Fonte da verdade: o valor visível no input
                 const atual = parseInt(inputPag.value, 10) || 0;
                 const total = parseInt(inputTot.value, 10) || 0;
 
                 let nova = atual + add;
                 if (total > 0 && nova > total) nova = total;
 
-                // Atualiza input
                 inputPag.value = nova;
 
-                // Salva no storage
                 const blocos = Storage.blocos.ler("livro", dataAtual);
                 const i = blocos.findIndex(x => x.id === b.id);
                 if (i >= 0) {
@@ -686,27 +605,24 @@
                     Storage.blocos.salvar("livro", dataAtual, blocos);
                 }
 
-                // Atualiza barra
                 const pct = total > 0 ? Math.min(100, Math.round((nova / total) * 100)) : 0;
-                el.querySelector(".progresso > div").style.width = pct + "%";
-                el.querySelector(".progresso-texto").textContent = `${nova} / ${total} · ${pct}%`;
+                elBloco.querySelector(".progresso > div").style.width = pct + "%";
+                elBloco.querySelector(".progresso-texto").textContent = `${nova} / ${total} · ${pct}%`;
 
                 if (i >= 0) registrarNaBiblioteca(blocos[i], pct);
             });
         });
-            
-        });
 
-        // ----- remover -----
-        el.querySelector("[data-rem]").addEventListener("click", () => {
+        // ---------- remover ----------
+        elBloco.querySelector("[data-rem]").addEventListener("click", () => {
             const blocos = Storage.blocos.ler("livro", dataAtual)
                 .filter(x => x.id !== b.id);
             Storage.blocos.salvar("livro", dataAtual, blocos);
             render();
         });
 
-        // ----- abrir Koodo -----
-        el.querySelector("[data-koodo]").addEventListener("click", () => {
+        // ---------- abrir Koodo ----------
+        elBloco.querySelector("[data-koodo]").addEventListener("click", () => {
             const blocos = Storage.blocos.ler("livro", dataAtual);
             const it = blocos.find(x => x.id === b.id);
             if (!it || !it.koodoId) {
@@ -718,8 +634,8 @@
             window.open(url, "_blank", "noopener");
         });
 
-        // ----- google -----
-        el.querySelector("[data-google]").addEventListener("click", () => {
+        // ---------- google ----------
+        elBloco.querySelector("[data-google]").addEventListener("click", () => {
             const blocos = Storage.blocos.ler("livro", dataAtual);
             const it = blocos.find(x => x.id === b.id);
             const q = (it?.tema || it?.titulo || "").trim();
@@ -727,14 +643,14 @@
             window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, "_blank");
         });
 
-        // ----- recomendar livros -----
-        el.querySelector("[data-recomendar]").addEventListener("click", async () => {
+        // ---------- recomendar livros ----------
+        elBloco.querySelector("[data-recomendar]").addEventListener("click", async () => {
             const blocos = Storage.blocos.ler("livro", dataAtual);
             const it = blocos.find(x => x.id === b.id);
             const q = (it?.tema || it?.titulo || "").trim();
             if (!q) return alert("Preencha o tema primeiro.");
 
-            const box = el.querySelector(`#rec_${b.id}`);
+            const box = elBloco.querySelector(`#rec_${b.id}`);
             box.style.display = "grid";
             box.innerHTML = `<div style="color:#888;font-size:13px;">Buscando…</div>`;
 
@@ -753,7 +669,7 @@
                     const capa = v.imageLinks?.thumbnail || "";
                     const titulo = v.title || "";
                     const autores = (v.authors || []).join(", ");
-                                        const paginas = v.pageCount || "";
+                    const paginas = v.pageCount || "";
                     return `
                         <div class="rec-card"
                              data-rec-titulo="${esc(titulo)}"
@@ -761,7 +677,6 @@
                              data-rec-link="${esc(v.infoLink || "")}"
                              data-rec-paginas="${paginas}"
                              data-rec-capa="${esc(capa)}">
-                        
                             ${capa ? `<img src="${esc(capa)}" alt="">` : `<div style="width:44px;height:64px;background:#252529;border-radius:4px;"></div>`}
                             <div class="rec-card-info">
                                 <div class="rec-card-titulo">${esc(titulo)}</div>
@@ -771,43 +686,37 @@
                     `;
                 }).join("");
 
-                // clique numa recomendação → preenche
                 box.querySelectorAll(".rec-card").forEach(card => {
                     card.addEventListener("click", () => {
                         const t = card.dataset.recTitulo;
                         const a = card.dataset.recAutor;
                         const l = card.dataset.recLink;
-                                                const blocos2 = Storage.blocos.ler("livro", dataAtual);
+                        const capa = card.dataset.recCapa || "";
+                        const pc = Number(card.dataset.recPaginas) || 0;
+
+                        const blocos2 = Storage.blocos.ler("livro", dataAtual);
                         const i = blocos2.findIndex(x => x.id === b.id);
                         if (i >= 0) {
                             blocos2[i].titulo = t;
                             blocos2[i].autor = a;
                             blocos2[i].link = l;
-
-                            const pc = Number(card.dataset.recPaginas) || 0;
                             if (pc) blocos2[i].totalPaginas = String(pc);
-
                             Storage.blocos.salvar("livro", dataAtual, blocos2);
-                        }
 
-                        // Guarda a capa também na biblioteca
-                        const capa = card.dataset.recCapa || "";
-                        if (capa) {
-                            const id = blocos2[i]?.koodoId || blocos2[i]?.link || (t + "|" + (blocos2[i]?.tema || "")).toLowerCase();
+                            const id = blocos2[i].koodoId || blocos2[i].link || (t + "|" + (blocos2[i].tema || "")).toLowerCase();
                             Storage.biblioteca.adicionar("livro", {
                                 id,
-                                tema: blocos2[i]?.tema || "",
+                                tema: blocos2[i].tema || "",
                                 titulo: t,
                                 autor: a,
                                 link: l,
                                 capa,
-                                totalPaginas: blocos2[i]?.totalPaginas || "",
-                                paginaAtual: blocos2[i]?.paginaAtual || "",
+                                totalPaginas: blocos2[i].totalPaginas || "",
+                                paginaAtual: blocos2[i].paginaAtual || "",
                                 pct: 0,
                                 status: "lendo",
                             });
                         }
-
                         render();
                     });
                 });
@@ -817,15 +726,16 @@
             }
         });
 
-        return el;
+        return elBloco;
     }
 
     // ==================================================
-    // LIVRO → BIBLIOTECA
+    // BIBLIOTECA
     // ==================================================
     function registrarNaBiblioteca(item, pct) {
         if (!item.titulo && !item.tema) return;
         const id = item.koodoId || item.link || (item.titulo + "|" + item.tema).toLowerCase();
+        const existente = Storage.biblioteca.listar("livro").find(x => x.id === id);
         Storage.biblioteca.adicionar("livro", {
             id,
             tema: item.tema,
@@ -837,7 +747,7 @@
             totalPaginas: item.totalPaginas,
             pct,
             status: pct >= 100 ? "concluido" : "lendo",
-            capa: "", // preenchido depois se recomendar
+            capa: existente?.capa || "",
         });
     }
 
@@ -845,12 +755,7 @@
         const wrap = el("conteudo");
         let lista = Storage.biblioteca.listar("livro");
 
-        // filtro
-        if (estado.bibFiltro !== "todos") {
-            lista = lista.filter(b => b.status === estado.bibFiltro);
-        }
-
-        // busca
+        if (estado.bibFiltro !== "todos") lista = lista.filter(b => b.status === estado.bibFiltro);
         if (estado.bibBusca.trim()) {
             const q = estado.bibBusca.toLowerCase();
             lista = lista.filter(b =>
@@ -859,14 +764,9 @@
             );
         }
 
-        // ordem
-        if (estado.bibOrdem === "recente") {
-            lista.sort((a, b) => (b.atualizadoEm || 0) - (a.atualizadoEm || 0));
-        } else if (estado.bibOrdem === "titulo") {
-            lista.sort((a, b) => (a.titulo || "").localeCompare(b.titulo || ""));
-        } else if (estado.bibOrdem === "progresso") {
-            lista.sort((a, b) => (b.pct || 0) - (a.pct || 0));
-        }
+        if (estado.bibOrdem === "recente")     lista.sort((a, b) => (b.atualizadoEm || 0) - (a.atualizadoEm || 0));
+        else if (estado.bibOrdem === "titulo") lista.sort((a, b) => (a.titulo || "").localeCompare(b.titulo || ""));
+        else if (estado.bibOrdem === "progresso") lista.sort((a, b) => (b.pct || 0) - (a.pct || 0));
 
         wrap.innerHTML = `
             <div class="bib-controles">
@@ -881,7 +781,6 @@
             <div id="bibGradeWrap"></div>
         `;
 
-        // marca ativos
         wrap.querySelectorAll("[data-filtro]").forEach(b => {
             if (b.dataset.filtro === estado.bibFiltro) b.classList.add("btn-primario");
             b.addEventListener("click", () => { estado.bibFiltro = b.dataset.filtro; render(); });
@@ -891,10 +790,10 @@
             b.addEventListener("click", () => { estado.bibOrdem = b.dataset.ordem; render(); });
         });
 
-        wrap.querySelector("#bibBusca").addEventListener("input", e => {
+        const buscaEl = wrap.querySelector("#bibBusca");
+        buscaEl.addEventListener("input", e => {
             estado.bibBusca = e.target.value;
             renderBibliotecaLivro();
-            // refoca
             const i = wrap.querySelector("#bibBusca");
             if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); }
         });
@@ -915,7 +814,6 @@
             </div>
         `).join("")}</div>`;
 
-        // clique → retoma estudo
         gradeWrap.querySelectorAll(".bib-item").forEach(item => {
             item.addEventListener("click", () => {
                 const id = item.dataset.id;
@@ -983,10 +881,6 @@
             const q = estado.apBusca.toLowerCase();
             lista = lista.filter(a => (a.texto || "").toLowerCase().includes(q));
         }
-        if (estado.apTipo)    lista = lista.filter(a => a.tipo === estado.apTipo);
-        if (estado.apImpacto) lista = lista.filter(a => a.impacto === estado.apImpacto);
-        if (estado.apStatus)  lista = lista.filter(a => a.status === estado.apStatus);
-
         lista.sort((a, b) => (b.criadoEm || 0) - (a.criadoEm || 0));
 
         wrap.innerHTML = `
@@ -1080,7 +974,6 @@
             </div>
         `;
 
-        // chips com estado local
         const tmp = { tipo: "", areas: [], impacto: "", status: "" };
 
         function renderChips(container, lista, multi, campo, classe) {
