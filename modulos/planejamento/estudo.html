@@ -574,10 +574,16 @@
             <label class="campo-label">Autor</label>
             <input type="text" data-campo="autor" value="${esc(b.autor)}" placeholder="Ex.: Philip Kotler">
 
-            <div class="linha-dupla">
+                       <div class="linha-dupla">
                 <div>
                     <label class="campo-label">Página atual</label>
                     <input type="number" data-campo="paginaAtual" value="${esc(b.paginaAtual)}" min="0">
+                    <div class="chips" style="margin-top:6px;" data-somar="${b.id}">
+                        <div class="chip" data-add="5">+5</div>
+                        <div class="chip" data-add="10">+10</div>
+                        <div class="chip" data-add="15">+15</div>
+                        <div class="chip" data-add="20">+20</div>
+                    </div>
                 </div>
                 <div>
                     <label class="campo-label">Total de páginas</label>
