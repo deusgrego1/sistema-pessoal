@@ -1141,14 +1141,68 @@
         const velocidadeAtual = b.velocidade || "1";
         const velocidades = ["1", "1.25", "1.5", "1.75", "2"];
 
-        elBloco.innerHTML = `
+                elBloco.innerHTML = `
             <div class="bloco-cabecalho">
                 <span class="bloco-titulo">Vídeo ${idx + 1}</span>
                 <button class="bloco-remover" data-rem="${b.id}" title="Remover">×</button>
             </div>
 
+            <div class="secao-titulo">📋 Antes de assistir</div>
+
             <label class="campo-label">Tema</label>
             <input type="text" data-campo="tema" value="${esc(b.tema)}" placeholder="Ex.: marketing digital">
+
+            <label class="campo-label">🔎 Buscar mais vídeos sobre o tema</label>
+            <div class="video-historico-wrap">
+                <select id="hist_${b.id}">
+                    <option value="">📚 Histórico de buscas…</option>
+                </select>
+                <button type="button" data-limpar-hist="1" title="Limpar histórico">🗑️</button>
+            </div>
+            <div class="video-filtros">
+                <div>
+                    <label class="campo-label" style="margin-top:0;">Ordenar por</label>
+                    <select data-filtro-recomendar="ordem">
+                        <option value="relevance">Relevância</option>
+                        <option value="viewCount">Mais vistos</option>
+                        <option value="date">Mais recentes</option>
+                        <option value="rating">Melhor avaliados</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="campo-label" style="margin-top:0;">Duração</label>
+                    <select data-filtro-recomendar="duracao">
+                        <option value="any">Qualquer</option>
+                        <option value="short">Curto (&lt; 4 min)</option>
+                        <option value="medium">Médio (4–20 min)</option>
+                        <option value="long">Longo (&gt; 20 min)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="campo-label" style="margin-top:0;">Período</label>
+                    <select data-filtro-recomendar="periodo">
+                        <option value="any">Qualquer</option>
+                        <option value="24h">Últimas 24h</option>
+                        <option value="semana">Última semana</option>
+                        <option value="mes">Último mês</option>
+                        <option value="ano">Último ano</option>
+                    </select>
+                </div>
+            </div>
+            <label class="checkbox-legenda" style="margin-bottom:10px;">
+                <input type="checkbox" data-filtro-recomendar="legenda">
+                <span>📝 Só com legenda</span>
+            </label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-secundario" data-recomendar-video="1">🎥 Recomendar vídeos</button>
+                <button class="btn-secundario" data-recomendar-video-novo="1">🆕 Só inéditos</button>
+                <button class="btn-secundario" data-google-video="1">📄 Google</button>
+            </div>
+            <div class="video-acoes-extra" id="acoes_extra_${b.id}" style="display:none;">
+                <button class="btn-secundario" data-abrir-todos="1">↗️ Abrir todos no YouTube</button>
+                <button class="btn-secundario" data-salvar-filtros="1">💾 Salvar filtros atuais</button>
+            </div>
+            <div class="recomendacoes" id="recv_${b.id}" style="display:none;"></div>
 
             <label class="campo-label">Link do vídeo (YouTube)</label>
             <div class="linha-dupla">
@@ -1172,6 +1226,19 @@
 
             <label class="campo-label">Objetivo do vídeo</label>
             <input type="text" data-campo="objetivo" value="${esc(b.objetivo)}" placeholder="Ex.: aprender passo a passo do funil">
+
+            <div class="linha-dupla">
+                <div>
+                    <label class="campo-label">Meta de hoje</label>
+                    <input type="text" data-campo="metaHoje" value="${esc(b.metaHoje)}" placeholder="Ex.: assistir 20 min">
+                </div>
+                <div>
+                    <label class="campo-label">Tempo previsto</label>
+                    <input type="text" data-campo="tempoPrevisto" value="${esc(b.tempoPrevisto)}" placeholder="Ex.: 20 min">
+                </div>
+            </div>
+
+            <div class="secao-titulo" style="margin-top:22px;">▶️ Assistindo</div>
 
             ${b.videoId ? `
                 <div class="video-player-wrap">
@@ -1208,16 +1275,7 @@
             </div>
             <div class="progresso-texto">${b.duracaoSeg > 0 ? `${formatarDuracao(b.minutoAtual)} / ${formatarDuracao(b.duracaoSeg)} · ${Math.min(100, Math.round((b.minutoAtual / b.duracaoSeg) * 100))}%` : "—"}</div>
 
-            <div class="linha-dupla">
-                <div>
-                    <label class="campo-label">Meta de hoje</label>
-                    <input type="text" data-campo="metaHoje" value="${esc(b.metaHoje)}" placeholder="Ex.: assistir 20 min">
-                </div>
-                <div>
-                    <label class="campo-label">Tempo previsto</label>
-                    <input type="text" data-campo="tempoPrevisto" value="${esc(b.tempoPrevisto)}" placeholder="Ex.: 20 min">
-                </div>
-            </div>
+            <div class="secao-titulo" style="margin-top:22px;">✅ Depois de assistir</div>
 
             <label class="campo-label">Resumo em 3 frases</label>
             <div class="area-3frases">
@@ -1273,60 +1331,7 @@
                     </div>
                 `).join("") || `<div style="color:#666;font-size:12px;">Nenhum momento marcado. Use o botão acima durante o play.</div>`}
             </div>
-
-            <label class="campo-label">🔎 Buscar mais vídeos sobre o tema</label>
-            <div class="video-historico-wrap">
-                <select id="hist_${b.id}">
-                    <option value="">📚 Histórico de buscas…</option>
-                </select>
-                <button type="button" data-limpar-hist="1" title="Limpar histórico">🗑️</button>
-            </div>
-            <div class="video-filtros">
-                <div>
-                    <label class="campo-label" style="margin-top:0;">Ordenar por</label>
-                    <select data-filtro-recomendar="ordem">
-                        <option value="relevance">Relevância</option>
-                        <option value="viewCount">Mais vistos</option>
-                        <option value="date">Mais recentes</option>
-                        <option value="rating">Melhor avaliados</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="campo-label" style="margin-top:0;">Duração</label>
-                    <select data-filtro-recomendar="duracao">
-                        <option value="any">Qualquer</option>
-                        <option value="short">Curto (&lt; 4 min)</option>
-                        <option value="medium">Médio (4–20 min)</option>
-                        <option value="long">Longo (&gt; 20 min)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="campo-label" style="margin-top:0;">Período</label>
-                    <select data-filtro-recomendar="periodo">
-                        <option value="any">Qualquer</option>
-                        <option value="24h">Últimas 24h</option>
-                        <option value="semana">Última semana</option>
-                        <option value="mes">Último mês</option>
-                        <option value="ano">Último ano</option>
-                    </select>
-                </div>
-            </div>
-            <label class="checkbox-legenda" style="margin-bottom:10px;">
-                <input type="checkbox" data-filtro-recomendar="legenda">
-                <span>📝 Só com legenda</span>
-            </label>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <button class="btn-secundario" data-recomendar-video="1">🎥 Recomendar vídeos</button>
-                <button class="btn-secundario" data-recomendar-video-novo="1">🆕 Só inéditos</button>
-                <button class="btn-secundario" data-google-video="1">📄 Google</button>
-            </div>
-            <div class="video-acoes-extra" id="acoes_extra_${b.id}" style="display:none;">
-                <button class="btn-secundario" data-abrir-todos="1">↗️ Abrir todos no YouTube</button>
-                <button class="btn-secundario" data-salvar-filtros="1">💾 Salvar filtros atuais</button>
-            </div>
-            <div class="recomendacoes" id="recv_${b.id}" style="display:none;"></div>
         `;
-
         // ---------- Salvar alterações dos campos ----------
         elBloco.querySelectorAll("[data-campo]").forEach(input => {
             input.addEventListener("input", () => {
