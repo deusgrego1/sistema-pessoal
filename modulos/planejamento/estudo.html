@@ -749,8 +749,15 @@
                     const capa = v.imageLinks?.thumbnail || "";
                     const titulo = v.title || "";
                     const autores = (v.authors || []).join(", ");
+                                        const paginas = v.pageCount || "";
                     return `
-                        <div class="rec-card" data-rec-titulo="${esc(titulo)}" data-rec-autor="${esc(autores)}" data-rec-link="${esc(v.infoLink || "")}">
+                        <div class="rec-card"
+                             data-rec-titulo="${esc(titulo)}"
+                             data-rec-autor="${esc(autores)}"
+                             data-rec-link="${esc(v.infoLink || "")}"
+                             data-rec-paginas="${paginas}"
+                             data-rec-capa="${esc(capa)}">
+                        
                             ${capa ? `<img src="${esc(capa)}" alt="">` : `<div style="width:44px;height:64px;background:#252529;border-radius:4px;"></div>`}
                             <div class="rec-card-info">
                                 <div class="rec-card-titulo">${esc(titulo)}</div>
