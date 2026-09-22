@@ -472,9 +472,15 @@
     // ==================================================
     // SUB-ABAS
     // ==================================================
-    function renderSubAbas() {
+        function renderSubAbas() {
         let abas = [];
+
         if (estado.tipo === "livro") {
+            abas = [
+                { id: "estudar",    label: "📝 Estudar hoje" },
+                { id: "biblioteca", label: "📚 Biblioteca" },
+            ];
+        } else if (estado.tipo === "video") {
             abas = [
                 { id: "estudar",    label: "📝 Estudar hoje" },
                 { id: "biblioteca", label: "📚 Biblioteca" },
@@ -503,24 +509,13 @@
     // ==================================================
     // CONTEÚDO
     // ==================================================
-    function renderConteudo() {
-        if (estado.tipo === "livro" && estado.subAba === "estudar")    return renderEstudarLivro();
-        if (estado.tipo === "livro" && estado.subAba === "biblioteca") return renderBibliotecaLivro();
-        if (estado.tipo === "aprendizados")                            return renderAprendizados();
+       function renderConteudo() {
+        if (estado.tipo === "livro"  && estado.subAba === "estudar")    return renderEstudarLivro();
+        if (estado.tipo === "livro"  && estado.subAba === "biblioteca") return renderBibliotecaLivro();
+        if (estado.tipo === "video"  && estado.subAba === "estudar")    return renderEstudarVideo();
+        if (estado.tipo === "video"  && estado.subAba === "biblioteca") return renderBibliotecaVideo();
+        if (estado.tipo === "aprendizados")                             return renderAprendizados();
         return renderEmConstrucao();
-    }
-
-    function renderEmConstrucao() {
-        const tipoInfo = TIPOS.find(t => t.id === estado.tipo) || { label: "?" };
-        el("conteudo").innerHTML = `
-            <div class="em-construcao">
-                <div class="icone">🚧</div>
-                <div><strong>${tipoInfo.label}</strong> está em construção.</div>
-                <p style="margin-top:8px; font-size:13px;">
-                    Os campos específicos deste tipo serão adicionados na próxima parte.
-                </p>
-            </div>
-        `;
     }
 
         // ==================================================
@@ -1561,6 +1556,143 @@
         });
     }
 
+    // ==================================================
+    // VÍDEO → BIBLIOTECA
+    // ==================================================
+    function registrarVideoNaBiblioteca(item) {
+        if (!item.titulo && !item.tema) return;
+        const id = item.videoId || item.url || (item.titulo + "|" + item.tema).toLowerCase();
+        if (!id) return;
+
+        const existente = Storage.biblioteca.listar("video").find(x => x.id === id);
+        const pct = item.duracaoSeg > 0
+            ? Math.min(100, Math.round((item.minutoAtual / item.duracaoSeg) * 100))
+            : 0;
+
+        Storage.biblioteca.adicionar("video", {
+            id,
+            tema: item.tema,
+            titulo: item.titulo || item.tema,
+            canal: item.canal,
+            videoId: item.videoId,
+            url: item.url,
+            duracaoSeg: item.duracaoSeg,
+            minutoAtual: item.minutoAtual,
+            thumb: item.videoId ? `https://i.ytimg.com/vi/${item.videoId}/mqdefault.jpg` : "",
+            pct,
+            status: pct >= 100 ? "concluido" : "assistindo",
+            valeReassistir: item.valeReassistir || false,
+            confiabilidade: item.confiabilidade || "",
+        });
+    }
+
+    function renderBibliotecaVideo() {
+        const wrap = el("conteudo");
+        const todos = Storage.biblioteca.listar("video");
+        let lista = [...todos];
+
+        if (estado.bibBusca.trim()) {
+            const q = estado.bibBusca.toLowerCase();
+            lista = lista.filter(b =>
+                (b.titulo || "").toLowerCase().includes(q) ||
+                (b.tema  || "").toLowerCase().includes(q) ||
+                (b.canal || "").toLowerCase().includes(q)
+            );
+        }
+
+        if (estado.bibOrdem === "recente")        lista.sort((a, b) => (b.atualizadoEm || 0) - (a.atualizadoEm || 0));
+        else if (estado.bibOrdem === "titulo")    lista.sort((a, b) => (a.titulo || "").localeCompare(b.titulo || ""));
+        else if (estado.bibOrdem === "progresso") lista.sort((a, b) => (b.pct || 0) - (a.pct || 0));
+
+        const total      = todos.length;
+        const assistindo = todos.filter(b => b.status !== "concluido").length;
+        const revisitar  = todos.filter(b => b.valeReassistir).length;
+
+        wrap.innerHTML = `
+            <div class="bib-stats">
+                <div><strong>${total}</strong> ${total === 1 ? "vídeo" : "vídeos"}</div>
+                <div>·</div>
+                <div><strong>${assistindo}</strong> em andamento</div>
+                <div>·</div>
+                <div><strong>${revisitar}</strong> ${revisitar === 1 ? "vale revisitar" : "valem revisitar"}</div>
+            </div>
+
+            <div class="bib-controles">
+                <input type="search" class="bib-busca" id="bibBusca" placeholder="🔍 Buscar por título, tema ou canal" value="${esc(estado.bibBusca)}">
+                <button class="btn-secundario" data-ordem="recente">Recentes</button>
+                <button class="btn-secundario" data-ordem="titulo">A-Z</button>
+                <button class="btn-secundario" data-ordem="progresso">Progresso</button>
+            </div>
+            <div id="bibGradeWrap"></div>
+        `;
+
+        wrap.querySelectorAll("[data-ordem]").forEach(b => {
+            if (b.dataset.ordem === estado.bibOrdem) b.classList.add("btn-primario");
+            b.addEventListener("click", () => { estado.bibOrdem = b.dataset.ordem; render(); });
+        });
+
+        const buscaEl = wrap.querySelector("#bibBusca");
+        buscaEl.addEventListener("input", e => {
+            estado.bibBusca = e.target.value;
+            renderBibliotecaVideo();
+            const i = wrap.querySelector("#bibBusca");
+            if (i) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); }
+        });
+
+        const gradeWrap = wrap.querySelector("#bibGradeWrap");
+        if (lista.length === 0) {
+            gradeWrap.innerHTML = `<div class="vazio">Nenhum vídeo na biblioteca ainda.</div>`;
+            return;
+        }
+
+        gradeWrap.innerHTML = `<div class="bib-grade">${lista.map(b => `
+            <div class="bib-item" data-id="${esc(b.id)}" style="aspect-ratio:auto;">
+                <div style="width:100%;aspect-ratio:16/9;background:#252529;border-radius:6px;margin-bottom:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#555;font-size:26px;">
+                    ${b.thumb ? `<img src="${esc(b.thumb)}" alt="" style="width:100%;height:100%;object-fit:cover;">` : "🎥"}
+                </div>
+                <div class="bib-titulo">${esc(b.titulo || "(sem título)")}</div>
+                <div class="bib-tema">${esc(b.canal || "")}${b.canal && b.tema ? " · " : ""}${esc(b.tema || "")}</div>
+                <div class="progresso"><div style="width:${b.pct || 0}%"></div></div>
+                <div class="progresso-texto">${b.duracaoSeg > 0 ? `${Math.round(b.pct || 0)}%` : "—"}</div>
+            </div>
+        `).join("")}</div>`;
+
+        // Clique → reabre no bloco do dia
+        gradeWrap.querySelectorAll(".bib-item").forEach(item => {
+            item.addEventListener("click", () => {
+                const id = item.dataset.id;
+                const b = Storage.biblioteca.listar("video").find(x => x.id === id);
+                if (!b) return;
+                const blocos = Storage.blocos.ler("video", dataAtual);
+                blocos.push({
+                    id: uid("blk"),
+                    tema: b.tema || "",
+                    titulo: b.titulo || "",
+                    canal: b.canal || "",
+                    plataforma: "YouTube",
+                    objetivo: "",
+                    url: b.url || "",
+                    videoId: b.videoId || "",
+                    duracaoSeg: b.duracaoSeg || 0,
+                    minutoAtual: b.minutoAtual || 0,
+                    metaHoje: "", tempoPrevisto: "",
+                    velocidade: "1",
+                    resumo1: "", resumo2: "", resumo3: "",
+                    oQueFazer: "", proximaAcao: "",
+                    valeReassistir: b.valeReassistir || false,
+                    publicado: "", validade: "",
+                    confiabilidade: b.confiabilidade || "",
+                    ideias: "",
+                    momentos: [],
+                    criadoEm: Date.now(),
+                });
+                Storage.blocos.salvar("video", dataAtual, blocos);
+                estado.subAba = "estudar";
+                render();
+            });
+        });
+    }
+    
     // ==================================================
     // APRENDIZADOS
     // ==================================================
