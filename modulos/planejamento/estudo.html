@@ -1919,23 +1919,8 @@
                 <div class="chip${b.confiabilidade === "baixa" ? " selecionado" : ""}" data-c="baixa">🔴 Não confio</div>
             </div>
 
-            <label class="campo-label">Por que salvei isso?</label>
-            <textarea data-campo="porQueSalvei" rows="2" placeholder="1 linha — filtra o que vale a pena">${esc(b.porQueSalvei)}</textarea>
-
-            <div class="linha-dupla">
-                <div>
-                    <label class="campo-label">Tempo de leitura</label>
-                    <input type="text" data-campo="tempoLeitura" value="${esc(b.tempoLeitura)}" placeholder="Ex.: 8 min">
-                </div>
-                <div>
-                    <label class="campo-label">Meta de hoje</label>
-                    <input type="text" data-campo="metaHoje" value="${esc(b.metaHoje)}" placeholder="Ex.: terminar">
-                </div>
-            </div>
-
-            <label class="campo-label">Tempo previsto</label>
+                       <label class="campo-label">Tempo previsto (quanto vou dedicar)</label>
             <input type="text" data-campo="tempoPrevisto" value="${esc(b.tempoPrevisto)}" placeholder="Ex.: 10 min">
-
             <div class="secao-titulo" style="margin-top:22px;">📖 Lendo</div>
 
             <label class="campo-label">Progresso</label>
@@ -1972,20 +1957,6 @@
             <label class="campo-label">Próxima ação</label>
             <input type="text" data-campo="proximaAcao" value="${esc(b.proximaAcao)}" placeholder="Ex.: pesquisar o autor">
 
-            <div class="linha-dupla">
-                <div>
-                    <label class="campo-label">Publicado em</label>
-                    <input type="text" data-campo="publicado" value="${esc(b.publicado)}" placeholder="Ex.: 12/03/2026">
-                </div>
-                <div>
-                    <label class="campo-label">Ainda é válido?</label>
-                    <div class="chips" data-validade-artigo="${b.id}">
-                        <div class="chip${b.validade === "vale" ? " selecionado" : ""}" data-v="vale">✅</div>
-                        <div class="chip${b.validade === "parcial" ? " selecionado" : ""}" data-v="parcial">⚠️</div>
-                        <div class="chip${b.validade === "desatualizado" ? " selecionado" : ""}" data-v="desatualizado">❌</div>
-                    </div>
-                </div>
-            </div>
         `;
 
         // ---------- Salvar campos ----------
@@ -2111,20 +2082,6 @@
             });
         });
 
-        // ---------- Validade ----------
-        elBloco.querySelectorAll("[data-validade-artigo] .chip").forEach(chip => {
-            chip.addEventListener("click", () => {
-                const v = chip.dataset.v;
-                elBloco.querySelectorAll("[data-validade-artigo] .chip").forEach(x =>
-                    x.classList.toggle("selecionado", x === chip));
-                const blocos = Storage.blocos.ler("artigo", dataAtual);
-                const i = blocos.findIndex(x => x.id === b.id);
-                if (i >= 0) {
-                    blocos[i].validade = v;
-                    Storage.blocos.salvar("artigo", dataAtual, blocos);
-                }
-            });
-        });
 
         // ---------- Adicionar trecho ----------
         elBloco.querySelector("[data-add-trecho]")?.addEventListener("click", () => {
@@ -2443,7 +2400,7 @@
             publicacao: item.publicacao,
             url: item.url,
             progresso: pct,
-            tempoLeitura: item.tempoLeitura,
+                        tempoLeitura: item.tempoPrevisto || item.tempoLeitura || "",
             confiabilidade: item.confiabilidade || "",
             status: pct >= 100 ? "concluido" : "lendo",
             pct,
