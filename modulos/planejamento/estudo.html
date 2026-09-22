@@ -660,6 +660,37 @@
                     registrarNaBiblioteca(it, p);
                 });
             }
+
+        // Botões +5, +10, +15, +20
+        el.querySelectorAll("[data-add]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const add = Number(btn.dataset.add);
+                const blocos = Storage.blocos.ler("livro", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i < 0) return;
+
+                const atual = Number(blocos[i].paginaAtual) || 0;
+                const total = Number(blocos[i].totalPaginas) || 0;
+                let nova = atual + add;
+
+                // não passa do total, se houver total definido
+                if (total > 0 && nova > total) nova = total;
+
+                blocos[i].paginaAtual = String(nova);
+                Storage.blocos.salvar("livro", dataAtual, blocos);
+
+                // Atualiza o input e a barra sem re-render completo
+                const inputPag = el.querySelector('[data-campo="paginaAtual"]');
+                if (inputPag) inputPag.value = nova;
+
+                const pct = total > 0 ? Math.min(100, Math.round((nova / total) * 100)) : 0;
+                el.querySelector(".progresso > div").style.width = pct + "%";
+                el.querySelector(".progresso-texto").textContent = `${nova} / ${total} · ${pct}%`;
+
+                registrarNaBiblioteca(blocos[i], pct);
+            });
+        });
+            
         });
 
         // ----- remover -----
