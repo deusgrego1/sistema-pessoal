@@ -400,8 +400,6 @@
         }
         .btn-adicionar-trecho:hover { background: #232f4a; border-color: #4a5c85; }
 
-        .cookie-input { font-family: monospace; font-size: 11px; }
-
         .botao-foco-flutuante {
             position: fixed; right: 24px; bottom: 24px; z-index: 9999;
             display: flex; align-items: center;
@@ -847,139 +845,6 @@
     }
 
     // ==================================================
-    // COOKIES DO MEDIUM (aceita JSON, header e Netscape)
-    // ==================================================
-    const CHAVE_MEDIUM_COOKIES = "estudo_medium_cookies";
-
-    function normalizarCookiesMedium(raw) {
-        if (!raw) return "";
-        raw = String(raw).trim();
-
-        // Formato JSON
-        if (raw.startsWith("[") || raw.startsWith("{")) {
-            try {
-                const obj = JSON.parse(raw);
-                const arr = Array.isArray(obj) ? obj : [obj];
-                return arr
-                    .filter(c => c && c.name && c.value)
-                    .map(c => `${c.name}=${c.value}`)
-                    .join("; ");
-            } catch (e) {}
-        }
-
-        // Formato Netscape (separado por TAB)
-        if (raw.includes("\t") || raw.includes("\n")) {
-            const linhas = raw.split(/\r?\n/);
-            const partes = [];
-            linhas.forEach(l => {
-                const cols = l.split("\t");
-                if (cols.length >= 7) {
-                    const nome = cols[5].trim();
-                    const valor = cols[6].trim();
-                    if (nome && valor) partes.push(`${nome}=${valor}`);
-                }
-            });
-            if (partes.length) return partes.join("; ");
-        }
-
-        // Já é header pronto
-        return raw;
-    }
-
-    function obterCookiesMedium() {
-        try { return localStorage.getItem(CHAVE_MEDIUM_COOKIES) || ""; }
-        catch { return ""; }
-    }
-
-    function salvarCookiesMedium(raw) {
-        const normalizado = normalizarCookiesMedium(raw);
-        localStorage.setItem(CHAVE_MEDIUM_COOKIES, normalizado);
-        return normalizado;
-    }
-
-    // Baixa conteúdo de artigo (usa cookies do Medium quando aplicável)
-    async function baixarConteudoArtigo(url) {
-        // Se for Medium e tiver cookies salvos, tenta primeiro
-        if (url.includes("medium.com") && obterCookiesMedium()) {
-            try {
-                const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-                const r = await fetch(proxy, {
-                    headers: { "Cookie": obterCookiesMedium() },
-                });
-                if (r.ok) {
-                    const html = await r.text();
-                    const doc = new DOMParser().parseFromString(html, "text/html");
-                    const article = doc.querySelector("article") || doc.body;
-                    const texto = article.innerText || "";
-                    if (texto.length > 500) {
-                        console.log("✅ Conteúdo do Medium baixado com cookies (" + texto.length + " chars)");
-                        return texto;
-                    }
-                }
-            } catch (e) {
-                console.warn("Medium com cookies falhou, caindo pro Jina:", e);
-            }
-        }
-
-        // Fallback: Jina
-        const r = await fetch(`https://r.jina.ai/${url}`);
-        if (!r.ok) throw new Error("Jina falhou");
-        return await r.text();
-    }
-
-    const SnapshotDB = (() => {
-        const DB_NAME = "estudo_snapshots";
-        const STORE = "artigos";
-        let dbPromise = null;
-
-        function abrir() {
-            if (dbPromise) return dbPromise;
-            dbPromise = new Promise((resolve, reject) => {
-                const req = indexedDB.open(DB_NAME, 1);
-                req.onupgradeneeded = () => {
-                    const db = req.result;
-                    if (!db.objectStoreNames.contains(STORE)) {
-                        db.createObjectStore(STORE, { keyPath: "id" });
-                    }
-                };
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
-            });
-            return dbPromise;
-        }
-
-        return {
-            async salvar(id, texto, meta = {}) {
-                const db = await abrir();
-                return new Promise((resolve, reject) => {
-                    const tx = db.transaction(STORE, "readwrite");
-                    tx.objectStore(STORE).put({ id, texto, meta, criadoEm: Date.now() });
-                    tx.oncomplete = () => resolve(true);
-                    tx.onerror = () => reject(tx.error);
-                });
-            },
-            async obter(id) {
-                const db = await abrir();
-                return new Promise((resolve, reject) => {
-                    const tx = db.transaction(STORE, "readonly");
-                    const req = tx.objectStore(STORE).get(id);
-                    req.onsuccess = () => resolve(req.result || null);
-                    req.onerror = () => reject(req.error);
-                });
-            },
-            async remover(id) {
-                const db = await abrir();
-                return new Promise((resolve, reject) => {
-                    const tx = db.transaction(STORE, "readwrite");
-                    tx.objectStore(STORE).delete(id);
-                    tx.oncomplete = () => resolve(true);
-                    tx.onerror = () => reject(tx.error);
-                });
-            },
-        };
-    })();
-
-    // ==================================================
     // BUSCA DE ARTIGOS — 5 fontes
     // ==================================================
     const FONTES_ARTIGO = [
@@ -1027,7 +892,7 @@
     }
 
     async function buscarHN(query) {
-        const url = `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(query)}&tags=story&hitsPerPage=10`;
+        const url = `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(query)}&tags=story&hitsPerPage=30`;
         const r = await fetchComFallback(url);
         const j = await r.json();
         return (j.hits || []).filter(h => h.title && h.url).map(h => {
@@ -1043,7 +908,7 @@
     }
 
     async function buscarReddit(query) {
-        const url = `https://www.reddit.com/search.json?q=${encodeURIComponent(query)}&sort=relevance&limit=10`;
+        const url = `https://www.reddit.com/search.json?q=${encodeURIComponent(query)}&sort=relevance&limit=25`;
         const r = await fetchComFallback(url);
         const j = await r.json();
         return (j.data?.children || []).map(c => c.data).filter(d => d.title).map(d => ({
@@ -1066,7 +931,7 @@
         const xml = await r.text();
         const doc = new DOMParser().parseFromString(xml, "text/xml");
         const items = doc.getElementsByTagName("item");
-        return Array.from(items).slice(0, 10).map(item => {
+        return Array.from(items).slice(0, 25).map(item => {
             const titulo = item.getElementsByTagName("title")[0]?.textContent || "";
             const link   = item.getElementsByTagName("link")[0]?.textContent || "";
             const autor  = item.getElementsByTagName("dc:creator")[0]?.textContent || "";
@@ -1081,7 +946,7 @@
     }
 
     async function buscarGDELT(query) {
-        const url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(query)}&mode=artlist&format=json&maxrecords=10&sort=hybridrel`;
+        const url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(query)}&mode=artlist&format=json&maxrecords=25&sort=hybridrel`;
         const r = await fetchComFallback(url);
         const j = await r.json();
         return (j.articles || []).map(a => {
@@ -1102,7 +967,7 @@
     async function buscarDevto(query) {
         const tag = normalizarTag(query);
         if (!tag) return [];
-        const url = `https://dev.to/api/articles?tag=${encodeURIComponent(tag)}&top=30&per_page=10`;
+        const url = `https://dev.to/api/articles?tag=${encodeURIComponent(tag)}&top=30&per_page=25`;
         const r = await fetchComFallback(url);
         const arr = await r.json();
         if (!Array.isArray(arr)) return [];
@@ -1140,10 +1005,10 @@
                 if (lista[i]) intercalado.push(lista[i]);
             }
         }
-        return intercalado.slice(0, 10);
+        return intercalado.slice(0, 21);
     }
 
-       // ==================================================
+        // ==================================================
     // LIVRO → ESTUDAR
     // ==================================================
     function renderEstudarLivro() {
@@ -2058,7 +1923,6 @@
             trechos: [],
             resumo1: "", resumo2: "", resumo3: "",
             oQueFazer: "", proximaAcao: "",
-            snapshotId: "",
             criadoEm: Date.now(),
         });
         Storage.blocos.salvar("artigo", dataAtual, blocos);
@@ -2128,20 +1992,8 @@
                 <button class="btn-secundario" data-buscar-meta-artigo="1">🔄 Buscar dados</button>
             </div>
             <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;">
-                <button class="btn-secundario" data-abrir-artigo="1">🔗 Abrir</button>
-                <button class="btn-secundario" data-salvar-snapshot="1">📥 Salvar conteúdo</button>
-                <button class="btn-secundario" data-ver-snapshot="1" style="display:none;">📄 Ver cópia salva</button>
+                <button class="btn-secundario" data-abrir-artigo="1">🔗 Abrir no navegador</button>
             </div>
-
-            <label class="campo-label">🍪 Cookies do Medium (opcional — para artigos pagos)</label>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <input type="text" id="mediumCookies_${b.id}" class="cookie-input" value="${esc(obterCookiesMedium())}" placeholder="Cole aqui os cookies exportados" style="flex:1;">
-                <button class="btn-secundario" type="button" data-salvar-cookies="1">💾 Salvar</button>
-                <button class="btn-secundario" type="button" data-limpar-cookies="1">🗑️</button>
-            </div>
-            <p style="font-size:11px;color:#666;margin-top:4px;">
-                Cole o texto exportado pelo EditThisCookie — o app normaliza sozinho.
-            </p>
 
             <label class="campo-label">Título</label>
             <input type="text" data-campo="titulo" value="${esc(b.titulo)}" placeholder="(puxado automaticamente)">
@@ -2262,69 +2114,6 @@
             window.open(it.url, "_blank", "noopener");
         });
 
-        elBloco.querySelector("[data-salvar-snapshot]")?.addEventListener("click", async () => {
-            const blocos = Storage.blocos.ler("artigo", dataAtual);
-            const it = blocos.find(x => x.id === b.id);
-            if (!it || !it.url) return alert("Cole o link primeiro.");
-
-            const btn = elBloco.querySelector("[data-salvar-snapshot]");
-            btn.textContent = "📥 Baixando…";
-            btn.disabled = true;
-
-            try {
-                const texto = await baixarConteudoArtigo(it.url);
-                const snapId = it.url;
-                await SnapshotDB.salvar(snapId, texto, {
-                    titulo: it.titulo, autor: it.autor, url: it.url,
-                });
-                const blocos2 = Storage.blocos.ler("artigo", dataAtual);
-                const j = blocos2.findIndex(x => x.id === b.id);
-                if (j >= 0) {
-                    blocos2[j].snapshotId = snapId;
-                    Storage.blocos.salvar("artigo", dataAtual, blocos2);
-                }
-                alert("✅ Cópia salva localmente.");
-                render();
-            } catch (e) {
-                console.error(e);
-                alert("Não consegui salvar. Veja o Console.");
-            } finally {
-                btn.textContent = "📥 Salvar conteúdo";
-                btn.disabled = false;
-            }
-        });
-
-        if (b.snapshotId) {
-            const btnVer = elBloco.querySelector("[data-ver-snapshot]");
-            if (btnVer) {
-                btnVer.style.display = "";
-                btnVer.addEventListener("click", async () => {
-                    const snap = await SnapshotDB.obter(b.snapshotId);
-                    if (!snap) return alert("Cópia não encontrada.");
-                    const w = window.open("", "_blank");
-                    w.document.write(`<pre style="white-space:pre-wrap;font-family:sans-serif;padding:20px;max-width:800px;margin:auto;">${snap.texto.replace(/[<>&]/g, c => ({"<":"&lt;",">":"&gt;","&":"&amp;"}[c]))}</pre>`);
-                });
-            }
-        }
-
-        // ---------- Cookies do Medium ----------
-        elBloco.querySelector("[data-salvar-cookies]")?.addEventListener("click", () => {
-            const campo = elBloco.querySelector(`#mediumCookies_${b.id}`);
-            const valor = campo.value.trim();
-            if (!valor) return alert("Cole os cookies primeiro.");
-            const salvo = salvarCookiesMedium(valor);
-            campo.value = salvo;
-            alert("✅ Cookies salvos. Agora os artigos pagos do Medium devem funcionar.");
-        });
-
-        elBloco.querySelector("[data-limpar-cookies]")?.addEventListener("click", () => {
-            if (!confirm("Remover os cookies do Medium?")) return;
-            localStorage.removeItem(CHAVE_MEDIUM_COOKIES);
-            const campo = elBloco.querySelector(`#mediumCookies_${b.id}`);
-            if (campo) campo.value = "";
-            alert("Cookies removidos.");
-        });
-
         elBloco.querySelectorAll("[data-confianca-artigo] .chip").forEach(chip => {
             chip.addEventListener("click", () => {
                 const c = chip.dataset.c;
@@ -2370,7 +2159,6 @@
             render();
         });
 
-        // ---------- Google ----------
         elBloco.querySelector("[data-google-artigo]")?.addEventListener("click", () => {
             const blocos = Storage.blocos.ler("artigo", dataAtual);
             const it = blocos.find(x => x.id === b.id);
@@ -2379,7 +2167,6 @@
             window.open(`https://www.google.com/search?q=${encodeURIComponent(q + " artigo")}`, "_blank");
         });
 
-        // ---------- Fontes (chips de toggles) ----------
         const fontesWrap = elBloco.querySelector(`#fontes_${b.id}`);
         let fontesAtivas = obterFontesAtivas();
 
@@ -2459,6 +2246,10 @@
                         const f = card.dataset.artFonte;
                         const au = card.dataset.artAutor;
 
+                        // 1) Abre o artigo no navegador (onde você já está logado no Medium)
+                        window.open(l, "_blank", "noopener");
+
+                        // 2) Preenche o bloco do dia pra você registrar
                         const blocos2 = Storage.blocos.ler("artigo", dataAtual);
                         const i = blocos2.findIndex(x => x.id === b.id);
                         if (i < 0) return;
@@ -2855,7 +2646,6 @@
                         trechos: [],
                         resumo1: "", resumo2: "", resumo3: "",
                         oQueFazer: "", proximaAcao: "",
-                        snapshotId: "",
                         criadoEm: Date.now(),
                     });
                     Storage.blocos.salvar("artigo", dataAtual, blocos);
