@@ -1564,15 +1564,15 @@
         }));
     }
 
-        const PROXIES_FALLBACK = [
-        // 1) direto — funciona pra HN, Dev.to, e APIs com CORS próprio
+           const PROXIES_FALLBACK = [
+        // 0) direto — funciona pra HN, Dev.to, e APIs com CORS próprio
         (u) => u,
-        // 2) corsproxy.io — o mais confiável pra GDELT e Reddit hoje
-        (u) => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
-        // 3) allorigins (antigo, às vezes cai)
-        (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-        // 4) codetabs (backup)
+        // 1) codetabs — grátis, sem key, bom pra GDELT
         (u) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
+        // 2) allorigins — clássico, às vezes cai mas volta
+        (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+        // 3) whateverorigin — último recurso (lento, mas existe)
+        (u) => `https://whateverorigin.org/get?url=${encodeURIComponent(u)}`,
     ];
 
     async function fetchComFallback(url) {
@@ -1580,19 +1580,21 @@
         for (let i = 0; i < PROXIES_FALLBACK.length; i++) {
             const alvo = PROXIES_FALLBACK[i](url);
             try {
+                console.log(`[proxy] tentando #${i}…`);
                 const r = await fetch(alvo);
                 if (r.ok) {
-                    if (i > 0) console.log(`[proxy] sucesso via #${i}:`, alvo.slice(0, 90));
+                    console.log(`[proxy] ✅ sucesso via #${i}`);
                     return r;
                 }
+                console.warn(`[proxy] ❌ #${i} retornou HTTP ${r.status}`);
                 ultimoErro = new Error(`HTTP ${r.status}`);
             } catch (e) {
+                console.warn(`[proxy] ❌ #${i} falhou:`, e.message);
                 ultimoErro = e;
             }
         }
         throw ultimoErro || new Error("Todos os proxies falharam");
     }
-
     function normalizarTag(txt) {
         return txt.toLowerCase()
             .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
