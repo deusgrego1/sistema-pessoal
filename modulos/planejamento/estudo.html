@@ -189,6 +189,41 @@
             z-index: 2;
         }
 
+        /* ---------- Painel GDELT dedicado ---------- */
+        .gdelt-painel {
+            background: #19191d; border: 1px solid #252529;
+            border-radius: 10px; padding: 16px; margin-bottom: 16px;
+        }
+        .gdelt-linha-filtros {
+            display: flex; flex-wrap: wrap; gap: 12px;
+            align-items: center; margin: 8px 0;
+        }
+        .gdelt-grupo {
+            display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+        }
+        .gdelt-grupo .rotulo {
+            font-size: 11px; color: #777;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            min-width: 62px;
+        }
+        .gdelt-busca-wrap {
+            display: flex; gap: 8px; margin-bottom: 12px;
+        }
+        .gdelt-busca-wrap input { flex: 1; }
+        .gdelt-timeline {
+            display: flex; align-items: flex-end; gap: 2px;
+            height: 90px; margin: 12px 0 6px;
+            padding: 8px; background: #141418;
+            border-radius: 8px; border: 1px solid #252529;
+        }
+        .gdelt-timeline .barra {
+            flex: 1; min-width: 2px;
+            background: linear-gradient(180deg, #66bb6a, #4caf50);
+            border-radius: 2px 2px 0 0;
+            transition: filter 0.15s;
+        }
+        .gdelt-timeline .barra:hover { filter: brightness(1.3); }
+
         .bib-stats {
             display: flex; gap: 20px; flex-wrap: wrap;
             padding: 12px 16px; margin-bottom: 14px;
@@ -452,7 +487,7 @@
     </style>
 </head>
 
-    <body>
+<body>
 <main class="container">
 
     <header class="header">
@@ -480,7 +515,524 @@
     <span class="texto-foco">Foco</span>
 </a>
 
-<script src="../../js/storage.js"></script>
+    <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estudo</title>
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .resumo-estudo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+        }
+        .resumo-card {
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 10px; padding: 14px 16px;
+            cursor: pointer; transition: 0.15s;
+        }
+        .resumo-card:hover { background: #222228; border-color: #3a3a40; }
+        .resumo-rotulo {
+            color: #777; font-size: 11px; text-transform: uppercase;
+            letter-spacing: 0.5px; display: block; margin-bottom: 6px;
+        }
+        .resumo-valor { color: #fff; font-size: 24px; font-weight: 600; line-height: 1; }
+
+        .tipos-barra { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tipo-pill {
+            position: relative; padding: 9px 16px; font-size: 13px; cursor: pointer;
+            border: 1px solid #333338; background: #17171a; color: #aaa;
+            border-radius: 20px; transition: 0.15s;
+        }
+        .tipo-pill:hover { color: #ddd; border-color: #44444a; }
+        .tipo-pill.ativo { background: #333; color: #fff; border-color: #55555c; }
+        .tipo-pill .ponto {
+            display: inline-block; width: 6px; height: 6px;
+            border-radius: 50%; background: #4caf50;
+            margin-left: 6px; vertical-align: middle;
+        }
+
+        .sub-abas {
+            display: flex; gap: 20px;
+            border-bottom: 1px solid #252529; margin-bottom: 18px;
+        }
+        .sub-aba {
+            padding: 8px 0; font-size: 13px; color: #888;
+            cursor: pointer; border-bottom: 2px solid transparent;
+            transition: 0.15s;
+        }
+        .sub-aba:hover { color: #ccc; }
+        .sub-aba.ativa { color: #fff; border-bottom-color: #4caf50; }
+
+        .campo-label {
+            display: block; font-size: 11px; color: #888;
+            letter-spacing: 1px; text-transform: uppercase;
+            margin: 14px 0 6px;
+        }
+        .campo-label:first-child { margin-top: 0; }
+
+        .secao-titulo {
+            font-size: 11px; color: #4caf50;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            font-weight: 600; padding: 14px 0 4px;
+            border-top: 1px solid #252529; margin-top: 14px;
+        }
+        .secao-titulo:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        .chip {
+            padding: 7px 13px; font-size: 12px; cursor: pointer;
+            border: 1px solid #333338; background: #1a1a1e;
+            color: #bbb; border-radius: 16px; transition: 0.15s;
+            user-select: none;
+        }
+        .chip:hover { background: #222228; color: #e0e0e0; }
+        .chip.selecionado { background: #2e2e33; border-color: #666; color: #fff; font-weight: 600; }
+        .chip.impacto-alto.selecionado   { background:#331f1f;border-color:#d45a5a;color:#e08b8b; }
+        .chip.impacto-medio.selecionado  { background:#332e1a;border-color:#c9a44a;color:#e0d48a; }
+        .chip.impacto-baixo.selecionado  { background:#1f3320;border-color:#4caf50;color:#a5d6a7; }
+
+        .progresso {
+            width: 100%; height: 8px; background: #252529;
+            border-radius: 4px; overflow: hidden; margin: 8px 0;
+        }
+        .progresso > div { height: 100%; background: #4caf50; transition: width 0.3s ease; }
+        .progresso-texto { font-size: 12px; color: #888; margin-top: 4px; }
+
+        .progresso-slider { width: 100%; margin: 6px 0 4px; accent-color: #4caf50; }
+
+        .bloco-estudo {
+            border: 1px solid #252529; border-radius: 10px;
+            padding: 16px; margin-bottom: 16px; background: #19191d;
+        }
+        .bloco-cabecalho {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 12px;
+        }
+        .bloco-titulo {
+            font-size: 12px; color: #777;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .bloco-remover {
+            background: none; border: none; color: #666;
+            font-size: 20px; cursor: pointer; padding: 0 6px;
+        }
+        .bloco-remover:hover { color: #d45a5a; }
+
+        .linha-dupla { display: flex; gap: 10px; }
+        .linha-dupla > * { flex: 1; }
+
+        .recomendacoes {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+        }
+        .rec-card {
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 8px; padding: 10px; cursor: pointer;
+            transition: 0.15s; display: flex; gap: 10px;
+        }
+        .rec-card:hover { background: #24242a; border-color: #3a3a40; }
+        .rec-card img {
+            width: 44px; height: 64px; object-fit: cover;
+            border-radius: 4px; flex-shrink: 0; background: #252529;
+        }
+        .rec-card-info { flex: 1; min-width: 0; }
+        .rec-card-titulo {
+            font-size: 12px; color: #eaeaea; font-weight: 600;
+            margin-bottom: 4px; line-height: 1.3;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .rec-card-autor { font-size: 11px; color: #888; }
+
+        .rec-artigo-card {
+            position: relative;
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 8px; padding: 12px 12px 32px 12px;
+            cursor: pointer;
+            transition: 0.15s; display: flex; flex-direction: column; gap: 6px;
+        }
+        .rec-artigo-card:hover { background: #24242a; border-color: #5a8ad4; }
+        .rec-artigo-titulo {
+            font-size: 13px; color: #eaeaea; font-weight: 600;
+            line-height: 1.35;
+            display: -webkit-box; -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .rec-artigo-meta {
+            display: flex; gap: 6px; flex-wrap: wrap;
+            font-size: 11px; color: #777;
+        }
+        .rec-artigo-fonte {
+            display: inline-block;
+            padding: 2px 7px; background: #252529;
+            border-radius: 8px; color: #a8c4e8; font-size: 10px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .rec-artigo-stats { font-size: 11px; color: #888; }
+
+        .badge-pago {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: linear-gradient(135deg, #c9a44a 0%, #d4af37 100%);
+            color: #1a1a1e;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 6px rgba(212, 175, 55, 0.35);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .rec-artigo-card.checando-pago::after {
+            content: "verificando…";
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: #252529;
+            color: #666;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* ---------- Painel GDELT dedicado ---------- */
+        .gdelt-painel {
+            background: #19191d; border: 1px solid #252529;
+            border-radius: 10px; padding: 16px; margin-bottom: 16px;
+        }
+        .gdelt-linha-filtros {
+            display: flex; flex-wrap: wrap; gap: 12px;
+            align-items: center; margin: 8px 0;
+        }
+        .gdelt-grupo {
+            display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+        }
+        .gdelt-grupo .rotulo {
+            font-size: 11px; color: #777;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            min-width: 62px;
+        }
+        .gdelt-busca-wrap {
+            display: flex; gap: 8px; margin-bottom: 12px;
+        }
+        .gdelt-busca-wrap input { flex: 1; }
+        .gdelt-timeline {
+            display: flex; align-items: flex-end; gap: 2px;
+            height: 90px; margin: 12px 0 6px;
+            padding: 8px; background: #141418;
+            border-radius: 8px; border: 1px solid #252529;
+        }
+        .gdelt-timeline .barra {
+            flex: 1; min-width: 2px;
+            background: linear-gradient(180deg, #66bb6a, #4caf50);
+            border-radius: 2px 2px 0 0;
+            transition: filter 0.15s;
+        }
+        .gdelt-timeline .barra:hover { filter: brightness(1.3); }
+
+        .bib-stats {
+            display: flex; gap: 20px; flex-wrap: wrap;
+            padding: 12px 16px; margin-bottom: 14px;
+            background: #19191d; border: 1px solid #252529;
+            border-radius: 10px; font-size: 13px; color: #888;
+        }
+        .bib-stats strong { color: #eaeaea; font-weight: 600; }
+
+        .bib-controles {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            margin-bottom: 16px; align-items: center;
+        }
+        .bib-busca {
+            flex: 1; min-width: 180px;
+            padding: 8px 14px; background: #17171a;
+            border: 1px solid #333338; color: #eaeaea;
+            border-radius: 20px; font-size: 13px; outline: none;
+            font-family: inherit;
+        }
+        .bib-busca:focus { border-color: #55555c; }
+        .bib-grade {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 14px;
+        }
+        .bib-item {
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 10px; padding: 12px; cursor: pointer;
+            transition: 0.15s;
+        }
+        .bib-item:hover {
+            background: #24242a; border-color: #4caf50;
+            transform: translateY(-2px);
+        }
+        .bib-capa {
+            width: 100%; aspect-ratio: 2/3; background: #252529;
+            border-radius: 6px; margin-bottom: 10px; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            color: #555; font-size: 28px;
+        }
+        .bib-capa img { width: 100%; height: 100%; object-fit: cover; }
+        .bib-titulo {
+            font-size: 13px; color: #eaeaea; font-weight: 600;
+            line-height: 1.3; margin-bottom: 4px;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .bib-tema { font-size: 11px; color: #777; margin-bottom: 6px; }
+
+        .ap-card {
+            background: #1c1c20; border-left: 3px solid #333;
+            border-radius: 8px; padding: 14px; margin-bottom: 10px;
+        }
+        .ap-linha-1 {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            font-size: 11px; color: #888; margin-bottom: 8px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .ap-texto {
+            font-size: 14px; color: #e0e0e0; line-height: 1.5;
+            margin-bottom: 10px; white-space: pre-wrap;
+        }
+        .ap-fonte { font-size: 12px; color: #777; font-style: italic; margin-bottom: 10px; }
+        .ap-rodape {
+            display: flex; gap: 6px; flex-wrap: wrap;
+            align-items: center; font-size: 11px;
+        }
+        .ap-rodape .tag { padding: 3px 8px; background: #252529; border-radius: 10px; color: #aaa; }
+
+        .em-construcao {
+            text-align: center; padding: 40px 20px;
+            color: #666; font-size: 14px;
+        }
+        .em-construcao .icone { font-size: 36px; margin-bottom: 10px; }
+
+        .vazio { text-align: center; padding: 30px 20px; color: #777; font-size: 14px; }
+        .btn-primario {
+            padding: 10px 18px; font-size: 14px;
+            background: #333; color: #fff;
+            border: 1px solid #55555c; border-radius: 10px;
+            cursor: pointer; font-family: inherit; transition: 0.15s;
+        }
+        .btn-primario:hover { background: #3a3a40; }
+        .btn-secundario {
+            padding: 8px 14px; font-size: 13px;
+            background: #1a1a1e; color: #bbb;
+            border: 1px solid #333338; border-radius: 20px;
+            cursor: pointer; font-family: inherit; transition: 0.15s;
+        }
+        .btn-secundario:hover { color: #e0e0e0; border-color: #44444a; }
+
+        .video-player-wrap {
+            position: relative; width: 100%; aspect-ratio: 16/9;
+            background: #000; border-radius: 10px; overflow: hidden;
+            margin: 8px 0 12px;
+        }
+        .video-player-wrap iframe,
+        .video-player-wrap > div {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+        }
+        .video-velocidade {
+            display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0 12px;
+        }
+        .video-velocidade .chip { font-variant-numeric: tabular-nums; }
+
+        .btn-marcar {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 16px; font-size: 14px;
+            background: #1a2a1a; color: #a5d6a7;
+            border: 1px solid #2e5a2e; border-radius: 20px;
+            cursor: pointer; font-family: inherit; transition: 0.15s;
+        }
+        .btn-marcar:hover { background: #223a22; border-color: #4caf50; }
+
+        .momentos-lista { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+        .momento-item {
+            display: flex; gap: 10px; align-items: flex-start;
+            padding: 8px 12px;
+            background: #1c1c20; border-left: 3px solid #4caf50;
+            border-radius: 6px; font-size: 13px; color: #d0d0d0;
+        }
+        .momento-tempo {
+            font-variant-numeric: tabular-nums;
+            color: #4caf50; font-weight: 600; flex-shrink: 0;
+            cursor: pointer;
+        }
+        .momento-tempo:hover { text-decoration: underline; }
+        .momento-texto { flex: 1; white-space: pre-wrap; }
+        .momento-remover {
+            background: none; border: none; color: #666;
+            font-size: 16px; cursor: pointer; padding: 0 4px;
+            flex-shrink: 0;
+        }
+        .momento-remover:hover { color: #d45a5a; }
+
+        .rec-video-card {
+            display: flex; gap: 10px; padding: 8px;
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 8px; cursor: pointer; transition: 0.15s;
+            position: relative;
+        }
+        .rec-video-card:hover { background: #24242a; border-color: #3a3a40; }
+        .rec-video-thumb {
+            width: 100px; height: 56px; flex-shrink: 0;
+            background: #252529; border-radius: 4px;
+            overflow: hidden; position: relative;
+        }
+        .rec-video-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .rec-video-info { flex: 1; min-width: 0; }
+        .rec-video-titulo {
+            font-size: 12px; color: #eaeaea; font-weight: 600;
+            line-height: 1.3; margin-bottom: 4px;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .rec-video-meta { font-size: 11px; color: #888; }
+
+        .rec-video-dur {
+            position: absolute; bottom: 3px; right: 3px;
+            background: rgba(0,0,0,0.82); color: #fff;
+            padding: 1px 5px; font-size: 10px;
+            border-radius: 3px; font-variant-numeric: tabular-nums;
+        }
+        .rec-video-fav {
+            position: absolute; top: 6px; right: 6px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 50%;
+            width: 26px; height: 26px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 13px; color: #ddd;
+            transition: 0.15s;
+        }
+        .rec-video-fav:hover { background: rgba(0,0,0,0.85); }
+        .rec-video-fav.favoritado { background: #d45a5a; border-color: #d45a5a; color: #fff; }
+
+        .rec-video-stats { font-size: 11px; color: #777; margin-top: 3px; }
+        .rec-video-stats .linha { display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; color: #777; }
+        .rec-video-stats .sep { color: #444; }
+
+        .video-historico-wrap {
+            display: flex; gap: 6px; align-items: center;
+            margin-bottom: 8px;
+        }
+        .video-historico-wrap select { flex: 1; }
+        .video-historico-wrap button {
+            padding: 6px 10px; font-size: 12px;
+            background: #1a1a1e; color: #888;
+            border: 1px solid #333338; border-radius: 6px;
+            cursor: pointer;
+        }
+        .video-historico-wrap button:hover { color: #d45a5a; }
+
+        .video-filtros {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .video-filtros select { width: 100%; }
+
+        .video-acoes-extra {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .checkbox-legenda {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 12px; color: #aaa;
+            cursor: pointer; padding: 6px 10px;
+            border: 1px solid #333338; border-radius: 16px;
+            user-select: none;
+        }
+        .checkbox-legenda:hover { color: #ddd; }
+        .checkbox-legenda input { margin: 0; }
+
+        .area-3frases { display: flex; flex-direction: column; gap: 6px; }
+        .area-3frases input { font-size: 13px; }
+
+        .trechos-lista { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+        .trecho-item {
+            display: flex; gap: 10px; align-items: flex-start;
+            padding: 8px 12px;
+            background: #1c1c20; border-left: 3px solid #5a8ad4;
+            border-radius: 6px; font-size: 13px; color: #d0d0d0;
+        }
+        .trecho-texto { flex: 1; white-space: pre-wrap; }
+        .trecho-ref { font-size: 11px; color: #777; font-style: italic; margin-top: 3px; }
+        .trecho-remover {
+            background: none; border: none; color: #666;
+            font-size: 16px; cursor: pointer; padding: 0 4px; flex-shrink: 0;
+        }
+        .trecho-remover:hover { color: #d45a5a; }
+        .btn-adicionar-trecho {
+            margin-top: 8px;
+            padding: 7px 14px; font-size: 13px;
+            background: #1a2233; color: #a8c4e8;
+            border: 1px solid #2c3a55; border-radius: 20px;
+            cursor: pointer; font-family: inherit;
+            transition: 0.15s;
+        }
+        .btn-adicionar-trecho:hover { background: #232f4a; border-color: #4a5c85; }
+
+        .botao-foco-flutuante {
+            position: fixed; right: 24px; bottom: 24px; z-index: 9999;
+            display: flex; align-items: center;
+            width: 44px; height: 44px; overflow: hidden;
+            text-decoration: none;
+            background: #17171a; color: #f5f5f5;
+            border: 1px solid #2d2d32; border-radius: 22px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+            transition: width 0.2s ease;
+        }
+        .botao-foco-flutuante:hover { width: 88px; }
+        .botao-foco-flutuante .icone-foco { min-width: 44px; text-align: center; font-size: 18px; }
+        .botao-foco-flutuante .texto-foco {
+            font-size: 13px; opacity: 0;
+            transition: opacity 0.15s ease; white-space: nowrap;
+        }
+        .botao-foco-flutuante:hover .texto-foco { opacity: 1; }
+    </style>
+</head>
+
+<body>
+<main class="container">
+
+    <header class="header">
+        <p class="eyebrow">PLANEJAMENTO</p>
+        <h1>📚 Estudo</h1>
+        <p class="subtitle">Estude hoje, retome o que parou, veja o que aprendeu.</p>
+    </header>
+
+    <section class="modules">
+        <div class="resumo-estudo" id="resumoEstudo"></div>
+        <div class="tipos-barra" id="tiposBarra"></div>
+        <div class="module-card" style="align-items:flex-start;">
+            <div style="width:100%;">
+                <div class="sub-abas" id="subAbas"></div>
+                <div id="conteudo"></div>
+            </div>
+        </div>
+    </section>
+
+    <a href="index.html" class="back-button">← Voltar para Planejamento</a>
+</main>
+
+<a href="../foco/foco.html" class="botao-foco-flutuante" aria-label="Ir para Foco">
+    <span class="icone-foco">🎯</span>
+    <span class="texto-foco">Foco</span>
+</a>
+
+    <script src="../../js/storage.js"></script>
 <script>
     "use strict";
 
@@ -509,6 +1061,13 @@
         bibOrdem: "recente",
         bibBusca: "",
         apBusca: "",
+        gdeltBusca: "",
+        gdeltIdioma: "todos",
+        gdeltPais: "todos",
+        gdeltPeriodo: "tudo",
+        gdeltOrdem: "hybridrel",
+        gdeltDominio: "",
+        gdeltModo: "lista",
     };
 
     const esc = Storage.escapeHTML;
@@ -580,6 +1139,9 @@
                 { id: "estudar",    label: "📝 Estudar hoje" },
                 { id: "biblioteca", label: "📚 Biblioteca" },
             ];
+            if (estado.tipo === "artigo") {
+                abas.push({ id: "gdelt", label: "📰 GDELT" });
+            }
         } else if (estado.tipo === "aprendizados") {
             abas = [];
         } else {
@@ -608,6 +1170,7 @@
         if (estado.tipo === "video"  && estado.subAba === "biblioteca") return renderBibliotecaVideo();
         if (estado.tipo === "artigo" && estado.subAba === "estudar")    return renderEstudarArtigo();
         if (estado.tipo === "artigo" && estado.subAba === "biblioteca") return renderBibliotecaArtigo();
+        if (estado.tipo === "artigo" && estado.subAba === "gdelt")      return renderGDELTDedicado();
         if (estado.tipo === "aprendizados")                             return renderAprendizados();
         return renderEmConstrucao();
     }
@@ -877,19 +1440,18 @@
     }
 
     // ==================================================
-    // BUSCA DE ARTIGOS — 5 fontes
+    // BUSCA DE ARTIGOS — 4 fontes (GDELT virou sub-aba)
     // ==================================================
     const FONTES_ARTIGO = [
         { id: "hn",     label: "🟠 HN" },
         { id: "reddit", label: "🔴 Reddit" },
         { id: "medium", label: "⚫ Medium" },
-        { id: "gdelt",  label: "🟢 GDELT" },
         { id: "devto",  label: "🟣 Dev.to" },
     ];
 
     const PRESETS_ARTIGO = {
-        tudo:      ["hn", "reddit", "medium", "gdelt", "devto"],
-        noticias:  ["gdelt"],
+        tudo:      ["hn", "reddit", "medium", "devto"],
+        noticias:  ["hn", "reddit", "medium"],
         pratico:   ["hn", "medium", "devto"],
         discussao: ["reddit", "hn"],
     };
@@ -897,14 +1459,109 @@
     const CHAVE_FONTES_ARTIGO = "estudo_artigo_fontes_ativas";
 
     function obterFontesAtivas() {
+        const validas = FONTES_ARTIGO.map(f => f.id);
         try {
             const arr = JSON.parse(localStorage.getItem(CHAVE_FONTES_ARTIGO));
-            if (Array.isArray(arr) && arr.length) return arr;
+            if (Array.isArray(arr) && arr.length) {
+                const limpo = arr.filter(id => validas.includes(id));
+                if (limpo.length) return limpo;
+            }
         } catch {}
         return [...PRESETS_ARTIGO.tudo];
     }
     function salvarFontesAtivas(arr) {
         localStorage.setItem(CHAVE_FONTES_ARTIGO, JSON.stringify(arr));
+    }
+
+    // ---------- GDELT: prefs + histórico + busca estendida ----------
+    const CHAVE_GDELT_PREFS = "estudo_gdelt_filtros_preferidos";
+    const CHAVE_GDELT_HIST  = "estudo_gdelt_historico_buscas";
+
+    function obterPrefsGdelt() {
+        try { return JSON.parse(localStorage.getItem(CHAVE_GDELT_PREFS)) || {}; }
+        catch { return {}; }
+    }
+    function salvarPrefsGdelt(p) {
+        localStorage.setItem(CHAVE_GDELT_PREFS, JSON.stringify(p));
+    }
+
+    function obterHistoricoGdelt() {
+        try { return JSON.parse(localStorage.getItem(CHAVE_GDELT_HIST)) || []; }
+        catch { return []; }
+    }
+    function salvarBuscaGdelt(tema) {
+        if (!tema) return;
+        let h = obterHistoricoGdelt().filter(t => t.toLowerCase() !== tema.toLowerCase());
+        h.unshift(tema);
+        h = h.slice(0, 10);
+        localStorage.setItem(CHAVE_GDELT_HIST, JSON.stringify(h));
+    }
+
+    const GDELT_LANG_MAP = { pt: "portuguese", en: "english", es: "spanish" };
+    const GDELT_PAIS_VALIDOS = ["BR", "US", "PT"];
+
+    async function buscarGDELTDedicado(query, opts = {}) {
+        const { idioma, pais, periodo, ordem, dominio } = opts;
+
+        let url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(query)}&mode=artlist&format=json&maxrecords=50&sort=${ordem || "hybridrel"}`;
+
+        if (idioma && idioma !== "todos" && GDELT_LANG_MAP[idioma]) {
+            url += `&sourcelang=${GDELT_LANG_MAP[idioma]}`;
+        }
+        if (pais && pais !== "todos" && GDELT_PAIS_VALIDOS.includes(pais)) {
+            url += `&sourcecountry=${pais}`;
+        }
+        if (periodo && periodo !== "tudo") {
+            url += `&timespan=${periodo}`;
+        }
+        if (dominio && dominio.trim()) {
+            url += `&domain=${encodeURIComponent(dominio.trim())}`;
+        }
+
+        const r = await fetchComFallback(url);
+        const j = await r.json();
+        return (j.articles || []).map(a => {
+            let iso = "";
+            if (a.seendate) {
+                const s = String(a.seendate);
+                iso = `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}T${s.slice(8,10)}:${s.slice(10,12)}:00Z`;
+            }
+            return {
+                titulo: a.title || "",
+                url: a.url || "",
+                autor: "",
+                publicado: iso,
+                fonte: a.domain || "",
+                origem: "GDELT",
+                pontos: 0,
+                comentarios: 0,
+                idioma: a.language || "",
+                pais: a.sourcecountry || "",
+            };
+        }).filter(a => a.titulo && a.url);
+    }
+
+    async function buscarGDELTTimeline(query, opts = {}) {
+        const { idioma, pais, periodo } = opts;
+
+        let url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(query)}&mode=timelinevol&format=json`;
+
+        if (idioma && idioma !== "todos" && GDELT_LANG_MAP[idioma]) {
+            url += `&sourcelang=${GDELT_LANG_MAP[idioma]}`;
+        }
+        if (pais && pais !== "todos" && GDELT_PAIS_VALIDOS.includes(pais)) {
+            url += `&sourcecountry=${pais}`;
+        }
+        url += `&timespan=${periodo && periodo !== "tudo" ? periodo : "1w"}`;
+
+        const r = await fetchComFallback(url);
+        const j = await r.json();
+        const serie = j.timeline?.[0];
+        if (!serie || !serie.data) return [];
+        return serie.data.map(d => ({
+            data: d.date || "",
+            valor: Number(d.value) || 0,
+        }));
     }
 
     async function fetchComFallback(url) {
@@ -977,6 +1634,50 @@
         }).filter(a => a.titulo && a.url);
     }
 
+    async function buscarDevto(query) {
+        const tag = normalizarTag(query);
+        if (!tag) return [];
+        const url = `https://dev.to/api/articles?tag=${encodeURIComponent(tag)}&top=30&per_page=25`;
+        const r = await fetchComFallback(url);
+        const arr = await r.json();
+        if (!Array.isArray(arr)) return [];
+        return arr.map(a => ({
+            titulo: a.title, url: a.url,
+            autor: a.user?.name || "",
+            publicado: a.published_at || "",
+            fonte: "dev.to", origem: "Dev.to",
+            pontos: a.positive_reactions_count || 0,
+            comentarios: a.comments_count || 0,
+        }));
+    }
+
+    async function buscarArtigosPorTema(query, fontesAtivas) {
+        const mapa = {
+            hn: buscarHN, reddit: buscarReddit,
+            medium: buscarMedium, devto: buscarDevto,
+        };
+
+        const promessas = fontesAtivas.map(id => {
+            const fn = mapa[id];
+            if (!fn) return Promise.resolve([]);
+            return fn(query).catch(e => {
+                console.warn(`[${id}] falhou:`, e);
+                return [];
+            });
+        });
+
+        const resultados = await Promise.all(promessas);
+
+        const intercalado = [];
+        const maxPorFonte = Math.max(...resultados.map(r => r.length), 0);
+        for (let i = 0; i < maxPorFonte; i++) {
+            for (const lista of resultados) {
+                if (lista[i]) intercalado.push(lista[i]);
+            }
+        }
+        return intercalado.slice(0, 21);
+    }
+
     // Verifica se um artigo do Medium é pago (Member-only)
     async function verificarPagoMedium(url) {
         if (!url || !url.includes("medium.com")) return null;
@@ -997,7 +1698,6 @@
         }
     }
 
-    // Roda a verificação em background nos cards renderizados
     async function verificarPagosDosCards(box) {
         const cards = [...box.querySelectorAll(".rec-artigo-card")];
         const alvos = cards.filter(c => (c.dataset.artUrl || "").includes("medium.com"));
@@ -1025,69 +1725,6 @@
         }
 
         await Promise.all(Array.from({ length: concorrencia }, worker));
-    }
-
-    async function buscarGDELT(query) {
-        const url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(query)}&mode=artlist&format=json&maxrecords=25&sort=hybridrel`;
-        const r = await fetchComFallback(url);
-        const j = await r.json();
-        return (j.articles || []).map(a => {
-            let iso = "";
-            if (a.seendate) {
-                const s = String(a.seendate);
-                iso = `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}T${s.slice(8,10)}:${s.slice(10,12)}:00Z`;
-            }
-            return {
-                titulo: a.title || "", url: a.url || "", autor: "",
-                publicado: iso,
-                fonte: a.domain || "", origem: "GDELT",
-                pontos: 0, comentarios: 0,
-            };
-        }).filter(a => a.titulo && a.url);
-    }
-
-    async function buscarDevto(query) {
-        const tag = normalizarTag(query);
-        if (!tag) return [];
-        const url = `https://dev.to/api/articles?tag=${encodeURIComponent(tag)}&top=30&per_page=25`;
-        const r = await fetchComFallback(url);
-        const arr = await r.json();
-        if (!Array.isArray(arr)) return [];
-        return arr.map(a => ({
-            titulo: a.title, url: a.url,
-            autor: a.user?.name || "",
-            publicado: a.published_at || "",
-            fonte: "dev.to", origem: "Dev.to",
-            pontos: a.positive_reactions_count || 0,
-            comentarios: a.comments_count || 0,
-        }));
-    }
-
-    async function buscarArtigosPorTema(query, fontesAtivas) {
-        const mapa = {
-            hn: buscarHN, reddit: buscarReddit, medium: buscarMedium,
-            gdelt: buscarGDELT, devto: buscarDevto,
-        };
-
-        const promessas = fontesAtivas.map(id => {
-            const fn = mapa[id];
-            if (!fn) return Promise.resolve([]);
-            return fn(query).catch(e => {
-                console.warn(`[${id}] falhou:`, e);
-                return [];
-            });
-        });
-
-        const resultados = await Promise.all(promessas);
-
-        const intercalado = [];
-        const maxPorFonte = Math.max(...resultados.map(r => r.length), 0);
-        for (let i = 0; i < maxPorFonte; i++) {
-            for (const lista of resultados) {
-                if (lista[i]) intercalado.push(lista[i]);
-            }
-        }
-        return intercalado.slice(0, 21);
     }
 
     // ==================================================
@@ -2057,7 +2694,6 @@
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center;">
                 <span style="font-size:11px;color:#777;">Modo:</span>
                 <button type="button" class="chip" data-preset-artigo="tudo">🎯 Tudo</button>
-                <button type="button" class="chip" data-preset-artigo="noticias">📰 Notícias</button>
                 <button type="button" class="chip" data-preset-artigo="pratico">🧠 Prático</button>
                 <button type="button" class="chip" data-preset-artigo="discussao">💬 Discussão</button>
             </div>
@@ -2321,7 +2957,6 @@
                     `;
                 }).join("");
 
-                // Verifica em background quais são pagos (só os do Medium)
                 verificarPagosDosCards(box);
 
                 box.querySelectorAll(".rec-artigo-card").forEach(card => {
@@ -2331,10 +2966,8 @@
                         const f = card.dataset.artFonte;
                         const au = card.dataset.artAutor;
 
-                        // Abre no navegador (onde você já está logado no Medium)
                         window.open(l, "_blank", "noopener");
 
-                        // Preenche o bloco do dia pra registro
                         const blocos2 = Storage.blocos.ler("artigo", dataAtual);
                         const i = blocos2.findIndex(x => x.id === b.id);
                         if (i < 0) return;
@@ -2358,7 +2991,284 @@
         return elBloco;
     }
 
-        // ==================================================
+    // ==================================================
+    // GDELT — PAINEL DEDICADO
+    // ==================================================
+    function renderGDELTDedicado() {
+        const prefs = obterPrefsGdelt();
+        if (prefs.idioma)  estado.gdeltIdioma  = prefs.idioma;
+        if (prefs.pais)    estado.gdeltPais    = prefs.pais;
+        if (prefs.periodo) estado.gdeltPeriodo = prefs.periodo;
+        if (prefs.ordem)   estado.gdeltOrdem   = prefs.ordem;
+        if (prefs.dominio !== undefined) estado.gdeltDominio = prefs.dominio;
+
+        const wrap = el("conteudo");
+        const historico = obterHistoricoGdelt();
+
+        wrap.innerHTML = `
+            <div class="gdelt-painel">
+                <div class="gdelt-busca-wrap">
+                    <input type="search" id="gdeltBusca" class="bib-busca" placeholder="🔎 Tema (ex.: marketing digital, IA, eleições)" value="${esc(estado.gdeltBusca)}">
+                    <button class="btn-primario" id="gdeltBtnBuscar">🔍 Buscar</button>
+                </div>
+
+                ${historico.length ? `
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center;">
+                        <span style="font-size:11px;color:#777;">Recentes:</span>
+                        ${historico.map(h => `<button class="btn-secundario" data-hist-gdelt="${esc(h)}" style="font-size:11px;padding:4px 10px;">${esc(h)}</button>`).join("")}
+                    </div>
+                ` : ""}
+
+                <div class="gdelt-linha-filtros">
+                    <div class="gdelt-grupo">
+                        <span class="rotulo">Idioma:</span>
+                        <div class="chips">
+                            <div class="chip${estado.gdeltIdioma === "todos" ? " selecionado" : ""}" data-gdelt-idioma="todos">🌐 Todos</div>
+                            <div class="chip${estado.gdeltIdioma === "pt" ? " selecionado" : ""}" data-gdelt-idioma="pt">🇧🇷 PT</div>
+                            <div class="chip${estado.gdeltIdioma === "en" ? " selecionado" : ""}" data-gdelt-idioma="en">🇺🇸 EN</div>
+                            <div class="chip${estado.gdeltIdioma === "es" ? " selecionado" : ""}" data-gdelt-idioma="es">🇪🇸 ES</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gdelt-linha-filtros">
+                    <div class="gdelt-grupo">
+                        <span class="rotulo">País:</span>
+                        <div class="chips">
+                            <div class="chip${estado.gdeltPais === "todos" ? " selecionado" : ""}" data-gdelt-pais="todos">🌐 Todos</div>
+                            <div class="chip${estado.gdeltPais === "BR" ? " selecionado" : ""}" data-gdelt-pais="BR">🇧🇷 BR</div>
+                            <div class="chip${estado.gdeltPais === "US" ? " selecionado" : ""}" data-gdelt-pais="US">🇺🇸 US</div>
+                            <div class="chip${estado.gdeltPais === "PT" ? " selecionado" : ""}" data-gdelt-pais="PT">🇵🇹 PT</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gdelt-linha-filtros">
+                    <div class="gdelt-grupo">
+                        <span class="rotulo">Período:</span>
+                        <div class="chips">
+                            <div class="chip${estado.gdeltPeriodo === "24h" ? " selecionado" : ""}" data-gdelt-periodo="24h">24h</div>
+                            <div class="chip${estado.gdeltPeriodo === "1w" ? " selecionado" : ""}" data-gdelt-periodo="1w">1 semana</div>
+                            <div class="chip${estado.gdeltPeriodo === "1m" ? " selecionado" : ""}" data-gdelt-periodo="1m">1 mês</div>
+                            <div class="chip${estado.gdeltPeriodo === "3m" ? " selecionado" : ""}" data-gdelt-periodo="3m">3 meses</div>
+                            <div class="chip${estado.gdeltPeriodo === "tudo" ? " selecionado" : ""}" data-gdelt-periodo="tudo">Tudo</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gdelt-linha-filtros">
+                    <div class="gdelt-grupo">
+                        <span class="rotulo">Ordenar:</span>
+                        <div class="chips">
+                            <div class="chip${estado.gdeltOrdem === "hybridrel" ? " selecionado" : ""}" data-gdelt-ordem="hybridrel">Relevância</div>
+                            <div class="chip${estado.gdeltOrdem === "datedesc" ? " selecionado" : ""}" data-gdelt-ordem="datedesc">Mais recentes</div>
+                            <div class="chip${estado.gdeltOrdem === "dateasc" ? " selecionado" : ""}" data-gdelt-ordem="dateasc">Mais antigos</div>
+                            <div class="chip${estado.gdeltOrdem === "tonedesc" ? " selecionado" : ""}" data-gdelt-ordem="tonedesc">Tom positivo</div>
+                            <div class="chip${estado.gdeltOrdem === "toneasc" ? " selecionado" : ""}" data-gdelt-ordem="toneasc">Tom negativo</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gdelt-linha-filtros">
+                    <div class="gdelt-grupo" style="flex:1;">
+                        <span class="rotulo">Domínio:</span>
+                        <input type="text" id="gdeltDominio" class="bib-busca" style="min-width:160px;flex:1;" placeholder="exame.com (opcional)" value="${esc(estado.gdeltDominio)}">
+                    </div>
+                </div>
+
+                <div class="gdelt-linha-filtros" style="margin-top:12px;">
+                    <div class="gdelt-grupo">
+                        <span class="rotulo">Modo:</span>
+                        <div class="chips">
+                            <div class="chip${estado.gdeltModo === "lista" ? " selecionado" : ""}" data-gdelt-modo="lista">📋 Lista</div>
+                            <div class="chip${estado.gdeltModo === "timeline" ? " selecionado" : ""}" data-gdelt-modo="timeline">📈 Linha do tempo</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="gdeltResultados"></div>
+        `;
+
+        function salvarPrefs() {
+            salvarPrefsGdelt({
+                idioma:  estado.gdeltIdioma,
+                pais:    estado.gdeltPais,
+                periodo: estado.gdeltPeriodo,
+                ordem:   estado.gdeltOrdem,
+                dominio: estado.gdeltDominio,
+            });
+        }
+
+        const inputBusca = wrap.querySelector("#gdeltBusca");
+        inputBusca.addEventListener("input", e => { estado.gdeltBusca = e.target.value; });
+        inputBusca.addEventListener("keydown", e => {
+            if (e.key === "Enter") executarBuscaGdelt();
+        });
+
+        wrap.querySelector("#gdeltBtnBuscar").addEventListener("click", () => executarBuscaGdelt());
+
+        wrap.querySelectorAll("[data-hist-gdelt]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                estado.gdeltBusca = btn.dataset.histGdelt;
+                inputBusca.value = estado.gdeltBusca;
+                executarBuscaGdelt();
+            });
+        });
+
+        wrap.querySelectorAll("[data-gdelt-idioma]").forEach(chip => {
+            chip.addEventListener("click", () => {
+                estado.gdeltIdioma = chip.dataset.gdeltIdioma;
+                wrap.querySelectorAll("[data-gdelt-idioma]").forEach(c => c.classList.toggle("selecionado", c === chip));
+                salvarPrefs();
+                if (estado.gdeltBusca) executarBuscaGdelt();
+            });
+        });
+
+        wrap.querySelectorAll("[data-gdelt-pais]").forEach(chip => {
+            chip.addEventListener("click", () => {
+                estado.gdeltPais = chip.dataset.gdeltPais;
+                wrap.querySelectorAll("[data-gdelt-pais]").forEach(c => c.classList.toggle("selecionado", c === chip));
+                salvarPrefs();
+                if (estado.gdeltBusca) executarBuscaGdelt();
+            });
+        });
+
+        wrap.querySelectorAll("[data-gdelt-periodo]").forEach(chip => {
+            chip.addEventListener("click", () => {
+                estado.gdeltPeriodo = chip.dataset.gdeltPeriodo;
+                wrap.querySelectorAll("[data-gdelt-periodo]").forEach(c => c.classList.toggle("selecionado", c === chip));
+                salvarPrefs();
+                if (estado.gdeltBusca) executarBuscaGdelt();
+            });
+        });
+
+        wrap.querySelectorAll("[data-gdelt-ordem]").forEach(chip => {
+            chip.addEventListener("click", () => {
+                estado.gdeltOrdem = chip.dataset.gdeltOrdem;
+                wrap.querySelectorAll("[data-gdelt-ordem]").forEach(c => c.classList.toggle("selecionado", c === chip));
+                salvarPrefs();
+                if (estado.gdeltBusca) executarBuscaGdelt();
+            });
+        });
+
+        wrap.querySelectorAll("[data-gdelt-modo]").forEach(chip => {
+            chip.addEventListener("click", () => {
+                estado.gdeltModo = chip.dataset.gdeltModo;
+                wrap.querySelectorAll("[data-gdelt-modo]").forEach(c => c.classList.toggle("selecionado", c === chip));
+                if (estado.gdeltBusca) executarBuscaGdelt();
+            });
+        });
+
+        const inputDom = wrap.querySelector("#gdeltDominio");
+        inputDom.addEventListener("input", e => { estado.gdeltDominio = e.target.value; });
+        inputDom.addEventListener("keydown", e => {
+            if (e.key === "Enter") { salvarPrefs(); if (estado.gdeltBusca) executarBuscaGdelt(); }
+        });
+        inputDom.addEventListener("blur", () => salvarPrefs());
+
+        async function executarBuscaGdelt() {
+            const q = estado.gdeltBusca.trim();
+            if (!q) return;
+
+            const box = wrap.querySelector("#gdeltResultados");
+
+            if (estado.gdeltModo === "timeline") {
+                box.innerHTML = `<div style="color:#888;font-size:13px;padding:20px;text-align:center;">Carregando linha do tempo…</div>`;
+                try {
+                    const pontos = await buscarGDELTTimeline(q, {
+                        idioma:  estado.gdeltIdioma,
+                        pais:    estado.gdeltPais,
+                        periodo: estado.gdeltPeriodo,
+                    });
+                    salvarBuscaGdelt(q);
+                    if (!pontos.length) {
+                        box.innerHTML = `<div class="vazio">Nada encontrado no período.</div>`;
+                        return;
+                    }
+                    const max = Math.max(...pontos.map(p => p.valor), 1);
+                    box.innerHTML = `
+                        <div style="margin-top:8px;">
+                            <div style="font-size:12px;color:#888;margin-bottom:6px;">
+                                Volume de notícias sobre <strong style="color:#eaeaea;">"${esc(q)}"</strong> no período
+                            </div>
+                            <div class="gdelt-timeline">
+                                ${pontos.map(p => {
+                                    const pct = Math.max(2, Math.round((p.valor / max) * 100));
+                                    const d = p.data ? String(p.data).slice(0, 8) : "";
+                                    const dataFmt = d ? `${d.slice(6,8)}/${d.slice(4,6)}` : "";
+                                    return `<div class="barra" style="height:${pct}%;" title="${dataFmt} — ${p.valor} ${p.valor === 1 ? "notícia" : "notícias"}"></div>`;
+                                }).join("")}
+                            </div>
+                            <div style="font-size:11px;color:#666;text-align:center;">
+                                pico: ${max} ${max === 1 ? "notícia" : "notícias"} · ${pontos.length} ponto(s)
+                            </div>
+                        </div>
+                    `;
+                } catch (e) {
+                    console.error(e);
+                    box.innerHTML = `<div class="vazio">Erro ao buscar linha do tempo.</div>`;
+                }
+                return;
+            }
+
+            box.innerHTML = `<div style="color:#888;font-size:13px;padding:20px;text-align:center;">Buscando notícias…</div>`;
+            try {
+                const lista = await buscarGDELTDedicado(q, {
+                    idioma:  estado.gdeltIdioma,
+                    pais:    estado.gdeltPais,
+                    periodo: estado.gdeltPeriodo,
+                    ordem:   estado.gdeltOrdem,
+                    dominio: estado.gdeltDominio,
+                });
+                salvarBuscaGdelt(q);
+
+                if (!lista.length) {
+                    box.innerHTML = `<div class="vazio">Nada encontrado com esses filtros.</div>`;
+                    return;
+                }
+
+                box.innerHTML = `
+                    <div style="font-size:12px;color:#888;margin:10px 0 8px;">
+                        <strong style="color:#eaeaea;">${lista.length}</strong> resultado(s)
+                    </div>
+                    <div class="recomendacoes" style="display:grid;">
+                        ${lista.map(a => {
+                            const dataRel = formatarDataRelativa(a.publicado);
+                            return `
+                                <div class="rec-artigo-card"
+                                     data-gdelt-titulo="${esc(a.titulo)}"
+                                     data-gdelt-url="${esc(a.url)}"
+                                     data-gdelt-fonte="${esc(a.fonte)}">
+                                    <div class="rec-artigo-meta">
+                                        <span class="rec-artigo-fonte">GDELT</span>
+                                        ${a.fonte ? `<span>· ${esc(a.fonte)}</span>` : ""}
+                                        ${a.pais  ? `<span>· ${esc(a.pais)}</span>`  : ""}
+                                    </div>
+                                    <div class="rec-artigo-titulo">${esc(a.titulo)}</div>
+                                    ${dataRel ? `<div class="rec-artigo-stats">${dataRel}</div>` : ""}
+                                </div>
+                            `;
+                        }).join("")}
+                    </div>
+                `;
+
+                box.querySelectorAll(".rec-artigo-card").forEach(card => {
+                    card.addEventListener("click", () => {
+                        const url = card.dataset.gdeltUrl;
+                        if (url) window.open(url, "_blank", "noopener");
+                    });
+                });
+            } catch (e) {
+                console.error(e);
+                box.innerHTML = `<div class="vazio">Erro ao buscar. Tente outro filtro.</div>`;
+            }
+        }
+
+        if (estado.gdeltBusca) executarBuscaGdelt();
+    }
+
+    // ==================================================
     // BIBLIOTECA LIVRO
     // ==================================================
     function registrarNaBiblioteca(item, pct) {
