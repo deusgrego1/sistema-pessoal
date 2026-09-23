@@ -1040,6 +1040,64 @@
         .sort((a, b) => (b._ts || 0) - (a._ts || 0));
     }
 
+const EDICOES_BING = {
+    BR: { lang: "pt-BR", cc: "BR" },
+    US: { lang: "en-US", cc: "US" },
+    PT: { lang: "pt-PT", cc: "PT" },
+    ES: { lang: "es-ES", cc: "ES" },
+    GB: { lang: "en-GB", cc: "GB" },
+    FR: { lang: "fr-FR", cc: "FR" },
+};
+
+async function buscarNoticiasBing(query, opts = {}) {
+    const { edicao, periodo, dominio } = opts;
+    const ed = EDICOES_BING[edicao] || EDICOES_BING.BR;
+
+    let q = query.trim();
+    if (dominio && dominio.trim()) q += ` site:${dominio.trim()}`;
+
+    const url = `https://www.bing.com/news/search?q=${encodeURIComponent(q)}&format=rss&setlang=${ed.lang}&cc=${ed.cc}`;
+    console.log("[news] bing:", q, "| edição:", edicao);
+
+    const r = await fetchComFallback(url);
+    const xml = await r.text();
+    const doc = new DOMParser().parseFromString(xml, "text/xml");
+    const itens = Array.from(doc.getElementsByTagName("item"));
+
+    const agora = Date.now();
+    const limiteMs = (PERIODOS_NEWS[periodo] || PERIODOS_NEWS.tudo).horas * 3600 * 1000;
+
+    return itens.map(item => {
+        const txt = tag => item.getElementsByTagName(tag)[0]?.textContent || "";
+
+        const linkBing = txt("link");
+        let real = linkBing;
+        try { real = new URL(linkBing).searchParams.get("url") || linkBing; } catch {}
+
+        let dom = "";
+        try { dom = new URL(real).hostname.replace(/^www\./, ""); } catch {}
+
+        const pub = txt("pubDate") ? new Date(txt("pubDate")) : null;
+        const ts = pub && !isNaN(pub) ? pub.getTime() : 0;
+
+        return {
+            titulo: txt("title"),
+            url: real,
+            autor: "",
+            publicado: ts ? new Date(ts).toISOString() : "",
+            fonte: dom,
+            origem: "Notícias",
+            pontos: 0,
+            comentarios: 0,
+            portal: txt("News:Source") || dom,
+            _ts: ts,
+        };
+    })
+    .filter(a => a.titulo && a.url)
+    .filter(a => !a._ts || (agora - a._ts) <= limiteMs)
+    .sort((a, b) => (b._ts || 0) - (a._ts || 0));
+}
+    
     async function buscarTimelineNoticias(query, opts = {}) {
         const { edicao } = opts;
         const lista = await buscarNoticiasNewsData(query, { edicao, periodo: "tudo" });
@@ -2667,7 +2725,7 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
 
             box.innerHTML = `<div style="color:#888;font-size:13px;padding:20px;text-align:center;">Buscando notícias…</div>`;
             try {
-                const lista = await buscarNoticiasNewsData(q, {
+                const lista = await buscarNoticiasBing(q, {
                     edicao:  estado.newsEdicao,
                     periodo: estado.newsPeriodo,
                     dominio: estado.newsDominio,
