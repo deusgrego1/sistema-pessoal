@@ -1,738 +1,513 @@
-<script src="../../js/storage.js"></script>
-<script>
-    "use strict";
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estudo</title>
+    <link rel="stylesheet" href="../../css/style.css">
 
-    const hoje = new Date();
-    const pad = n => String(n).padStart(2, "0");
-    const dataHoje = `${hoje.getFullYear()}-${pad(hoje.getMonth()+1)}-${pad(hoje.getDate())}`;
-    const paramsURL = new URLSearchParams(location.search);
-    const dataParam = paramsURL.get("data");
-    const dataAtual = (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam)) ? dataParam : dataHoje;
+    <style>
+        .resumo-estudo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+        }
+        .resumo-card {
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 10px; padding: 14px 16px;
+            cursor: pointer; transition: 0.15s;
+        }
+        .resumo-card:hover { background: #222228; border-color: #3a3a40; }
+        .resumo-rotulo {
+            color: #777; font-size: 11px; text-transform: uppercase;
+            letter-spacing: 0.5px; display: block; margin-bottom: 6px;
+        }
+        .resumo-valor { color: #fff; font-size: 24px; font-weight: 600; line-height: 1; }
 
-    Storage.migrar();
+        .tipos-barra { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tipo-pill {
+            position: relative; padding: 9px 16px; font-size: 13px; cursor: pointer;
+            border: 1px solid #333338; background: #17171a; color: #aaa;
+            border-radius: 20px; transition: 0.15s;
+        }
+        .tipo-pill:hover { color: #ddd; border-color: #44444a; }
+        .tipo-pill.ativo { background: #333; color: #fff; border-color: #55555c; }
+        .tipo-pill .ponto {
+            display: inline-block; width: 6px; height: 6px;
+            border-radius: 50%; background: #4caf50;
+            margin-left: 6px; vertical-align: middle;
+        }
 
-    const TIPOS = [
-        { id: "livro",   label: "📖 Livro" },
-        { id: "video",   label: "🎥 Vídeo" },
-        { id: "artigo",  label: "📄 Artigo" },
-        { id: "pratica", label: "🛠️ Prática" },
-        { id: "curso",   label: "🎓 Curso" },
-    ];
-    const ABAS_APRENDIZADOS = { id: "aprendizados", label: "🧠 Aprendizados" };
+        .sub-abas {
+            display: flex; gap: 20px;
+            border-bottom: 1px solid #252529; margin-bottom: 18px;
+        }
+        .sub-aba {
+            padding: 8px 0; font-size: 13px; color: #888;
+            cursor: pointer; border-bottom: 2px solid transparent;
+            transition: 0.15s;
+        }
+        .sub-aba:hover { color: #ccc; }
+        .sub-aba.ativa { color: #fff; border-bottom-color: #4caf50; }
 
-    const estado = {
-        tipo: "livro",
-        subAba: "estudar",
-        bibFiltro: "todos",
-        bibOrdem: "recente",
-        bibBusca: "",
-        apBusca: "",
-        newsBusca: "",
-        newsEdicao: "BR",
-        newsPeriodo: "48h",
-        newsDominio: "",
-        newsModo: "lista",
-    };
+        .campo-label {
+            display: block; font-size: 11px; color: #888;
+            letter-spacing: 1px; text-transform: uppercase;
+            margin: 14px 0 6px;
+        }
+        .campo-label:first-child { margin-top: 0; }
 
-    const esc = Storage.escapeHTML;
-    function el(id) { return document.getElementById(id); }
-    function uid(p) { return `${p}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`; }
-    function temConteudoHoje(tipo) {
-        return Storage.blocos.ler(tipo, dataAtual).length > 0;
-    }
+        .secao-titulo {
+            font-size: 11px; color: #4caf50;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            font-weight: 600; padding: 14px 0 4px;
+            border-top: 1px solid #252529; margin-top: 14px;
+        }
+        .secao-titulo:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
 
-    // ==================================================
-    // RESUMO / TIPOS / SUB-ABAS / CONTEÚDO
-    // ==================================================
-    function renderResumo() {
-        const blocosHoje = TIPOS.reduce(
-            (acc, t) => acc + Storage.blocos.ler(t.id, dataAtual).length, 0
-        );
-        const emAndamento = Storage.biblioteca.listar("livro")
-            .filter(b => b.status !== "concluido").length;
-        const apsAtivos = Storage.aprendizados.listar()
-            .filter(a => a.status !== "descartado").length;
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        .chip {
+            padding: 7px 13px; font-size: 12px; cursor: pointer;
+            border: 1px solid #333338; background: #1a1a1e;
+            color: #bbb; border-radius: 16px; transition: 0.15s;
+            user-select: none;
+        }
+        .chip:hover { background: #222228; color: #e0e0e0; }
+        .chip.selecionado { background: #2e2e33; border-color: #666; color: #fff; font-weight: 600; }
+        .chip.impacto-alto.selecionado   { background:#331f1f;border-color:#d45a5a;color:#e08b8b; }
+        .chip.impacto-medio.selecionado  { background:#332e1a;border-color:#c9a44a;color:#e0d48a; }
+        .chip.impacto-baixo.selecionado  { background:#1f3320;border-color:#4caf50;color:#a5d6a7; }
 
-        el("resumoEstudo").innerHTML = `
-            <div class="resumo-card" data-ir="estudar">
-                <span class="resumo-rotulo">Estudos hoje</span>
-                <span class="resumo-valor">${blocosHoje}</span>
+        .progresso {
+            width: 100%; height: 8px; background: #252529;
+            border-radius: 4px; overflow: hidden; margin: 8px 0;
+        }
+        .progresso > div { height: 100%; background: #4caf50; transition: width 0.3s ease; }
+        .progresso-texto { font-size: 12px; color: #888; margin-top: 4px; }
+
+        .progresso-slider { width: 100%; margin: 6px 0 4px; accent-color: #4caf50; }
+
+        .bloco-estudo {
+            border: 1px solid #252529; border-radius: 10px;
+            padding: 16px; margin-bottom: 16px; background: #19191d;
+        }
+        .bloco-cabecalho {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 12px;
+        }
+        .bloco-titulo {
+            font-size: 12px; color: #777;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .bloco-remover {
+            background: none; border: none; color: #666;
+            font-size: 20px; cursor: pointer; padding: 0 6px;
+        }
+        .bloco-remover:hover { color: #d45a5a; }
+
+        .linha-dupla { display: flex; gap: 10px; }
+        .linha-dupla > * { flex: 1; }
+
+        .recomendacoes {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+        }
+        .rec-card {
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 8px; padding: 10px; cursor: pointer;
+            transition: 0.15s; display: flex; gap: 10px;
+        }
+        .rec-card:hover { background: #24242a; border-color: #3a3a40; }
+        .rec-card img {
+            width: 44px; height: 64px; object-fit: cover;
+            border-radius: 4px; flex-shrink: 0; background: #252529;
+        }
+        .rec-card-info { flex: 1; min-width: 0; }
+        .rec-card-titulo {
+            font-size: 12px; color: #eaeaea; font-weight: 600;
+            margin-bottom: 4px; line-height: 1.3;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .rec-card-autor { font-size: 11px; color: #888; }
+
+        .rec-artigo-card {
+            position: relative;
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 8px; padding: 12px 12px 32px 12px;
+            cursor: pointer;
+            transition: 0.15s; display: flex; flex-direction: column; gap: 6px;
+        }
+        .rec-artigo-card:hover { background: #24242a; border-color: #5a8ad4; }
+        .rec-artigo-titulo {
+            font-size: 13px; color: #eaeaea; font-weight: 600;
+            line-height: 1.35;
+            display: -webkit-box; -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .rec-artigo-meta {
+            display: flex; gap: 6px; flex-wrap: wrap;
+            font-size: 11px; color: #777;
+        }
+        .rec-artigo-fonte {
+            display: inline-block;
+            padding: 2px 7px; background: #252529;
+            border-radius: 8px; color: #a8c4e8; font-size: 10px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .rec-artigo-stats { font-size: 11px; color: #888; }
+
+        .badge-pago {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: linear-gradient(135deg, #c9a44a 0%, #d4af37 100%);
+            color: #1a1a1e;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 6px rgba(212, 175, 55, 0.35);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .rec-artigo-card.checando-pago::after {
+            content: "verificando…";
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: #252529;
+            color: #666;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 8px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* ---------- Painel Notícias (NewsData.io) ---------- */
+        .gdelt-painel {
+            background: #19191d; border: 1px solid #252529;
+            border-radius: 10px; padding: 16px; margin-bottom: 16px;
+        }
+        .gdelt-linha-filtros {
+            display: flex; flex-wrap: wrap; gap: 12px;
+            align-items: center; margin: 8px 0;
+        }
+        .gdelt-grupo {
+            display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+        }
+        .gdelt-grupo .rotulo {
+            font-size: 11px; color: #777;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            min-width: 62px;
+        }
+        .gdelt-busca-wrap {
+            display: flex; gap: 8px; margin-bottom: 12px;
+        }
+        .gdelt-busca-wrap input { flex: 1; }
+        .gdelt-timeline {
+            display: flex; align-items: flex-end; gap: 2px;
+            height: 90px; margin: 12px 0 6px;
+            padding: 8px; background: #141418;
+            border-radius: 8px; border: 1px solid #252529;
+        }
+        .gdelt-timeline .barra {
+            flex: 1; min-width: 2px;
+            background: linear-gradient(180deg, #66bb6a, #4caf50);
+            border-radius: 2px 2px 0 0;
+            transition: filter 0.15s;
+        }
+        .gdelt-timeline .barra:hover { filter: brightness(1.3); }
+
+        .bib-stats {
+            display: flex; gap: 20px; flex-wrap: wrap;
+            padding: 12px 16px; margin-bottom: 14px;
+            background: #19191d; border: 1px solid #252529;
+            border-radius: 10px; font-size: 13px; color: #888;
+        }
+        .bib-stats strong { color: #eaeaea; font-weight: 600; }
+
+        .bib-controles {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            margin-bottom: 16px; align-items: center;
+        }
+        .bib-busca {
+            flex: 1; min-width: 180px;
+            padding: 8px 14px; background: #17171a;
+            border: 1px solid #333338; color: #eaeaea;
+            border-radius: 20px; font-size: 13px; outline: none;
+            font-family: inherit;
+        }
+        .bib-busca:focus { border-color: #55555c; }
+        .bib-grade {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 14px;
+        }
+        .bib-item {
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 10px; padding: 12px; cursor: pointer;
+            transition: 0.15s;
+        }
+        .bib-item:hover {
+            background: #24242a; border-color: #4caf50;
+            transform: translateY(-2px);
+        }
+        .bib-capa {
+            width: 100%; aspect-ratio: 2/3; background: #252529;
+            border-radius: 6px; margin-bottom: 10px; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            color: #555; font-size: 28px;
+        }
+        .bib-capa img { width: 100%; height: 100%; object-fit: cover; }
+        .bib-titulo {
+            font-size: 13px; color: #eaeaea; font-weight: 600;
+            line-height: 1.3; margin-bottom: 4px;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .bib-tema { font-size: 11px; color: #777; margin-bottom: 6px; }
+
+        .ap-card {
+            background: #1c1c20; border-left: 3px solid #333;
+            border-radius: 8px; padding: 14px; margin-bottom: 10px;
+        }
+        .ap-linha-1 {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            font-size: 11px; color: #888; margin-bottom: 8px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .ap-texto {
+            font-size: 14px; color: #e0e0e0; line-height: 1.5;
+            margin-bottom: 10px; white-space: pre-wrap;
+        }
+        .ap-fonte { font-size: 12px; color: #777; font-style: italic; margin-bottom: 10px; }
+        .ap-rodape {
+            display: flex; gap: 6px; flex-wrap: wrap;
+            align-items: center; font-size: 11px;
+        }
+        .ap-rodape .tag { padding: 3px 8px; background: #252529; border-radius: 10px; color: #aaa; }
+
+        .em-construcao {
+            text-align: center; padding: 40px 20px;
+            color: #666; font-size: 14px;
+        }
+        .em-construcao .icone { font-size: 36px; margin-bottom: 10px; }
+
+        .vazio { text-align: center; padding: 30px 20px; color: #777; font-size: 14px; }
+        .btn-primario {
+            padding: 10px 18px; font-size: 14px;
+            background: #333; color: #fff;
+            border: 1px solid #55555c; border-radius: 10px;
+            cursor: pointer; font-family: inherit; transition: 0.15s;
+        }
+        .btn-primario:hover { background: #3a3a40; }
+        .btn-secundario {
+            padding: 8px 14px; font-size: 13px;
+            background: #1a1a1e; color: #bbb;
+            border: 1px solid #333338; border-radius: 20px;
+            cursor: pointer; font-family: inherit; transition: 0.15s;
+        }
+        .btn-secundario:hover { color: #e0e0e0; border-color: #44444a; }
+
+        .video-player-wrap {
+            position: relative; width: 100%; aspect-ratio: 16/9;
+            background: #000; border-radius: 10px; overflow: hidden;
+            margin: 8px 0 12px;
+        }
+        .video-player-wrap iframe,
+        .video-player-wrap > div {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+        }
+        .video-velocidade {
+            display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0 12px;
+        }
+        .video-velocidade .chip { font-variant-numeric: tabular-nums; }
+
+        .btn-marcar {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 16px; font-size: 14px;
+            background: #1a2a1a; color: #a5d6a7;
+            border: 1px solid #2e5a2e; border-radius: 20px;
+            cursor: pointer; font-family: inherit; transition: 0.15s;
+        }
+        .btn-marcar:hover { background: #223a22; border-color: #4caf50; }
+
+        .momentos-lista { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+        .momento-item {
+            display: flex; gap: 10px; align-items: flex-start;
+            padding: 8px 12px;
+            background: #1c1c20; border-left: 3px solid #4caf50;
+            border-radius: 6px; font-size: 13px; color: #d0d0d0;
+        }
+        .momento-tempo {
+            font-variant-numeric: tabular-nums;
+            color: #4caf50; font-weight: 600; flex-shrink: 0;
+            cursor: pointer;
+        }
+        .momento-tempo:hover { text-decoration: underline; }
+        .momento-texto { flex: 1; white-space: pre-wrap; }
+        .momento-remover {
+            background: none; border: none; color: #666;
+            font-size: 16px; cursor: pointer; padding: 0 4px;
+            flex-shrink: 0;
+        }
+        .momento-remover:hover { color: #d45a5a; }
+
+        .rec-video-card {
+            display: flex; gap: 10px; padding: 8px;
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 8px; cursor: pointer; transition: 0.15s;
+            position: relative;
+        }
+        .rec-video-card:hover { background: #24242a; border-color: #3a3a40; }
+        .rec-video-thumb {
+            width: 100px; height: 56px; flex-shrink: 0;
+            background: #252529; border-radius: 4px;
+            overflow: hidden; position: relative;
+        }
+        .rec-video-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .rec-video-info { flex: 1; min-width: 0; }
+        .rec-video-titulo {
+            font-size: 12px; color: #eaeaea; font-weight: 600;
+            line-height: 1.3; margin-bottom: 4px;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .rec-video-meta { font-size: 11px; color: #888; }
+
+        .rec-video-dur {
+            position: absolute; bottom: 3px; right: 3px;
+            background: rgba(0,0,0,0.82); color: #fff;
+            padding: 1px 5px; font-size: 10px;
+            border-radius: 3px; font-variant-numeric: tabular-nums;
+        }
+        .rec-video-fav {
+            position: absolute; top: 6px; right: 6px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 50%;
+            width: 26px; height: 26px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 13px; color: #ddd;
+            transition: 0.15s;
+        }
+        .rec-video-fav:hover { background: rgba(0,0,0,0.85); }
+        .rec-video-fav.favoritado { background: #d45a5a; border-color: #d45a5a; color: #fff; }
+
+        .rec-video-stats { font-size: 11px; color: #777; margin-top: 3px; }
+        .rec-video-stats .linha { display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; color: #777; }
+        .rec-video-stats .sep { color: #444; }
+
+        .video-historico-wrap {
+            display: flex; gap: 6px; align-items: center;
+            margin-bottom: 8px;
+        }
+        .video-historico-wrap select { flex: 1; }
+        .video-historico-wrap button {
+            padding: 6px 10px; font-size: 12px;
+            background: #1a1a1e; color: #888;
+            border: 1px solid #333338; border-radius: 6px;
+            cursor: pointer;
+        }
+        .video-historico-wrap button:hover { color: #d45a5a; }
+
+        .video-filtros {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .video-filtros select { width: 100%; }
+
+        .video-acoes-extra {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .checkbox-legenda {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 12px; color: #aaa;
+            cursor: pointer; padding: 6px 10px;
+            border: 1px solid #333338; border-radius: 16px;
+            user-select: none;
+        }
+        .checkbox-legenda:hover { color: #ddd; }
+        .checkbox-legenda input { margin: 0; }
+
+        .area-3frases { display: flex; flex-direction: column; gap: 6px; }
+        .area-3frases input { font-size: 13px; }
+
+        .trechos-lista { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+        .trecho-item {
+            display: flex; gap: 10px; align-items: flex-start;
+            padding: 8px 12px;
+            background: #1c1c20; border-left: 3px solid #5a8ad4;
+            border-radius: 6px; font-size: 13px; color: #d0d0d0;
+        }
+        .trecho-texto { flex: 1; white-space: pre-wrap; }
+        .trecho-ref { font-size: 11px; color: #777; font-style: italic; margin-top: 3px; }
+        .trecho-remover {
+            background: none; border: none; color: #666;
+            font-size: 16px; cursor: pointer; padding: 0 4px; flex-shrink: 0;
+        }
+        .trecho-remover:hover { color: #d45a5a; }
+        .btn-adicionar-trecho {
+            margin-top: 8px;
+            padding: 7px 14px; font-size: 13px;
+            background: #1a2233; color: #a8c4e8;
+            border: 1px solid #2c3a55; border-radius: 20px;
+            cursor: pointer; font-family: inherit;
+            transition: 0.15s;
+        }
+        .btn-adicionar-trecho:hover { background: #232f4a; border-color: #4a5c85; }
+
+        .botao-foco-flutuante {
+            position: fixed; right: 24px; bottom: 24px; z-index: 9999;
+            display: flex; align-items: center;
+            width: 44px; height: 44px; overflow: hidden;
+            text-decoration: none;
+            background: #17171a; color: #f5f5f5;
+            border: 1px solid #2d2d32; border-radius: 22px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+            transition: width 0.2s ease;
+        }
+        .botao-foco-flutuante:hover { width: 88px; }
+        .botao-foco-flutuante .icone-foco { min-width: 44px; text-align: center; font-size: 18px; }
+        .botao-foco-flutuante .texto-foco {
+            font-size: 13px; opacity: 0;
+            transition: opacity 0.15s ease; white-space: nowrap;
+        }
+        .botao-foco-flutuante:hover .texto-foco { opacity: 1; }
+    </style>
+</head>
+
+<body>
+<main class="container">
+
+    <header class="header">
+        <p class="eyebrow">PLANEJAMENTO</p>
+        <h1>📚 Estudo</h1>
+        <p class="subtitle">Estude hoje, retome o que parou, veja o que aprendeu.</p>
+    </header>
+
+    <section class="modules">
+        <div class="resumo-estudo" id="resumoEstudo"></div>
+        <div class="tipos-barra" id="tiposBarra"></div>
+        <div class="module-card" style="align-items:flex-start;">
+            <div style="width:100%;">
+                <div class="sub-abas" id="subAbas"></div>
+                <div id="conteudo"></div>
             </div>
-            <div class="resumo-card" data-ir="biblioteca">
-                <span class="resumo-rotulo">Em andamento</span>
-                <span class="resumo-valor">${emAndamento}</span>
-            </div>
-            <div class="resumo-card" data-ir="aprendizados">
-                <span class="resumo-rotulo">Aprendizados ativos</span>
-                <span class="resumo-valor">${apsAtivos}</span>
-            </div>
-        `;
+        </div>
+    </section>
 
-        el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
-            card.addEventListener("click", () => {
-                const ir = card.dataset.ir;
-                if (ir === "aprendizados") estado.tipo = "aprendizados";
-                else { estado.tipo = "livro"; estado.subAba = ir; }
-                render();
-            });
-        });
-    }
-
-    function renderTipos() {
-        const lista = [...TIPOS, ABAS_APRENDIZADOS];
-        el("tiposBarra").innerHTML = lista.map(t => {
-            const ativo = estado.tipo === t.id ? " ativo" : "";
-            const tem = TIPOS.some(x => x.id === t.id) && temConteudoHoje(t.id);
-            const ponto = tem ? `<span class="ponto"></span>` : "";
-            return `<div class="tipo-pill${ativo}" data-tipo="${t.id}">${t.label}${ponto}</div>`;
-        }).join("");
-
-        el("tiposBarra").querySelectorAll(".tipo-pill").forEach(p => {
-            p.addEventListener("click", () => {
-                estado.tipo = p.dataset.tipo;
-                estado.subAba = "estudar";
-                render();
-            });
-        });
-    }
-
-    function renderSubAbas() {
-        let abas = [];
-        if (estado.tipo === "livro" || estado.tipo === "video" || estado.tipo === "artigo") {
-            abas = [
-                { id: "estudar",    label: "📝 Estudar hoje" },
-                { id: "biblioteca", label: "📚 Biblioteca" },
-            ];
-            if (estado.tipo === "artigo") {
-                abas.push({ id: "noticias", label: "📰 Notícias" });
-            }
-        } else if (estado.tipo === "aprendizados") {
-            abas = [];
-        } else {
-            abas = [{ id: "estudar", label: "📝 Estudar hoje" }];
-        }
-
-        if (abas.length === 0) { el("subAbas").innerHTML = ""; return; }
-        if (!abas.some(a => a.id === estado.subAba)) estado.subAba = abas[0].id;
-
-        el("subAbas").innerHTML = abas.map(a =>
-            `<div class="sub-aba${estado.subAba === a.id ? " ativa" : ""}" data-aba="${a.id}">${a.label}</div>`
-        ).join("");
-
-        el("subAbas").querySelectorAll(".sub-aba").forEach(s => {
-            s.addEventListener("click", () => {
-                estado.subAba = s.dataset.aba;
-                render();
-            });
-        });
-    }
-
-    function renderConteudo() {
-        if (estado.tipo === "livro"  && estado.subAba === "estudar")    return renderEstudarLivro();
-        if (estado.tipo === "livro"  && estado.subAba === "biblioteca") return renderBibliotecaLivro();
-        if (estado.tipo === "video"  && estado.subAba === "estudar")    return renderEstudarVideo();
-        if (estado.tipo === "video"  && estado.subAba === "biblioteca") return renderBibliotecaVideo();
-        if (estado.tipo === "artigo" && estado.subAba === "estudar")    return renderEstudarArtigo();
-        if (estado.tipo === "artigo" && estado.subAba === "biblioteca") return renderBibliotecaArtigo();
-        if (estado.tipo === "artigo" && estado.subAba === "noticias")   return renderNoticias();
-        if (estado.tipo === "aprendizados")                             return renderAprendizados();
-        return renderEmConstrucao();
-    }
-
-    function renderEmConstrucao() {
-        const tipoInfo = TIPOS.find(t => t.id === estado.tipo) || { label: "?" };
-        el("conteudo").innerHTML = `
-            <div class="em-construcao">
-                <div class="icone">🚧</div>
-                <div><strong>${tipoInfo.label}</strong> está em construção.</div>
-                <p style="margin-top:8px; font-size:13px;">
-                    Os campos específicos deste tipo serão adicionados na próxima parte.
-                </p>
-            </div>
-        `;
-    }
-
-    // ==================================================
-    // AUXILIARES DE VÍDEO
-    // ==================================================
-    const players = {};
-    const YOUTUBE_API_KEY = "AIzaSyB2mJE_ad6wDZ7wVBHWfRWjXDrYDpqYQ-g";
-
-    function extrairVideoId(url) {
-        if (!url) return "";
-        const s = url.trim();
-        const m = s.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
-        if (m) return m[1];
-        if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
-        return "";
-    }
-
-    function formatarDuracao(seg) {
-        const s = Number(seg) || 0;
-        const h = Math.floor(s / 3600);
-        const m = Math.floor((s % 3600) / 60);
-        const ss = Math.floor(s % 60);
-        if (h > 0) return `${h}:${String(m).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;
-        return `${m}:${String(ss).padStart(2,"0")}`;
-    }
-
-    function parseDuracao(txt) {
-        if (!txt) return 0;
-        const partes = String(txt).split(":").map(n => parseInt(n, 10) || 0);
-        if (partes.length === 3) return partes[0]*3600 + partes[1]*60 + partes[2];
-        if (partes.length === 2) return partes[0]*60 + partes[1];
-        if (partes.length === 1) return partes[0];
-        return 0;
-    }
-
-    function formatarDuracaoCurta(seg) {
-        seg = Number(seg) || 0;
-        if (seg < 60) return `${seg}s`;
-        const min = Math.round(seg / 60);
-        if (min < 60) return `${min} min`;
-        const h = Math.floor(seg / 3600);
-        const m = Math.round((seg % 3600) / 60);
-        return m > 0 ? `${h}h ${m}min` : `${h}h`;
-    }
-
-    function formatarVisualizacoes(n) {
-        n = Number(n) || 0;
-        if (n >= 1e9) return (n/1e9).toFixed(1).replace(".", ",") + " bi";
-        if (n >= 1e6) return (n/1e6).toFixed(1).replace(".", ",") + " mi";
-        if (n >= 1e3) return Math.floor(n/1e3) + " mil";
-        return String(n);
-    }
-
-    function formatarDataRelativa(iso) {
-        if (!iso) return "";
-        const d = new Date(iso);
-        const diff = Math.floor((new Date() - d) / 1000);
-        if (diff < 60) return "agora";
-        if (diff < 3600) return `há ${Math.floor(diff/60)} min`;
-        if (diff < 86400) return `há ${Math.floor(diff/3600)} h`;
-        if (diff < 86400*30) return `há ${Math.floor(diff/86400)} d`;
-        if (diff < 86400*365) return `há ${Math.floor(diff/86400/30)} meses`;
-        return `há ${Math.floor(diff/86400/365)} ano(s)`;
-    }
-
-    const videosVistos = new Set();
-    const CHAVE_HISTORICO = "estudo_video_historico_buscas";
-    const CHAVE_FILTROS   = "estudo_video_filtros_preferidos";
-
-    function obterHistoricoBuscas() {
-        try { return JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || []; }
-        catch { return []; }
-    }
-    function salvarBuscaNoHistorico(tema) {
-        if (!tema) return;
-        let h = obterHistoricoBuscas().filter(t => t.toLowerCase() !== tema.toLowerCase());
-        h.unshift(tema);
-        h = h.slice(0, 8);
-        localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(h));
-    }
-    function limparHistoricoBuscas() { localStorage.removeItem(CHAVE_HISTORICO); }
-
-    function obterFiltrosSalvos() {
-        try { return JSON.parse(localStorage.getItem(CHAVE_FILTROS)) || {}; }
-        catch { return {}; }
-    }
-    function salvarFiltros(opts) {
-        localStorage.setItem(CHAVE_FILTROS, JSON.stringify(opts));
-    }
-
-    let ytApiPromise = null;
-    function carregarYTAPI() {
-        if (ytApiPromise) return ytApiPromise;
-        ytApiPromise = new Promise(resolve => {
-            if (window.YT && window.YT.Player) return resolve();
-            window.onYouTubeIframeAPIReady = () => resolve();
-            const s = document.createElement("script");
-            s.src = "https://www.youtube.com/iframe_api";
-            document.head.appendChild(s);
-        });
-        return ytApiPromise;
-    }
-
-    async function aplicarPlayer(blockId, videoId, velocidade) {
-        if (!videoId) return;
-        await carregarYTAPI();
-        if (players[blockId]) {
-            try { players[blockId].destroy(); } catch(e) {}
-        }
-        players[blockId] = new window.YT.Player(`yt_${blockId}`, {
-            videoId,
-            playerVars: { rel: 0, modestbranding: 1, hl: "pt" },
-            events: {
-                onReady: (ev) => {
-                    if (velocidade && ev.target.setPlaybackRate) {
-                        try { ev.target.setPlaybackRate(Number(velocidade)); } catch(e) {}
-                    }
-                }
-            }
-        });
-    }
-
-    async function buscarMetadadosYouTube(videoId) {
-        const url = `https://www.youtube.com/oembed?url=${encodeURIComponent(
-            `https://www.youtube.com/watch?v=${videoId}`
-        )}&format=json`;
-        const r = await fetch(url);
-        if (!r.ok) throw new Error("oEmbed falhou");
-        const j = await r.json();
-        return {
-            titulo: j.title || "",
-            canal: j.author_name || "",
-            thumb: j.thumbnail_url || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
-            duracaoSeg: 0,
-        };
-    }
-
-    async function buscarVideosPorTema(query, opts = {}) {
-        if (!YOUTUBE_API_KEY) throw new Error("Chave do YouTube ausente");
-
-        const ordem    = opts.ordem    || "relevance";
-        const duracao  = opts.duracao  || "any";
-        const periodo  = opts.periodo  || "any";
-        const ineditos = !!opts.ineditos;
-        const legenda  = !!opts.legenda;
-
-        let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=25&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}&regionCode=BR&relevanceLanguage=pt&order=${ordem}`;
-
-        if (duracao !== "any") url += `&videoDuration=${duracao}`;
-        if (legenda) url += `&videoCaption=closedCaption`;
-
-        if (periodo !== "any") {
-            const dias = { "24h": 1, "semana": 7, "mes": 30, "ano": 365 }[periodo] || 0;
-            if (dias) {
-                const desde = new Date(Date.now() - dias * 86400000);
-                url += `&publishedAfter=${desde.toISOString()}`;
-            }
-        }
-
-        const r = await fetch(url);
-        if (!r.ok) {
-            const err = await r.json().catch(() => ({}));
-            console.error("YouTube API erro:", err);
-            throw new Error("YouTube API falhou");
-        }
-        const j = await r.json();
-        let items = j.items || [];
-        if (!items.length) return [];
-
-        if (ineditos) {
-            const novos = items.filter(x => !videosVistos.has(x.id.videoId));
-            if (novos.length >= 3) items = novos;
-            else videosVistos.clear();
-        }
-
-        for (let i = items.length - 1; i > 0; i--) {
-            const k = Math.floor(Math.random() * (i + 1));
-            [items[i], items[k]] = [items[k], items[i]];
-        }
-        items = items.slice(0, 6);
-        items.forEach(x => videosVistos.add(x.id.videoId));
-
-        const ids      = items.map(x => x.id.videoId).join(",");
-        const canalIds = [...new Set(items.map(x => x.snippet.channelId))].join(",");
-
-        let detalhes = {}, canais = {};
-        try {
-            const r2 = await fetch(
-                `https://www.googleapis.com/youtube/v3/videos?part=contentDetails,statistics&id=${ids}&key=${YOUTUBE_API_KEY}`
-            );
-            const j2 = await r2.json();
-            (j2.items || []).forEach(v => {
-                detalhes[v.id] = {
-                    duracao: v.contentDetails?.duration,
-                    views:   Number(v.statistics?.viewCount || 0),
-                    likes:   Number(v.statistics?.likeCount || 0),
-                };
-            });
-
-            const r3 = await fetch(
-                `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${canalIds}&key=${YOUTUBE_API_KEY}`
-            );
-            const j3 = await r3.json();
-            (j3.items || []).forEach(c => {
-                canais[c.id] = Number(c.statistics?.subscriberCount || 0);
-            });
-        } catch (e) {}
-
-        function isoParaSegundos(iso) {
-            if (!iso) return 0;
-            const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-            if (!m) return 0;
-            return (Number(m[1])||0)*3600 + (Number(m[2])||0)*60 + (Number(m[3])||0);
-        }
-
-        return items.map(it => {
-            const d = detalhes[it.id.videoId] || {};
-            const seg = d.duracao ? isoParaSegundos(d.duracao) : 0;
-            return {
-                vid:       it.id.videoId,
-                titulo:    it.snippet.title,
-                canal:     it.snippet.channelTitle,
-                canalId:   it.snippet.channelId,
-                publicado: it.snippet.publishedAt,
-                durSeg:    seg,
-                dur:       seg ? formatarDuracao(seg) : "",
-                durCurta:  seg ? formatarDuracaoCurta(seg) : "",
-                views:     d.views || 0,
-                likes:     d.likes || 0,
-                subs:      canais[it.snippet.channelId] || 0,
-                thumb:     it.snippet.thumbnails?.medium?.url || it.snippet.thumbnails?.default?.url || "",
-            };
-        });
-    }
-
-    // ==================================================
-    // AUXILIARES DE ARTIGO
-    // ==================================================
-    async function buscarMetadadosArtigo(url) {
-        const api = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
-        const r = await fetch(api);
-        if (!r.ok) throw new Error("Microlink falhou");
-        const j = await r.json();
-        const d = j.data || {};
-        return {
-            titulo:     d.title || "",
-            autor:      d.author || "",
-            publicacao: d.publisher || d.provider || "",
-            descricao:  d.description || "",
-            imagem:     d.image?.url || "",
-        };
-    }
-
-    // ==================================================
-    // BUSCA DE ARTIGOS — 4 fontes
-    // ==================================================
-    const FONTES_ARTIGO = [
-        { id: "hn",     label: "🟠 HN" },
-        { id: "reddit", label: "🔴 Reddit" },
-        { id: "medium", label: "⚫ Medium" },
-        { id: "devto",  label: "🟣 Dev.to" },
-    ];
-
-    const PRESETS_ARTIGO = {
-        tudo:      ["hn", "reddit", "medium", "devto"],
-        noticias:  ["hn", "reddit", "medium"],
-        pratico:   ["hn", "medium", "devto"],
-        discussao: ["reddit", "hn"],
-    };
-
-    const CHAVE_FONTES_ARTIGO = "estudo_artigo_fontes_ativas";
-
-    function obterFontesAtivas() {
-        const validas = FONTES_ARTIGO.map(f => f.id);
-        try {
-            const arr = JSON.parse(localStorage.getItem(CHAVE_FONTES_ARTIGO));
-            if (Array.isArray(arr) && arr.length) {
-                const limpo = arr.filter(id => validas.includes(id));
-                if (limpo.length) return limpo;
-            }
-        } catch {}
-        return [...PRESETS_ARTIGO.tudo];
-    }
-    function salvarFontesAtivas(arr) {
-        localStorage.setItem(CHAVE_FONTES_ARTIGO, JSON.stringify(arr));
-    }
-
-    // ---------- Notícias (NewsData.io): prefs + histórico + edições ----------
-    const CHAVE_NEWS_PREFS = "estudo_news_filtros_preferidos";
-    const CHAVE_NEWS_HIST  = "estudo_news_historico_buscas";
-
-    function obterPrefsNews() {
-        try { return JSON.parse(localStorage.getItem(CHAVE_NEWS_PREFS)) || {}; }
-        catch { return {}; }
-    }
-    function salvarPrefsNews(p) {
-        localStorage.setItem(CHAVE_NEWS_PREFS, JSON.stringify(p));
-    }
-
-    function obterHistoricoNews() {
-        try { return JSON.parse(localStorage.getItem(CHAVE_NEWS_HIST)) || []; }
-        catch { return []; }
-    }
-    function salvarBuscaNews(tema) {
-        if (!tema) return;
-        let h = obterHistoricoNews().filter(t => t.toLowerCase() !== tema.toLowerCase());
-        h.unshift(tema);
-        h = h.slice(0, 10);
-        localStorage.setItem(CHAVE_NEWS_HIST, JSON.stringify(h));
-    }
-
-    const NEWSDATA_KEY = "pub_96706e91d45d4676a6f66fa4f9ced844";
-
-    const EDICOES_NEWS = {
-        BR: { pais: "br", idioma: "pt", label: "🇧🇷 BR" },
-        US: { pais: "us", idioma: "en", label: "🇺🇸 US" },
-        PT: { pais: "pt", idioma: "pt", label: "🇵🇹 PT" },
-        ES: { pais: "es", idioma: "es", label: "🇪🇸 ES" },
-        GB: { pais: "gb", idioma: "en", label: "🇬🇧 UK" },
-        FR: { pais: "fr", idioma: "fr", label: "🇫🇷 FR" },
-    };
-
-    const PERIODOS_NEWS = {
-        "24h":  { horas: 24,   label: "24h" },
-        "48h":  { horas: 48,   label: "48h" },
-        "tudo": { horas: 9999, label: "Tudo" },
-    };
-
-    async function buscarNoticiasNewsData(query, opts = {}) {
-        const { edicao, periodo, dominio } = opts;
-
-        const ed = EDICOES_NEWS[edicao] || EDICOES_NEWS.BR;
-
-        let url = `https://newsdata.io/api/1/news?apikey=${NEWSDATA_KEY}&q=${encodeURIComponent(query)}&country=${ed.pais}&language=${ed.idioma}&size=50`;
-
-        if (dominio && dominio.trim()) {
-            url += `&domainurl=${encodeURIComponent(dominio.trim())}`;
-        }
-
-        console.log("[news] buscando:", query, "| edição:", edicao);
-
-        const r = await fetch(url);
-        if (!r.ok) {
-            const err = await r.json().catch(() => ({}));
-            console.error("[news] erro API:", err);
-            throw new Error("NewsData falhou HTTP " + r.status);
-        }
-
-        const j = await r.json();
-
-        if (j.status !== "success") {
-            throw new Error(j.message || "NewsData retornou erro");
-        }
-
-        const agora = Date.now();
-        const limiteHoras = (PERIODOS_NEWS[periodo] || PERIODOS_NEWS.tudo).horas;
-        const limiteMs = limiteHoras * 3600 * 1000;
-
-        return (j.results || []).map(a => {
-            const pub = a.pubDate ? new Date(a.pubDate.replace(" ", "T") + "Z") : null;
-            const portal = a.source_name || a.source_id || "";
-            let dom = "";
-            try { dom = new URL(a.source_url || a.link).hostname.replace(/^www\./, ""); } catch {}
-
-            return {
-                titulo: a.title || "",
-                url: a.link || "",
-                autor: "",
-                publicado: pub ? pub.toISOString() : "",
-                fonte: dom || portal,
-                origem: "Notícias",
-                pontos: 0,
-                comentarios: 0,
-                portal,
-                _ts: pub ? pub.getTime() : 0,
-            };
-        })
-        .filter(a => a.titulo && a.url)
-        .filter(a => !a._ts || (agora - a._ts) <= limiteMs)
-        .sort((a, b) => (b._ts || 0) - (a._ts || 0));
-    }
-
-    async function buscarTimelineNoticias(query, opts = {}) {
-        const { edicao } = opts;
-
-        const lista = await buscarNoticiasNewsData(query, { edicao, periodo: "tudo" });
-
-        const porDia = {};
-        lista.forEach(a => {
-            if (!a.publicado) return;
-            const d = a.publicado.slice(0, 10);
-            porDia[d] = (porDia[d] || 0) + 1;
-        });
-
-        return Object.keys(porDia).sort().map(d => ({
-            data: d.replace(/-/g, "") + "000000",
-            valor: porDia[d],
-        }));
-    }
-
-    // ---------- cadeia de proxies (só Reddit/Medium precisam) ----------
-    const WORKER_PROXY = "https://ancient-truth-1e.germanco1324.workers.dev/?url=";
-
-    const PROXIES_FALLBACK = [
-        (u) => u,
-        (u) => WORKER_PROXY + encodeURIComponent(u),
-        (u) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
-        (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-    ];
-
-    async function fetchComFallback(url) {
-        let ultimoErro = null;
-        for (let i = 0; i < PROXIES_FALLBACK.length; i++) {
-            const alvo = PROXIES_FALLBACK[i](url);
-            try {
-                console.log(`[proxy] tentando #${i}…`);
-                const r = await fetch(alvo);
-                if (r.ok) {
-                    console.log(`[proxy] ✅ sucesso via #${i}`);
-                    return r;
-                }
-                console.warn(`[proxy] ❌ #${i} retornou HTTP ${r.status}`);
-                ultimoErro = new Error(`HTTP ${r.status}`);
-            } catch (e) {
-                console.warn(`[proxy] ❌ #${i} falhou:`, e.message);
-                ultimoErro = e;
-            }
-        }
-        throw ultimoErro || new Error("Todos os proxies falharam");
-    }
-
-    function normalizarTag(txt) {
-        return txt.toLowerCase()
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-            .replace(/\s+/g, "-")
-            .replace(/[^a-z0-9-]/g, "");
-    }
-
-    async function buscarHN(query) {
-        const url = `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(query)}&tags=story&hitsPerPage=30`;
-        const r = await fetchComFallback(url);
-        const j = await r.json();
-        return (j.hits || []).filter(h => h.title && h.url).map(h => {
-            let dominio = "";
-            try { dominio = new URL(h.url).hostname.replace(/^www\./, ""); } catch {}
-            return {
-                titulo: h.title, url: h.url, autor: h.author || "",
-                publicado: h.created_at || "",
-                fonte: dominio, origem: "HN",
-                pontos: h.points || 0, comentarios: h.num_comments || 0,
-            };
-        });
-    }
-
-    async function buscarReddit(query) {
-        const url = `https://www.reddit.com/search.json?q=${encodeURIComponent(query)}&sort=relevance&limit=25`;
-        const r = await fetchComFallback(url);
-        const j = await r.json();
-        return (j.data?.children || []).map(c => c.data).filter(d => d.title).map(d => ({
-            titulo: d.title,
-            url: `https://reddit.com${d.permalink}`,
-            autor: `u/${d.author}`,
-            publicado: new Date((d.created_utc || 0) * 1000).toISOString(),
-            fonte: `r/${d.subreddit}`,
-            origem: "Reddit",
-            pontos: d.score || 0,
-            comentarios: d.num_comments || 0,
-        }));
-    }
-
-    async function buscarMedium(query) {
-        const tag = normalizarTag(query);
-        if (!tag) return [];
-        const url = `https://medium.com/feed/tag/${tag}`;
-        const r = await fetchComFallback(url);
-        const xml = await r.text();
-        const doc = new DOMParser().parseFromString(xml, "text/xml");
-        const items = doc.getElementsByTagName("item");
-        return Array.from(items).slice(0, 25).map(item => {
-            const titulo = item.getElementsByTagName("title")[0]?.textContent || "";
-            const link   = item.getElementsByTagName("link")[0]?.textContent || "";
-            const autor  = item.getElementsByTagName("dc:creator")[0]?.textContent || "";
-            const data   = item.getElementsByTagName("pubDate")[0]?.textContent || "";
-            return {
-                titulo, url: link, autor,
-                publicado: data ? new Date(data).toISOString() : "",
-                fonte: "medium.com", origem: "Medium",
-                pontos: 0, comentarios: 0,
-            };
-        }).filter(a => a.titulo && a.url);
-    }
-
-    async function buscarDevto(query) {
-        const tag = normalizarTag(query);
-        if (!tag) return [];
-        const url = `https://dev.to/api/articles?tag=${encodeURIComponent(tag)}&top=30&per_page=25`;
-        const r = await fetchComFallback(url);
-        const arr = await r.json();
-        if (!Array.isArray(arr)) return [];
-        return arr.map(a => ({
-            titulo: a.title, url: a.url,
-            autor: a.user?.name || "",
-            publicado: a.published_at || "",
-            fonte: "dev.to", origem: "Dev.to",
-            pontos: a.positive_reactions_count || 0,
-            comentarios: a.comments_count || 0,
-        }));
-    }
-
-    async function buscarArtigosPorTema(query, fontesAtivas) {
-        const mapa = {
-            hn: buscarHN, reddit: buscarReddit,
-            medium: buscarMedium, devto: buscarDevto,
-        };
-
-        const promessas = fontesAtivas.map(id => {
-            const fn = mapa[id];
-            if (!fn) return Promise.resolve([]);
-            return fn(query).catch(e => {
-                console.warn(`[${id}] falhou:`, e);
-                return [];
-            });
-        });
-
-        const resultados = await Promise.all(promessas);
-
-        const intercalado = [];
-        const maxPorFonte = Math.max(...resultados.map(r => r.length), 0);
-        for (let i = 0; i < maxPorFonte; i++) {
-            for (const lista of resultados) {
-                if (lista[i]) intercalado.push(lista[i]);
-            }
-        }
-        return intercalado.slice(0, 21);
-    }
-
-    // Verifica se um artigo do Medium é pago (Member-only)
-    async function verificarPagoMedium(url) {
-        if (!url || !url.includes("medium.com")) return null;
-        try {
-            const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-            const r = await fetch(proxy);
-            if (!r.ok) return null;
-            const html = await r.text();
-
-            const m1 = html.match(/<meta\s+property=["']isAccessibleForFree["']\s+content=["']([^"']+)["']/i);
-            const m2 = html.match(/<meta\s+content=["']([^"']+)["']\s+property=["']isAccessibleForFree["']/i);
-            const match = m1 || m2;
-
-            if (!match) return null;
-            return match[1].toLowerCase() === "false";
-        } catch (e) {
-            return null;
-        }
-    }
-
-    async function verificarPagosDosCards(box) {
-        const cards = [...box.querySelectorAll(".rec-artigo-card")];
-        const alvos = cards.filter(c => (c.dataset.artUrl || "").includes("medium.com"));
-        if (!alvos.length) return;
-
-        let i = 0;
-        const concorrencia = 3;
-
-        async function worker() {
-            while (i < alvos.length) {
-                const card = alvos[i++];
-                card.classList.add("checando-pago");
-
-                const pago = await verificarPagoMedium(card.dataset.artUrl);
-
-                card.classList.remove("checando-pago");
-
-                if (pago === true) {
-                    const badge = document.createElement("span");
-                    badge.className = "badge-pago";
-                    badge.textContent = "⭐ Pago";
-                    card.appendChild(badge);
-                }
-            }
-        }
-
-        <script src="../../js/storage.js"></script>
+    <script src="../../js/storage.js"></script>
 <script>
     "use strict";
 
@@ -2955,6 +2730,13 @@
 
         if (estado.newsBusca) executarBuscaNews();
     }
+    <a href="index.html" class="back-button">← Voltar para Planejamento</a>
+</main>
+
+<a href="../foco/foco.html" class="botao-foco-flutuante" aria-label="Ir para Foco">
+    <span class="icone-foco">🎯</span>
+    <span class="texto-foco">Foco</span>
+</a>
 
         // ==================================================
     // BIBLIOTECA LIVRO
@@ -3529,5 +3311,3 @@
 </script>
 </body>
 </html>
-        await Promise.all(Array.from({ length: concorrencia }, worker));
-    }
