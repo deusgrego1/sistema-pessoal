@@ -2690,7 +2690,16 @@
             const q = estado.gdeltBusca.trim();
             if (!q) return;
 
-            const box = wrap.querySelector("#gdeltResultados");
+                        const box = wrap.querySelector("#gdeltResultados");
+
+            const agora = Date.now();
+            const ultimaBusca = wrap._ultimaBuscaGdelt || 0;
+            if (agora - ultimaBusca < 5500) {
+                const faltam = Math.ceil((5500 - (agora - ultimaBusca)) / 1000);
+                box.innerHTML = `<div class="vazio">⏳ Aguarde ${faltam}s antes de buscar de novo.</div>`;
+                return;
+            }
+            wrap._ultimaBuscaGdelt = agora;
 
             if (estado.gdeltModo === "timeline") {
                 box.innerHTML = `<div style="color:#888;font-size:13px;padding:20px;text-align:center;">Carregando linha do tempo…</div>`;
@@ -2790,9 +2799,21 @@
                         if (url) window.open(url, "_blank", "noopener");
                     });
                 });
-            } catch (e) {
+                        } catch (e) {
                 console.error(e);
-                box.innerHTML = `<div class="vazio">Erro ao buscar. Tente outro filtro.</div>`;
+                if (e.message === "RATE_LIMIT") {
+                    box.innerHTML = `
+                        <div class="vazio">
+                            ⏳ O GDELT está limitando as buscas.<br>
+                            <span style="font-size:13px;color:#666;">
+                                Aguarde ~1 minuto e tente de novo.<br>
+                                (Limite: 1 busca a cada 5 segundos)
+                            </span>
+                        </div>
+                    `;
+                } else {
+                    box.innerHTML = `<div class="vazio">Erro ao buscar. Tente outro filtro.</div>`;
+                }
             }
         }
 
