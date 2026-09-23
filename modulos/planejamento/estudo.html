@@ -1,11 +1,3 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estudo</title>
-    <link rel="stylesheet" href="../../css/style.css">
-
     <style>
         .resumo-estudo {
             display: grid;
@@ -156,6 +148,19 @@
             text-transform: uppercase; letter-spacing: 0.5px;
         }
         .rec-artigo-stats { font-size: 11px; color: #888; }
+
+        .badge-paywall {
+            display: inline-block;
+            padding: 2px 7px; border-radius: 8px;
+            font-size: 10px; text-transform: uppercase;
+            letter-spacing: 0.5px; font-weight: 600;
+            cursor: pointer; user-select: none;
+            transition: 0.15s; white-space: nowrap;
+        }
+        .badge-paywall.pago     { background: #331f1f; color: #e08b8b; border: 1px solid #5a2e2e; }
+        .badge-paywall.gratuito { background: #1f3320; color: #a5d6a7; border: 1px solid #2e5a2e; }
+        .badge-paywall.incerto  { background: #332e1a; color: #e0d48a; border: 1px solid #5a4a2e; }
+        .badge-paywall:hover    { filter: brightness(1.25); }
 
         .bib-stats {
             display: flex; gap: 20px; flex-wrap: wrap;
@@ -416,40 +421,8 @@
             font-size: 13px; opacity: 0;
             transition: opacity 0.15s ease; white-space: nowrap;
         }
-        .botao-foco-flutuante:hover .texto-foco { opacity: 1; }
-    </style>
-</head>
 
-    <body>
-<main class="container">
-
-    <header class="header">
-        <p class="eyebrow">PLANEJAMENTO</p>
-        <h1>📚 Estudo</h1>
-        <p class="subtitle">Estude hoje, retome o que parou, veja o que aprendeu.</p>
-    </header>
-
-    <section class="modules">
-        <div class="resumo-estudo" id="resumoEstudo"></div>
-        <div class="tipos-barra" id="tiposBarra"></div>
-        <div class="module-card" style="align-items:flex-start;">
-            <div style="width:100%;">
-                <div class="sub-abas" id="subAbas"></div>
-                <div id="conteudo"></div>
-            </div>
-        </div>
-    </section>
-
-    <a href="index.html" class="back-button">← Voltar para Planejamento</a>
-</main>
-
-<a href="../foco/foco.html" class="botao-foco-flutuante" aria-label="Ir para Foco">
-    <span class="icone-foco">🎯</span>
-    <span class="texto-foco">Foco</span>
-</a>
-
-<script src="../../js/storage.js"></script>
-<script>
+        <script>
     "use strict";
 
     const hoje = new Date();
@@ -550,6 +523,11 @@
             ];
         } else if (estado.tipo === "aprendizados") {
             abas = [];
+        } else if (estado.tipo === "pratica") {
+            abas = [
+                { id: "estudar", label: "📝 Estudar hoje" },
+                { id: "bussola", label: "🧭 Bússola" },
+            ];
         } else {
             abas = [{ id: "estudar", label: "📝 Estudar hoje" }];
         }
@@ -576,6 +554,8 @@
         if (estado.tipo === "video"  && estado.subAba === "biblioteca") return renderBibliotecaVideo();
         if (estado.tipo === "artigo" && estado.subAba === "estudar")    return renderEstudarArtigo();
         if (estado.tipo === "artigo" && estado.subAba === "biblioteca") return renderBibliotecaArtigo();
+        if (estado.tipo === "pratica" && estado.subAba === "estudar")   return renderEstudarPratica();
+        if (estado.tipo === "pratica" && estado.subAba === "bussola")   return renderBussolaPratica();
         if (estado.tipo === "aprendizados")                             return renderAprendizados();
         return renderEmConstrucao();
     }
@@ -826,7 +806,7 @@
         });
     }
 
-        // ==================================================
+                    // ==================================================
     // AUXILIARES DE ARTIGO
     // ==================================================
     async function buscarMetadadosArtigo(url) {
@@ -873,6 +853,93 @@
     }
     function salvarFontesAtivas(arr) {
         localStorage.setItem(CHAVE_FONTES_ARTIGO, JSON.stringify(arr));
+    }
+
+    // ---------- detecção de paywall ----------
+    const DOMINIOS_PAGOS = new Set([
+        "wsj.com", "ft.com", "economist.com", "bloomberg.com",
+        "theinformation.com", "hbr.org", "theatlantic.com",
+        "newyorker.com", "wired.com", "businessinsider.com",
+        "nytimes.com", "washingtonpost.com", "latimes.com",
+        "bostonglobe.com", "telegraph.co.uk", "thetimes.co.uk",
+        "lemonde.fr", "lefigaro.fr", "spiegel.de", "zeit.de",
+        "folha.uol.com.br", "estadao.com.br", "oglobo.globo.com",
+        "valor.globo.com", "foreignaffairs.com",
+    ]);
+
+    const CHAVE_OVERRIDE_PAYWALL = "estudo_artigo_paywall_override";
+
+    function obterOverridePaywall() {
+        try { return JSON.parse(localStorage.getItem(CHAVE_OVERRIDE_PAYWALL)) || {}; }
+        catch { return {}; }
+    }
+    function salvarOverridePaywall(map) {
+        localStorage.setItem(CHAVE_OVERRIDE_PAYWALL, JSON.stringify(map));
+    }
+
+    function dominioDe(url) {
+        try { return new URL(url).hostname.replace(/^www\./, "").toLowerCase(); }
+        catch { return ""; }
+    }
+
+    function detectarPaywall(url, origem) {
+        const overrides = obterOverridePaywall();
+        if (overrides[url]) return overrides[url];
+
+        const dom = dominioDe(url);
+        if (!dom) return "desconhecido";
+
+        for (const d of DOMINIOS_PAGOS) {
+            if (dom === d || dom.endsWith("." + d)) return "pago";
+        }
+
+        if (origem === "Dev.to" || dom === "dev.to") return "gratuito";
+
+        if (dom === "medium.com" || dom.endsWith(".medium.com")) return "pode_ser_pago";
+
+        if (origem === "GDELT") return "desconhecido";
+
+        return "gratuito";
+    }
+
+    function cicloPaywall(url) {
+        const overrides = obterOverridePaywall();
+        const atual = overrides[url] || "";
+        let proximo;
+        if (atual === "")            proximo = "pago";
+        else if (atual === "pago")   proximo = "gratuito";
+        else                         proximo = "";
+
+        if (proximo === "") delete overrides[url];
+        else overrides[url] = proximo;
+        salvarOverridePaywall(overrides);
+        return proximo;
+    }
+
+    function badgePaywallHTML(status, url, origem) {
+        const cls = status === "pago" ? "pago"
+                  : status === "gratuito" ? "gratuito"
+                  : "incerto";
+        const txt = status === "pago" ? "🔒 Pago"
+                  : status === "gratuito" ? "🆓 Grátis"
+                  : "❓ Talvez";
+        const tit = status === "pago" ? "Provavelmente pago (clique para mudar)"
+                  : status === "gratuito" ? "Provavelmente gratuito (clique para mudar)"
+                  : "Não foi possível detectar (clique para mudar)";
+        return `<span class="badge-paywall ${cls}" data-paywall-toggle="1" data-url="${esc(url)}" data-origem="${esc(origem || "")}" title="${tit}">${txt}</span>`;
+    }
+
+    function atualizarBadgePaywall(badgeEl, status) {
+        badgeEl.className = "badge-paywall " + (
+            status === "pago" ? "pago" :
+            status === "gratuito" ? "gratuito" : "incerto"
+        );
+        badgeEl.textContent = status === "pago" ? "🔒 Pago"
+                            : status === "gratuito" ? "🆓 Grátis"
+                            : "❓ Talvez";
+        badgeEl.title = status === "pago" ? "Provavelmente pago (clique para mudar)"
+                      : status === "gratuito" ? "Provavelmente gratuito (clique para mudar)"
+                      : "Não foi possível detectar (clique para mudar)";
     }
 
     async function fetchComFallback(url) {
@@ -1008,7 +1075,383 @@
         return intercalado.slice(0, 21);
     }
 
-        // ==================================================
+    // ==================================================
+    // ARTIGO → ESTUDAR
+    // ==================================================
+    function addBlocoArtigo() {
+        const blocos = Storage.blocos.ler("artigo", dataAtual);
+        blocos.push({
+            id: uid("blk"),
+            tema: "", titulo: "", autor: "", publicacao: "",
+            url: "", confiabilidade: "",
+            tempoPrevisto: "", progresso: 0,
+            trechos: [],
+            resumo1: "", resumo2: "", resumo3: "",
+            oQueFazer: "", proximaAcao: "",
+            criadoEm: Date.now(),
+        });
+        Storage.blocos.salvar("artigo", dataAtual, blocos);
+        render();
+    }
+
+    function renderEstudarArtigo() {
+        const blocos = Storage.blocos.ler("artigo", dataAtual);
+        const wrap = el("conteudo");
+        wrap.innerHTML = "";
+
+        if (blocos.length === 0) {
+            const vazio = document.createElement("div");
+            vazio.className = "vazio";
+            vazio.innerHTML = `
+                <p>Nenhum artigo registrado hoje ainda.</p>
+                <button class="btn-primario" id="btnAddArtigo">+ Adicionar artigo</button>
+            `;
+            wrap.appendChild(vazio);
+            vazio.querySelector("#btnAddArtigo").addEventListener("click", addBlocoArtigo);
+            return;
+        }
+
+        blocos.forEach((b, i) => wrap.appendChild(renderBlocoArtigo(b, i)));
+
+        const addWrap = document.createElement("div");
+        addWrap.style.marginTop = "10px";
+        addWrap.innerHTML = `<button class="btn-secundario" id="btnAddArtigo">+ Adicionar outro artigo hoje</button>`;
+        wrap.appendChild(addWrap);
+        addWrap.querySelector("#btnAddArtigo").addEventListener("click", addBlocoArtigo);
+    }
+
+    function renderBlocoArtigo(b, idx) {
+        const elBloco = document.createElement("div");
+        elBloco.className = "bloco-estudo";
+        elBloco.dataset.id = b.id;
+
+        elBloco.innerHTML = `
+            <div class="bloco-cabecalho">
+                <span class="bloco-titulo">Artigo ${idx + 1}</span>
+                <button class="bloco-remover" data-rem="${b.id}" title="Remover">×</button>
+            </div>
+
+            <div class="secao-titulo">📋 Antes de ler</div>
+
+            <label class="campo-label">Tema</label>
+            <input type="text" data-campo="tema" value="${esc(b.tema)}" placeholder="Ex.: marketing digital">
+
+            <label class="campo-label">🔎 Buscar artigos sobre o tema</label>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center;">
+                <span style="font-size:11px;color:#777;">Modo:</span>
+                <button type="button" class="chip" data-preset-artigo="tudo">🎯 Tudo</button>
+                <button type="button" class="chip" data-preset-artigo="noticias">📰 Notícias</button>
+                <button type="button" class="chip" data-preset-artigo="pratico">🧠 Prático</button>
+                <button type="button" class="chip" data-preset-artigo="discussao">💬 Discussão</button>
+            </div>
+            <div class="chips" id="fontes_${b.id}" style="margin-bottom:8px;"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-secundario" data-recomendar-artigo="1">📄 Recomendar</button>
+                <button class="btn-secundario" data-google-artigo="1">🔍 Google</button>
+            </div>
+            <div class="recomendacoes" id="reca_${b.id}" style="display:none;"></div>
+
+            <label class="campo-label">Link do artigo</label>
+            <div class="linha-dupla">
+                <input type="text" data-campo="url" value="${esc(b.url)}" placeholder="https://...">
+                <button class="btn-secundario" data-buscar-meta-artigo="1">🔄 Buscar dados</button>
+            </div>
+            <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-secundario" data-abrir-artigo="1">🔗 Abrir no navegador</button>
+            </div>
+
+            <label class="campo-label">Título</label>
+            <input type="text" data-campo="titulo" value="${esc(b.titulo)}" placeholder="(puxado automaticamente)">
+
+            <div class="linha-dupla">
+                <div>
+                    <label class="campo-label">Autor</label>
+                    <input type="text" data-campo="autor" value="${esc(b.autor)}" placeholder="(puxado)">
+                </div>
+                <div>
+                    <label class="campo-label">Publicação</label>
+                    <input type="text" data-campo="publicacao" value="${esc(b.publicacao)}" placeholder="(puxado)">
+                </div>
+            </div>
+
+            <label class="campo-label">Confiabilidade da publicação</label>
+            <div class="chips" data-confianca-artigo="${b.id}">
+                <div class="chip${b.confiabilidade === "alta" ? " selecionado" : ""}" data-c="alta">🟢 Confio</div>
+                <div class="chip${b.confiabilidade === "neutra" ? " selecionado" : ""}" data-c="neutra">🟡 Neutro</div>
+                <div class="chip${b.confiabilidade === "baixa" ? " selecionado" : ""}" data-c="baixa">🔴 Não confio</div>
+            </div>
+
+            <label class="campo-label">Tempo previsto (quanto vou dedicar)</label>
+            <input type="text" data-campo="tempoPrevisto" value="${esc(b.tempoPrevisto)}" placeholder="Ex.: 10 min">
+
+            <div class="secao-titulo" style="margin-top:22px;">📖 Lendo</div>
+
+            <label class="campo-label">Progresso</label>
+            <input type="range" class="progresso-slider" min="0" max="100" step="5" value="${b.progresso || 0}" data-campo="progresso">
+            <div class="progresso"><div style="width:${b.progresso || 0}%"></div></div>
+            <div class="progresso-texto">${b.progresso || 0}% lido</div>
+
+            <label class="campo-label">📌 Trechos marcados</label>
+            <div class="trechos-lista" data-trechos="${b.id}">
+                ${(b.trechos || []).map((t, i) => `
+                    <div class="trecho-item">
+                        <div class="trecho-texto">
+                            "${esc(t.texto || "")}"
+                            ${t.ref ? `<div class="trecho-ref">${esc(t.ref)}</div>` : ""}
+                        </div>
+                        <button class="trecho-remover" data-trecho-rem="${i}">×</button>
+                    </div>
+                `).join("") || `<div style="color:#666;font-size:12px;">Nenhum trecho marcado.</div>`}
+            </div>
+            <button class="btn-adicionar-trecho" data-add-trecho="1">➕ Adicionar trecho</button>
+
+            <div class="secao-titulo" style="margin-top:22px;">✅ Depois de ler</div>
+
+            <label class="campo-label">Resumo em 3 frases</label>
+            <div class="area-3frases">
+                <input type="text" data-campo="resumo1" value="${esc(b.resumo1)}" placeholder="1. …">
+                <input type="text" data-campo="resumo2" value="${esc(b.resumo2)}" placeholder="2. …">
+                <input type="text" data-campo="resumo3" value="${esc(b.resumo3)}" placeholder="3. …">
+            </div>
+
+            <label class="campo-label">O que vou fazer com isso</label>
+            <textarea data-campo="oQueFazer" rows="2">${esc(b.oQueFazer)}</textarea>
+
+            <label class="campo-label">Próxima ação</label>
+            <input type="text" data-campo="proximaAcao" value="${esc(b.proximaAcao)}" placeholder="Ex.: pesquisar o autor">
+        `;
+
+        elBloco.querySelectorAll("[data-campo]").forEach(input => {
+            input.addEventListener("input", () => {
+                const campo = input.dataset.campo;
+                const blocos = Storage.blocos.ler("artigo", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i < 0) return;
+
+                if (campo === "progresso") {
+                    blocos[i].progresso = Number(input.value);
+                    elBloco.querySelector(".progresso > div").style.width = input.value + "%";
+                    elBloco.querySelector(".progresso-texto").textContent = input.value + "% lido";
+                } else {
+                    blocos[i][campo] = input.value;
+                }
+                Storage.blocos.salvar("artigo", dataAtual, blocos);
+
+                if (campo === "url" || campo === "titulo" || campo === "autor" || campo === "publicacao" || campo === "progresso") {
+                    const at = Storage.blocos.ler("artigo", dataAtual).find(x => x.id === b.id);
+                    if (at) registrarArtigoNaBiblioteca(at);
+                }
+            });
+        });
+
+        elBloco.querySelector("[data-buscar-meta-artigo]")?.addEventListener("click", async () => {
+            const blocos = Storage.blocos.ler("artigo", dataAtual);
+            const i = blocos.findIndex(x => x.id === b.id);
+            if (i < 0) return;
+            const url = (blocos[i].url || "").trim();
+            if (!/^https?:\/\//i.test(url)) return alert("Cole uma URL válida.");
+
+            const btn = elBloco.querySelector("[data-buscar-meta-artigo]");
+            btn.textContent = "🔄 Buscando…";
+            btn.disabled = true;
+
+            try {
+                const meta = await buscarMetadadosArtigo(url);
+                const blocos2 = Storage.blocos.ler("artigo", dataAtual);
+                const j = blocos2.findIndex(x => x.id === b.id);
+                if (j >= 0) {
+                    if (meta.titulo)     blocos2[j].titulo     = meta.titulo;
+                    if (meta.autor)      blocos2[j].autor      = meta.autor;
+                    if (meta.publicacao) blocos2[j].publicacao = meta.publicacao;
+                    Storage.blocos.salvar("artigo", dataAtual, blocos2);
+                }
+            } catch (e) {
+                console.warn(e);
+                alert("Não consegui puxar automaticamente. Preencha manual.");
+            }
+            render();
+        });
+
+        elBloco.querySelector("[data-abrir-artigo]")?.addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("artigo", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            if (!it || !it.url) return alert("Cole o link primeiro.");
+            window.open(it.url, "_blank", "noopener");
+        });
+
+        elBloco.querySelectorAll("[data-confianca-artigo] .chip").forEach(chip => {
+            chip.addEventListener("click", () => {
+                const c = chip.dataset.c;
+                elBloco.querySelectorAll("[data-confianca-artigo] .chip").forEach(x =>
+                    x.classList.toggle("selecionado", x === chip));
+                const blocos = Storage.blocos.ler("artigo", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i >= 0) {
+                    blocos[i].confiabilidade = c;
+                    Storage.blocos.salvar("artigo", dataAtual, blocos);
+                }
+            });
+        });
+
+        elBloco.querySelector("[data-add-trecho]")?.addEventListener("click", () => {
+            const texto = prompt("Cole o trecho exato:");
+            if (!texto) return;
+            const ref = prompt("Referência (opcional — ex.: § 3):") || "";
+            const blocos = Storage.blocos.ler("artigo", dataAtual);
+            const i = blocos.findIndex(x => x.id === b.id);
+            if (i < 0) return;
+            blocos[i].trechos = blocos[i].trechos || [];
+            blocos[i].trechos.push({ texto, ref });
+            Storage.blocos.salvar("artigo", dataAtual, blocos);
+            render();
+        });
+
+        elBloco.querySelectorAll("[data-trecho-rem]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const idx = Number(btn.dataset.trechoRem);
+                const blocos = Storage.blocos.ler("artigo", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i < 0) return;
+                blocos[i].trechos.splice(idx, 1);
+                Storage.blocos.salvar("artigo", dataAtual, blocos);
+                render();
+            });
+        });
+
+        elBloco.querySelector("[data-rem]").addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("artigo", dataAtual).filter(x => x.id !== b.id);
+            Storage.blocos.salvar("artigo", dataAtual, blocos);
+            render();
+        });
+
+        elBloco.querySelector("[data-google-artigo]")?.addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("artigo", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            const q = (it?.tema || "").trim();
+            if (!q) return alert("Preencha o tema primeiro.");
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(q + " artigo")}`, "_blank");
+        });
+
+        const fontesWrap = elBloco.querySelector(`#fontes_${b.id}`);
+        let fontesAtivas = obterFontesAtivas();
+
+        function renderChipsFontes() {
+            fontesWrap.innerHTML = FONTES_ARTIGO.map(f => {
+                const ativo = fontesAtivas.includes(f.id);
+                return `<div class="chip${ativo ? " selecionado" : ""}" data-fonte="${f.id}">${f.label}</div>`;
+            }).join("");
+
+            fontesWrap.querySelectorAll(".chip").forEach(chip => {
+                chip.addEventListener("click", () => {
+                    const id = chip.dataset.fonte;
+                    const i = fontesAtivas.indexOf(id);
+                    if (i >= 0) fontesAtivas.splice(i, 1);
+                    else fontesAtivas.push(id);
+                    if (fontesAtivas.length === 0) fontesAtivas = ["hn"];
+                    salvarFontesAtivas(fontesAtivas);
+                    renderChipsFontes();
+                });
+            });
+        }
+        renderChipsFontes();
+
+        elBloco.querySelectorAll("[data-preset-artigo]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const preset = btn.dataset.presetArtigo;
+                fontesAtivas = [...PRESETS_ARTIGO[preset]];
+                salvarFontesAtivas(fontesAtivas);
+                renderChipsFontes();
+            });
+        });
+
+        elBloco.querySelector("[data-recomendar-artigo]")?.addEventListener("click", async () => {
+            const blocos = Storage.blocos.ler("artigo", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            const q = (it?.tema || "").trim();
+            if (!q) return alert("Preencha o tema primeiro.");
+
+            const box = elBloco.querySelector(`#reca_${b.id}`);
+            box.style.display = "grid";
+            box.innerHTML = `<div style="color:#888;font-size:13px;">Buscando em ${fontesAtivas.length} fonte(s)…</div>`;
+
+            try {
+                const lista = await buscarArtigosPorTema(q, fontesAtivas);
+                if (!lista.length) {
+                    box.innerHTML = `<div style="color:#888;font-size:13px;">Nada encontrado. Tente outro modo ou o Google.</div>`;
+                    return;
+                }
+
+                box.innerHTML = lista.map(a => {
+                    const dataRel = formatarDataRelativa(a.publicado);
+                    const stats = [];
+                    if (a.pontos)      stats.push(`▲ ${a.pontos}`);
+                    if (a.comentarios) stats.push(`💬 ${a.comentarios}`);
+                    if (dataRel)       stats.push(dataRel);
+                    const pw = detectarPaywall(a.url, a.origem);
+                    return `
+                        <div class="rec-artigo-card"
+                             data-art-titulo="${esc(a.titulo)}"
+                             data-art-url="${esc(a.url)}"
+                             data-art-fonte="${esc(a.fonte)}"
+                             data-art-autor="${esc(a.autor)}">
+                            <div class="rec-artigo-meta">
+                                <span class="rec-artigo-fonte">${esc(a.origem)}</span>
+                                ${a.fonte ? `<span>· ${esc(a.fonte)}</span>` : ""}
+                                ${a.autor ? `<span>· ${esc(a.autor)}</span>` : ""}
+                                ${badgePaywallHTML(pw, a.url, a.origem)}
+                            </div>
+                            <div class="rec-artigo-titulo">${esc(a.titulo)}</div>
+                            ${stats.length ? `<div class="rec-artigo-stats">${stats.join(" · ")}</div>` : ""}
+                        </div>
+                    `;
+                }).join("");
+
+                box.querySelectorAll(".rec-artigo-card").forEach(card => {
+                    card.addEventListener("click", () => {
+                        const t = card.dataset.artTitulo;
+                        const l = card.dataset.artUrl;
+                        const f = card.dataset.artFonte;
+                        const au = card.dataset.artAutor;
+
+                        // 1) Abre o artigo no navegador (onde você já está logado no Medium)
+                        window.open(l, "_blank", "noopener");
+
+                        // 2) Preenche o bloco do dia pra você registrar
+                        const blocos2 = Storage.blocos.ler("artigo", dataAtual);
+                        const i = blocos2.findIndex(x => x.id === b.id);
+                        if (i < 0) return;
+                        blocos2[i].titulo = t;
+                        blocos2[i].url = l;
+                        blocos2[i].publicacao = f;
+                        blocos2[i].autor = au;
+                        Storage.blocos.salvar("artigo", dataAtual, blocos2);
+
+                        registrarArtigoNaBiblioteca(blocos2[i]);
+                        render();
+                    });
+                });
+
+                box.querySelectorAll("[data-paywall-toggle]").forEach(badge => {
+                    badge.addEventListener("click", (ev) => {
+                        ev.stopPropagation();
+                        const url = badge.dataset.url;
+                        const origem = badge.dataset.origem;
+                        cicloPaywall(url);
+                        const novo = detectarPaywall(url, origem);
+                        atualizarBadgePaywall(badge, novo);
+                    });
+                });
+            } catch (e) {
+                console.error(e);
+                box.innerHTML = `<div style="color:#888;font-size:13px;">Erro ao buscar. Tente o Google.</div>`;
+            }
+        });
+
+        setTimeout(() => registrarArtigoNaBiblioteca(b), 0);
+        return elBloco;
+    }
+
+                // ==================================================
     // LIVRO → ESTUDAR
     // ==================================================
     function renderEstudarLivro() {
@@ -1911,26 +2354,63 @@
     }
 
     // ==================================================
-    // ARTIGO → ESTUDAR
+    // PRÁTICA → ESTUDAR
     // ==================================================
-    function addBlocoArtigo() {
-        const blocos = Storage.blocos.ler("artigo", dataAtual);
+    const NIVEIS_PRATICA = [
+        { id: "aprendiz", label: "🔨 Aprendiz" },
+        { id: "artesao",  label: "⚒️ Artesão" },
+        { id: "mestre",   label: "🗡️ Mestre" },
+        { id: "lenda",    label: "👑 Lenda" },
+    ];
+    const TEMPOS_PRATICA = [
+        { id: "15",   label: "15 min" },
+        { id: "30",   label: "30 min" },
+        { id: "45",   label: "45 min" },
+        { id: "1h",   label: "1h" },
+        { id: "1h30", label: "1h30" },
+        { id: "2h+",  label: "2h+" },
+    ];
+    const REPS_PRATICA = [
+        { id: "5",   label: "5" },
+        { id: "10",  label: "10" },
+        { id: "15",  label: "15" },
+        { id: "20",  label: "20" },
+        { id: "50+", label: "50+" },
+    ];
+    const ENERGIA_PRATICA = [
+        { id: "alta",  label: "🔋 Cheio" },
+        { id: "media", label: "🟡 Médio" },
+        { id: "baixa", label: "🪫 Baixo" },
+    ];
+    const DIFICULDADE_PRATICA = [
+        { id: "facil",   label: "🟢 Fácil" },
+        { id: "media",   label: "🟡 Médio" },
+        { id: "dificil", label: "🔴 Difícil" },
+    ];
+
+    function addBlocoPratica() {
+        const blocos = Storage.blocos.ler("pratica", dataAtual);
         blocos.push({
             id: uid("blk"),
-            tema: "", titulo: "", autor: "", publicacao: "",
-            url: "", confiabilidade: "",
-            tempoPrevisto: "", progresso: 0,
-            trechos: [],
-            resumo1: "", resumo2: "", resumo3: "",
-            oQueFazer: "", proximaAcao: "",
+            tema: "",
+            oQuePraticar: "",
+            nivel: "",
+            sessaoTempo: "",
+            sessaoReps: "",
+            pontoFraco: "",
+            feedback: "",
+            proximaAcao: "",
+            energia: "",
+            dificuldade: "",
+            audioVideo: [],
             criadoEm: Date.now(),
         });
-        Storage.blocos.salvar("artigo", dataAtual, blocos);
+        Storage.blocos.salvar("pratica", dataAtual, blocos);
         render();
     }
 
-    function renderEstudarArtigo() {
-        const blocos = Storage.blocos.ler("artigo", dataAtual);
+    function renderEstudarPratica() {
+        const blocos = Storage.blocos.ler("pratica", dataAtual);
         const wrap = el("conteudo");
         wrap.innerHTML = "";
 
@@ -1938,342 +2418,187 @@
             const vazio = document.createElement("div");
             vazio.className = "vazio";
             vazio.innerHTML = `
-                <p>Nenhum artigo registrado hoje ainda.</p>
-                <button class="btn-primario" id="btnAddArtigo">+ Adicionar artigo</button>
+                <p>Nenhuma prática registrada hoje ainda.</p>
+                <button class="btn-primario" id="btnAddPratica">+ Adicionar prática</button>
             `;
             wrap.appendChild(vazio);
-            vazio.querySelector("#btnAddArtigo").addEventListener("click", addBlocoArtigo);
+            vazio.querySelector("#btnAddPratica").addEventListener("click", addBlocoPratica);
             return;
         }
 
-        blocos.forEach((b, i) => wrap.appendChild(renderBlocoArtigo(b, i)));
+        blocos.forEach((b, i) => wrap.appendChild(renderBlocoPratica(b, i)));
 
         const addWrap = document.createElement("div");
         addWrap.style.marginTop = "10px";
-        addWrap.innerHTML = `<button class="btn-secundario" id="btnAddArtigo">+ Adicionar outro artigo hoje</button>`;
+        addWrap.innerHTML = `<button class="btn-secundario" id="btnAddPratica">+ Adicionar outra prática hoje</button>`;
         wrap.appendChild(addWrap);
-        addWrap.querySelector("#btnAddArtigo").addEventListener("click", addBlocoArtigo);
+        addWrap.querySelector("#btnAddPratica").addEventListener("click", addBlocoPratica);
     }
 
-    function renderBlocoArtigo(b, idx) {
+    function renderBlocoPratica(b, idx) {
         const elBloco = document.createElement("div");
         elBloco.className = "bloco-estudo";
         elBloco.dataset.id = b.id;
 
         elBloco.innerHTML = `
             <div class="bloco-cabecalho">
-                <span class="bloco-titulo">Artigo ${idx + 1}</span>
+                <span class="bloco-titulo">Prática ${idx + 1}</span>
                 <button class="bloco-remover" data-rem="${b.id}" title="Remover">×</button>
             </div>
 
-            <div class="secao-titulo">📋 Antes de ler</div>
+            <div class="secao-titulo">📋 Antes de praticar</div>
 
-            <label class="campo-label">Tema</label>
-            <input type="text" data-campo="tema" value="${esc(b.tema)}" placeholder="Ex.: marketing digital">
+            <label class="campo-label">Tema / habilidade</label>
+            <input type="text" data-campo="tema" value="${esc(b.tema)}" placeholder="Ex.: corte de vídeo, escalas no violão">
 
-            <label class="campo-label">🔎 Buscar artigos sobre o tema</label>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center;">
-                <span style="font-size:11px;color:#777;">Modo:</span>
-                <button type="button" class="chip" data-preset-artigo="tudo">🎯 Tudo</button>
-                <button type="button" class="chip" data-preset-artigo="noticias">📰 Notícias</button>
-                <button type="button" class="chip" data-preset-artigo="pratico">🧠 Prático</button>
-                <button type="button" class="chip" data-preset-artigo="discussao">💬 Discussão</button>
-            </div>
-            <div class="chips" id="fontes_${b.id}" style="margin-bottom:8px;"></div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <button class="btn-secundario" data-recomendar-artigo="1">📄 Recomendar</button>
-                <button class="btn-secundario" data-google-artigo="1">🔍 Google</button>
-            </div>
-            <div class="recomendacoes" id="reca_${b.id}" style="display:none;"></div>
+            <label class="campo-label">O que vou praticar hoje</label>
+            <textarea data-campo="oQuePraticar" rows="2" placeholder="Ex.: 3 variações do lick em Am, 80 bpm">${esc(b.oQuePraticar)}</textarea>
 
-            <label class="campo-label">Link do artigo</label>
-            <div class="linha-dupla">
-                <input type="text" data-campo="url" value="${esc(b.url)}" placeholder="https://...">
-                <button class="btn-secundario" data-buscar-meta-artigo="1">🔄 Buscar dados</button>
-            </div>
-            <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;">
-                <button class="btn-secundario" data-abrir-artigo="1">🔗 Abrir no navegador</button>
+            <label class="campo-label">Nível atual</label>
+            <div class="chips" data-nivel="${b.id}">
+                ${NIVEIS_PRATICA.map(n => `
+                    <div class="chip${b.nivel === n.id ? " selecionado" : ""}" data-n="${n.id}">${n.label}</div>
+                `).join("")}
             </div>
 
-            <label class="campo-label">Título</label>
-            <input type="text" data-campo="titulo" value="${esc(b.titulo)}" placeholder="(puxado automaticamente)">
-
-            <div class="linha-dupla">
-                <div>
-                    <label class="campo-label">Autor</label>
-                    <input type="text" data-campo="autor" value="${esc(b.autor)}" placeholder="(puxado)">
-                </div>
-                <div>
-                    <label class="campo-label">Publicação</label>
-                    <input type="text" data-campo="publicacao" value="${esc(b.publicacao)}" placeholder="(puxado)">
-                </div>
+            <label class="campo-label">Duração da sessão</label>
+            <div class="chips" data-tempo="${b.id}">
+                ${TEMPOS_PRATICA.map(t => `
+                    <div class="chip${b.sessaoTempo === t.id ? " selecionado" : ""}" data-t="${t.id}">${t.label}</div>
+                `).join("")}
             </div>
 
-            <label class="campo-label">Confiabilidade da publicação</label>
-            <div class="chips" data-confianca-artigo="${b.id}">
-                <div class="chip${b.confiabilidade === "alta" ? " selecionado" : ""}" data-c="alta">🟢 Confio</div>
-                <div class="chip${b.confiabilidade === "neutra" ? " selecionado" : ""}" data-c="neutra">🟡 Neutro</div>
-                <div class="chip${b.confiabilidade === "baixa" ? " selecionado" : ""}" data-c="baixa">🔴 Não confio</div>
+            <label class="campo-label">Repetições</label>
+            <div class="chips" data-reps="${b.id}">
+                ${REPS_PRATICA.map(r => `
+                    <div class="chip${b.sessaoReps === r.id ? " selecionado" : ""}" data-r="${r.id}">${r.label}</div>
+                `).join("")}
             </div>
 
-            <label class="campo-label">Tempo previsto (quanto vou dedicar)</label>
-            <input type="text" data-campo="tempoPrevisto" value="${esc(b.tempoPrevisto)}" placeholder="Ex.: 10 min">
+            <label class="campo-label">Ponto fraco a atacar</label>
+            <input type="text" data-campo="pontoFraco" value="${esc(b.pontoFraco)}" placeholder="Ex.: transição do refrão, mão direita atrasa">
 
-            <div class="secao-titulo" style="margin-top:22px;">📖 Lendo</div>
+            <div class="secao-titulo" style="margin-top:22px;">✅ Depois de praticar</div>
 
-            <label class="campo-label">Progresso</label>
-            <input type="range" class="progresso-slider" min="0" max="100" step="5" value="${b.progresso || 0}" data-campo="progresso">
-            <div class="progresso"><div style="width:${b.progresso || 0}%"></div></div>
-            <div class="progresso-texto">${b.progresso || 0}% lido</div>
-
-            <label class="campo-label">📌 Trechos marcados</label>
-            <div class="trechos-lista" data-trechos="${b.id}">
-                ${(b.trechos || []).map((t, i) => `
-                    <div class="trecho-item">
-                        <div class="trecho-texto">
-                            "${esc(t.texto || "")}"
-                            ${t.ref ? `<div class="trecho-ref">${esc(t.ref)}</div>` : ""}
-                        </div>
-                        <button class="trecho-remover" data-trecho-rem="${i}">×</button>
-                    </div>
-                `).join("") || `<div style="color:#666;font-size:12px;">Nenhum trecho marcado.</div>`}
-            </div>
-            <button class="btn-adicionar-trecho" data-add-trecho="1">➕ Adicionar trecho</button>
-
-            <div class="secao-titulo" style="margin-top:22px;">✅ Depois de ler</div>
-
-            <label class="campo-label">Resumo em 3 frases</label>
-            <div class="area-3frases">
-                <input type="text" data-campo="resumo1" value="${esc(b.resumo1)}" placeholder="1. …">
-                <input type="text" data-campo="resumo2" value="${esc(b.resumo2)}" placeholder="2. …">
-                <input type="text" data-campo="resumo3" value="${esc(b.resumo3)}" placeholder="3. …">
-            </div>
-
-            <label class="campo-label">O que vou fazer com isso</label>
-            <textarea data-campo="oQueFazer" rows="2">${esc(b.oQueFazer)}</textarea>
+            <label class="campo-label">Feedback recebido / auto-observação</label>
+            <textarea data-campo="feedback" rows="3" placeholder="Ex.: travou na virada de acorde; melhorou a dinâmica no final">${esc(b.feedback)}</textarea>
 
             <label class="campo-label">Próxima ação</label>
-            <input type="text" data-campo="proximaAcao" value="${esc(b.proximaAcao)}" placeholder="Ex.: pesquisar o autor">
+            <input type="text" data-campo="proximaAcao" value="${esc(b.proximaAcao)}" placeholder="Ex.: repetir em 85 bpm, isolar a virada">
+
+            <div class="linha-dupla">
+                <div>
+                    <label class="campo-label">Energia</label>
+                    <div class="chips" data-energia="${b.id}">
+                        ${ENERGIA_PRATICA.map(e => `
+                            <div class="chip${b.energia === e.id ? " selecionado" : ""}" data-e="${e.id}">${e.label}</div>
+                        `).join("")}
+                    </div>
+                </div>
+                <div>
+                    <label class="campo-label">Dificuldade</label>
+                    <div class="chips" data-dificuldade="${b.id}">
+                        ${DIFICULDADE_PRATICA.map(d => `
+                            <div class="chip${b.dificuldade === d.id ? " selecionado" : ""}" data-d="${d.id}">${d.label}</div>
+                        `).join("")}
+                    </div>
+                </div>
+            </div>
+
+            <label class="campo-label">🎙️ Áudio / vídeo próprio</label>
+            <div style="color:#666;font-size:12px;padding:10px 12px;background:#19191d;border:1px dashed #333;border-radius:8px;">
+                Em breve — gravação e upload local via IndexedDB (passo 3).
+            </div>
         `;
 
         elBloco.querySelectorAll("[data-campo]").forEach(input => {
             input.addEventListener("input", () => {
                 const campo = input.dataset.campo;
-                const blocos = Storage.blocos.ler("artigo", dataAtual);
+                const blocos = Storage.blocos.ler("pratica", dataAtual);
                 const i = blocos.findIndex(x => x.id === b.id);
                 if (i < 0) return;
-
-                if (campo === "progresso") {
-                    blocos[i].progresso = Number(input.value);
-                    elBloco.querySelector(".progresso > div").style.width = input.value + "%";
-                    elBloco.querySelector(".progresso-texto").textContent = input.value + "% lido";
-                } else {
-                    blocos[i][campo] = input.value;
-                }
-                Storage.blocos.salvar("artigo", dataAtual, blocos);
-
-                if (campo === "url" || campo === "titulo" || campo === "autor" || campo === "publicacao" || campo === "progresso") {
-                    const at = Storage.blocos.ler("artigo", dataAtual).find(x => x.id === b.id);
-                    if (at) registrarArtigoNaBiblioteca(at);
-                }
+                blocos[i][campo] = input.value;
+                Storage.blocos.salvar("pratica", dataAtual, blocos);
             });
         });
 
-        elBloco.querySelector("[data-buscar-meta-artigo]")?.addEventListener("click", async () => {
-            const blocos = Storage.blocos.ler("artigo", dataAtual);
-            const i = blocos.findIndex(x => x.id === b.id);
-            if (i < 0) return;
-            const url = (blocos[i].url || "").trim();
-            if (!/^https?:\/\//i.test(url)) return alert("Cole uma URL válida.");
-
-            const btn = elBloco.querySelector("[data-buscar-meta-artigo]");
-            btn.textContent = "🔄 Buscando…";
-            btn.disabled = true;
-
-            try {
-                const meta = await buscarMetadadosArtigo(url);
-                const blocos2 = Storage.blocos.ler("artigo", dataAtual);
-                const j = blocos2.findIndex(x => x.id === b.id);
-                if (j >= 0) {
-                    if (meta.titulo)     blocos2[j].titulo     = meta.titulo;
-                    if (meta.autor)      blocos2[j].autor      = meta.autor;
-                    if (meta.publicacao) blocos2[j].publicacao = meta.publicacao;
-                    Storage.blocos.salvar("artigo", dataAtual, blocos2);
-                }
-            } catch (e) {
-                console.warn(e);
-                alert("Não consegui puxar automaticamente. Preencha manual.");
-            }
-            render();
-        });
-
-        elBloco.querySelector("[data-abrir-artigo]")?.addEventListener("click", () => {
-            const blocos = Storage.blocos.ler("artigo", dataAtual);
-            const it = blocos.find(x => x.id === b.id);
-            if (!it || !it.url) return alert("Cole o link primeiro.");
-            window.open(it.url, "_blank", "noopener");
-        });
-
-        elBloco.querySelectorAll("[data-confianca-artigo] .chip").forEach(chip => {
+        elBloco.querySelectorAll("[data-nivel] .chip").forEach(chip => {
             chip.addEventListener("click", () => {
-                const c = chip.dataset.c;
-                elBloco.querySelectorAll("[data-confianca-artigo] .chip").forEach(x =>
-                    x.classList.toggle("selecionado", x === chip));
-                const blocos = Storage.blocos.ler("artigo", dataAtual);
+                const v = chip.dataset.n;
+                elBloco.querySelectorAll("[data-nivel] .chip").forEach(c =>
+                    c.classList.toggle("selecionado", c === chip));
+                const blocos = Storage.blocos.ler("pratica", dataAtual);
                 const i = blocos.findIndex(x => x.id === b.id);
-                if (i >= 0) {
-                    blocos[i].confiabilidade = c;
-                    Storage.blocos.salvar("artigo", dataAtual, blocos);
-                }
+                if (i >= 0) { blocos[i].nivel = v; Storage.blocos.salvar("pratica", dataAtual, blocos); }
             });
         });
 
-        elBloco.querySelector("[data-add-trecho]")?.addEventListener("click", () => {
-            const texto = prompt("Cole o trecho exato:");
-            if (!texto) return;
-            const ref = prompt("Referência (opcional — ex.: § 3):") || "";
-            const blocos = Storage.blocos.ler("artigo", dataAtual);
-            const i = blocos.findIndex(x => x.id === b.id);
-            if (i < 0) return;
-            blocos[i].trechos = blocos[i].trechos || [];
-            blocos[i].trechos.push({ texto, ref });
-            Storage.blocos.salvar("artigo", dataAtual, blocos);
-            render();
+        elBloco.querySelectorAll("[data-tempo] .chip").forEach(chip => {
+            chip.addEventListener("click", () => {
+                const v = chip.dataset.t;
+                elBloco.querySelectorAll("[data-tempo] .chip").forEach(c =>
+                    c.classList.toggle("selecionado", c === chip));
+                const blocos = Storage.blocos.ler("pratica", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i >= 0) { blocos[i].sessaoTempo = v; Storage.blocos.salvar("pratica", dataAtual, blocos); }
+            });
         });
 
-        elBloco.querySelectorAll("[data-trecho-rem]").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const idx = Number(btn.dataset.trechoRem);
-                const blocos = Storage.blocos.ler("artigo", dataAtual);
+        elBloco.querySelectorAll("[data-reps] .chip").forEach(chip => {
+            chip.addEventListener("click", () => {
+                const v = chip.dataset.r;
+                elBloco.querySelectorAll("[data-reps] .chip").forEach(c =>
+                    c.classList.toggle("selecionado", c === chip));
+                const blocos = Storage.blocos.ler("pratica", dataAtual);
                 const i = blocos.findIndex(x => x.id === b.id);
-                if (i < 0) return;
-                blocos[i].trechos.splice(idx, 1);
-                Storage.blocos.salvar("artigo", dataAtual, blocos);
-                render();
+                if (i >= 0) { blocos[i].sessaoReps = v; Storage.blocos.salvar("pratica", dataAtual, blocos); }
+            });
+        });
+
+        elBloco.querySelectorAll("[data-energia] .chip").forEach(chip => {
+            chip.addEventListener("click", () => {
+                const v = chip.dataset.e;
+                elBloco.querySelectorAll("[data-energia] .chip").forEach(c =>
+                    c.classList.toggle("selecionado", c === chip));
+                const blocos = Storage.blocos.ler("pratica", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i >= 0) { blocos[i].energia = v; Storage.blocos.salvar("pratica", dataAtual, blocos); }
+            });
+        });
+
+        elBloco.querySelectorAll("[data-dificuldade] .chip").forEach(chip => {
+            chip.addEventListener("click", () => {
+                const v = chip.dataset.d;
+                elBloco.querySelectorAll("[data-dificuldade] .chip").forEach(c =>
+                    c.classList.toggle("selecionado", c === chip));
+                const blocos = Storage.blocos.ler("pratica", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i >= 0) { blocos[i].dificuldade = v; Storage.blocos.salvar("pratica", dataAtual, blocos); }
             });
         });
 
         elBloco.querySelector("[data-rem]").addEventListener("click", () => {
-            const blocos = Storage.blocos.ler("artigo", dataAtual).filter(x => x.id !== b.id);
-            Storage.blocos.salvar("artigo", dataAtual, blocos);
+            const blocos = Storage.blocos.ler("pratica", dataAtual).filter(x => x.id !== b.id);
+            Storage.blocos.salvar("pratica", dataAtual, blocos);
             render();
         });
 
-        elBloco.querySelector("[data-google-artigo]")?.addEventListener("click", () => {
-            const blocos = Storage.blocos.ler("artigo", dataAtual);
-            const it = blocos.find(x => x.id === b.id);
-            const q = (it?.tema || "").trim();
-            if (!q) return alert("Preencha o tema primeiro.");
-            window.open(`https://www.google.com/search?q=${encodeURIComponent(q + " artigo")}`, "_blank");
-        });
-
-        const fontesWrap = elBloco.querySelector(`#fontes_${b.id}`);
-        let fontesAtivas = obterFontesAtivas();
-
-        function renderChipsFontes() {
-            fontesWrap.innerHTML = FONTES_ARTIGO.map(f => {
-                const ativo = fontesAtivas.includes(f.id);
-                return `<div class="chip${ativo ? " selecionado" : ""}" data-fonte="${f.id}">${f.label}</div>`;
-            }).join("");
-
-            fontesWrap.querySelectorAll(".chip").forEach(chip => {
-                chip.addEventListener("click", () => {
-                    const id = chip.dataset.fonte;
-                    const i = fontesAtivas.indexOf(id);
-                    if (i >= 0) fontesAtivas.splice(i, 1);
-                    else fontesAtivas.push(id);
-                    if (fontesAtivas.length === 0) fontesAtivas = ["hn"];
-                    salvarFontesAtivas(fontesAtivas);
-                    renderChipsFontes();
-                });
-            });
-        }
-        renderChipsFontes();
-
-        elBloco.querySelectorAll("[data-preset-artigo]").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const preset = btn.dataset.presetArtigo;
-                fontesAtivas = [...PRESETS_ARTIGO[preset]];
-                salvarFontesAtivas(fontesAtivas);
-                renderChipsFontes();
-            });
-        });
-
-        elBloco.querySelector("[data-recomendar-artigo]")?.addEventListener("click", async () => {
-            const blocos = Storage.blocos.ler("artigo", dataAtual);
-            const it = blocos.find(x => x.id === b.id);
-            const q = (it?.tema || "").trim();
-            if (!q) return alert("Preencha o tema primeiro.");
-
-            const box = elBloco.querySelector(`#reca_${b.id}`);
-            box.style.display = "grid";
-            box.innerHTML = `<div style="color:#888;font-size:13px;">Buscando em ${fontesAtivas.length} fonte(s)…</div>`;
-
-            try {
-                const lista = await buscarArtigosPorTema(q, fontesAtivas);
-                if (!lista.length) {
-                    box.innerHTML = `<div style="color:#888;font-size:13px;">Nada encontrado. Tente outro modo ou o Google.</div>`;
-                    return;
-                }
-
-                box.innerHTML = lista.map(a => {
-                    const dataRel = formatarDataRelativa(a.publicado);
-                    const stats = [];
-                    if (a.pontos)      stats.push(`▲ ${a.pontos}`);
-                    if (a.comentarios) stats.push(`💬 ${a.comentarios}`);
-                    if (dataRel)       stats.push(dataRel);
-                    return `
-                        <div class="rec-artigo-card"
-                             data-art-titulo="${esc(a.titulo)}"
-                             data-art-url="${esc(a.url)}"
-                             data-art-fonte="${esc(a.fonte)}"
-                             data-art-autor="${esc(a.autor)}">
-                            <div class="rec-artigo-meta">
-                                <span class="rec-artigo-fonte">${esc(a.origem)}</span>
-                                ${a.fonte ? `<span>· ${esc(a.fonte)}</span>` : ""}
-                                ${a.autor ? `<span>· ${esc(a.autor)}</span>` : ""}
-                            </div>
-                            <div class="rec-artigo-titulo">${esc(a.titulo)}</div>
-                            ${stats.length ? `<div class="rec-artigo-stats">${stats.join(" · ")}</div>` : ""}
-                        </div>
-                    `;
-                }).join("");
-
-                box.querySelectorAll(".rec-artigo-card").forEach(card => {
-                    card.addEventListener("click", () => {
-                        const t = card.dataset.artTitulo;
-                        const l = card.dataset.artUrl;
-                        const f = card.dataset.artFonte;
-                        const au = card.dataset.artAutor;
-
-                        // 1) Abre o artigo no navegador (onde você já está logado no Medium)
-                        window.open(l, "_blank", "noopener");
-
-                        // 2) Preenche o bloco do dia pra você registrar
-                        const blocos2 = Storage.blocos.ler("artigo", dataAtual);
-                        const i = blocos2.findIndex(x => x.id === b.id);
-                        if (i < 0) return;
-                        blocos2[i].titulo = t;
-                        blocos2[i].url = l;
-                        blocos2[i].publicacao = f;
-                        blocos2[i].autor = au;
-                        Storage.blocos.salvar("artigo", dataAtual, blocos2);
-
-                        registrarArtigoNaBiblioteca(blocos2[i]);
-                        render();
-                    });
-                });
-            } catch (e) {
-                console.error(e);
-                box.innerHTML = `<div style="color:#888;font-size:13px;">Erro ao buscar. Tente o Google.</div>`;
-            }
-        });
-
-        setTimeout(() => registrarArtigoNaBiblioteca(b), 0);
         return elBloco;
     }
 
-        // ==================================================
+    function renderBussolaPratica() {
+        el("conteudo").innerHTML = `
+            <div class="em-construcao">
+                <div class="icone">🧭</div>
+                <div><strong>Bússola</strong> — em construção.</div>
+                <p style="margin-top:8px; font-size:13px;">
+                    Objetivo final, próximo marco, pipeline, alvo da próxima sessão e gaps entram no passo 2.
+                </p>
+            </div>
+        `;
+    }
+
+                        // ==================================================
     // BIBLIOTECA LIVRO
     // ==================================================
     function registrarNaBiblioteca(item, pct) {
@@ -2846,3 +3171,5 @@
 </script>
 </body>
 </html>
+        .botao-foco-flutuante:hover .texto-foco { opacity: 1; }
+    </style>
