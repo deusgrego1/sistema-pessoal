@@ -189,7 +189,7 @@
             z-index: 2;
         }
 
-        /* ---------- Painel GDELT dedicado ---------- */
+        /* ---------- Painel Notícias (Google News) ---------- */
         .gdelt-painel {
             background: #19191d; border: 1px solid #252529;
             border-radius: 10px; padding: 16px; margin-bottom: 16px;
@@ -515,7 +515,7 @@
     <span class="texto-foco">Foco</span>
 </a>
 
-<script src="../../js/storage.js"></script>
+    <script src="../../js/storage.js"></script>
 <script>
     "use strict";
 
@@ -544,13 +544,11 @@
         bibOrdem: "recente",
         bibBusca: "",
         apBusca: "",
-        gdeltBusca: "",
-        gdeltIdioma: "todos",
-        gdeltPais: "todos",
-        gdeltPeriodo: "tudo",
-        gdeltOrdem: "hybridrel",
-        gdeltDominio: "",
-        gdeltModo: "lista",
+        newsBusca: "",
+        newsEdicao: "BR",
+        newsPeriodo: "7d",
+        newsDominio: "",
+        newsModo: "lista",
     };
 
     const esc = Storage.escapeHTML;
@@ -623,7 +621,7 @@
                 { id: "biblioteca", label: "📚 Biblioteca" },
             ];
             if (estado.tipo === "artigo") {
-                abas.push({ id: "gdelt", label: "📰 GDELT" });
+                abas.push({ id: "noticias", label: "📰 Notícias" });
             }
         } else if (estado.tipo === "aprendizados") {
             abas = [];
@@ -653,7 +651,7 @@
         if (estado.tipo === "video"  && estado.subAba === "biblioteca") return renderBibliotecaVideo();
         if (estado.tipo === "artigo" && estado.subAba === "estudar")    return renderEstudarArtigo();
         if (estado.tipo === "artigo" && estado.subAba === "biblioteca") return renderBibliotecaArtigo();
-        if (estado.tipo === "artigo" && estado.subAba === "gdelt")      return renderGDELTDedicado();
+        if (estado.tipo === "artigo" && estado.subAba === "noticias")   return renderNoticias();
         if (estado.tipo === "aprendizados")                             return renderAprendizados();
         return renderEmConstrucao();
     }
@@ -923,7 +921,7 @@
     }
 
     // ==================================================
-    // BUSCA DE ARTIGOS — 4 fontes (GDELT virou sub-aba)
+    // BUSCA DE ARTIGOS — 4 fontes
     // ==================================================
     const FONTES_ARTIGO = [
         { id: "hn",     label: "🟠 HN" },
@@ -956,112 +954,125 @@
         localStorage.setItem(CHAVE_FONTES_ARTIGO, JSON.stringify(arr));
     }
 
-    // ---------- GDELT: prefs + histórico + busca estendida ----------
-    const CHAVE_GDELT_PREFS = "estudo_gdelt_filtros_preferidos";
-    const CHAVE_GDELT_HIST  = "estudo_gdelt_historico_buscas";
+    // ---------- Notícias (Google News RSS): prefs + histórico + edições ----------
+    const CHAVE_NEWS_PREFS = "estudo_news_filtros_preferidos";
+    const CHAVE_NEWS_HIST  = "estudo_news_historico_buscas";
 
-    function obterPrefsGdelt() {
-        try { return JSON.parse(localStorage.getItem(CHAVE_GDELT_PREFS)) || {}; }
+    function obterPrefsNews() {
+        try { return JSON.parse(localStorage.getItem(CHAVE_NEWS_PREFS)) || {}; }
         catch { return {}; }
     }
-    function salvarPrefsGdelt(p) {
-        localStorage.setItem(CHAVE_GDELT_PREFS, JSON.stringify(p));
+    function salvarPrefsNews(p) {
+        localStorage.setItem(CHAVE_NEWS_PREFS, JSON.stringify(p));
     }
 
-    function obterHistoricoGdelt() {
-        try { return JSON.parse(localStorage.getItem(CHAVE_GDELT_HIST)) || []; }
+    function obterHistoricoNews() {
+        try { return JSON.parse(localStorage.getItem(CHAVE_NEWS_HIST)) || []; }
         catch { return []; }
     }
-    function salvarBuscaGdelt(tema) {
+    function salvarBuscaNews(tema) {
         if (!tema) return;
-        let h = obterHistoricoGdelt().filter(t => t.toLowerCase() !== tema.toLowerCase());
+        let h = obterHistoricoNews().filter(t => t.toLowerCase() !== tema.toLowerCase());
         h.unshift(tema);
         h = h.slice(0, 10);
-        localStorage.setItem(CHAVE_GDELT_HIST, JSON.stringify(h));
+        localStorage.setItem(CHAVE_NEWS_HIST, JSON.stringify(h));
     }
 
-    const GDELT_LANG_MAP = { pt: "portuguese", en: "english", es: "spanish" };
-    const GDELT_PAIS_VALIDOS = ["BR", "US", "PT"];
+    const EDICOES_NEWS = {
+        BR: { hl: "pt-BR", gl: "BR", ceid: "BR:pt-419", label: "🇧🇷 BR" },
+        US: { hl: "en-US", gl: "US", ceid: "US:en",     label: "🇺🇸 US" },
+        PT: { hl: "pt-PT", gl: "PT", ceid: "PT:pt-150", label: "🇵🇹 PT" },
+        ES: { hl: "es",    gl: "ES", ceid: "ES:es",     label: "🇪🇸 ES" },
+        GB: { hl: "en-GB", gl: "GB", ceid: "GB:en",     label: "🇬🇧 UK" },
+        FR: { hl: "fr",    gl: "FR", ceid: "FR:fr",     label: "🇫🇷 FR" },
+    };
 
-    async function buscarGDELTDedicado(query, opts = {}) {
-        const { idioma, pais, periodo, ordem, dominio } = opts;
+    const PERIODOS_NEWS = {
+        "1h":   "when:1h",
+        "24h":  "when:1d",
+        "7d":   "when:7d",
+        "30d":  "when:30d",
+        "tudo": "",
+    };
 
-        let url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(query)}&mode=artlist&format=json&maxrecords=50&sort=${ordem || "hybridrel"}`;
+    async function buscarNoticiasGoogle(query, opts = {}) {
+        const { edicao, periodo, dominio } = opts;
 
-        if (idioma && idioma !== "todos" && GDELT_LANG_MAP[idioma]) {
-            url += `&sourcelang=${GDELT_LANG_MAP[idioma]}`;
-        }
-        if (pais && pais !== "todos" && GDELT_PAIS_VALIDOS.includes(pais)) {
-            url += `&sourcecountry=${pais}`;
-        }
-        if (periodo && periodo !== "tudo") {
-            url += `&timespan=${periodo}`;
+        const ed = EDICOES_NEWS[edicao] || EDICOES_NEWS.BR;
+
+        const partes = [query];
+        if (periodo && periodo !== "tudo" && PERIODOS_NEWS[periodo]) {
+            partes.push(PERIODOS_NEWS[periodo]);
         }
         if (dominio && dominio.trim()) {
-            url += `&domain=${encodeURIComponent(dominio.trim())}`;
+            partes.push(`site:${dominio.trim()}`);
+        }
+        const q = partes.join(" ");
+
+        const url = `https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=${ed.hl}&gl=${ed.gl}&ceid=${ed.ceid}`;
+
+        console.log("[news] buscando:", q, "| edição:", edicao);
+
+        const r = await fetchComFallback(url);
+        const xml = await r.text();
+
+        if (!xml || !xml.includes("<rss")) {
+            throw new Error("Resposta inesperada do Google News");
         }
 
-                const r = await fetchComFallback(url);
-        const texto = await r.text();
+        const doc = new DOMParser().parseFromString(xml, "text/xml");
+        const items = doc.getElementsByTagName("item");
 
-        // GDELT devolve texto puro em rate limit / erro de query
-        if (!texto.trim().startsWith("{")) {
-            const lower = texto.toLowerCase();
-            if (lower.includes("please limit requests")) {
-                throw new Error("RATE_LIMIT");
+        return Array.from(items).slice(0, 50).map(item => {
+            let titulo = item.getElementsByTagName("title")[0]?.textContent || "";
+            const link   = item.getElementsByTagName("link")[0]?.textContent || "";
+            const pub    = item.getElementsByTagName("pubDate")[0]?.textContent || "";
+            const srcEl  = item.getElementsByTagName("source")[0];
+            const portal = srcEl?.textContent || "";
+            const srcUrl = srcEl?.getAttribute("url") || "";
+
+            if (portal && titulo.endsWith(` - ${portal}`)) {
+                titulo = titulo.slice(0, -` - ${portal}`.length);
             }
-            throw new Error("Resposta inesperada do GDELT: " + texto.slice(0, 120));
-        }
 
-        let j;
-        try { j = JSON.parse(texto); }
-        catch { throw new Error("JSON inválido do GDELT"); }
+            let dominio = "";
+            try { dominio = new URL(srcUrl).hostname.replace(/^www\./, ""); } catch {}
 
-        return (j.articles || []).map(a => {
-            let iso = "";
-            if (a.seendate) {
-                const s = String(a.seendate);
-                iso = `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}T${s.slice(8,10)}:${s.slice(10,12)}:00Z`;
-            }
             return {
-                titulo: a.title || "",
-                url: a.url || "",
+                titulo,
+                url: link,
                 autor: "",
-                publicado: iso,
-                fonte: a.domain || "",
-                origem: "GDELT",
+                publicado: pub ? new Date(pub).toISOString() : "",
+                fonte: dominio || portal,
+                origem: "Notícias",
                 pontos: 0,
                 comentarios: 0,
-                idioma: a.language || "",
-                pais: a.sourcecountry || "",
+                portal,
             };
         }).filter(a => a.titulo && a.url);
     }
 
-    async function buscarGDELTTimeline(query, opts = {}) {
-        const { idioma, pais, periodo } = opts;
+    async function buscarTimelineNoticias(query, opts = {}) {
+        const { edicao, periodo } = opts;
 
-        let url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(query)}&mode=timelinevol&format=json`;
+        const periodoBusca = (periodo === "30d" || periodo === "7d") ? periodo : "30d";
 
-        if (idioma && idioma !== "todos" && GDELT_LANG_MAP[idioma]) {
-            url += `&sourcelang=${GDELT_LANG_MAP[idioma]}`;
-        }
-        if (pais && pais !== "todos" && GDELT_PAIS_VALIDOS.includes(pais)) {
-            url += `&sourcecountry=${pais}`;
-        }
-        url += `&timespan=${periodo && periodo !== "tudo" ? periodo : "1w"}`;
+        const lista = await buscarNoticiasGoogle(query, { edicao, periodo: periodoBusca });
 
-        const r = await fetchComFallback(url);
-        const j = await r.json();
-        const serie = j.timeline?.[0];
-        if (!serie || !serie.data) return [];
-        return serie.data.map(d => ({
-            data: d.date || "",
-            valor: Number(d.value) || 0,
+        const porDia = {};
+        lista.forEach(a => {
+            if (!a.publicado) return;
+            const d = a.publicado.slice(0, 10);
+            porDia[d] = (porDia[d] || 0) + 1;
+        });
+
+        return Object.keys(porDia).sort().map(d => ({
+            data: d.replace(/-/g, "") + "000000",
+            valor: porDia[d],
         }));
     }
 
-        // ---------- cadeia de proxies (GDELT/Reddit/Medium não mandam CORS) ----------
+    // ---------- cadeia de proxies (só Reddit/Medium precisam) ----------
     const WORKER_PROXY = "https://ancient-truth-1e.germanco1324.workers.dev/?url=";
 
     const PROXIES_FALLBACK = [
@@ -2511,53 +2522,38 @@
     }
 
     // ==================================================
-    // GDELT — PAINEL DEDICADO
+    // NOTÍCIAS (Google News RSS) — PAINEL DEDICADO
     // ==================================================
-    function renderGDELTDedicado() {
-        const prefs = obterPrefsGdelt();
-        if (prefs.idioma)  estado.gdeltIdioma  = prefs.idioma;
-        if (prefs.pais)    estado.gdeltPais    = prefs.pais;
-        if (prefs.periodo) estado.gdeltPeriodo = prefs.periodo;
-        if (prefs.ordem)   estado.gdeltOrdem   = prefs.ordem;
-        if (prefs.dominio !== undefined) estado.gdeltDominio = prefs.dominio;
+    function renderNoticias() {
+        const prefs = obterPrefsNews();
+        if (prefs.edicao)  estado.newsEdicao  = prefs.edicao;
+        if (prefs.periodo) estado.newsPeriodo = prefs.periodo;
+        if (prefs.dominio !== undefined) estado.newsDominio = prefs.dominio;
 
         const wrap = el("conteudo");
-        const historico = obterHistoricoGdelt();
+        const historico = obterHistoricoNews();
 
         wrap.innerHTML = `
             <div class="gdelt-painel">
                 <div class="gdelt-busca-wrap">
-                    <input type="search" id="gdeltBusca" class="bib-busca" placeholder="🔎 Tema (ex.: marketing digital, IA, eleições)" value="${esc(estado.gdeltBusca)}">
-                    <button class="btn-primario" id="gdeltBtnBuscar">🔍 Buscar</button>
+                    <input type="search" id="newsBusca" class="bib-busca" placeholder="🔎 Tema (ex.: marketing digital, IA, eleições)" value="${esc(estado.newsBusca)}">
+                    <button class="btn-primario" id="newsBtnBuscar">🔍 Buscar</button>
                 </div>
 
                 ${historico.length ? `
                     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center;">
                         <span style="font-size:11px;color:#777;">Recentes:</span>
-                        ${historico.map(h => `<button class="btn-secundario" data-hist-gdelt="${esc(h)}" style="font-size:11px;padding:4px 10px;">${esc(h)}</button>`).join("")}
+                        ${historico.map(h => `<button class="btn-secundario" data-hist-news="${esc(h)}" style="font-size:11px;padding:4px 10px;">${esc(h)}</button>`).join("")}
                     </div>
                 ` : ""}
 
                 <div class="gdelt-linha-filtros">
                     <div class="gdelt-grupo">
-                        <span class="rotulo">Idioma:</span>
+                        <span class="rotulo">Edição:</span>
                         <div class="chips">
-                            <div class="chip${estado.gdeltIdioma === "todos" ? " selecionado" : ""}" data-gdelt-idioma="todos">🌐 Todos</div>
-                            <div class="chip${estado.gdeltIdioma === "pt" ? " selecionado" : ""}" data-gdelt-idioma="pt">🇧🇷 PT</div>
-                            <div class="chip${estado.gdeltIdioma === "en" ? " selecionado" : ""}" data-gdelt-idioma="en">🇺🇸 EN</div>
-                            <div class="chip${estado.gdeltIdioma === "es" ? " selecionado" : ""}" data-gdelt-idioma="es">🇪🇸 ES</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="gdelt-linha-filtros">
-                    <div class="gdelt-grupo">
-                        <span class="rotulo">País:</span>
-                        <div class="chips">
-                            <div class="chip${estado.gdeltPais === "todos" ? " selecionado" : ""}" data-gdelt-pais="todos">🌐 Todos</div>
-                            <div class="chip${estado.gdeltPais === "BR" ? " selecionado" : ""}" data-gdelt-pais="BR">🇧🇷 BR</div>
-                            <div class="chip${estado.gdeltPais === "US" ? " selecionado" : ""}" data-gdelt-pais="US">🇺🇸 US</div>
-                            <div class="chip${estado.gdeltPais === "PT" ? " selecionado" : ""}" data-gdelt-pais="PT">🇵🇹 PT</div>
+                            ${Object.entries(EDICOES_NEWS).map(([id, ed]) => `
+                                <div class="chip${estado.newsEdicao === id ? " selecionado" : ""}" data-news-edicao="${id}">${ed.label}</div>
+                            `).join("")}
                         </div>
                     </div>
                 </div>
@@ -2566,24 +2562,11 @@
                     <div class="gdelt-grupo">
                         <span class="rotulo">Período:</span>
                         <div class="chips">
-                            <div class="chip${estado.gdeltPeriodo === "24h" ? " selecionado" : ""}" data-gdelt-periodo="24h">24h</div>
-                            <div class="chip${estado.gdeltPeriodo === "1w" ? " selecionado" : ""}" data-gdelt-periodo="1w">1 semana</div>
-                            <div class="chip${estado.gdeltPeriodo === "1m" ? " selecionado" : ""}" data-gdelt-periodo="1m">1 mês</div>
-                            <div class="chip${estado.gdeltPeriodo === "3m" ? " selecionado" : ""}" data-gdelt-periodo="3m">3 meses</div>
-                            <div class="chip${estado.gdeltPeriodo === "tudo" ? " selecionado" : ""}" data-gdelt-periodo="tudo">Tudo</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="gdelt-linha-filtros">
-                    <div class="gdelt-grupo">
-                        <span class="rotulo">Ordenar:</span>
-                        <div class="chips">
-                            <div class="chip${estado.gdeltOrdem === "hybridrel" ? " selecionado" : ""}" data-gdelt-ordem="hybridrel">Relevância</div>
-                            <div class="chip${estado.gdeltOrdem === "datedesc" ? " selecionado" : ""}" data-gdelt-ordem="datedesc">Mais recentes</div>
-                            <div class="chip${estado.gdeltOrdem === "dateasc" ? " selecionado" : ""}" data-gdelt-ordem="dateasc">Mais antigos</div>
-                            <div class="chip${estado.gdeltOrdem === "tonedesc" ? " selecionado" : ""}" data-gdelt-ordem="tonedesc">Tom positivo</div>
-                            <div class="chip${estado.gdeltOrdem === "toneasc" ? " selecionado" : ""}" data-gdelt-ordem="toneasc">Tom negativo</div>
+                            <div class="chip${estado.newsPeriodo === "1h" ? " selecionado" : ""}" data-news-periodo="1h">1 hora</div>
+                            <div class="chip${estado.newsPeriodo === "24h" ? " selecionado" : ""}" data-news-periodo="24h">24h</div>
+                            <div class="chip${estado.newsPeriodo === "7d" ? " selecionado" : ""}" data-news-periodo="7d">1 semana</div>
+                            <div class="chip${estado.newsPeriodo === "30d" ? " selecionado" : ""}" data-news-periodo="30d">1 mês</div>
+                            <div class="chip${estado.newsPeriodo === "tudo" ? " selecionado" : ""}" data-news-periodo="tudo">Tudo</div>
                         </div>
                     </div>
                 </div>
@@ -2591,7 +2574,7 @@
                 <div class="gdelt-linha-filtros">
                     <div class="gdelt-grupo" style="flex:1;">
                         <span class="rotulo">Domínio:</span>
-                        <input type="text" id="gdeltDominio" class="bib-busca" style="min-width:160px;flex:1;" placeholder="exame.com (opcional)" value="${esc(estado.gdeltDominio)}">
+                        <input type="text" id="newsDominio" class="bib-busca" style="min-width:160px;flex:1;" placeholder="exame.com (opcional)" value="${esc(estado.newsDominio)}">
                     </div>
                 </div>
 
@@ -2599,117 +2582,87 @@
                     <div class="gdelt-grupo">
                         <span class="rotulo">Modo:</span>
                         <div class="chips">
-                            <div class="chip${estado.gdeltModo === "lista" ? " selecionado" : ""}" data-gdelt-modo="lista">📋 Lista</div>
-                            <div class="chip${estado.gdeltModo === "timeline" ? " selecionado" : ""}" data-gdelt-modo="timeline">📈 Linha do tempo</div>
+                            <div class="chip${estado.newsModo === "lista" ? " selecionado" : ""}" data-news-modo="lista">📋 Lista</div>
+                            <div class="chip${estado.newsModo === "timeline" ? " selecionado" : ""}" data-news-modo="timeline">📈 Linha do tempo</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div id="gdeltResultados"></div>
+            <div id="newsResultados"></div>
         `;
 
         function salvarPrefs() {
-            salvarPrefsGdelt({
-                idioma:  estado.gdeltIdioma,
-                pais:    estado.gdeltPais,
-                periodo: estado.gdeltPeriodo,
-                ordem:   estado.gdeltOrdem,
-                dominio: estado.gdeltDominio,
+            salvarPrefsNews({
+                edicao:  estado.newsEdicao,
+                periodo: estado.newsPeriodo,
+                dominio: estado.newsDominio,
             });
         }
 
-        const inputBusca = wrap.querySelector("#gdeltBusca");
-        inputBusca.addEventListener("input", e => { estado.gdeltBusca = e.target.value; });
+        const inputBusca = wrap.querySelector("#newsBusca");
+        inputBusca.addEventListener("input", e => { estado.newsBusca = e.target.value; });
         inputBusca.addEventListener("keydown", e => {
-            if (e.key === "Enter") executarBuscaGdelt();
+            if (e.key === "Enter") executarBuscaNews();
         });
 
-        wrap.querySelector("#gdeltBtnBuscar").addEventListener("click", () => executarBuscaGdelt());
+        wrap.querySelector("#newsBtnBuscar").addEventListener("click", () => executarBuscaNews());
 
-        wrap.querySelectorAll("[data-hist-gdelt]").forEach(btn => {
+        wrap.querySelectorAll("[data-hist-news]").forEach(btn => {
             btn.addEventListener("click", () => {
-                estado.gdeltBusca = btn.dataset.histGdelt;
-                inputBusca.value = estado.gdeltBusca;
-                executarBuscaGdelt();
+                estado.newsBusca = btn.dataset.histNews;
+                inputBusca.value = estado.newsBusca;
+                executarBuscaNews();
             });
         });
 
-        wrap.querySelectorAll("[data-gdelt-idioma]").forEach(chip => {
+        wrap.querySelectorAll("[data-news-edicao]").forEach(chip => {
             chip.addEventListener("click", () => {
-                estado.gdeltIdioma = chip.dataset.gdeltIdioma;
-                wrap.querySelectorAll("[data-gdelt-idioma]").forEach(c => c.classList.toggle("selecionado", c === chip));
+                estado.newsEdicao = chip.dataset.newsEdicao;
+                wrap.querySelectorAll("[data-news-edicao]").forEach(c => c.classList.toggle("selecionado", c === chip));
                 salvarPrefs();
-                if (estado.gdeltBusca) executarBuscaGdelt();
+                if (estado.newsBusca) executarBuscaNews();
             });
         });
 
-        wrap.querySelectorAll("[data-gdelt-pais]").forEach(chip => {
+        wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
             chip.addEventListener("click", () => {
-                estado.gdeltPais = chip.dataset.gdeltPais;
-                wrap.querySelectorAll("[data-gdelt-pais]").forEach(c => c.classList.toggle("selecionado", c === chip));
+                estado.newsPeriodo = chip.dataset.newsPeriodo;
+                wrap.querySelectorAll("[data-news-periodo]").forEach(c => c.classList.toggle("selecionado", c === chip));
                 salvarPrefs();
-                if (estado.gdeltBusca) executarBuscaGdelt();
+                if (estado.newsBusca) executarBuscaNews();
             });
         });
 
-        wrap.querySelectorAll("[data-gdelt-periodo]").forEach(chip => {
+        wrap.querySelectorAll("[data-news-modo]").forEach(chip => {
             chip.addEventListener("click", () => {
-                estado.gdeltPeriodo = chip.dataset.gdeltPeriodo;
-                wrap.querySelectorAll("[data-gdelt-periodo]").forEach(c => c.classList.toggle("selecionado", c === chip));
-                salvarPrefs();
-                if (estado.gdeltBusca) executarBuscaGdelt();
+                estado.newsModo = chip.dataset.newsModo;
+                wrap.querySelectorAll("[data-news-modo]").forEach(c => c.classList.toggle("selecionado", c === chip));
+                if (estado.newsBusca) executarBuscaNews();
             });
         });
 
-        wrap.querySelectorAll("[data-gdelt-ordem]").forEach(chip => {
-            chip.addEventListener("click", () => {
-                estado.gdeltOrdem = chip.dataset.gdeltOrdem;
-                wrap.querySelectorAll("[data-gdelt-ordem]").forEach(c => c.classList.toggle("selecionado", c === chip));
-                salvarPrefs();
-                if (estado.gdeltBusca) executarBuscaGdelt();
-            });
-        });
-
-        wrap.querySelectorAll("[data-gdelt-modo]").forEach(chip => {
-            chip.addEventListener("click", () => {
-                estado.gdeltModo = chip.dataset.gdeltModo;
-                wrap.querySelectorAll("[data-gdelt-modo]").forEach(c => c.classList.toggle("selecionado", c === chip));
-                if (estado.gdeltBusca) executarBuscaGdelt();
-            });
-        });
-
-        const inputDom = wrap.querySelector("#gdeltDominio");
-        inputDom.addEventListener("input", e => { estado.gdeltDominio = e.target.value; });
+        const inputDom = wrap.querySelector("#newsDominio");
+        inputDom.addEventListener("input", e => { estado.newsDominio = e.target.value; });
         inputDom.addEventListener("keydown", e => {
-            if (e.key === "Enter") { salvarPrefs(); if (estado.gdeltBusca) executarBuscaGdelt(); }
+            if (e.key === "Enter") { salvarPrefs(); if (estado.newsBusca) executarBuscaNews(); }
         });
         inputDom.addEventListener("blur", () => salvarPrefs());
 
-        async function executarBuscaGdelt() {
-            const q = estado.gdeltBusca.trim();
+        async function executarBuscaNews() {
+            const q = estado.newsBusca.trim();
             if (!q) return;
 
-                        const box = wrap.querySelector("#gdeltResultados");
+            const box = wrap.querySelector("#newsResultados");
 
-            const agora = Date.now();
-            const ultimaBusca = wrap._ultimaBuscaGdelt || 0;
-            if (agora - ultimaBusca < 5500) {
-                const faltam = Math.ceil((5500 - (agora - ultimaBusca)) / 1000);
-                box.innerHTML = `<div class="vazio">⏳ Aguarde ${faltam}s antes de buscar de novo.</div>`;
-                return;
-            }
-            wrap._ultimaBuscaGdelt = agora;
-
-            if (estado.gdeltModo === "timeline") {
+            if (estado.newsModo === "timeline") {
                 box.innerHTML = `<div style="color:#888;font-size:13px;padding:20px;text-align:center;">Carregando linha do tempo…</div>`;
                 try {
-                    const pontos = await buscarGDELTTimeline(q, {
-                        idioma:  estado.gdeltIdioma,
-                        pais:    estado.gdeltPais,
-                        periodo: estado.gdeltPeriodo,
+                    const pontos = await buscarTimelineNoticias(q, {
+                        edicao:  estado.newsEdicao,
+                        periodo: estado.newsPeriodo,
                     });
-                    salvarBuscaGdelt(q);
+                    salvarBuscaNews(q);
                     if (!pontos.length) {
                         box.innerHTML = `<div class="vazio">Nada encontrado no período.</div>`;
                         return;
@@ -2729,39 +2682,25 @@
                                 }).join("")}
                             </div>
                             <div style="font-size:11px;color:#666;text-align:center;">
-                                pico: ${max} ${max === 1 ? "notícia" : "notícias"} · ${pontos.length} ponto(s)
+                                pico: ${max} ${max === 1 ? "notícia" : "notícias"} · ${pontos.length} dia(s)
                             </div>
                         </div>
                     `;
-                            } catch (e) {
-                console.error(e);
-                if (e.message === "RATE_LIMIT") {
-                    box.innerHTML = `
-                        <div class="vazio">
-                            ⏳ O GDELT está limitando as buscas.<br>
-                            <span style="font-size:13px;color:#666;">
-                                Aguarde ~1 minuto e tente de novo.<br>
-                                (Limite: 1 busca a cada 5 segundos)
-                            </span>
-                        </div>
-                    `;
-                } else {
-                    box.innerHTML = `<div class="vazio">Erro ao buscar. Tente outro filtro.</div>`;
+                } catch (e) {
+                    console.error(e);
+                    box.innerHTML = `<div class="vazio">Erro ao buscar linha do tempo.</div>`;
                 }
-            }
                 return;
             }
 
             box.innerHTML = `<div style="color:#888;font-size:13px;padding:20px;text-align:center;">Buscando notícias…</div>`;
             try {
-                const lista = await buscarGDELTDedicado(q, {
-                    idioma:  estado.gdeltIdioma,
-                    pais:    estado.gdeltPais,
-                    periodo: estado.gdeltPeriodo,
-                    ordem:   estado.gdeltOrdem,
-                    dominio: estado.gdeltDominio,
+                const lista = await buscarNoticiasGoogle(q, {
+                    edicao:  estado.newsEdicao,
+                    periodo: estado.newsPeriodo,
+                    dominio: estado.newsDominio,
                 });
-                salvarBuscaGdelt(q);
+                salvarBuscaNews(q);
 
                 if (!lista.length) {
                     box.innerHTML = `<div class="vazio">Nada encontrado com esses filtros.</div>`;
@@ -2777,13 +2716,12 @@
                             const dataRel = formatarDataRelativa(a.publicado);
                             return `
                                 <div class="rec-artigo-card"
-                                     data-gdelt-titulo="${esc(a.titulo)}"
-                                     data-gdelt-url="${esc(a.url)}"
-                                     data-gdelt-fonte="${esc(a.fonte)}">
+                                     data-news-titulo="${esc(a.titulo)}"
+                                     data-news-url="${esc(a.url)}"
+                                     data-news-fonte="${esc(a.fonte)}">
                                     <div class="rec-artigo-meta">
-                                        <span class="rec-artigo-fonte">GDELT</span>
-                                        ${a.fonte ? `<span>· ${esc(a.fonte)}</span>` : ""}
-                                        ${a.pais  ? `<span>· ${esc(a.pais)}</span>`  : ""}
+                                        <span class="rec-artigo-fonte">📰 ${esc(a.portal || a.fonte)}</span>
+                                        ${a.fonte && a.portal && a.fonte !== a.portal ? `<span>· ${esc(a.fonte)}</span>` : ""}
                                     </div>
                                     <div class="rec-artigo-titulo">${esc(a.titulo)}</div>
                                     ${dataRel ? `<div class="rec-artigo-stats">${dataRel}</div>` : ""}
@@ -2795,29 +2733,17 @@
 
                 box.querySelectorAll(".rec-artigo-card").forEach(card => {
                     card.addEventListener("click", () => {
-                        const url = card.dataset.gdeltUrl;
+                        const url = card.dataset.newsUrl;
                         if (url) window.open(url, "_blank", "noopener");
                     });
                 });
-                        } catch (e) {
+            } catch (e) {
                 console.error(e);
-                if (e.message === "RATE_LIMIT") {
-                    box.innerHTML = `
-                        <div class="vazio">
-                            ⏳ O GDELT está limitando as buscas.<br>
-                            <span style="font-size:13px;color:#666;">
-                                Aguarde ~1 minuto e tente de novo.<br>
-                                (Limite: 1 busca a cada 5 segundos)
-                            </span>
-                        </div>
-                    `;
-                } else {
-                    box.innerHTML = `<div class="vazio">Erro ao buscar. Tente outro filtro.</div>`;
-                }
+                box.innerHTML = `<div class="vazio">Erro ao buscar. Tente outro filtro.</div>`;
             }
         }
 
-        if (estado.gdeltBusca) executarBuscaGdelt();
+        if (estado.newsBusca) executarBuscaNews();
     }
 
     // ==================================================
@@ -3392,4 +3318,4 @@
     render();
 </script>
 </body>
-</html>
+</html>    
