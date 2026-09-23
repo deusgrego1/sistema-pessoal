@@ -1,3 +1,11 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estudo</title>
+    <link rel="stylesheet" href="../../css/style.css">
+
     <style>
         .resumo-estudo {
             display: grid;
@@ -421,8 +429,40 @@
             font-size: 13px; opacity: 0;
             transition: opacity 0.15s ease; white-space: nowrap;
         }
+        .botao-foco-flutuante:hover .texto-foco { opacity: 1; }
+    </style>
+</head>
 
-        <script>
+<body>
+<main class="container">
+
+    <header class="header">
+        <p class="eyebrow">PLANEJAMENTO</p>
+        <h1>📚 Estudo</h1>
+        <p class="subtitle">Estude hoje, retome o que parou, veja o que aprendeu.</p>
+    </header>
+
+    <section class="modules">
+        <div class="resumo-estudo" id="resumoEstudo"></div>
+        <div class="tipos-barra" id="tiposBarra"></div>
+        <div class="module-card" style="align-items:flex-start;">
+            <div style="width:100%;">
+                <div class="sub-abas" id="subAbas"></div>
+                <div id="conteudo"></div>
+            </div>
+        </div>
+    </section>
+
+    <a href="index.html" class="back-button">← Voltar para Planejamento</a>
+</main>
+
+<a href="../foco/foco.html" class="botao-foco-flutuante" aria-label="Ir para Foco">
+    <span class="icone-foco">🎯</span>
+    <span class="texto-foco">Foco</span>
+</a>
+
+<script src="../../js/storage.js"></script>
+<script>
     "use strict";
 
     const hoje = new Date();
@@ -806,7 +846,7 @@
         });
     }
 
-                    // ==================================================
+    // ==================================================
     // AUXILIARES DE ARTIGO
     // ==================================================
     async function buscarMetadadosArtigo(url) {
@@ -1413,10 +1453,8 @@
                         const f = card.dataset.artFonte;
                         const au = card.dataset.artAutor;
 
-                        // 1) Abre o artigo no navegador (onde você já está logado no Medium)
                         window.open(l, "_blank", "noopener");
 
-                        // 2) Preenche o bloco do dia pra você registrar
                         const blocos2 = Storage.blocos.ler("artigo", dataAtual);
                         const i = blocos2.findIndex(x => x.id === b.id);
                         if (i < 0) return;
@@ -1451,7 +1489,7 @@
         return elBloco;
     }
 
-                // ==================================================
+        // ==================================================
     // LIVRO → ESTUDAR
     // ==================================================
     function renderEstudarLivro() {
@@ -2598,7 +2636,7 @@
         `;
     }
 
-                        // ==================================================
+    // ==================================================
     // BIBLIOTECA LIVRO
     // ==================================================
     function registrarNaBiblioteca(item, pct) {
@@ -3171,5 +3209,3 @@
 </script>
 </body>
 </html>
-        .botao-foco-flutuante:hover .texto-foco { opacity: 1; }
-    </style>
