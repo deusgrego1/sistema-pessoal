@@ -991,7 +991,7 @@
         const { edicao, periodo, dominio } = opts;
         const ed = EDICOES_NEWS[edicao] || EDICOES_NEWS.BR;
 
-        let url = `https://newsdata.io/api/1/news?apikey=${NEWSDATA_KEY}&q=${encodeURIComponent(query)}&country=${ed.pais}&language=${ed.idioma}&size=50`;
+        let url = `https://newsdata.io/api/1/news?apikey=${NEWSDATA_KEY}&q=${encodeURIComponent(query)}&country=${ed.pais}&language=${ed.idioma}&size=10`;
 
         if (dominio && dominio.trim()) {
             url += `&domainurl=${encodeURIComponent(dominio.trim())}`;
