@@ -991,7 +991,7 @@
         const { edicao, periodo, dominio } = opts;
         const ed = EDICOES_NEWS[edicao] || EDICOES_NEWS.BR;
 
-        let url = `https://newsdata.io/api/1/latest?apikey=${NEWSDATA_KEY}&qInTitle=${encodeURIComponent(query)}&country=${ed.pais}&language=${ed.idioma}&size=10`;
+        let url = `https://newsdata.io/api/1/latest?apikey=${NEWSDATA_KEY}&qInMeta=${encodeURIComponent(query)}&country=${ed.pais}&language=${ed.idioma}&size=10`;
 
         if (dominio && dominio.trim()) {
             url += `&domainurl=${encodeURIComponent(dominio.trim())}`;
@@ -2560,15 +2560,6 @@
                     </div>
                 </div>
 
-                <div class="gdelt-linha-filtros" style="margin-top:12px;">
-                    <div class="gdelt-grupo">
-                        <span class="rotulo">Modo:</span>
-                        <div class="chips">
-                            <div class="chip${estado.newsModo === "lista" ? " selecionado" : ""}" data-news-modo="lista">📋 Lista</div>
-                            <div class="chip${estado.newsModo === "timeline" ? " selecionado" : ""}" data-news-modo="timeline">📈 Linha do tempo</div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <div id="newsResultados"></div>
@@ -2607,22 +2598,21 @@
             });
         });
 
-        wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
-            chip.addEventListener("click", () => {
-                estado.newsPeriodo = chip.dataset.newsPeriodo;
-                wrap.querySelectorAll("[data-news-periodo]").forEach(c => c.classList.toggle("selecionado", c === chip));
-                salvarPrefs();
-                if (estado.newsBusca) executarBuscaNews();
-            });
-        });
+        wrap.querySelectorAll("[data-news-edicao]").forEach(chip => {
+    chip.addEventListener("click", () => {
+        estado.newsEdicao = chip.dataset.newsEdicao;
+        wrap.querySelectorAll("[data-news-edicao]").forEach(c => c.classList.toggle("selecionado", c === chip));
+        salvarPrefs();
+    });
+});
 
-        wrap.querySelectorAll("[data-news-modo]").forEach(chip => {
-            chip.addEventListener("click", () => {
-                estado.newsModo = chip.dataset.newsModo;
-                wrap.querySelectorAll("[data-news-modo]").forEach(c => c.classList.toggle("selecionado", c === chip));
-                if (estado.newsBusca) executarBuscaNews();
-            });
-        });
+wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
+    chip.addEventListener("click", () => {
+        estado.newsPeriodo = chip.dataset.newsPeriodo;
+        wrap.querySelectorAll("[data-news-periodo]").forEach(c => c.classList.toggle("selecionado", c === chip));
+        salvarPrefs();
+    });
+});
 
         const inputDom = wrap.querySelector("#newsDominio");
         inputDom.addEventListener("input", e => { estado.newsDominio = e.target.value; });
