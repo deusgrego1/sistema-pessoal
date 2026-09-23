@@ -1564,13 +1564,33 @@
         }));
     }
 
+        const PROXIES_FALLBACK = [
+        // 1) direto — funciona pra HN, Dev.to, e APIs com CORS próprio
+        (u) => u,
+        // 2) corsproxy.io — o mais confiável pra GDELT e Reddit hoje
+        (u) => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+        // 3) allorigins (antigo, às vezes cai)
+        (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+        // 4) codetabs (backup)
+        (u) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
+    ];
+
     async function fetchComFallback(url) {
-        try {
-            const r = await fetch(url);
-            if (r.ok) return r;
-        } catch (e) { /* tenta proxy */ }
-        const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-        return await fetch(proxy);
+        let ultimoErro = null;
+        for (let i = 0; i < PROXIES_FALLBACK.length; i++) {
+            const alvo = PROXIES_FALLBACK[i](url);
+            try {
+                const r = await fetch(alvo);
+                if (r.ok) {
+                    if (i > 0) console.log(`[proxy] sucesso via #${i}:`, alvo.slice(0, 90));
+                    return r;
+                }
+                ultimoErro = new Error(`HTTP ${r.status}`);
+            } catch (e) {
+                ultimoErro = e;
+            }
+        }
+        throw ultimoErro || new Error("Todos os proxies falharam");
     }
 
     function normalizarTag(txt) {
