@@ -1001,8 +1001,22 @@
             url += `&domain=${encodeURIComponent(dominio.trim())}`;
         }
 
-        const r = await fetchComFallback(url);
-        const j = await r.json();
+                const r = await fetchComFallback(url);
+        const texto = await r.text();
+
+        // GDELT devolve texto puro em rate limit / erro de query
+        if (!texto.trim().startsWith("{")) {
+            const lower = texto.toLowerCase();
+            if (lower.includes("please limit requests")) {
+                throw new Error("RATE_LIMIT");
+            }
+            throw new Error("Resposta inesperada do GDELT: " + texto.slice(0, 120));
+        }
+
+        let j;
+        try { j = JSON.parse(texto); }
+        catch { throw new Error("JSON inválido do GDELT"); }
+
         return (j.articles || []).map(a => {
             let iso = "";
             if (a.seendate) {
@@ -1047,13 +1061,15 @@
         }));
     }
 
-    // ---------- cadeia de proxies (GDELT/Reddit/Medium não mandam CORS) ----------
+        // ---------- cadeia de proxies (GDELT/Reddit/Medium não mandam CORS) ----------
+    const WORKER_PROXY = "https://ancient-truth-1e.germanco1324.workers.dev/?url=";
+
     const PROXIES_FALLBACK = [
         (u) => u,
+        (u) => WORKER_PROXY + encodeURIComponent(u),
         (u) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
         (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-        (u) => `https://whateverorigin.org/get?url=${encodeURIComponent(u)}`,
-    ];
+    ];cf
 
     async function fetchComFallback(url) {
         let ultimoErro = null;
@@ -2708,10 +2724,22 @@
                             </div>
                         </div>
                     `;
-                } catch (e) {
-                    console.error(e);
-                    box.innerHTML = `<div class="vazio">Erro ao buscar linha do tempo.</div>`;
+                            } catch (e) {
+                console.error(e);
+                if (e.message === "RATE_LIMIT") {
+                    box.innerHTML = `
+                        <div class="vazio">
+                            ⏳ O GDELT está limitando as buscas.<br>
+                            <span style="font-size:13px;color:#666;">
+                                Aguarde ~1 minuto e tente de novo.<br>
+                                (Limite: 1 busca a cada 5 segundos)
+                            </span>
+                        </div>
+                    `;
+                } else {
+                    box.innerHTML = `<div class="vazio">Erro ao buscar. Tente outro filtro.</div>`;
                 }
+            }
                 return;
             }
 
