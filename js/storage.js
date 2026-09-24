@@ -109,6 +109,96 @@
         },
     };
 
+/* ============================================================
+   Storage.pratica — Módulo Prática
+   Base: helpers, chaves, data
+   ============================================================ */
+Storage.pratica = (function () {
+
+    // -------- Chaves internas --------
+    const K = {
+        SKILLS:        "pratica_skills",
+        SNAPSHOTS:     "pratica_snapshots_mensais",
+        CONTEXTO_DIA:  "treinador_contexto_",   // + YYYY-MM-DD
+        BLOCOS_PREFIX: "estudo_",               // estudo_<data>_pratica_blocos
+        BLOCOS_SUFIX:  "_pratica_blocos"
+    };
+
+    // -------- Helpers de data --------
+    function dataHoje() {
+        // Reaproveita o helper global, se existir
+        if (typeof Storage.dataHoje === "function") return Storage.dataHoje();
+        const d = new Date();
+        const p = n => String(n).padStart(2, "0");
+        return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+    }
+
+    function agoraISO() {
+        return new Date().toISOString();
+    }
+
+    function diasEntre(dataA, dataB) {
+        // dataA e dataB: YYYY-MM-DD ou ISO
+        const a = new Date(dataA).getTime();
+        const b = new Date(dataB).getTime();
+        return Math.floor(Math.abs(b - a) / 86400000);
+    }
+
+    // -------- Geração de IDs --------
+    function gerarId(prefixo) {
+        const ts = Date.now().toString(36);
+        const rand = Math.random().toString(36).slice(2, 8);
+        return `${prefixo}_${ts}${rand}`;
+    }
+
+    // -------- Leitura/escrita crua --------
+    function lerJSON(chave, fallback) {
+        try {
+            const raw = localStorage.getItem(chave);
+            if (!raw) return fallback;
+            return JSON.parse(raw);
+        } catch (e) {
+            console.warn("[Storage.pratica] falha ao ler", chave, e);
+            return fallback;
+        }
+    }
+
+    function salvarJSON(chave, valor) {
+        try {
+            localStorage.setItem(chave, JSON.stringify(valor));
+            return true;
+        } catch (e) {
+            console.warn("[Storage.pratica] falha ao salvar", chave, e);
+            return false;
+        }
+    }
+
+    // -------- Suporte --------
+    function suporta() {
+        try {
+            localStorage.setItem("__teste_pratica__", "1");
+            localStorage.removeItem("__teste_pratica__");
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    // -------- API pública básica --------
+    return {
+        K,
+        dataHoje,
+        agoraISO,
+        diasEntre,
+        gerarId,
+        lerJSON,
+        salvarJSON,
+        suporta,
+        _versao: "1.0.0"
+    };
+
+})();
+    
     // ---------- migração formato antigo → novo ----------
     function migrar() {
         const marcador = "storage_migrado_v1";
