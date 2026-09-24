@@ -111,7 +111,8 @@
 
     /* ============================================================
        Storage.pratica — Módulo Prática
-       Parte 1/20 — Helpers, chaves, IDs, persistência crua
+       Parte 1–4/20 — Helpers, Skills, Frentes, Marcos, Mídias,
+                     Pontos de Virada, Feedback, Derivados, Snapshots
        ============================================================ */
     const pratica = (function () {
 
@@ -119,20 +120,17 @@
         const K = {
             SKILLS:        "pratica_skills",
             SNAPSHOTS:     "pratica_snapshots_mensais",
-            CONTEXTO_DIA:  "treinador_contexto_",   // + YYYY-MM-DD
-            BLOCOS_PREFIX: "estudo_",               // estudo_<data>_pratica_blocos
+            CONTEXTO_DIA:  "treinador_contexto_",
+            BLOCOS_PREFIX: "estudo_",
             BLOCOS_SUFIX:  "_pratica_blocos"
         };
 
         // -------- Helpers de data --------
-        // (usa o dataHoje do escopo externo — já definido no topo do IIFE)
-
         function agoraISO() {
             return new Date().toISOString();
         }
 
         function diasEntre(dataA, dataB) {
-            // dataA e dataB: YYYY-MM-DD ou ISO
             const a = new Date(dataA).getTime();
             const b = new Date(dataB).getTime();
             return Math.floor(Math.abs(b - a) / 86400000);
@@ -167,7 +165,7 @@
             }
         }
 
-                // -------- Suporte --------
+        // -------- Suporte --------
         function suporta() {
             try {
                 localStorage.setItem("__teste_pratica__", "1");
@@ -178,7 +176,9 @@
             }
         }
 
-        // -------- SKILLS (CRUD) --------
+        // ============================================================
+        // SKILLS (CRUD)
+        // ============================================================
         function _lerTodasSkills() {
             return lerJSONLocal(K.SKILLS, []);
         }
@@ -356,7 +356,7 @@
                 _salvarTodasSkills(lista);
             },
 
-                       definirMarcoAtivo(skillId, frenteId, marcoId) {
+            definirMarcoAtivo(skillId, frenteId, marcoId) {
                 return this.atualizarFrente(skillId, frenteId, { marco_ativo: marcoId });
             },
 
@@ -518,7 +518,7 @@
                 _salvarTodasSkills(lista);
             },
 
-                        listarFeedback(skillId, filtro = {}) {
+            listarFeedback(skillId, filtro = {}) {
                 const skill = this.ler(skillId);
                 if (!skill) return [];
                 let arr = (skill.feedback || []).slice();
@@ -531,7 +531,6 @@
         // DERIVADOS — nunca salvos, calculados na hora
         // ============================================================
 
-        // --- Blocos do dia (lê do localStorage) ---
         function _lerBlocosPratica(data) {
             return lerJSONLocal(`${K.BLOCOS_PREFIX}${data}${K.BLOCOS_SUFIX}`, []);
         }
@@ -544,20 +543,19 @@
                 const chave = localStorage.key(i);
                 if (!chave.startsWith(prefixo) || !chave.endsWith(sufixo)) continue;
                 const data = chave.slice(prefixo.length, chave.length - sufixo.length);
-                const blocos = lerJSONLocal(chave, []);
-                blocos.forEach(b => out.push({ ...b, data }));
+                const blocosArr = lerJSONLocal(chave, []);
+                blocosArr.forEach(b => out.push({ ...b, data }));
             }
             return out;
         }
 
-        // --- Temperatura por frente ---
         function _temperaturaPorFrente(skill, frenteId) {
-            const blocos = _listarTodosBlocosPratica().filter(b =>
+            const blocosArr = _listarTodosBlocosPratica().filter(b =>
                 b.skillId === skill.id && b.frenteId === frenteId
             );
-            if (!blocos.length) return { emoji: "🆕", label: "nova", dias: null };
+            if (!blocosArr.length) return { emoji: "🆕", label: "nova", dias: null };
 
-            const ultima = blocos
+            const ultima = blocosArr
                 .map(b => b.data)
                 .sort()
                 .reverse()[0];
@@ -576,14 +574,12 @@
         function _temperaturaGeral(skill) {
             if (!skill.frentes.length) return { emoji: "🆕", label: "nova", dias: null };
             const temps = skill.frentes.map(f => _temperaturaPorFrente(skill, f.id));
-            // pega a mais recente
             return temps
                 .filter(t => t.dias !== null)
                 .sort((a, b) => a.dias - b.dias)[0]
                 || { emoji: "🆕", label: "nova", dias: null };
         }
 
-        // --- Gap por frente (% do marco ativo) ---
         function _gapPorFrente(skill, frente) {
             const marcoId = frente.marco_ativo;
             if (!marcoId || !skill.marcos[marcoId]) return null;
@@ -599,7 +595,6 @@
             return Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length);
         }
 
-        // --- Streak (dias seguidos com prática) ---
         function _streak(skill) {
             const datas = [...new Set(
                 _listarTodosBlocosPratica()
@@ -625,7 +620,6 @@
                 }
             }
 
-            // recorde (varre tudo)
             let recorde = 0, seq = 1;
             for (let i = 1; i < datas.length; i++) {
                 const diff = diasEntre(datas[i], datas[i - 1]);
@@ -637,27 +631,25 @@
             return { atual, recorde, ultima: datas[0] };
         }
 
-        // --- Qualidade média (dos blocos) ---
         function _qualidadeMedia(skill, opts = {}) {
-            let blocos = _listarTodosBlocosPratica().filter(b => b.skillId === skill.id);
-            if (opts.frenteId) blocos = blocos.filter(b => b.frenteId === opts.frenteId);
+            let blocosArr = _listarTodosBlocosPratica().filter(b => b.skillId === skill.id);
+            if (opts.frenteId) blocosArr = blocosArr.filter(b => b.frenteId === opts.frenteId);
             if (opts.ultimosDias) {
                 const corte = new Date();
                 corte.setDate(corte.getDate() - opts.ultimosDias);
                 const corteStr = corte.toISOString().slice(0, 10);
-                blocos = blocos.filter(b => b.data >= corteStr);
+                blocosArr = blocosArr.filter(b => b.data >= corteStr);
             }
-            const comQ = blocos.filter(b => typeof b.qualidade === "number");
+            const comQ = blocosArr.filter(b => typeof b.qualidade === "number");
             if (!comQ.length) return null;
             return Math.round((comQ.reduce((a, b) => a + b.qualidade, 0) / comQ.length) * 100) / 100;
         }
 
-        // --- Totais ---
         function _totais(skill) {
-            const blocos = _listarTodosBlocosPratica().filter(b => b.skillId === skill.id);
-            const tempo = blocos.reduce((a, b) => a + (Number(b.tempo_real_min) || 0), 0);
+            const blocosArr = _listarTodosBlocosPratica().filter(b => b.skillId === skill.id);
+            const tempo = blocosArr.reduce((a, b) => a + (Number(b.tempo_real_min) || 0), 0);
             return {
-                sessoes: blocos.length,
+                sessoes: blocosArr.length,
                 tempo_total_min: tempo,
                 marcos_fechados: Object.values(skill.marcos || {}).filter(m => m.percentual >= 100).length,
                 pontos_virada: (skill.pontos_de_virada || []).length,
@@ -665,7 +657,6 @@
             };
         }
 
-        // --- Nível (por frente, skill = frente mais avançada) ---
         function _nivelPorFrente(skill, frente) {
             const marcosFrente = (frente.marcos || [])
                 .map(id => skill.marcos[id])
@@ -686,7 +677,6 @@
             return { nivel: melhor };
         }
 
-        // --- Snapshot de uma skill (objeto derivado) ---
         function _snapshotSkill(skill) {
             const frentes = {};
             skill.frentes.forEach(f => {
@@ -719,9 +709,6 @@
             };
         }
 
-        // ============================================================
-        // API PÚBLICA — derivados
-        // ============================================================
         const derivados = {
             temperaturaPorFrente: _temperaturaPorFrente,
             temperaturaGeral:     _temperaturaGeral,
@@ -734,7 +721,6 @@
             nivelGeral:           _nivelGeral,
             snapshotSkill:        _snapshotSkill,
 
-            // visão completa de uma skill (tudo derivado + básico)
             visaoCompleta(skillId) {
                 const skill = skills.ler(skillId);
                 if (!skill) return null;
@@ -744,7 +730,6 @@
                 };
             },
 
-            // lista todas as skills com derivados (pro Arsenal)
             listarComDerivados() {
                 return skills.listar().map(s => ({
                     ...s,
@@ -754,7 +739,7 @@
         };
 
         // ============================================================
-        // SNAPSHOTS MENSAIS — salvos (automático 1x/mês)
+        // SNAPSHOTS MENSAIS
         // ============================================================
         const snapshots = {
             listar() {
@@ -765,7 +750,6 @@
                 return this.listar().find(s => s.mes === mes) || null;
             },
 
-            // mes: "YYYY-MM". Se já existir, não sobrescreve (imutável).
             tirar(mes = null) {
                 const alvo = mes || dataHoje().slice(0, 7);
                 const lista = this.listar();
@@ -789,10 +773,10 @@
                 };
 
                 Object.values(skillsSnap).forEach(sn => {
-                    totalGlobal.sessoes       += sn.sessoes_total;
-                    totalGlobal.tempo_min     += sn.tempo_total_min;
+                    totalGlobal.sessoes        += sn.sessoes_total;
+                    totalGlobal.tempo_min      += sn.tempo_total_min;
                     totalGlobal.marcos_fechados += sn.marcos_fechados_total;
-                    totalGlobal.pontos_virada += sn.pontos_virada_total;
+                    totalGlobal.pontos_virada  += sn.pontos_virada_total;
                     if (sn.temperatura_geral === "🧊") totalGlobal.skills_congeladas++;
                     else                                totalGlobal.skills_ativas++;
                 });
@@ -817,7 +801,7 @@
         // -------- API pública básica --------
         return {
             K,
-            dataHoje,          // herdado do escopo externo
+            dataHoje,
             agoraISO,
             diasEntre,
             gerarId,
@@ -829,6 +813,8 @@
             snapshots,
             _versao: "1.0.0"
         };
+    })();
+
     // ---------- migração formato antigo → novo ----------
     function migrar() {
         const marcador = "storage_migrado_v1";
