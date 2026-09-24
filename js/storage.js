@@ -1,876 +1,2782 @@
-// ==================================================
-// storage.js — Módulo único de persistência
-// ==================================================
-(function () {
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estudo</title>
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .resumo-estudo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+        }
+        .resumo-card {
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 10px; padding: 14px 16px;
+            cursor: pointer; transition: 0.15s;
+        }
+        .resumo-card:hover { background: #222228; border-color: #3a3a40; }
+        .resumo-rotulo {
+            color: #777; font-size: 11px; text-transform: uppercase;
+            letter-spacing: 0.5px; display: block; margin-bottom: 6px;
+        }
+        .resumo-valor { color: #fff; font-size: 24px; font-weight: 600; line-height: 1; }
+
+        .tipos-barra { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tipo-pill {
+            position: relative; padding: 9px 16px; font-size: 13px; cursor: pointer;
+            border: 1px solid #333338; background: #17171a; color: #aaa;
+            border-radius: 20px; transition: 0.15s;
+        }
+        .tipo-pill:hover { color: #ddd; border-color: #44444a; }
+        .tipo-pill.ativo { background: #333; color: #fff; border-color: #55555c; }
+        .tipo-pill .ponto {
+            display: inline-block; width: 6px; height: 6px;
+            border-radius: 50%; background: #4caf50;
+            margin-left: 6px; vertical-align: middle;
+        }
+
+        .sub-abas {
+            display: flex; gap: 20px;
+            border-bottom: 1px solid #252529; margin-bottom: 18px;
+        }
+        .sub-aba {
+            padding: 8px 0; font-size: 13px; color: #888;
+            cursor: pointer; border-bottom: 2px solid transparent;
+            transition: 0.15s;
+        }
+        .sub-aba:hover { color: #ccc; }
+        .sub-aba.ativa { color: #fff; border-bottom-color: #4caf50; }
+
+        .campo-label {
+            display: block; font-size: 11px; color: #888;
+            letter-spacing: 1px; text-transform: uppercase;
+            margin: 14px 0 6px;
+        }
+        .campo-label:first-child { margin-top: 0; }
+
+        .secao-titulo {
+            font-size: 11px; color: #4caf50;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            font-weight: 600; padding: 14px 0 4px;
+            border-top: 1px solid #252529; margin-top: 14px;
+        }
+        .secao-titulo:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        .chip {
+            padding: 7px 13px; font-size: 12px; cursor: pointer;
+            border: 1px solid #333338; background: #1a1a1e;
+            color: #bbb; border-radius: 16px; transition: 0.15s;
+            user-select: none;
+        }
+        .chip:hover { background: #222228; color: #e0e0e0; }
+        .chip.selecionado { background: #2e2e33; border-color: #666; color: #fff; font-weight: 600; }
+        .chip.impacto-alto.selecionado   { background:#331f1f;border-color:#d45a5a;color:#e08b8b; }
+        .chip.impacto-medio.selecionado  { background:#332e1a;border-color:#c9a44a;color:#e0d48a; }
+        .chip.impacto-baixo.selecionado  { background:#1f3320;border-color:#4caf50;color:#a5d6a7; }
+
+        .progresso {
+            width: 100%; height: 8px; background: #252529;
+            border-radius: 4px; overflow: hidden; margin: 8px 0;
+        }
+        .progresso > div { height: 100%; background: #4caf50; transition: width 0.3s ease; }
+        .progresso-texto { font-size: 12px; color: #888; margin-top: 4px; }
+
+        .progresso-slider { width: 100%; margin: 6px 0 4px; accent-color: #4caf50; }
+
+        .bloco-estudo {
+            border: 1px solid #252529; border-radius: 10px;
+            padding: 16px; margin-bottom: 16px; background: #19191d;
+        }
+        .bloco-cabecalho {
+            display: flex; justify-content: space-between;
+            align-items: center; margin-bottom: 12px;
+        }
+        .bloco-titulo {
+            font-size: 12px; color: #777;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .bloco-remover {
+            background: none; border: none; color: #666;
+            font-size: 20px; cursor: pointer; padding: 0 6px;
+        }
+        .bloco-remover:hover { color: #d45a5a; }
+
+        .linha-dupla { display: flex; gap: 10px; }
+        .linha-dupla > * { flex: 1; }
+
+        .recomendacoes {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+        }
+        .rec-card {
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 8px; padding: 10px; cursor: pointer;
+            transition: 0.15s; display: flex; gap: 10px;
+        }
+        .rec-card:hover { background: #24242a; border-color: #3a3a40; }
+        .rec-card img {
+            width: 44px; height: 64px; object-fit: cover;
+            border-radius: 4px; flex-shrink: 0; background: #252529;
+        }
+        .rec-card-info { flex: 1; min-width: 0; }
+        .rec-card-titulo {
+            font-size: 12px; color: #eaeaea; font-weight: 600;
+            margin-bottom: 4px; line-height: 1.3;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .rec-card-autor { font-size: 11px; color: #888; }
+
+        .rec-artigo-card {
+            position: relative;
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 8px; padding: 12px 12px 32px 12px;
+            cursor: pointer;
+            transition: 0.15s; display: flex; flex-direction: column; gap: 6px;
+        }
+        .rec-artigo-card:hover { background: #24242a; border-color: #5a8ad4; }
+        .rec-artigo-titulo {
+            font-size: 13px; color: #eaeaea; font-weight: 600;
+            line-height: 1.35;
+            display: -webkit-box; -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .rec-artigo-meta {
+            display: flex; gap: 6px; flex-wrap: wrap;
+            font-size: 11px; color: #777;
+        }
+        .rec-artigo-fonte {
+            display: inline-block;
+            padding: 2px 7px; background: #252529;
+            border-radius: 8px; color: #a8c4e8; font-size: 10px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .rec-artigo-stats { font-size: 11px; color: #888; }
+
+        .badge-pago {
+            position: absolute;
+            bottom: 8px; right: 8px;
+            background: linear-gradient(135deg, #c9a44a 0%, #d4af37 100%);
+            color: #1a1a1e;
+            font-size: 10px; font-weight: 700;
+            padding: 2px 8px; border-radius: 10px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 6px rgba(212, 175, 55, 0.35);
+            pointer-events: none;
+            z-index: 2;
+        }
+        .rec-artigo-card.checando-pago::after {
+            content: "verificando…";
+            position: absolute;
+            bottom: 8px; right: 8px;
+            background: #252529; color: #666;
+            font-size: 9px; padding: 2px 6px;
+            border-radius: 8px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .gdelt-painel {
+            background: #19191d; border: 1px solid #252529;
+            border-radius: 10px; padding: 16px; margin-bottom: 16px;
+        }
+        .gdelt-linha-filtros {
+            display: flex; flex-wrap: wrap; gap: 12px;
+            align-items: center; margin: 8px 0;
+        }
+        .gdelt-grupo {
+            display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+        }
+        .gdelt-grupo .rotulo {
+            font-size: 11px; color: #777;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            min-width: 62px;
+        }
+        .gdelt-busca-wrap {
+            display: flex; gap: 8px; margin-bottom: 12px;
+        }
+        .gdelt-busca-wrap input { flex: 1; }
+        .gdelt-timeline {
+            display: flex; align-items: flex-end; gap: 2px;
+            height: 90px; margin: 12px 0 6px;
+            padding: 8px; background: #141418;
+            border-radius: 8px; border: 1px solid #252529;
+        }
+        .gdelt-timeline .barra {
+            flex: 1; min-width: 2px;
+            background: linear-gradient(180deg, #66bb6a, #4caf50);
+            border-radius: 2px 2px 0 0;
+            transition: filter 0.15s;
+        }
+        .gdelt-timeline .barra:hover { filter: brightness(1.3); }
+
+        .bib-stats {
+            display: flex; gap: 20px; flex-wrap: wrap;
+            padding: 12px 16px; margin-bottom: 14px;
+            background: #19191d; border: 1px solid #252529;
+            border-radius: 10px; font-size: 13px; color: #888;
+        }
+        .bib-stats strong { color: #eaeaea; font-weight: 600; }
+
+        .bib-controles {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            margin-bottom: 16px; align-items: center;
+        }
+        .bib-busca {
+            flex: 1; min-width: 180px;
+            padding: 8px 14px; background: #17171a;
+            border: 1px solid #333338; color: #eaeaea;
+            border-radius: 20px; font-size: 13px; outline: none;
+            font-family: inherit;
+        }
+        .bib-busca:focus { border-color: #55555c; }
+        .bib-grade {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 14px;
+        }
+        .bib-item {
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 10px; padding: 12px; cursor: pointer;
+            transition: 0.15s;
+        }
+        .bib-item:hover {
+            background: #24242a; border-color: #4caf50;
+            transform: translateY(-2px);
+        }
+        .bib-capa {
+            width: 100%; aspect-ratio: 2/3; background: #252529;
+            border-radius: 6px; margin-bottom: 10px; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            color: #555; font-size: 28px;
+        }
+        .bib-capa img { width: 100%; height: 100%; object-fit: cover; }
+        .bib-titulo {
+            font-size: 13px; color: #eaeaea; font-weight: 600;
+            line-height: 1.3; margin-bottom: 4px;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .bib-tema { font-size: 11px; color: #777; margin-bottom: 6px; }
+
+        .ap-card {
+            background: #1c1c20; border-left: 3px solid #333;
+            border-radius: 8px; padding: 14px; margin-bottom: 10px;
+        }
+        .ap-linha-1 {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            font-size: 11px; color: #888; margin-bottom: 8px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .ap-texto {
+            font-size: 14px; color: #e0e0e0; line-height: 1.5;
+            margin-bottom: 10px; white-space: pre-wrap;
+        }
+        .ap-fonte { font-size: 12px; color: #777; font-style: italic; margin-bottom: 10px; }
+        .ap-rodape {
+            display: flex; gap: 6px; flex-wrap: wrap;
+            align-items: center; font-size: 11px;
+        }
+        .ap-rodape .tag { padding: 3px 8px; background: #252529; border-radius: 10px; color: #aaa; }
+
+        .em-construcao {
+            text-align: center; padding: 40px 20px;
+            color: #666; font-size: 14px;
+        }
+        .em-construcao .icone { font-size: 36px; margin-bottom: 10px; }
+
+        .vazio { text-align: center; padding: 30px 20px; color: #777; font-size: 14px; }
+        .btn-primario {
+            padding: 10px 18px; font-size: 14px;
+            background: #333; color: #fff;
+            border: 1px solid #55555c; border-radius: 10px;
+            cursor: pointer; font-family: inherit; transition: 0.15s;
+        }
+        .btn-primario:hover { background: #3a3a40; }
+        .btn-secundario {
+            padding: 8px 14px; font-size: 13px;
+            background: #1a1a1e; color: #bbb;
+            border: 1px solid #333338; border-radius: 20px;
+            cursor: pointer; font-family: inherit; transition: 0.15s;
+        }
+        .btn-secundario:hover { color: #e0e0e0; border-color: #44444a; }
+
+        .video-player-wrap {
+            position: relative; width: 100%; aspect-ratio: 16/9;
+            background: #000; border-radius: 10px; overflow: hidden;
+            margin: 8px 0 12px;
+        }
+        .video-player-wrap iframe,
+        .video-player-wrap > div {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+        }
+        .video-velocidade {
+            display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0 12px;
+        }
+        .video-velocidade .chip { font-variant-numeric: tabular-nums; }
+
+        .btn-marcar {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 16px; font-size: 14px;
+            background: #1a2a1a; color: #a5d6a7;
+            border: 1px solid #2e5a2e; border-radius: 20px;
+            cursor: pointer; font-family: inherit; transition: 0.15s;
+        }
+        .btn-marcar:hover { background: #223a22; border-color: #4caf50; }
+
+        .momentos-lista { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+        .momento-item {
+            display: flex; gap: 10px; align-items: flex-start;
+            padding: 8px 12px;
+            background: #1c1c20; border-left: 3px solid #4caf50;
+            border-radius: 6px; font-size: 13px; color: #d0d0d0;
+        }
+        .momento-tempo {
+            font-variant-numeric: tabular-nums;
+            color: #4caf50; font-weight: 600; flex-shrink: 0;
+            cursor: pointer;
+        }
+        .momento-tempo:hover { text-decoration: underline; }
+        .momento-texto { flex: 1; white-space: pre-wrap; }
+        .momento-remover {
+            background: none; border: none; color: #666;
+            font-size: 16px; cursor: pointer; padding: 0 4px;
+            flex-shrink: 0;
+        }
+        .momento-remover:hover { color: #d45a5a; }
+
+        .rec-video-card {
+            display: flex; gap: 10px; padding: 8px;
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 8px; cursor: pointer; transition: 0.15s;
+            position: relative;
+        }
+        .rec-video-card:hover { background: #24242a; border-color: #3a3a40; }
+        .rec-video-thumb {
+            width: 100px; height: 56px; flex-shrink: 0;
+            background: #252529; border-radius: 4px;
+            overflow: hidden; position: relative;
+        }
+        .rec-video-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .rec-video-info { flex: 1; min-width: 0; }
+        .rec-video-titulo {
+            font-size: 12px; color: #eaeaea; font-weight: 600;
+            line-height: 1.3; margin-bottom: 4px;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .rec-video-meta { font-size: 11px; color: #888; }
+
+        .rec-video-dur {
+            position: absolute; bottom: 3px; right: 3px;
+            background: rgba(0,0,0,0.82); color: #fff;
+            padding: 1px 5px; font-size: 10px;
+            border-radius: 3px; font-variant-numeric: tabular-nums;
+        }
+        .rec-video-fav {
+            position: absolute; top: 6px; right: 6px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 50%;
+            width: 26px; height: 26px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 13px; color: #ddd;
+            transition: 0.15s;
+        }
+        .rec-video-fav:hover { background: rgba(0,0,0,0.85); }
+        .rec-video-fav.favoritado { background: #d45a5a; border-color: #d45a5a; color: #fff; }
+
+        .rec-video-stats { font-size: 11px; color: #777; margin-top: 3px; }
+        .rec-video-stats .linha { display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; color: #777; }
+        .rec-video-stats .sep { color: #444; }
+
+        .video-historico-wrap {
+            display: flex; gap: 6px; align-items: center;
+            margin-bottom: 8px;
+        }
+        .video-historico-wrap select { flex: 1; }
+        .video-historico-wrap button {
+            padding: 6px 10px; font-size: 12px;
+            background: #1a1a1e; color: #888;
+            border: 1px solid #333338; border-radius: 6px;
+            cursor: pointer;
+        }
+        .video-historico-wrap button:hover { color: #d45a5a; }
+
+        .video-filtros {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .video-filtros select { width: 100%; }
+
+        .video-acoes-extra {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .checkbox-legenda {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 12px; color: #aaa;
+            cursor: pointer; padding: 6px 10px;
+            border: 1px solid #333338; border-radius: 16px;
+            user-select: none;
+        }
+        .checkbox-legenda:hover { color: #ddd; }
+        .checkbox-legenda input { margin: 0; }
+
+        .area-3frases { display: flex; flex-direction: column; gap: 6px; }
+        .area-3frases input { font-size: 13px; }
+
+        .trechos-lista { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+        .trecho-item {
+            display: flex; gap: 10px; align-items: flex-start;
+            padding: 8px 12px;
+            background: #1c1c20; border-left: 3px solid #5a8ad4;
+            border-radius: 6px; font-size: 13px; color: #d0d0d0;
+        }
+        .trecho-texto { flex: 1; white-space: pre-wrap; }
+        .trecho-ref { font-size: 11px; color: #777; font-style: italic; margin-top: 3px; }
+        .trecho-remover {
+            background: none; border: none; color: #666;
+            font-size: 16px; cursor: pointer; padding: 0 4px; flex-shrink: 0;
+        }
+        .trecho-remover:hover { color: #d45a5a; }
+        .btn-adicionar-trecho {
+            margin-top: 8px;
+            padding: 7px 14px; font-size: 13px;
+            background: #1a2233; color: #a8c4e8;
+            border: 1px solid #2c3a55; border-radius: 20px;
+            cursor: pointer; font-family: inherit;
+            transition: 0.15s;
+        }
+        .btn-adicionar-trecho:hover { background: #232f4a; border-color: #4a5c85; }
+
+        .botao-foco-flutuante {
+            position: fixed; right: 24px; bottom: 24px; z-index: 9999;
+            display: flex; align-items: center;
+            width: 44px; height: 44px; overflow: hidden;
+            text-decoration: none;
+            background: #17171a; color: #f5f5f5;
+            border: 1px solid #2d2d32; border-radius: 22px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+            transition: width 0.2s ease;
+        }
+        .botao-foco-flutuante:hover { width: 88px; }
+        .botao-foco-flutuante .icone-foco { min-width: 44px; text-align: center; font-size: 18px; }
+        .botao-foco-flutuante .texto-foco {
+            font-size: 13px; opacity: 0;
+            transition: opacity 0.15s ease; white-space: nowrap;
+        }
+        .botao-foco-flutuante:hover .texto-foco { opacity: 1; }
+
+        /* ---------- Prática · Arsenal ---------- */
+        .arsenal-grade {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .arsenal-card {
+            background: #1c1c20;
+            border: 1px solid #2a2a30;
+            border-radius: 10px;
+            padding: 14px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .arsenal-card:hover {
+            background: #24242a;
+            border-color: #4caf50;
+            transform: translateY(-2px);
+        }
+        .arsenal-cabecalho {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .arsenal-icone { font-size: 24px; line-height: 1; }
+        .arsenal-temp  { font-size: 16px; line-height: 1; }
+        .arsenal-nome {
+            font-size: 14px;
+            color: #eaeaea;
+            font-weight: 600;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+        .arsenal-meta {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+        .arsenal-meta .sep { margin: 0 4px; color: #444; }
+        .arsenal-rodape {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+<main class="container">
+
+    <header class="header">
+        <p class="eyebrow">PLANEJAMENTO</p>
+        <h1>📚 Estudo</h1>
+        <p class="subtitle">Estude hoje, retome o que parou, veja o que aprendeu.</p>
+    </header>
+
+    <section class="modules">
+        <div class="resumo-estudo" id="resumoEstudo"></div>
+        <div class="tipos-barra" id="tiposBarra"></div>
+        <div class="module-card" style="align-items:flex-start;">
+            <div style="width:100%;">
+                <div class="sub-abas" id="subAbas"></div>
+                <div id="conteudo"></div>
+            </div>
+        </div>
+    </section>
+
+    <a href="index.html" class="back-button">← Voltar para Planejamento</a>
+</main>
+
+<a href="../foco/foco.html" class="botao-foco-flutuante" aria-label="Ir para Foco">
+    <span class="icone-foco">🎯</span>
+    <span class="texto-foco">Foco</span>
+</a>
+
+<script src="../../js/storage.js"></script>
+<script>
     "use strict";
 
-    const PREFIX = "estudo";
+    const hoje = new Date();
+    const pad = n => String(n).padStart(2, "0");
+    const dataHoje = `${hoje.getFullYear()}-${pad(hoje.getMonth()+1)}-${pad(hoje.getDate())}`;
+    const paramsURL = new URLSearchParams(location.search);
+    const dataParam = paramsURL.get("data");
+    const dataAtual = (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam)) ? dataParam : dataHoje;
 
-    function pad(n) { return String(n).padStart(2, "0"); }
+    Storage.migrar();
 
-    function dataHoje() {
-        const d = new Date();
-        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const TIPOS = [
+        { id: "livro",   label: "📖 Livro" },
+        { id: "video",   label: "🎥 Vídeo" },
+        { id: "artigo",  label: "📄 Artigo" },
+        { id: "pratica", label: "🛠️ Prática" },
+        { id: "curso",   label: "🎓 Curso" },
+    ];
+    const ABAS_APRENDIZADOS = { id: "aprendizados", label: "🧠 Aprendizados" };
+
+    const estado = {
+        tipo: "livro",
+        subAba: "estudar",
+        bibFiltro: "todos",
+        bibOrdem: "recente",
+        bibBusca: "",
+        apBusca: "",
+        newsBusca: "",
+        newsEdicao: "BR",
+        newsPeriodo: "48h",
+        newsDominio: "",
+        newsModo: "lista",
+    };
+
+    const esc = Storage.escapeHTML;
+    function el(id) { return document.getElementById(id); }
+    function uid(p) { return `${p}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`; }
+    function temConteudoHoje(tipo) {
+        return Storage.blocos.ler(tipo, dataAtual).length > 0;
     }
 
-    function escapeHTML(s) {
-        return String(s ?? "").replace(/[&<>"']/g, c => ({
-            "&": "&amp;", "<": "&lt;", ">": "&gt;",
-            '"': "&quot;", "'": "&#39;"
-        }[c]));
+    // ==================================================
+    // RESUMO / TIPOS / SUB-ABAS / CONTEÚDO
+    // ==================================================
+    function renderResumo() {
+        const blocosHoje = TIPOS.reduce(
+            (acc, t) => acc + Storage.blocos.ler(t.id, dataAtual).length, 0
+        );
+        const emAndamento = Storage.biblioteca.listar("livro")
+            .filter(b => b.status !== "concluido").length;
+        const apsAtivos = Storage.aprendizados.listar()
+            .filter(a => a.status !== "descartado").length;
+
+        el("resumoEstudo").innerHTML = `
+            <div class="resumo-card" data-ir="estudar">
+                <span class="resumo-rotulo">Estudos hoje</span>
+                <span class="resumo-valor">${blocosHoje}</span>
+            </div>
+            <div class="resumo-card" data-ir="biblioteca">
+                <span class="resumo-rotulo">Em andamento</span>
+                <span class="resumo-valor">${emAndamento}</span>
+            </div>
+            <div class="resumo-card" data-ir="aprendizados">
+                <span class="resumo-rotulo">Aprendizados ativos</span>
+                <span class="resumo-valor">${apsAtivos}</span>
+            </div>
+        `;
+
+        el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
+            card.addEventListener("click", () => {
+                const ir = card.dataset.ir;
+                if (ir === "aprendizados") estado.tipo = "aprendizados";
+                else { estado.tipo = "livro"; estado.subAba = ir; }
+                render();
+            });
+        });
     }
 
-    function lerJSON(chave, fallback) {
+    function renderTipos() {
+        const lista = [...TIPOS, ABAS_APRENDIZADOS];
+        el("tiposBarra").innerHTML = lista.map(t => {
+            const ativo = estado.tipo === t.id ? " ativo" : "";
+            const tem = TIPOS.some(x => x.id === t.id) && temConteudoHoje(t.id);
+            const ponto = tem ? `<span class="ponto"></span>` : "";
+            return `<div class="tipo-pill${ativo}" data-tipo="${t.id}">${t.label}${ponto}</div>`;
+        }).join("");
+
+        el("tiposBarra").querySelectorAll(".tipo-pill").forEach(p => {
+            p.addEventListener("click", () => {
+                estado.tipo = p.dataset.tipo;
+                estado.subAba = "estudar";
+                render();
+            });
+        });
+    }
+
+    function renderSubAbas() {
+        let abas = [];
+        if (estado.tipo === "livro" || estado.tipo === "video" || estado.tipo === "artigo") {
+            abas = [
+                { id: "estudar",    label: "📝 Estudar hoje" },
+                { id: "biblioteca", label: "📚 Biblioteca" },
+            ];
+            if (estado.tipo === "artigo") {
+                abas.push({ id: "noticias", label: "📰 Notícias" });
+            }
+        } else if (estado.tipo === "aprendizados") {
+            abas = [];
+        } else if (estado.tipo === "pratica") {
+            abas = [
+                { id: "praticar", label: "📝 Praticar hoje" },
+                { id: "arsenal",  label: "🎯 Arsenal" },
+            ];
+        } else {
+            abas = [{ id: "estudar", label: "📝 Estudar hoje" }];
+        }
+
+        if (abas.length === 0) { el("subAbas").innerHTML = ""; return; }
+        if (!abas.some(a => a.id === estado.subAba)) estado.subAba = abas[0].id;
+
+        el("subAbas").innerHTML = abas.map(a =>
+            `<div class="sub-aba${estado.subAba === a.id ? " ativa" : ""}" data-aba="${a.id}">${a.label}</div>`
+        ).join("");
+
+        el("subAbas").querySelectorAll(".sub-aba").forEach(s => {
+            s.addEventListener("click", () => {
+                estado.subAba = s.dataset.aba;
+                render();
+            });
+        });
+    }
+
+    function renderConteudo() {
+        if (estado.tipo === "livro"  && estado.subAba === "estudar")    return renderEstudarLivro();
+        if (estado.tipo === "livro"  && estado.subAba === "biblioteca") return renderBibliotecaLivro();
+        if (estado.tipo === "video"  && estado.subAba === "estudar")    return renderEstudarVideo();
+        if (estado.tipo === "video"  && estado.subAba === "biblioteca") return renderBibliotecaVideo();
+        if (estado.tipo === "artigo" && estado.subAba === "estudar")    return renderEstudarArtigo();
+        if (estado.tipo === "artigo" && estado.subAba === "biblioteca") return renderBibliotecaArtigo();
+        if (estado.tipo === "artigo" && estado.subAba === "noticias")   return renderNoticias();
+        if (estado.tipo === "aprendizados")                             return renderAprendizados();
+        if (estado.tipo === "pratica" && estado.subAba === "praticar")  return renderPraticarHoje();
+        if (estado.tipo === "pratica" && estado.subAba === "arsenal")   return renderArsenal();
+        return renderEmConstrucao();
+    }
+
+    function renderEmConstrucao() {
+        const tipoInfo = TIPOS.find(t => t.id === estado.tipo) || { label: "?" };
+        el("conteudo").innerHTML = `
+            <div class="em-construcao">
+                <div class="icone">🚧</div>
+                <div><strong>${tipoInfo.label}</strong> está em construção.</div>
+                <p style="margin-top:8px; font-size:13px;">
+                    Os campos específicos deste tipo serão adicionados na próxima parte.
+                </p>
+            </div>
+        `;
+    }
+
+    // ==================================================
+    // PRÁTICA — casca (Partes 6+ preenchem o conteúdo real)
+    // ==================================================
+    function renderPraticarHoje() {
+        el("conteudo").innerHTML = `
+            <div class="vazio">
+                <div style="font-size:36px; margin-bottom:10px;">🛠️</div>
+                <div><strong>Praticar hoje</strong> será preenchido na Parte 10.</div>
+                <p style="font-size:13px; color:#666; margin-top:8px;">
+                    O Treinador e o bloco do dia vêm nas próximas partes.
+                    Por enquanto, dê uma olhada no <strong>Arsenal</strong>.
+                </p>
+            </div>
+        `;
+    }
+
+    function renderArsenal() {
+        const wrap = el("conteudo");
+        const comDerivados = Storage.pratica.derivados.listarComDerivados();
+
+        if (!comDerivados.length) {
+            wrap.innerHTML = `
+                <div class="vazio">
+                    <div style="font-size:36px; margin-bottom:10px;">🎯</div>
+                    <div>Nenhuma skill no Arsenal ainda.</div>
+                    <p style="font-size:13px; color:#666; margin-top:8px;">
+                        Skills são as habilidades que você treina (violão, inglês, copy…).
+                    </p>
+                    <button class="btn-primario" id="btnNovaSkill" style="margin-top:14px;">+ Criar primeira skill</button>
+                </div>
+            `;
+        } else {
+            wrap.innerHTML = `
+                <div class="bib-controles" style="margin-bottom:14px;">
+                    <button class="btn-primario" id="btnNovaSkill">+ Nova skill</button>
+                </div>
+                <div class="arsenal-grade">
+                    ${comDerivados.map(renderCardArsenal).join("")}
+                </div>
+            `;
+        }
+
+        wrap.querySelector("#btnNovaSkill")?.addEventListener("click", () => {
+            const nome = prompt("Nome da skill (ex.: Violão, Inglês, Copywriting):", "");
+            if (!nome) return;
+            const icone = (prompt("Ícone (emoji, opcional):", "🛠️") || "🛠️").trim() || "🛠️";
+            Storage.pratica.skills.criar({ nome, icone });
+            render();
+        });
+    }
+
+    function renderCardArsenal(s) {
+        const d = s._derivados || {};
+        const temp   = d.temperatura_geral || "🆕";
+        const gap    = (d.gap_medio === null || d.gap_medio === undefined) ? "—" : d.gap_medio + "%";
+        const streak = d.streak_atual || 0;
+        const sessoes = d.sessoes_total || 0;
+
+        return `
+            <div class="arsenal-card" data-id="${esc(s.id)}">
+                <div class="arsenal-cabecalho">
+                    <span class="arsenal-icone">${esc(s.icone)}</span>
+                    <span class="arsenal-temp" title="Temperatura">${temp}</span>
+                </div>
+                <div class="arsenal-nome">${esc(s.nome)}</div>
+                <div class="arsenal-meta">
+                    <span>${s.frentes.length} frente${s.frentes.length === 1 ? "" : "s"}</span>
+                    <span class="sep">·</span>
+                    <span>gap ${gap}</span>
+                </div>
+                <div class="arsenal-rodape">
+                    <span>${streak > 0 ? "🔥 " + streak + "d" : "—"}</span>
+                    <span>${sessoes} sessõe${sessoes === 1 ? "m" : "s"}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    // ==================================================
+    // AUXILIARES DE VÍDEO
+    // ==================================================
+    const players = {};
+    const YOUTUBE_API_KEY = "AIzaSyB2mJE_ad6wDZ7wVBHWfRWjXDrYDpqYQ-g";
+
+    function extrairVideoId(url) {
+        if (!url) return "";
+        const s = url.trim();
+        const m = s.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
+        if (m) return m[1];
+        if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
+        return "";
+    }
+
+    function formatarDuracao(seg) {
+        const s = Number(seg) || 0;
+        const h = Math.floor(s / 3600);
+        const m = Math.floor((s % 3600) / 60);
+        const ss = Math.floor(s % 60);
+        if (h > 0) return `${h}:${String(m).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;
+        return `${m}:${String(ss).padStart(2,"0")}`;
+    }
+
+    function parseDuracao(txt) {
+        if (!txt) return 0;
+        const partes = String(txt).split(":").map(n => parseInt(n, 10) || 0);
+        if (partes.length === 3) return partes[0]*3600 + partes[1]*60 + partes[2];
+        if (partes.length === 2) return partes[0]*60 + partes[1];
+        if (partes.length === 1) return partes[0];
+        return 0;
+    }
+
+    function formatarDuracaoCurta(seg) {
+        seg = Number(seg) || 0;
+        if (seg < 60) return `${seg}s`;
+        const min = Math.round(seg / 60);
+        if (min < 60) return `${min} min`;
+        const h = Math.floor(seg / 3600);
+        const m = Math.round((seg % 3600) / 60);
+        return m > 0 ? `${h}h ${m}min` : `${h}h`;
+    }
+
+    function formatarVisualizacoes(n) {
+        n = Number(n) || 0;
+        if (n >= 1e9) return (n/1e9).toFixed(1).replace(".", ",") + " bi";
+        if (n >= 1e6) return (n/1e6).toFixed(1).replace(".", ",") + " mi";
+        if (n >= 1e3) return Math.floor(n/1e3) + " mil";
+        return String(n);
+    }
+
+    function formatarDataRelativa(iso) {
+        if (!iso) return "";
+        const d = new Date(iso);
+        const diff = Math.floor((new Date() - d) / 1000);
+        if (diff < 60) return "agora";
+        if (diff < 3600) return `há ${Math.floor(diff/60)} min`;
+        if (diff < 86400) return `há ${Math.floor(diff/3600)} h`;
+        if (diff < 86400*30) return `há ${Math.floor(diff/86400)} d`;
+        if (diff < 86400*365) return `há ${Math.floor(diff/86400/30)} meses`;
+        return `há ${Math.floor(diff/86400/365)} ano(s)`;
+    }
+
+    const videosVistos = new Set();
+    const CHAVE_HISTORICO = "estudo_video_historico_buscas";
+    const CHAVE_FILTROS   = "estudo_video_filtros_preferidos";
+
+    function obterHistoricoBuscas() {
+        try { return JSON.parse(localStorage.getItem(CHAVE_HISTORICO)) || []; }
+        catch { return []; }
+    }
+    function salvarBuscaNoHistorico(tema) {
+        if (!tema) return;
+        let h = obterHistoricoBuscas().filter(t => t.toLowerCase() !== tema.toLowerCase());
+        h.unshift(tema);
+        h = h.slice(0, 8);
+        localStorage.setItem(CHAVE_HISTORICO, JSON.stringify(h));
+    }
+    function limparHistoricoBuscas() { localStorage.removeItem(CHAVE_HISTORICO); }
+
+    function obterFiltrosSalvos() {
+        try { return JSON.parse(localStorage.getItem(CHAVE_FILTROS)) || {}; }
+        catch { return {}; }
+    }
+    function salvarFiltros(opts) {
+        localStorage.setItem(CHAVE_FILTROS, JSON.stringify(opts));
+    }
+
+    let ytApiPromise = null;
+    function carregarYTAPI() {
+        if (ytApiPromise) return ytApiPromise;
+        ytApiPromise = new Promise(resolve => {
+            if (window.YT && window.YT.Player) return resolve();
+            window.onYouTubeIframeAPIReady = () => resolve();
+            const s = document.createElement("script");
+            s.src = "https://www.youtube.com/iframe_api";
+            document.head.appendChild(s);
+        });
+        return ytApiPromise;
+    }
+
+    async function aplicarPlayer(blockId, videoId, velocidade) {
+        if (!videoId) return;
+        await carregarYTAPI();
+        if (players[blockId]) {
+            try { players[blockId].destroy(); } catch(e) {}
+        }
+        players[blockId] = new window.YT.Player(`yt_${blockId}`, {
+            videoId,
+            playerVars: { rel: 0, modestbranding: 1, hl: "pt" },
+            events: {
+                onReady: (ev) => {
+                    if (velocidade && ev.target.setPlaybackRate) {
+                        try { ev.target.setPlaybackRate(Number(velocidade)); } catch(e) {}
+                    }
+                }
+            }
+        });
+    }
+
+    async function buscarMetadadosYouTube(videoId) {
+        const url = `https://www.youtube.com/oembed?url=${encodeURIComponent(
+            `https://www.youtube.com/watch?v=${videoId}`
+        )}&format=json`;
+        const r = await fetch(url);
+        if (!r.ok) throw new Error("oEmbed falhou");
+        const j = await r.json();
+        return {
+            titulo: j.title || "",
+            canal: j.author_name || "",
+            thumb: j.thumbnail_url || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+            duracaoSeg: 0,
+        };
+    }
+
+    async function buscarVideosPorTema(query, opts = {}) {
+        if (!YOUTUBE_API_KEY) throw new Error("Chave do YouTube ausente");
+
+        const ordem    = opts.ordem    || "relevance";
+        const duracao  = opts.duracao  || "any";
+        const periodo  = opts.periodo  || "any";
+        const ineditos = !!opts.ineditos;
+        const legenda  = !!opts.legenda;
+
+        let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=25&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}&regionCode=BR&relevanceLanguage=pt&order=${ordem}`;
+
+        if (duracao !== "any") url += `&videoDuration=${duracao}`;
+        if (legenda) url += `&videoCaption=closedCaption`;
+
+        if (periodo !== "any") {
+            const dias = { "24h": 1, "semana": 7, "mes": 30, "ano": 365 }[periodo] || 0;
+            if (dias) {
+                const desde = new Date(Date.now() - dias * 86400000);
+                url += `&publishedAfter=${desde.toISOString()}`;
+            }
+        }
+
+        const r = await fetch(url);
+        if (!r.ok) {
+            const err = await r.json().catch(() => ({}));
+            console.error("YouTube API erro:", err);
+            throw new Error("YouTube API falhou");
+        }
+        const j = await r.json();
+        let items = j.items || [];
+        if (!items.length) return [];
+
+        if (ineditos) {
+            const novos = items.filter(x => !videosVistos.has(x.id.videoId));
+            if (novos.length >= 3) items = novos;
+            else videosVistos.clear();
+        }
+
+        for (let i = items.length - 1; i > 0; i--) {
+            const k = Math.floor(Math.random() * (i + 1));
+            [items[i], items[k]] = [items[k], items[i]];
+        }
+        items = items.slice(0, 6);
+        items.forEach(x => videosVistos.add(x.id.videoId));
+
+        const ids      = items.map(x => x.id.videoId).join(",");
+        const canalIds = [...new Set(items.map(x => x.snippet.channelId))].join(",");
+
+        let detalhes = {}, canais = {};
         try {
-            const raw = localStorage.getItem(chave);
-            if (!raw) return fallback;
-            const v = JSON.parse(raw);
-            return v ?? fallback;
-        } catch { return fallback; }
-    }
-
-    function salvarJSON(chave, valor) {
-        try { localStorage.setItem(chave, JSON.stringify(valor)); }
-        catch (e) { console.warn("storage cheio?", e); }
-    }
-
-    // ---------- chaves ----------
-    const K = {
-        blocos:     (tipo, data) => `${PREFIX}_${data}_${tipo}_blocos`,
-        biblioteca: (tipo)       => `biblioteca_${tipo}`,
-        aprendizados: ()         => `aprendizados`,
-    };
-
-    // ---------- blocos do dia ----------
-    const blocos = {
-        ler(tipo, data) {
-            return lerJSON(K.blocos(tipo, data), []);
-        },
-        salvar(tipo, data, arr) {
-            salvarJSON(K.blocos(tipo, data), arr);
-        },
-    };
-
-    // ---------- biblioteca ----------
-    const biblioteca = {
-        listar(tipo) {
-            return lerJSON(K.biblioteca(tipo), []);
-        },
-        adicionar(tipo, item) {
-            const lista = this.listar(tipo);
-            const id = item.id;
-            const idx = lista.findIndex(x => x.id === id);
-            if (idx >= 0) {
-                lista[idx] = { ...lista[idx], ...item, atualizadoEm: Date.now() };
-            } else {
-                item.criadoEm = item.criadoEm || Date.now();
-                item.atualizadoEm = Date.now();
-                lista.push(item);
-            }
-            salvarJSON(K.biblioteca(tipo), lista);
-            return item;
-        },
-        atualizar(tipo, id, patch) {
-            const lista = this.listar(tipo);
-            const idx = lista.findIndex(x => x.id === id);
-            if (idx >= 0) {
-                lista[idx] = { ...lista[idx], ...patch, atualizadoEm: Date.now() };
-                salvarJSON(K.biblioteca(tipo), lista);
-            }
-        },
-        remover(tipo, id) {
-            const lista = this.listar(tipo).filter(x => x.id !== id);
-            salvarJSON(K.biblioteca(tipo), lista);
-        },
-    };
-
-    // ---------- aprendizados ----------
-    const aprendizados = {
-        listar() { return lerJSON(K.aprendizados(), []); },
-        adicionar(a) {
-            const lista = this.listar();
-            a.id = a.id || `ap_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
-            a.criadoEm = a.criadoEm || Date.now();
-            lista.push(a);
-            salvarJSON(K.aprendizados(), lista);
-            return a;
-        },
-        atualizar(id, patch) {
-            const lista = this.listar();
-            const idx = lista.findIndex(x => x.id === id);
-            if (idx >= 0) {
-                lista[idx] = { ...lista[idx], ...patch, atualizadoEm: Date.now() };
-                salvarJSON(K.aprendizados(), lista);
-            }
-        },
-        remover(id) {
-            const lista = this.listar().filter(x => x.id !== id);
-            salvarJSON(K.aprendizados(), lista);
-        },
-    };
-
-    /* ============================================================
-       Storage.pratica — Módulo Prática
-       Parte 1–4/20 — Helpers, Skills, Frentes, Marcos, Mídias,
-                     Pontos de Virada, Feedback, Derivados, Snapshots
-       ============================================================ */
-    const pratica = (function () {
-
-        // -------- Chaves internas --------
-        const K = {
-            SKILLS:        "pratica_skills",
-            SNAPSHOTS:     "pratica_snapshots_mensais",
-            CONTEXTO_DIA:  "treinador_contexto_",
-            BLOCOS_PREFIX: "estudo_",
-            BLOCOS_SUFIX:  "_pratica_blocos"
-        };
-
-        // -------- Helpers de data --------
-        function agoraISO() {
-            return new Date().toISOString();
-        }
-
-        function diasEntre(dataA, dataB) {
-            const a = new Date(dataA).getTime();
-            const b = new Date(dataB).getTime();
-            return Math.floor(Math.abs(b - a) / 86400000);
-        }
-
-        // -------- Geração de IDs --------
-        function gerarId(prefixo) {
-            const ts = Date.now().toString(36);
-            const rand = Math.random().toString(36).slice(2, 8);
-            return `${prefixo}_${ts}${rand}`;
-        }
-
-        // -------- Leitura/escrita crua --------
-        function lerJSONLocal(chave, fallback) {
-            try {
-                const raw = localStorage.getItem(chave);
-                if (!raw) return fallback;
-                return JSON.parse(raw);
-            } catch (e) {
-                console.warn("[Storage.pratica] falha ao ler", chave, e);
-                return fallback;
-            }
-        }
-
-        function salvarJSONLocal(chave, valor) {
-            try {
-                localStorage.setItem(chave, JSON.stringify(valor));
-                return true;
-            } catch (e) {
-                console.warn("[Storage.pratica] falha ao salvar", chave, e);
-                return false;
-            }
-        }
-
-        // -------- Suporte --------
-        function suporta() {
-            try {
-                localStorage.setItem("__teste_pratica__", "1");
-                localStorage.removeItem("__teste_pratica__");
-                return true;
-            } catch (e) {
-                return false;
-            }
-        }
-
-        // ============================================================
-        // SKILLS (CRUD)
-        // ============================================================
-        function _lerTodasSkills() {
-            return lerJSONLocal(K.SKILLS, []);
-        }
-
-        function _salvarTodasSkills(lista) {
-            return salvarJSONLocal(K.SKILLS, lista);
-        }
-
-        function _idxSkill(lista, id) {
-            return lista.findIndex(s => s.id === id);
-        }
-
-        const skills = {
-            listar() {
-                return _lerTodasSkills();
-            },
-
-            listarAtivas() {
-                return _lerTodasSkills().filter(s => !s.arquivada);
-            },
-
-            ler(id) {
-                return _lerTodasSkills().find(s => s.id === id) || null;
-            },
-
-            criar(dados = {}) {
-                const lista = _lerTodasSkills();
-                const nova = {
-                    id: dados.id || gerarId("skill"),
-                    nome: dados.nome || "",
-                    icone: dados.icone || "🛠️",
-                    area: dados.area || "estudo",
-                    norte: {
-                        objetivo_final: dados.norte?.objetivo_final || "",
-                        frase: dados.norte?.frase || ""
-                    },
-                    frentes: dados.frentes || [],
-                    marcos: dados.marcos || {},
-                    midias: [],
-                    pontos_de_virada: [],
-                    feedback: [],
-                    config: {
-                        nivel: dados.config?.nivel || "aprendiz",
-                        regra_nivel: dados.config?.regra_nivel || { artesao: 3, mestre: 8, lenda: 15 },
-                        template_area_origem: dados.config?.template_area_origem || dados.area || "estudo"
-                    },
-                    arquivada: false,
-                    criado_em: agoraISO(),
-                    atualizado_em: agoraISO()
-                };
-                lista.push(nova);
-                _salvarTodasSkills(lista);
-                return nova;
-            },
-
-            atualizar(id, patch) {
-                const lista = _lerTodasSkills();
-                const i = _idxSkill(lista, id);
-                if (i < 0) return null;
-                lista[i] = { ...lista[i], ...patch, atualizado_em: agoraISO() };
-                _salvarTodasSkills(lista);
-                return lista[i];
-            },
-
-            remover(id) {
-                const lista = _lerTodasSkills().filter(s => s.id !== id);
-                _salvarTodasSkills(lista);
-            },
-
-            arquivar(id) {
-                return this.atualizar(id, { arquivada: true });
-            },
-
-            desarquivar(id) {
-                return this.atualizar(id, { arquivada: false });
-            },
-
-            // -------- Frentes --------
-            adicionarFrente(skillId, dados = {}) {
-                const lista = _lerTodasSkills();
-                const i = _idxSkill(lista, skillId);
-                if (i < 0) return null;
-                const nova = {
-                    id: dados.id || gerarId("fr"),
-                    nome: dados.nome || "",
-                    icone: dados.icone || "🎯",
-                    fase: dados.fase || "aprendendo",
-                    modo_sessao: dados.modo_sessao || "tempo",
-                    marco_ativo: dados.marco_ativo || null,
-                    marcos: dados.marcos || [],
-                    arquivada: false,
-                    criado_em: agoraISO()
-                };
-                lista[i].frentes.push(nova);
-                lista[i].atualizado_em = agoraISO();
-                _salvarTodasSkills(lista);
-                return nova;
-            },
-
-            atualizarFrente(skillId, frenteId, patch) {
-                const lista = _lerTodasSkills();
-                const i = _idxSkill(lista, skillId);
-                if (i < 0) return null;
-                const j = lista[i].frentes.findIndex(f => f.id === frenteId);
-                if (j < 0) return null;
-                lista[i].frentes[j] = { ...lista[i].frentes[j], ...patch };
-                lista[i].atualizado_em = agoraISO();
-                _salvarTodasSkills(lista);
-                return lista[i].frentes[j];
-            },
-
-            removerFrente(skillId, frenteId) {
-                const lista = _lerTodasSkills();
-                const i = _idxSkill(lista, skillId);
-                if (i < 0) return;
-                lista[i].frentes = lista[i].frentes.filter(f => f.id !== frenteId);
-                lista[i].atualizado_em = agoraISO();
-                _salvarTodasSkills(lista);
-            },
-
-            // -------- Marcos --------
-            adicionarMarco(skillId, dados = {}) {
-                const lista = _lerTodasSkills();
-                const i = _idxSkill(lista, skillId);
-                if (i < 0) return null;
-                const novo = {
-                    id: dados.id || gerarId("mc"),
-                    titulo: dados.titulo || "",
-                    frente: dados.frente || null,
-                    percentual: dados.percentual || 0,
-                    peso: dados.peso || 3,
-                    data_inicio: dados.data_inicio || dataHoje(),
-                    data_fim: null,
-                    prerequisito: dados.prerequisito || null,
-                    entregavel: dados.entregavel || null
-                };
-                lista[i].marcos[novo.id] = novo;
-                const j = lista[i].frentes.findIndex(f => f.id === novo.frente);
-                if (j >= 0 && !lista[i].frentes[j].marcos.includes(novo.id)) {
-                    lista[i].frentes[j].marcos.push(novo.id);
-                    if (!lista[i].frentes[j].marco_ativo) {
-                        lista[i].frentes[j].marco_ativo = novo.id;
-                    }
-                }
-                lista[i].atualizado_em = agoraISO();
-                _salvarTodasSkills(lista);
-                return novo;
-            },
-
-            atualizarMarco(skillId, marcoId, patch) {
-                const lista = _lerTodasSkills();
-                const i = _idxSkill(lista, skillId);
-                if (i < 0 || !lista[i].marcos[marcoId]) return null;
-                lista[i].marcos[marcoId] = { ...lista[i].marcos[marcoId], ...patch };
-                if (patch.percentual >= 100 && !lista[i].marcos[marcoId].data_fim) {
-                    lista[i].marcos[marcoId].data_fim = dataHoje();
-                }
-                lista[i].atualizado_em = agoraISO();
-                _salvarTodasSkills(lista);
-                return lista[i].marcos[marcoId];
-            },
-
-            removerMarco(skillId, marcoId) {
-                const lista = _lerTodasSkills();
-                const i = _idxSkill(lista, skillId);
-                if (i < 0) return;
-                delete lista[i].marcos[marcoId];
-                lista[i].frentes.forEach(f => {
-                    f.marcos = f.marcos.filter(m => m !== marcoId);
-                    if (f.marco_ativo === marcoId) {
-                        f.marco_ativo = f.marcos[0] || null;
-                    }
-                });
-                lista[i].atualizado_em = agoraISO();
-                _salvarTodasSkills(lista);
-            },
-
-            definirMarcoAtivo(skillId, frenteId, marcoId) {
-                return this.atualizarFrente(skillId, frenteId, { marco_ativo: marcoId });
-            },
-
-            // -------- Mídias --------
-            adicionarMidia(skillId, dados = {}) {
-                const lista = _lerTodasSkills();
-                const i = _idxSkill(lista, skillId);
-                if (i < 0) return null;
-                const nova = {
-                    id: dados.id || gerarId("md"),
-                    tipo: dados.tipo || "video",
-                    origem: dados.origem || "manual",
-                    url: dados.url || "",
-                    fileId: dados.fileId || "",
-                    nome: dados.nome || "",
-                    nota: dados.nota || "",
-                    data: dados.data || dataHoje(),
-                    frente: dados.frente || null,
-                    contexto: dados.contexto || "geral"
-                };
-                lista[i].midias = lista[i].midias || [];
-                lista[i].midias.push(nova);
-                lista[i].atualizado_em = agoraISO();
-                _salvarTodasSkills(lista);
-                return nova;
-            },
-
-            atualizarMidia(skillId, midiaId, patch) {
-                const lista = _lerTodasSkills();
-                const i = _idxSkill(lista, skillId);
-                if (i < 0) return null;
-                const j = (lista[i].midias || []).findIndex(m => m.id === midiaId);
-                if (j < 0) return null;
-                lista[i].midias[j] = { ...lista[i].midias[j], ...patch };
-                lista[i].atualizado_em = agoraISO();
-                _salvarTodasSkills(lista);
-                return lista[i].midias[j];
-            },
-
-            removerMidia(skillId, midiaId) {
-                const lista = _lerTodasSkills();
-                const i = _idxSkill(lista, skillId);
-                if (i < 0) return;
-                lista[i].midias = (lista[i].midias || []).filter(m => m.id !== midiaId);
-                lista[i].atualizado_em = agoraISO();
-                _salvarTodasSkills(lista);
-            },
-
-            listarMidias(skillId, filtro = {}) {
-                const skill = this.ler(skillId);
-                if (!skill) return [];
-                let arr = skill.midias || [];
-                if (filtro.contexto) arr = arr.filter(m => m.contexto === filtro.contexto);
-                if (filtro.frente)   arr = arr.filter(m => m.frente === filtro.frente);
-                if (filtro.tipo)     arr = arr.filter(m => m.tipo === filtro.tipo);
-                return arr.sort((a, b) => (b.data || "").localeCompare(a.data || ""));
-            },
-
-            definirAntesDepois(skillId, antesId, depoisId) {
-                const lista = _lerTodasSkills();
-                const i = _idxSkill(lista, skillId);
-                if (i < 0) return;
-                (lista[i].midias || []).forEach(m => {
-                    if (m.id === antesId)  m.contexto = "antes";
-                    if (m.id === depoisId) m.contexto = "depois";
-                });
-                lista[i].atualizado_em = agoraISO();
-                _salvarTodasSkills(lista);
-            },
-
-            // -------- Pontos de virada --------
-            adicionarPontoVirada(skillId, dados = {}) {
-                const lista = _lerTodasSkills();
-                const i = _idxSkill(lista, skillId);
-                if (i < 0) return null;
-                const novo = {
-                    id: dados.id || gerarId("pv"),
-                    data: dados.data || dataHoje(),
-                    frente: dados.frente || null,
-                    texto: dados.texto || "",
-                    sessao_id: dados.sessao_id || null,
-                    criado_em: agoraISO()
-                };
-                lista[i].pontos_de_virada = lista[i].pontos_de_virada || [];
-                lista[i].pontos_de_virada.push(novo);
-                lista[i].atualizado_em = agoraISO();
-                _salvarTodasSkills(lista);
-                return novo;
-            },
-
-            atualizarPontoVirada(skillId, pvId, patch) {
-                const lista = _lerTodasSkills();
-                const i = _idxSkill(lista, skillId);
-                if (i < 0) return null;
-                const j = (lista[i].pontos_de_virada || []).findIndex(p => p.id === pvId);
-                if (j < 0) return null;
-                lista[i].pontos_de_virada[j] = { ...lista[i].pontos_de_virada[j], ...patch };
-                lista[i].atualizado_em = agoraISO();
-                _salvarTodasSkills(lista);
-                return lista[i].pontos_de_virada[j];
-            },
-
-            removerPontoVirada(skillId, pvId) {
-                const lista = _lerTodasSkills();
-                const i = _idxSkill(lista, skillId);
-                if (i < 0) return;
-                lista[i].pontos_de_virada = (lista[i].pontos_de_virada || []).filter(p => p.id !== pvId);
-                lista[i].atualizado_em = agoraISO();
-                _salvarTodasSkills(lista);
-            },
-
-            listarPontosVirada(skillId) {
-                const skill = this.ler(skillId);
-                if (!skill) return [];
-                return (skill.pontos_de_virada || [])
-                    .slice()
-                    .sort((a, b) => (b.data || "").localeCompare(a.data || ""));
-            },
-
-            // -------- Feedback --------
-            adicionarFeedback(skillId, dados = {}) {
-                const lista = _lerTodasSkills();
-                const i = _idxSkill(lista, skillId);
-                if (i < 0) return null;
-                const novo = {
-                    id: dados.id || gerarId("fb"),
-                    data: dados.data || dataHoje(),
-                    fonte: dados.fonte || "auto",
-                    nota: dados.nota || "amarelo",
-                    texto: dados.texto || "",
-                    frente: dados.frente || null,
-                    criado_em: agoraISO()
-                };
-                lista[i].feedback = lista[i].feedback || [];
-                lista[i].feedback.push(novo);
-                lista[i].atualizado_em = agoraISO();
-                _salvarTodasSkills(lista);
-                return novo;
-            },
-
-            atualizarFeedback(skillId, fbId, patch) {
-                const lista = _lerTodasSkills();
-                const i = _idxSkill(lista, skillId);
-                if (i < 0) return null;
-                const j = (lista[i].feedback || []).findIndex(f => f.id === fbId);
-                if (j < 0) return null;
-                lista[i].feedback[j] = { ...lista[i].feedback[j], ...patch };
-                lista[i].atualizado_em = agoraISO();
-                _salvarTodasSkills(lista);
-                return lista[i].feedback[j];
-            },
-
-            removerFeedback(skillId, fbId) {
-                const lista = _lerTodasSkills();
-                const i = _idxSkill(lista, skillId);
-                if (i < 0) return;
-                lista[i].feedback = (lista[i].feedback || []).filter(f => f.id !== fbId);
-                lista[i].atualizado_em = agoraISO();
-                _salvarTodasSkills(lista);
-            },
-
-            listarFeedback(skillId, filtro = {}) {
-                const skill = this.ler(skillId);
-                if (!skill) return [];
-                let arr = (skill.feedback || []).slice();
-                if (filtro.fonte) arr = arr.filter(f => f.fonte === filtro.fonte);
-                return arr.sort((a, b) => (b.data || "").localeCompare(a.data || ""));
-            }
-        };
-
-        // ============================================================
-        // DERIVADOS — nunca salvos, calculados na hora
-        // ============================================================
-
-        function _lerBlocosPratica(data) {
-            return lerJSONLocal(`${K.BLOCOS_PREFIX}${data}${K.BLOCOS_SUFIX}`, []);
-        }
-
-        function _listarTodosBlocosPratica() {
-            const out = [];
-            const prefixo = `${K.BLOCOS_PREFIX}`;
-            const sufixo = `${K.BLOCOS_SUFIX}`;
-            for (let i = 0; i < localStorage.length; i++) {
-                const chave = localStorage.key(i);
-                if (!chave.startsWith(prefixo) || !chave.endsWith(sufixo)) continue;
-                const data = chave.slice(prefixo.length, chave.length - sufixo.length);
-                const blocosArr = lerJSONLocal(chave, []);
-                blocosArr.forEach(b => out.push({ ...b, data }));
-            }
-            return out;
-        }
-
-        function _temperaturaPorFrente(skill, frenteId) {
-            const blocosArr = _listarTodosBlocosPratica().filter(b =>
-                b.skillId === skill.id && b.frenteId === frenteId
+            const r2 = await fetch(
+                `https://www.googleapis.com/youtube/v3/videos?part=contentDetails,statistics&id=${ids}&key=${YOUTUBE_API_KEY}`
             );
-            if (!blocosArr.length) return { emoji: "🆕", label: "nova", dias: null };
-
-            const ultima = blocosArr
-                .map(b => b.data)
-                .sort()
-                .reverse()[0];
-
-            const dias = diasEntre(ultima, dataHoje());
-
-            let emoji, label;
-            if (dias <= 3)       { emoji = "🔥"; label = "quente"; }
-            else if (dias <= 14) { emoji = "🌤"; label = "morna"; }
-            else if (dias <= 30) { emoji = "❄️"; label = "fria"; }
-            else                 { emoji = "🧊"; label = "congelada"; }
-
-            return { emoji, label, dias, ultima };
-        }
-
-        function _temperaturaGeral(skill) {
-            if (!skill.frentes.length) return { emoji: "🆕", label: "nova", dias: null };
-            const temps = skill.frentes.map(f => _temperaturaPorFrente(skill, f.id));
-            return temps
-                .filter(t => t.dias !== null)
-                .sort((a, b) => a.dias - b.dias)[0]
-                || { emoji: "🆕", label: "nova", dias: null };
-        }
-
-        function _gapPorFrente(skill, frente) {
-            const marcoId = frente.marco_ativo;
-            if (!marcoId || !skill.marcos[marcoId]) return null;
-            const pct = Number(skill.marcos[marcoId].percentual) || 0;
-            return Math.max(0, 100 - pct);
-        }
-
-        function _gapGeral(skill) {
-            const gaps = skill.frentes
-                .map(f => _gapPorFrente(skill, f))
-                .filter(g => g !== null);
-            if (!gaps.length) return null;
-            return Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length);
-        }
-
-        function _streak(skill) {
-            const datas = [...new Set(
-                _listarTodosBlocosPratica()
-                    .filter(b => b.skillId === skill.id)
-                    .map(b => b.data)
-            )].sort().reverse();
-
-            if (!datas.length) return { atual: 0, recorde: 0, ultima: null };
-
-            const hoje = dataHoje();
-            const ontem = (() => {
-                const d = new Date(); d.setDate(d.getDate() - 1);
-                return d.toISOString().slice(0, 10);
-            })();
-
-            let atual = 0;
-            if (datas[0] === hoje || datas[0] === ontem) {
-                atual = 1;
-                for (let i = 1; i < datas.length; i++) {
-                    const diff = diasEntre(datas[i], datas[i - 1]);
-                    if (diff === 1) atual++;
-                    else break;
-                }
-            }
-
-            let recorde = 0, seq = 1;
-            for (let i = 1; i < datas.length; i++) {
-                const diff = diasEntre(datas[i], datas[i - 1]);
-                if (diff === 1) seq++;
-                else { recorde = Math.max(recorde, seq); seq = 1; }
-            }
-            recorde = Math.max(recorde, seq, atual);
-
-            return { atual, recorde, ultima: datas[0] };
-        }
-
-        function _qualidadeMedia(skill, opts = {}) {
-            let blocosArr = _listarTodosBlocosPratica().filter(b => b.skillId === skill.id);
-            if (opts.frenteId) blocosArr = blocosArr.filter(b => b.frenteId === opts.frenteId);
-            if (opts.ultimosDias) {
-                const corte = new Date();
-                corte.setDate(corte.getDate() - opts.ultimosDias);
-                const corteStr = corte.toISOString().slice(0, 10);
-                blocosArr = blocosArr.filter(b => b.data >= corteStr);
-            }
-            const comQ = blocosArr.filter(b => typeof b.qualidade === "number");
-            if (!comQ.length) return null;
-            return Math.round((comQ.reduce((a, b) => a + b.qualidade, 0) / comQ.length) * 100) / 100;
-        }
-
-        function _totais(skill) {
-            const blocosArr = _listarTodosBlocosPratica().filter(b => b.skillId === skill.id);
-            const tempo = blocosArr.reduce((a, b) => a + (Number(b.tempo_real_min) || 0), 0);
-            return {
-                sessoes: blocosArr.length,
-                tempo_total_min: tempo,
-                marcos_fechados: Object.values(skill.marcos || {}).filter(m => m.percentual >= 100).length,
-                pontos_virada: (skill.pontos_de_virada || []).length,
-                feedbacks_externos: (skill.feedback || []).filter(f => f.fonte !== "auto").length
-            };
-        }
-
-        function _nivelPorFrente(skill, frente) {
-            const marcosFrente = (frente.marcos || [])
-                .map(id => skill.marcos[id])
-                .filter(Boolean);
-            const fechados = marcosFrente.filter(m => m.percentual >= 100).length;
-            const regra = skill.config?.regra_nivel || { artesao: 3, mestre: 8, lenda: 15 };
-
-            if (fechados >= regra.lenda)   return "lenda";
-            if (fechados >= regra.mestre)  return "mestre";
-            if (fechados >= regra.artesao) return "artesao";
-            return "aprendiz";
-        }
-
-        function _nivelGeral(skill) {
-            const niveis = skill.frentes.map(f => _nivelPorFrente(skill, f));
-            const ordem = { aprendiz: 0, artesao: 1, mestre: 2, lenda: 3 };
-            const melhor = niveis.sort((a, b) => ordem[b] - ordem[a])[0] || "aprendiz";
-            return { nivel: melhor };
-        }
-
-        function _snapshotSkill(skill) {
-            const frentes = {};
-            skill.frentes.forEach(f => {
-                frentes[f.id] = {
-                    nome: f.nome,
-                    gap: _gapPorFrente(skill, f),
-                    temperatura: _temperaturaPorFrente(skill, f),
-                    nivel: _nivelPorFrente(skill, f)
+            const j2 = await r2.json();
+            (j2.items || []).forEach(v => {
+                detalhes[v.id] = {
+                    duracao: v.contentDetails?.duration,
+                    views:   Number(v.statistics?.viewCount || 0),
+                    likes:   Number(v.statistics?.likeCount || 0),
                 };
             });
 
-            const t = _totais(skill);
-            const s = _streak(skill);
+            const r3 = await fetch(
+                `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${canalIds}&key=${YOUTUBE_API_KEY}`
+            );
+            const j3 = await r3.json();
+            (j3.items || []).forEach(c => {
+                canais[c.id] = Number(c.statistics?.subscriberCount || 0);
+            });
+        } catch (e) {}
 
+        function isoParaSegundos(iso) {
+            if (!iso) return 0;
+            const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+            if (!m) return 0;
+            return (Number(m[1])||0)*3600 + (Number(m[2])||0)*60 + (Number(m[3])||0);
+        }
+
+        return items.map(it => {
+            const d = detalhes[it.id.videoId] || {};
+            const seg = d.duracao ? isoParaSegundos(d.duracao) : 0;
             return {
-                nivel: _nivelGeral(skill).nivel,
-                frentes_gap: Object.fromEntries(
-                    Object.entries(frentes).map(([id, f]) => [f.nome, f.gap])
-                ),
-                marcos_fechados_total: t.marcos_fechados,
-                pontos_virada_total: t.pontos_virada,
-                feedbacks_externos: t.feedbacks_externos,
-                streak_atual: s.atual,
-                streak_recorde: s.recorde,
-                tempo_total_min: t.tempo_total_min,
-                sessoes_total: t.sessoes,
-                qualidade_media: _qualidadeMedia(skill),
-                temperatura_geral: _temperaturaGeral(skill).emoji,
-                gap_medio: _gapGeral(skill)
+                vid:       it.id.videoId,
+                titulo:    it.snippet.title,
+                canal:     it.snippet.channelTitle,
+                canalId:   it.snippet.channelId,
+                publicado: it.snippet.publishedAt,
+                durSeg:    seg,
+                dur:       seg ? formatarDuracao(seg) : "",
+                durCurta:  seg ? formatarDuracaoCurta(seg) : "",
+                views:     d.views || 0,
+                likes:     d.likes || 0,
+                subs:      canais[it.snippet.channelId] || 0,
+                thumb:     it.snippet.thumbnails?.medium?.url || it.snippet.thumbnails?.default?.url || "",
             };
-        }
-
-        const derivados = {
-            temperaturaPorFrente: _temperaturaPorFrente,
-            temperaturaGeral:     _temperaturaGeral,
-            gapPorFrente:         _gapPorFrente,
-            gapGeral:             _gapGeral,
-            streak:               _streak,
-            qualidadeMedia:       _qualidadeMedia,
-            totais:               _totais,
-            nivelPorFrente:       _nivelPorFrente,
-            nivelGeral:           _nivelGeral,
-            snapshotSkill:        _snapshotSkill,
-
-            visaoCompleta(skillId) {
-                const skill = skills.ler(skillId);
-                if (!skill) return null;
-                return {
-                    ...skill,
-                    _derivados: _snapshotSkill(skill)
-                };
-            },
-
-            listarComDerivados() {
-                return skills.listar().map(s => ({
-                    ...s,
-                    _derivados: _snapshotSkill(s)
-                }));
-            }
-        };
-
-        // ============================================================
-        // SNAPSHOTS MENSAIS
-        // ============================================================
-        const snapshots = {
-            listar() {
-                return lerJSONLocal(K.SNAPSHOTS, []);
-            },
-
-            ler(mes) {
-                return this.listar().find(s => s.mes === mes) || null;
-            },
-
-            tirar(mes = null) {
-                const alvo = mes || dataHoje().slice(0, 7);
-                const lista = this.listar();
-                if (lista.some(s => s.mes === alvo)) {
-                    return lista.find(s => s.mes === alvo);
-                }
-
-                const todasSkills = skills.listar();
-                const skillsSnap = {};
-                todasSkills.forEach(s => {
-                    skillsSnap[s.id] = _snapshotSkill(s);
-                });
-
-                const totalGlobal = {
-                    sessoes: 0,
-                    tempo_min: 0,
-                    marcos_fechados: 0,
-                    pontos_virada: 0,
-                    skills_ativas: 0,
-                    skills_congeladas: 0
-                };
-
-                Object.values(skillsSnap).forEach(sn => {
-                    totalGlobal.sessoes        += sn.sessoes_total;
-                    totalGlobal.tempo_min      += sn.tempo_total_min;
-                    totalGlobal.marcos_fechados += sn.marcos_fechados_total;
-                    totalGlobal.pontos_virada  += sn.pontos_virada_total;
-                    if (sn.temperatura_geral === "🧊") totalGlobal.skills_congeladas++;
-                    else                                totalGlobal.skills_ativas++;
-                });
-
-                const novo = {
-                    mes: alvo,
-                    skills: skillsSnap,
-                    total_global: totalGlobal,
-                    criado_em: agoraISO()
-                };
-                lista.push(novo);
-                salvarJSONLocal(K.SNAPSHOTS, lista);
-                return novo;
-            },
-
-            remover(mes) {
-                const lista = this.listar().filter(s => s.mes !== mes);
-                salvarJSONLocal(K.SNAPSHOTS, lista);
-            }
-        };
-
-        // -------- API pública básica --------
-        return {
-            K,
-            dataHoje,
-            agoraISO,
-            diasEntre,
-            gerarId,
-            lerJSON: lerJSONLocal,
-            salvarJSON: salvarJSONLocal,
-            suporta,
-            skills,
-            derivados,
-            snapshots,
-            _versao: "1.0.0"
-        };
-    })();
-
-    // ---------- migração formato antigo → novo ----------
-    function migrar() {
-        const marcador = "storage_migrado_v1";
-        if (localStorage.getItem(marcador)) return;
-
-        const regex = /^planejamento_(\d{4}-\d{2}-\d{2})_estudo_(\d+)$/;
-        const porData = {};
-
-        for (let i = 0; i < localStorage.length; i++) {
-            const chave = localStorage.key(i);
-            const m = chave.match(regex);
-            if (!m) continue;
-            const [, data, idx] = m;
-            if (!porData[data]) porData[data] = {};
-            porData[data][idx] = localStorage.getItem(chave) || "";
-        }
-
-        Object.keys(porData).forEach(data => {
-            const campos = porData[data];
-            const temAlgo = Object.values(campos).some(v => v && v.trim());
-            if (!temAlgo) return;
-
-            const blocosAtuais = blocos.ler("livro", data);
-            if (blocosAtuais.length > 0) return;
-
-            blocos.salvar("livro", data, [{
-                id: `blk_migr_${data}`,
-                tema: campos[0] || "",
-                titulo: "",
-                autor: "",
-                paginaAtual: "",
-                totalPaginas: "",
-                capitulo: "",
-                metaHoje: "",
-                tempoPrevisto: campos[3] || "",
-                oQueAprendi: campos[1] || "",
-                comoAplicar: "",
-                proximaAcao: "",
-                link: "",
-                koodoId: "",
-                status: "",
-                criadoEm: Date.now(),
-            }]);
         });
-
-        localStorage.setItem(marcador, "1");
     }
 
-    window.Storage = {
-        dataHoje,
-        escapeHTML,
-        blocos,
-        biblioteca,
-        aprendizados,
-        pratica,
-        migrar,
-        K,
+    // ==================================================
+    // AUXILIARES DE ARTIGO
+    // ==================================================
+    async function buscarMetadadosArtigo(url) {
+        const api = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
+        const r = await fetch(api);
+        if (!r.ok) throw new Error("Microlink falhou");
+        const j = await r.json();
+        const d = j.data || {};
+        return {
+            titulo:     d.title || "",
+            autor:      d.author || "",
+            publicacao: d.publisher || d.provider || "",
+            descricao:  d.description || "",
+            imagem:     d.image?.url || "",
+        };
+    }
+
+    // ==================================================
+    // BUSCA DE ARTIGOS — 4 fontes
+    // ==================================================
+    const FONTES_ARTIGO = [
+        { id: "hn",     label: "🟠 HN" },
+        { id: "reddit", label: "🔴 Reddit" },
+        { id: "medium", label: "⚫ Medium" },
+        { id: "devto",  label: "🟣 Dev.to" },
+    ];
+
+    const PRESETS_ARTIGO = {
+        tudo:      ["hn", "reddit", "medium", "devto"],
+        noticias:  ["hn", "reddit", "medium"],
+        pratico:   ["hn", "medium", "devto"],
+        discussao: ["reddit", "hn"],
     };
-})();
+
+    const CHAVE_FONTES_ARTIGO = "estudo_artigo_fontes_ativas";
+
+    function obterFontesAtivas() {
+        const validas = FONTES_ARTIGO.map(f => f.id);
+        try {
+            const arr = JSON.parse(localStorage.getItem(CHAVE_FONTES_ARTIGO));
+            if (Array.isArray(arr) && arr.length) {
+                const limpo = arr.filter(id => validas.includes(id));
+                if (limpo.length) return limpo;
+            }
+        } catch {}
+        return [...PRESETS_ARTIGO.tudo];
+    }
+    function salvarFontesAtivas(arr) {
+        localStorage.setItem(CHAVE_FONTES_ARTIGO, JSON.stringify(arr));
+    }
+
+    // ---------- Notícias (NewsData.io): prefs + histórico + edições ----------
+    const CHAVE_NEWS_PREFS = "estudo_news_filtros_preferidos";
+    const CHAVE_NEWS_HIST  = "estudo_news_historico_buscas";
+
+    function obterPrefsNews() {
+        try { return JSON.parse(localStorage.getItem(CHAVE_NEWS_PREFS)) || {}; }
+        catch { return {}; }
+    }
+    function salvarPrefsNews(p) {
+        localStorage.setItem(CHAVE_NEWS_PREFS, JSON.stringify(p));
+    }
+
+    function obterHistoricoNews() {
+        try { return JSON.parse(localStorage.getItem(CHAVE_NEWS_HIST)) || []; }
+        catch { return []; }
+    }
+    function salvarBuscaNews(tema) {
+        if (!tema) return;
+        let h = obterHistoricoNews().filter(t => t.toLowerCase() !== tema.toLowerCase());
+        h.unshift(tema);
+        h = h.slice(0, 10);
+        localStorage.setItem(CHAVE_NEWS_HIST, JSON.stringify(h));
+    }
+
+    const NEWSDATA_KEY = "pub_96706e91d45d4676a6f66fa4f9ced844";
+
+    const EDICOES_NEWS = {
+        BR: { pais: "br", idioma: "pt", label: "🇧🇷 BR" },
+        US: { pais: "us", idioma: "en", label: "🇺🇸 US" },
+        PT: { pais: "pt", idioma: "pt", label: "🇵🇹 PT" },
+        ES: { pais: "es", idioma: "es", label: "🇪🇸 ES" },
+        GB: { pais: "gb", idioma: "en", label: "🇬🇧 UK" },
+        FR: { pais: "fr", idioma: "fr", label: "🇫🇷 FR" },
+    };
+
+    const PERIODOS_NEWS = {
+        "24h":  { horas: 24,   label: "24h" },
+        "48h":  { horas: 48,   label: "48h" },
+        "tudo": { horas: 9999, label: "Tudo" },
+    };
+
+    async function buscarNoticiasNewsData(query, opts = {}) {
+        const { edicao, periodo, dominio } = opts;
+        const ed = EDICOES_NEWS[edicao] || EDICOES_NEWS.BR;
+
+        let url = `https://newsdata.io/api/1/latest?apikey=${NEWSDATA_KEY}&qInMeta=${encodeURIComponent(query)}&country=${ed.pais}&language=${ed.idioma}&size=10`;
+
+        if (dominio && dominio.trim()) {
+            url += `&domainurl=${encodeURIComponent(dominio.trim())}`;
+        }
+
+        console.log("[news] buscando:", query, "| edição:", edicao);
+
+        const r = await fetch(url);
+        if (!r.ok) {
+            const err = await r.json().catch(() => ({}));
+            console.error("[news] erro API:", err);
+            throw new Error("NewsData falhou HTTP " + r.status);
+        }
+
+        const j = await r.json();
+
+        if (j.status !== "success") {
+            throw new Error(j.message || "NewsData retornou erro");
+        }
+
+        const agora = Date.now();
+        const limiteHoras = (PERIODOS_NEWS[periodo] || PERIODOS_NEWS.tudo).horas;
+        const limiteMs = limiteHoras * 3600 * 1000;
+
+        return (j.results || []).map(a => {
+            const pub = a.pubDate ? new Date(a.pubDate.replace(" ", "T") + "Z") : null;
+            const portal = a.source_name || a.source_id || "";
+            let dom = "";
+            try { dom = new URL(a.source_url || a.link).hostname.replace(/^www\./, ""); } catch {}
+
+            return {
+                titulo: a.title || "",
+                url: a.link || "",
+                autor: "",
+                publicado: pub ? pub.toISOString() : "",
+                fonte: dom || portal,
+                origem: "Notícias",
+                pontos: 0,
+                comentarios: 0,
+                portal,
+                _ts: pub ? pub.getTime() : 0,
+            };
+        })
+        .filter(a => a.titulo && a.url)
+        .filter(a => !a._ts || (agora - a._ts) <= limiteMs)
+        .sort((a, b) => (b._ts || 0) - (a._ts || 0));
+    }
+
+const EDICOES_BING = {
+    BR: { lang: "pt-BR", cc: "BR" },
+    US: { lang: "en-US", cc: "US" },
+    PT: { lang: "pt-PT", cc: "PT" },
+    ES: { lang: "es-ES", cc: "ES" },
+    GB: { lang: "en-GB", cc: "GB" },
+    FR: { lang: "fr-FR", cc: "FR" },
+};
+
+async function buscarNoticiasBing(query, opts = {}) {
+    const { edicao, periodo, dominio } = opts;
+    const ed = EDICOES_BING[edicao] || EDICOES_BING.BR;
+
+    let q = query.trim();
+    if (dominio && dominio.trim()) q += ` site:${dominio.trim()}`;
+
+    const url = `https://www.bing.com/news/search?q=${encodeURIComponent(q)}&format=rss&setlang=${ed.lang}&cc=${ed.cc}`;
+    console.log("[news] bing:", q, "| edição:", edicao);
+
+    const r = await fetchComFallback(url);
+    const xml = await r.text();
+    const doc = new DOMParser().parseFromString(xml, "text/xml");
+    const itens = Array.from(doc.getElementsByTagName("item"));
+
+    const agora = Date.now();
+    const limiteMs = (PERIODOS_NEWS[periodo] || PERIODOS_NEWS.tudo).horas * 3600 * 1000;
+
+    return itens.map(item => {
+        const txt = tag => item.getElementsByTagName(tag)[0]?.textContent || "";
+
+        const linkBing = txt("link");
+        let real = linkBing;
+        try { real = new URL(linkBing).searchParams.get("url") || linkBing; } catch {}
+
+        let dom = "";
+        try { dom = new URL(real).hostname.replace(/^www\./, ""); } catch {}
+
+        const pub = txt("pubDate") ? new Date(txt("pubDate")) : null;
+        const ts = pub && !isNaN(pub) ? pub.getTime() : 0;
+
+        return {
+            titulo: txt("title"),
+            url: real,
+            autor: "",
+            publicado: ts ? new Date(ts).toISOString() : "",
+            fonte: dom,
+            origem: "Notícias",
+            pontos: 0,
+            comentarios: 0,
+            portal: txt("News:Source") || dom,
+            _ts: ts,
+        };
+    })
+    .filter(a => a.titulo && a.url)
+    .filter(a => !a._ts || (agora - a._ts) <= limiteMs)
+    .sort((a, b) => (b._ts || 0) - (a._ts || 0));
+}
+    
+    async function buscarTimelineNoticias(query, opts = {}) {
+        const { edicao } = opts;
+        const lista = await buscarNoticiasNewsData(query, { edicao, periodo: "tudo" });
+
+        const porDia = {};
+        lista.forEach(a => {
+            if (!a.publicado) return;
+            const d = a.publicado.slice(0, 10);
+            porDia[d] = (porDia[d] || 0) + 1;
+        });
+
+        return Object.keys(porDia).sort().map(d => ({
+            data: d.replace(/-/g, "") + "000000",
+            valor: porDia[d],
+        }));
+    }
+
+    // ---------- cadeia de proxies ----------
+    const WORKER_PROXY = "https://ancient-truth-1e.germanco1324.workers.dev/?url=";
+
+    const PROXIES_FALLBACK = [
+        (u) => u,
+        (u) => WORKER_PROXY + encodeURIComponent(u),
+        (u) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
+        (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+    ];
+
+    async function fetchComFallback(url) {
+        let ultimoErro = null;
+        for (let i = 0; i < PROXIES_FALLBACK.length; i++) {
+            const alvo = PROXIES_FALLBACK[i](url);
+            try {
+                console.log(`[proxy] tentando #${i}…`);
+                const r = await fetch(alvo);
+                if (r.ok) {
+                    console.log(`[proxy] ✅ sucesso via #${i}`);
+                    return r;
+                }
+                console.warn(`[proxy] ❌ #${i} retornou HTTP ${r.status}`);
+                ultimoErro = new Error(`HTTP ${r.status}`);
+            } catch (e) {
+                console.warn(`[proxy] ❌ #${i} falhou:`, e.message);
+                ultimoErro = e;
+            }
+        }
+        throw ultimoErro || new Error("Todos os proxies falharam");
+    }
+
+    function normalizarTag(txt) {
+        return txt.toLowerCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/\s+/g, "-")
+            .replace(/[^a-z0-9-]/g, "");
+    }
+
+    async function buscarHN(query) {
+        const url = `https://hn.algolia.com/api/v1/search?query=${encodeURIComponent(query)}&tags=story&hitsPerPage=30`;
+        const r = await fetchComFallback(url);
+        const j = await r.json();
+        return (j.hits || []).filter(h => h.title && h.url).map(h => {
+            let dominio = "";
+            try { dominio = new URL(h.url).hostname.replace(/^www\./, ""); } catch {}
+            return {
+                titulo: h.title, url: h.url, autor: h.author || "",
+                publicado: h.created_at || "",
+                fonte: dominio, origem: "HN",
+                pontos: h.points || 0, comentarios: h.num_comments || 0,
+            };
+        });
+    }
+
+    async function buscarReddit(query) {
+        const url = `https://www.reddit.com/search.json?q=${encodeURIComponent(query)}&sort=relevance&limit=25`;
+        const r = await fetchComFallback(url);
+        const j = await r.json();
+        return (j.data?.children || []).map(c => c.data).filter(d => d.title).map(d => ({
+            titulo: d.title,
+            url: `https://reddit.com${d.permalink}`,
+            autor: `u/${d.author}`,
+            publicado: new Date((d.created_utc || 0) * 1000).toISOString(),
+            fonte: `r/${d.subreddit}`,
+            origem: "Reddit",
+            pontos: d.score || 0,
+            comentarios: d.num_comments || 0,
+        }));
+    }
+
+    async function buscarMedium(query) {
+        const tag = normalizarTag(query);
+        if (!tag) return [];
+        const url = `https://medium.com/feed/tag/${tag}`;
+        const r = await fetchComFallback(url);
+        const xml = await r.text();
+        const doc = new DOMParser().parseFromString(xml, "text/xml");
+        const items = doc.getElementsByTagName("item");
+        return Array.from(items).slice(0, 25).map(item => {
+            const titulo = item.getElementsByTagName("title")[0]?.textContent || "";
+            const link   = item.getElementsByTagName("link")[0]?.textContent || "";
+            const autor  = item.getElementsByTagName("dc:creator")[0]?.textContent || "";
+            const data   = item.getElementsByTagName("pubDate")[0]?.textContent || "";
+            return {
+                titulo, url: link, autor,
+                publicado: data ? new Date(data).toISOString() : "",
+                fonte: "medium.com", origem: "Medium",
+                pontos: 0, comentarios: 0,
+            };
+        }).filter(a => a.titulo && a.url);
+    }
+
+    async function buscarDevto(query) {
+        const tag = normalizarTag(query);
+        if (!tag) return [];
+        const url = `https://dev.to/api/articles?tag=${encodeURIComponent(tag)}&top=30&per_page=25`;
+        const r = await fetchComFallback(url);
+        const arr = await r.json();
+        if (!Array.isArray(arr)) return [];
+        return arr.map(a => ({
+            titulo: a.title, url: a.url,
+            autor: a.user?.name || "",
+            publicado: a.published_at || "",
+            fonte: "dev.to", origem: "Dev.to",
+            pontos: a.positive_reactions_count || 0,
+            comentarios: a.comments_count || 0,
+        }));
+    }
+
+    async function buscarArtigosPorTema(query, fontesAtivas) {
+        const mapa = {
+            hn: buscarHN, reddit: buscarReddit,
+            medium: buscarMedium, devto: buscarDevto,
+        };
+
+        const promessas = fontesAtivas.map(id => {
+            const fn = mapa[id];
+            if (!fn) return Promise.resolve([]);
+            return fn(query).catch(e => {
+                console.warn(`[${id}] falhou:`, e);
+                return [];
+            });
+        });
+
+        const resultados = await Promise.all(promessas);
+
+        const intercalado = [];
+        const maxPorFonte = Math.max(...resultados.map(r => r.length), 0);
+        for (let i = 0; i < maxPorFonte; i++) {
+            for (const lista of resultados) {
+                if (lista[i]) intercalado.push(lista[i]);
+            }
+        }
+        return intercalado.slice(0, 21);
+    }
+
+    async function verificarPagoMedium(url) {
+        if (!url || !url.includes("medium.com")) return null;
+        try {
+            const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+            const r = await fetch(proxy);
+            if (!r.ok) return null;
+            const html = await r.text();
+
+            const m1 = html.match(/<meta\s+property=["']isAccessibleForFree["']\s+content=["']([^"']+)["']/i);
+            const m2 = html.match(/<meta\s+content=["']([^"']+)["']\s+property=["']isAccessibleForFree["']/i);
+            const match = m1 || m2;
+
+            if (!match) return null;
+            return match[1].toLowerCase() === "false";
+        } catch (e) {
+            return null;
+        }
+    }
+
+    async function verificarPagosDosCards(box) {
+        const cards = [...box.querySelectorAll(".rec-artigo-card")];
+        const alvos = cards.filter(c => (c.dataset.artUrl || "").includes("medium.com"));
+        if (!alvos.length) return;
+
+        let i = 0;
+        const concorrencia = 3;
+
+        async function worker() {
+            while (i < alvos.length) {
+                const card = alvos[i++];
+                card.classList.add("checando-pago");
+
+                const pago = await verificarPagoMedium(card.dataset.artUrl);
+
+                card.classList.remove("checando-pago");
+
+                if (pago === true) {
+                    const badge = document.createElement("span");
+                    badge.className = "badge-pago";
+                    badge.textContent = "⭐ Pago";
+                    card.appendChild(badge);
+                }
+            }
+        }
+
+        await Promise.all(Array.from({ length: concorrencia }, worker));
+    }
+
+    // ==================================================
+    // LIVRO → ESTUDAR
+    // ==================================================
+    function renderEstudarLivro() {
+        const blocos = Storage.blocos.ler("livro", dataAtual);
+        const wrap = el("conteudo");
+        wrap.innerHTML = "";
+
+        if (blocos.length === 0) {
+            const vazio = document.createElement("div");
+            vazio.className = "vazio";
+            vazio.innerHTML = `
+                <p>Nenhum livro registrado hoje ainda.</p>
+                <button class="btn-primario" id="btnAddLivro">+ Adicionar livro</button>
+            `;
+            wrap.appendChild(vazio);
+            vazio.querySelector("#btnAddLivro").addEventListener("click", addBlocoLivro);
+            return;
+        }
+
+        blocos.forEach((b, i) => wrap.appendChild(renderBlocoLivro(b, i)));
+
+        const addWrap = document.createElement("div");
+        addWrap.style.marginTop = "10px";
+        addWrap.innerHTML = `<button class="btn-secundario" id="btnAddLivro">+ Adicionar outro livro hoje</button>`;
+        wrap.appendChild(addWrap);
+        addWrap.querySelector("#btnAddLivro").addEventListener("click", addBlocoLivro);
+    }
+
+    function addBlocoLivro() {
+        const blocos = Storage.blocos.ler("livro", dataAtual);
+        blocos.push({
+            id: uid("blk"),
+            tema: "", titulo: "", autor: "",
+            paginaAtual: "", totalPaginas: "", capitulo: "",
+            metaHoje: "", tempoPrevisto: "",
+            oQueAprendi: "", comoAplicar: "", proximaAcao: "",
+            link: "", koodoId: "", status: "",
+            criadoEm: Date.now(),
+        });
+        Storage.blocos.salvar("livro", dataAtual, blocos);
+        render();
+    }
+
+    function renderBlocoLivro(b, idx) {
+        const elBloco = document.createElement("div");
+        elBloco.className = "bloco-estudo";
+
+        const total = Number(b.totalPaginas) || 0;
+        const atual = Number(b.paginaAtual) || 0;
+        const pct = total > 0 ? Math.min(100, Math.round((atual / total) * 100)) : 0;
+
+        elBloco.innerHTML = `
+            <div class="bloco-cabecalho">
+                <span class="bloco-titulo">Livro ${idx + 1}</span>
+                <button class="bloco-remover" data-rem="${b.id}" title="Remover">×</button>
+            </div>
+
+            <div class="secao-titulo">📋 Antes de estudar</div>
+
+            <label class="campo-label">Tema</label>
+            <input type="text" data-campo="tema" value="${esc(b.tema)}" placeholder="Ex.: marketing digital">
+
+            <label class="campo-label">🔎 Buscar material sobre o tema</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-secundario" data-recomendar="1">📚 Recomendar livros</button>
+                <button class="btn-secundario" data-google="1">📄 Google</button>
+            </div>
+            <div class="recomendacoes" id="rec_${b.id}" style="display:none;"></div>
+
+            <label class="campo-label">Título do livro</label>
+            <input type="text" data-campo="titulo" value="${esc(b.titulo)}" placeholder="Ex.: Marketing 4.0">
+
+            <label class="campo-label">Autor</label>
+            <input type="text" data-campo="autor" value="${esc(b.autor)}" placeholder="Ex.: Philip Kotler">
+
+            <div class="linha-dupla">
+                <div>
+                    <label class="campo-label">Página atual</label>
+                    <input type="number" data-campo="paginaAtual" value="${esc(b.paginaAtual)}" min="0">
+                    <div class="chips" style="margin-top:6px;">
+                        <div class="chip" data-add="5">+5</div>
+                        <div class="chip" data-add="10">+10</div>
+                        <div class="chip" data-add="15">+15</div>
+                        <div class="chip" data-add="20">+20</div>
+                    </div>
+                </div>
+                <div>
+                    <label class="campo-label">Total de páginas</label>
+                    <input type="number" data-campo="totalPaginas" value="${esc(b.totalPaginas)}" min="0">
+                </div>
+            </div>
+
+            <div class="progresso"><div style="width:${pct}%"></div></div>
+            <div class="progresso-texto">${atual} / ${total} · ${pct}%</div>
+
+            <label class="campo-label">Capítulo / seção atual</label>
+            <input type="text" data-campo="capitulo" value="${esc(b.capitulo)}" placeholder="Ex.: Cap. 3 — Funil">
+
+            <div class="linha-dupla">
+                <div>
+                    <label class="campo-label">Meta de hoje</label>
+                    <input type="text" data-campo="metaHoje" value="${esc(b.metaHoje)}" placeholder="Ex.: ler 20 páginas">
+                </div>
+                <div>
+                    <label class="campo-label">Tempo previsto</label>
+                    <input type="text" data-campo="tempoPrevisto" value="${esc(b.tempoPrevisto)}" placeholder="Ex.: 30 min">
+                </div>
+            </div>
+
+            <label class="campo-label">📖 Abrir no Koodo</label>
+            <div class="linha-dupla">
+                <input type="text" data-campo="koodoId" value="${esc(b.koodoId)}" placeholder="Cole aqui o ID (número depois de #/epub/)">
+                <button class="btn-secundario" data-koodo="1">📖 Abrir</button>
+            </div>
+
+            <div class="secao-titulo" style="margin-top:22px;">✅ Depois de estudar</div>
+
+            <label class="campo-label">O que aprendi</label>
+            <textarea data-campo="oQueAprendi" rows="4">${esc(b.oQueAprendi)}</textarea>
+
+            <label class="campo-label">Como aplicar</label>
+            <textarea data-campo="comoAplicar" rows="2">${esc(b.comoAplicar)}</textarea>
+
+            <label class="campo-label">Próxima ação</label>
+            <input type="text" data-campo="proximaAcao" value="${esc(b.proximaAcao)}" placeholder="Ex.: voltar da pág. 47">
+        `;
+
+        elBloco.querySelectorAll("[data-campo]").forEach(input => {
+            input.addEventListener("input", () => {
+                const campo = input.dataset.campo;
+                const blocos = Storage.blocos.ler("livro", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i >= 0) {
+                    blocos[i][campo] = input.value;
+                    Storage.blocos.salvar("livro", dataAtual, blocos);
+                }
+            });
+
+            if (input.dataset.campo === "paginaAtual" || input.dataset.campo === "totalPaginas") {
+                input.addEventListener("input", () => {
+                    const blocos = Storage.blocos.ler("livro", dataAtual);
+                    const it = blocos.find(x => x.id === b.id);
+                    if (!it) return;
+                    const tot = Number(it.totalPaginas) || 0;
+                    const at = Number(it.paginaAtual) || 0;
+                    const p = tot > 0 ? Math.min(100, Math.round((at / tot) * 100)) : 0;
+                    elBloco.querySelector(".progresso > div").style.width = p + "%";
+                    elBloco.querySelector(".progresso-texto").textContent = `${at} / ${tot} · ${p}%`;
+                    registrarNaBiblioteca(it, p);
+                });
+            }
+        });
+
+        elBloco.querySelectorAll("[data-add]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const add      = Number(btn.dataset.add) || 0;
+                const inputPag = elBloco.querySelector('[data-campo="paginaAtual"]');
+                const inputTot = elBloco.querySelector('[data-campo="totalPaginas"]');
+                const atual = parseInt(inputPag.value, 10) || 0;
+                const total = parseInt(inputTot.value, 10) || 0;
+                let nova = atual + add;
+                if (total > 0 && nova > total) nova = total;
+                inputPag.value = nova;
+
+                const blocos = Storage.blocos.ler("livro", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i >= 0) {
+                    blocos[i].paginaAtual = String(nova);
+                    Storage.blocos.salvar("livro", dataAtual, blocos);
+                }
+                const pct = total > 0 ? Math.min(100, Math.round((nova / total) * 100)) : 0;
+                elBloco.querySelector(".progresso > div").style.width = pct + "%";
+                elBloco.querySelector(".progresso-texto").textContent = `${nova} / ${total} · ${pct}%`;
+                if (i >= 0) registrarNaBiblioteca(blocos[i], pct);
+            });
+        });
+
+        elBloco.querySelector("[data-rem]").addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("livro", dataAtual).filter(x => x.id !== b.id);
+            Storage.blocos.salvar("livro", dataAtual, blocos);
+            render();
+        });
+
+        elBloco.querySelector("[data-koodo]").addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("livro", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            if (!it || !it.koodoId) { alert("Cole o ID do Koodo primeiro."); return; }
+            const titulo = encodeURIComponent(it.titulo || it.tema || "livro");
+            const url = `https://web.koodoreader.com/#/epub/${it.koodoId}?title=${titulo}&file=${it.koodoId}`;
+            window.open(url, "_blank", "noopener");
+        });
+
+        elBloco.querySelector("[data-google]").addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("livro", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            const q = (it?.tema || it?.titulo || "").trim();
+            if (!q) return alert("Preencha o tema primeiro.");
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, "_blank");
+        });
+
+        elBloco.addEventListener("click", async (ev) => {
+            if (!ev.target.closest("[data-recomendar]")) return;
+            const blocos = Storage.blocos.ler("livro", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            const q = (it?.tema || it?.titulo || "").trim();
+            if (!q) return alert("Preencha o tema primeiro.");
+
+            const box = elBloco.querySelector(`#rec_${b.id}`);
+            box.style.display = "grid";
+            box.innerHTML = `<div style="color:#888;font-size:13px;">Buscando…</div>`;
+
+            try {
+                const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=6&country=US`;
+                console.log("Google Books:", url);
+                const r = await fetch(url);
+                const data = await r.json();
+
+                if (!data.items || data.items.length === 0) {
+                    box.innerHTML = `<div style="color:#888;font-size:13px;">Nada encontrado.</div>`;
+                    return;
+                }
+
+                box.innerHTML = data.items.map(item => {
+                    const v = item.volumeInfo || {};
+                    const capa = v.imageLinks?.thumbnail || "";
+                    const titulo = v.title || "";
+                    const autores = (v.authors || []).join(", ");
+                    const paginas = v.pageCount || "";
+                    return `
+                        <div class="rec-card"
+                             data-rec-titulo="${esc(titulo)}"
+                             data-rec-autor="${esc(autores)}"
+                             data-rec-link="${esc(v.infoLink || "")}"
+                             data-rec-paginas="${paginas}"
+                             data-rec-capa="${esc(capa)}">
+                            ${capa ? `<img src="${esc(capa)}" alt="">` : `<div style="width:44px;height:64px;background:#252529;border-radius:4px;"></div>`}
+                            <div class="rec-card-info">
+                                <div class="rec-card-titulo">${esc(titulo)}</div>
+                                <div class="rec-card-autor">${esc(autores)}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join("");
+
+                box.querySelectorAll(".rec-card").forEach(card => {
+                    card.addEventListener("click", () => {
+                        const t = card.dataset.recTitulo;
+                        const a = card.dataset.recAutor;
+                        const l = card.dataset.recLink;
+                        const capa = card.dataset.recCapa || "";
+                        const pc = Number(card.dataset.recPaginas) || 0;
+
+                        const blocos2 = Storage.blocos.ler("livro", dataAtual);
+                        const i = blocos2.findIndex(x => x.id === b.id);
+                        if (i >= 0) {
+                            blocos2[i].titulo = t;
+                            blocos2[i].autor = a;
+                            blocos2[i].link = l;
+                            if (pc) blocos2[i].totalPaginas = String(pc);
+                            Storage.blocos.salvar("livro", dataAtual, blocos2);
+
+                            const id = blocos2[i].koodoId || blocos2[i].link || (t + "|" + (blocos2[i].tema || "")).toLowerCase();
+                            Storage.biblioteca.adicionar("livro", {
+                                id,
+                                tema: blocos2[i].tema || "",
+                                titulo: t,
+                                autor: a,
+                                link: l,
+                                capa,
+                                totalPaginas: blocos2[i].totalPaginas || "",
+                                paginaAtual: blocos2[i].paginaAtual || "",
+                                pct: 0,
+                                status: "lendo",
+                            });
+                        }
+                        render();
+                    });
+                });
+            } catch (e) {
+                console.error(e);
+                box.innerHTML = `<div style="color:#888;font-size:13px;">Erro ao buscar.</div>`;
+            }
+        });
+
+        return elBloco;
+    }
+
+    // ==================================================
+    // VÍDEO → ESTUDAR
+    // ==================================================
+    function addBlocoVideo() {
+        const blocos = Storage.blocos.ler("video", dataAtual);
+        blocos.push({
+            id: uid("blk"),
+            tema: "", titulo: "", canal: "", plataforma: "YouTube",
+            objetivo: "", url: "", videoId: "",
+            duracaoSeg: 0, minutoAtual: 0,
+            metaHoje: "", tempoPrevisto: "",
+            velocidade: "1",
+            resumo1: "", resumo2: "", resumo3: "",
+            oQueFazer: "", proximaAcao: "",
+            valeReassistir: false,
+            publicado: "", validade: "",
+            confiabilidade: "",
+            ideias: "",
+            momentos: [],
+            criadoEm: Date.now(),
+        });
+        Storage.blocos.salvar("video", dataAtual, blocos);
+        render();
+    }
+
+    function renderEstudarVideo() {
+        const blocos = Storage.blocos.ler("video", dataAtual);
+        const wrap = el("conteudo");
+        wrap.innerHTML = "";
+
+        if (blocos.length === 0) {
+            const vazio = document.createElement("div");
+            vazio.className = "vazio";
+            vazio.innerHTML = `
+                <p>Nenhum vídeo registrado hoje ainda.</p>
+                <button class="btn-primario" id="btnAddVideo">+ Adicionar vídeo</button>
+            `;
+            wrap.appendChild(vazio);
+            vazio.querySelector("#btnAddVideo").addEventListener("click", addBlocoVideo);
+            return;
+        }
+
+        blocos.forEach((b, i) => wrap.appendChild(renderBlocoVideo(b, i)));
+
+        const addWrap = document.createElement("div");
+        addWrap.style.marginTop = "10px";
+        addWrap.innerHTML = `<button class="btn-secundario" id="btnAddVideo">+ Adicionar outro vídeo hoje</button>`;
+        wrap.appendChild(addWrap);
+        addWrap.querySelector("#btnAddVideo").addEventListener("click", addBlocoVideo);
+    }
+
+    function renderBlocoVideo(b, idx) {
+        const elBloco = document.createElement("div");
+        elBloco.className = "bloco-estudo";
+        elBloco.dataset.id = b.id;
+
+        const velocidadeAtual = b.velocidade || "1";
+        const velocidades = ["1", "1.25", "1.5", "1.75", "2"];
+
+        elBloco.innerHTML = `
+            <div class="bloco-cabecalho">
+                <span class="bloco-titulo">Vídeo ${idx + 1}</span>
+                <button class="bloco-remover" data-rem="${b.id}" title="Remover">×</button>
+            </div>
+
+            <div class="secao-titulo">📋 Antes de assistir</div>
+
+            <label class="campo-label">Tema</label>
+            <input type="text" data-campo="tema" value="${esc(b.tema)}" placeholder="Ex.: marketing digital">
+
+            <label class="campo-label">🔎 Buscar mais vídeos sobre o tema</label>
+            <div class="video-historico-wrap">
+                <select id="hist_${b.id}">
+                    <option value="">📚 Histórico de buscas…</option>
+                </select>
+                <button type="button" data-limpar-hist="1" title="Limpar histórico">🗑️</button>
+            </div>
+            <div class="video-filtros">
+                <div>
+                    <label class="campo-label" style="margin-top:0;">Ordenar por</label>
+                    <select data-filtro-recomendar="ordem">
+                        <option value="relevance">Relevância</option>
+                        <option value="viewCount">Mais vistos</option>
+                        <option value="date">Mais recentes</option>
+                        <option value="rating">Melhor avaliados</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="campo-label" style="margin-top:0;">Duração</label>
+                    <select data-filtro-recomendar="duracao">
+                        <option value="any">Qualquer</option>
+                        <option value="short">Curto (&lt; 4 min)</option>
+                        <option value="medium">Médio (4–20 min)</option>
+                        <option value="long">Longo (&gt; 20 min)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="campo-label" style="margin-top:0;">Período</label>
+                    <select data-filtro-recomendar="periodo">
+                        <option value="any">Qualquer</option>
+                        <option value="24h">Últimas 24h</option>
+                        <option value="semana">Última semana</option>
+                        <option value="mes">Último mês</option>
+                        <option value="ano">Último ano</option>
+                    </select>
+                </div>
+            </div>
+            <label class="checkbox-legenda" style="margin-bottom:10px;">
+                <input type="checkbox" data-filtro-recomendar="legenda">
+                <span>📝 Só com legenda</span>
+            </label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-secundario" data-recomendar-video="1">🎥 Recomendar vídeos</button>
+                <button class="btn-secundario" data-recomendar-video-novo="1">🆕 Só inéditos</button>
+                <button class="btn-secundario" data-google-video="1">📄 Google</button>
+            </div>
+            <div class="video-acoes-extra" id="acoes_extra_${b.id}" style="display:none;">
+                <button class="btn-secundario" data-abrir-todos="1">↗️ Abrir todos no YouTube</button>
+                <button class="btn-secundario" data-salvar-filtros="1">💾 Salvar filtros atuais</button>
+            </div>
+            <div class="recomendacoes" id="recv_${b.id}" style="display:none;"></div>
+
+            <label class="campo-label">Link do vídeo (YouTube)</label>
+            <div class="linha-dupla">
+                <input type="text" data-campo="url" value="${esc(b.url)}" placeholder="https://youtube.com/watch?v=...">
+                <button class="btn-secundario" data-buscar-meta="1">🔄 Buscar dados</button>
+            </div>
+
+            <label class="campo-label">Título</label>
+            <input type="text" data-campo="titulo" value="${esc(b.titulo)}" placeholder="(puxado automaticamente)">
+
+            <div class="linha-dupla">
+                <div>
+                    <label class="campo-label">Canal</label>
+                    <input type="text" data-campo="canal" value="${esc(b.canal)}" placeholder="(puxado)">
+                </div>
+                <div>
+                    <label class="campo-label">Plataforma</label>
+                    <input type="text" data-campo="plataforma" value="${esc(b.plataforma)}" placeholder="YouTube">
+                </div>
+            </div>
+
+            <label class="campo-label">Objetivo do vídeo</label>
+            <input type="text" data-campo="objetivo" value="${esc(b.objetivo)}" placeholder="Ex.: aprender passo a passo do funil">
+
+            <div class="linha-dupla">
+                <div>
+                    <label class="campo-label">Meta de hoje</label>
+                    <input type="text" data-campo="metaHoje" value="${esc(b.metaHoje)}" placeholder="Ex.: assistir 20 min">
+                </div>
+                <div>
+                    <label class="campo-label">Tempo previsto</label>
+                    <input type="text" data-campo="tempoPrevisto" value="${esc(b.tempoPrevisto)}" placeholder="Ex.: 20 min">
+                </div>
+            </div>
+
+            <div class="secao-titulo" style="margin-top:22px;">▶️ Assistindo</div>
+
+            ${b.videoId ? `
+                <div class="video-player-wrap">
+                    <div id="yt_${b.id}"></div>
+                </div>
+
+                <label class="campo-label">Velocidade de reprodução</label>
+                <div class="video-velocidade" data-vel="${b.id}">
+                    ${velocidades.map(v => `
+                        <div class="chip${v === velocidadeAtual ? " selecionado" : ""}" data-v="${v}">${v}x</div>
+                    `).join("")}
+                </div>
+
+                <button class="btn-marcar" data-marcar="${b.id}">⏱️ Marcar momento</button>
+            ` : `
+                <div style="padding:14px;background:#19191d;border:1px dashed #333;border-radius:10px;margin:10px 0;text-align:center;color:#666;font-size:13px;">
+                    Cole o link do vídeo e clique em <strong>🔄 Buscar dados</strong> para carregar o player.
+                </div>
+            `}
+
+            <div class="linha-dupla">
+                <div>
+                    <label class="campo-label">Duração total</label>
+                    <input type="text" data-campo="duracaoTexto" value="${b.duracaoSeg ? formatarDuracao(b.duracaoSeg) : ""}" placeholder="Ex.: 45:00">
+                </div>
+                <div>
+                    <label class="campo-label">Minuto atual</label>
+                    <input type="text" data-campo="minutoTexto" value="${b.minutoAtual ? formatarDuracao(b.minutoAtual) : ""}" placeholder="Ex.: 12:40">
+                </div>
+            </div>
+
+            <div class="progresso">
+                <div style="width:${b.duracaoSeg > 0 ? Math.min(100, Math.round((b.minutoAtual / b.duracaoSeg) * 100)) : 0}%"></div>
+            </div>
+            <div class="progresso-texto">${b.duracaoSeg > 0 ? `${formatarDuracao(b.minutoAtual)} / ${formatarDuracao(b.duracaoSeg)} · ${Math.min(100, Math.round((b.minutoAtual / b.duracaoSeg) * 100))}%` : "—"}</div>
+
+            <div class="secao-titulo" style="margin-top:22px;">✅ Depois de assistir</div>
+
+            <label class="campo-label">Resumo em 3 frases</label>
+            <div class="area-3frases">
+                <input type="text" data-campo="resumo1" value="${esc(b.resumo1)}" placeholder="1. …">
+                <input type="text" data-campo="resumo2" value="${esc(b.resumo2)}" placeholder="2. …">
+                <input type="text" data-campo="resumo3" value="${esc(b.resumo3)}" placeholder="3. …">
+            </div>
+
+            <label class="campo-label">O que vou fazer com isso</label>
+            <textarea data-campo="oQueFazer" rows="2">${esc(b.oQueFazer)}</textarea>
+
+            <label class="campo-label">Próxima ação</label>
+            <input type="text" data-campo="proximaAcao" value="${esc(b.proximaAcao)}" placeholder="Ex.: retomar no 12:40">
+
+            <div class="linha-dupla">
+                <div>
+                    <label class="campo-label">Vale reassistir?</label>
+                    <div class="chips" data-boolean="valeReassistir">
+                        <div class="chip${b.valeReassistir ? " selecionado" : ""}" data-bool="1">Sim</div>
+                        <div class="chip${!b.valeReassistir ? " selecionado" : ""}" data-bool="0">Não</div>
+                    </div>
+                </div>
+                <div>
+                    <label class="campo-label">Publicado em</label>
+                    <input type="text" data-campo="publicado" value="${esc(b.publicado)}" placeholder="Ex.: 12/03/2026">
+                </div>
+            </div>
+
+            <label class="campo-label">Ainda é válido?</label>
+            <div class="chips" data-validade="${b.id}">
+                <div class="chip${b.validade === "vale" ? " selecionado" : ""}" data-v="vale">✅ Vale</div>
+                <div class="chip${b.validade === "parcial" ? " selecionado" : ""}" data-v="parcial">⚠️ Parcial</div>
+                <div class="chip${b.validade === "desatualizado" ? " selecionado" : ""}" data-v="desatualizado">❌ Desatualizado</div>
+            </div>
+
+            <label class="campo-label">Confiabilidade do canal</label>
+            <div class="chips" data-confianca="${b.id}">
+                <div class="chip${b.confiabilidade === "alta" ? " selecionado" : ""}" data-c="alta">🟢 Confio</div>
+                <div class="chip${b.confiabilidade === "neutra" ? " selecionado" : ""}" data-c="neutra">🟡 Neutro</div>
+                <div class="chip${b.confiabilidade === "baixa" ? " selecionado" : ""}" data-c="baixa">🔴 Não confio</div>
+            </div>
+
+            <label class="campo-label">Ideias para criar</label>
+            <textarea data-campo="ideias" rows="2">${esc(b.ideias)}</textarea>
+
+            <label class="campo-label">⏱️ Momentos marcados</label>
+            <div class="momentos-lista" data-momentos="${b.id}">
+                ${(b.momentos || []).map((m, i) => `
+                    <div class="momento-item">
+                        <span class="momento-tempo" data-pular="${i}">${formatarDuracao(m.t)}</span>
+                        <span class="momento-texto">${esc(m.texto || "")}</span>
+                        <button class="momento-remover" data-mom-rem="${i}">×</button>
+                    </div>
+                `).join("") || `<div style="color:#666;font-size:12px;">Nenhum momento marcado. Use o botão acima durante o play.</div>`}
+            </div>
+        `;
+
+        elBloco.querySelectorAll("[data-campo]").forEach(input => {
+            input.addEventListener("input", () => {
+                const campo = input.dataset.campo;
+                const blocos = Storage.blocos.ler("video", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i < 0) return;
+
+                if (campo === "duracaoTexto") {
+                    blocos[i].duracaoSeg = parseDuracao(input.value);
+                } else if (campo === "minutoTexto") {
+                    blocos[i].minutoAtual = parseDuracao(input.value);
+                } else {
+                    blocos[i][campo] = input.value;
+                }
+                Storage.blocos.salvar("video", dataAtual, blocos);
+
+                if (campo === "url" || campo === "titulo" || campo === "canal" ||
+                    campo === "minutoTexto" || campo === "duracaoTexto") {
+                    const atualizado = Storage.blocos.ler("video", dataAtual).find(x => x.id === b.id);
+                    if (atualizado) registrarVideoNaBiblioteca(atualizado);
+                }
+
+                if (campo === "duracaoTexto" || campo === "minutoTexto") {
+                    const tot = blocos[i].duracaoSeg || 0;
+                    const at  = blocos[i].minutoAtual || 0;
+                    const p = tot > 0 ? Math.min(100, Math.round((at / tot) * 100)) : 0;
+                    elBloco.querySelector(".progresso > div").style.width = p + "%";
+                    elBloco.querySelector(".progresso-texto").textContent =
+                        tot > 0 ? `${formatarDuracao(at)} / ${formatarDuracao(tot)} · ${p}%` : "—";
+                }
+            });
+        });
+
+        const btnMeta = elBloco.querySelector("[data-buscar-meta]");
+        if (btnMeta) {
+            btnMeta.addEventListener("click", async () => {
+                const blocos = Storage.blocos.ler("video", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i < 0) return;
+                const url = blocos[i].url || "";
+                const vid = extrairVideoId(url);
+                if (!vid) return alert("Cole um link de YouTube válido.");
+
+                blocos[i].videoId = vid;
+                Storage.blocos.salvar("video", dataAtual, blocos);
+
+                btnMeta.textContent = "🔄 Buscando…";
+                btnMeta.disabled = true;
+
+                try {
+                    const meta = await buscarMetadadosYouTube(vid);
+                    const blocos2 = Storage.blocos.ler("video", dataAtual);
+                    const j = blocos2.findIndex(x => x.id === b.id);
+                    if (j >= 0) {
+                        if (meta.titulo) blocos2[j].titulo = meta.titulo;
+                        if (meta.canal)  blocos2[j].canal  = meta.canal;
+                        Storage.blocos.salvar("video", dataAtual, blocos2);
+                    }
+                } catch (e) {
+                    console.warn("oEmbed falhou", e);
+                }
+                render();
+            });
+        }
+
+        elBloco.querySelectorAll("[data-vel] .chip").forEach(chip => {
+            chip.addEventListener("click", () => {
+                const v = chip.dataset.v;
+                elBloco.querySelectorAll("[data-vel] .chip").forEach(c =>
+                    c.classList.toggle("selecionado", c === chip));
+                const blocos = Storage.blocos.ler("video", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i >= 0) {
+                    blocos[i].velocidade = v;
+                    Storage.blocos.salvar("video", dataAtual, blocos);
+                }
+                const p = players[b.id];
+                if (p && p.setPlaybackRate) {
+                    try { p.setPlaybackRate(Number(v)); } catch(e) {}
+                }
+            });
+        });
+
+        const btnMarcar = elBloco.querySelector("[data-marcar]");
+        if (btnMarcar) {
+            btnMarcar.addEventListener("click", () => {
+                const p = players[b.id];
+                let t = 0;
+                try { t = Math.floor(p?.getCurrentTime?.() || 0); } catch(e) {}
+                const texto = prompt(`Momento em ${formatarDuracao(t)} — o que aconteceu aqui?`, "");
+                if (!texto) return;
+                const blocos = Storage.blocos.ler("video", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i < 0) return;
+                blocos[i].momentos = blocos[i].momentos || [];
+                blocos[i].momentos.push({ t, texto });
+                Storage.blocos.salvar("video", dataAtual, blocos);
+                render();
+            });
+        }
+
+        elBloco.querySelectorAll("[data-pular]").forEach(span => {
+            span.addEventListener("click", () => {
+                const idx = Number(span.dataset.pular);
+                const p = players[b.id];
+                if (p && p.seekTo) {
+                    const blocos = Storage.blocos.ler("video", dataAtual);
+                    const it = blocos.find(x => x.id === b.id);
+                    const m = it?.momentos?.[idx];
+                    if (m) { p.seekTo(m.t, true); p.playVideo?.(); }
+                }
+            });
+        });
+        elBloco.querySelectorAll("[data-mom-rem]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const idx = Number(btn.dataset.momRem);
+                const blocos = Storage.blocos.ler("video", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i < 0) return;
+                blocos[i].momentos.splice(idx, 1);
+                Storage.blocos.salvar("video", dataAtual, blocos);
+                render();
+            });
+        });
+
+        elBloco.querySelectorAll('[data-boolean="valeReassistir"] .chip').forEach(chip => {
+            chip.addEventListener("click", () => {
+                const v = chip.dataset.bool === "1";
+                elBloco.querySelectorAll('[data-boolean="valeReassistir"] .chip').forEach(c =>
+                    c.classList.toggle("selecionado", c === chip));
+                const blocos = Storage.blocos.ler("video", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i >= 0) {
+                    blocos[i].valeReassistir = v;
+                    Storage.blocos.salvar("video", dataAtual, blocos);
+                }
+            });
+        });
+
+        elBloco.querySelectorAll("[data-validade] .chip").forEach(chip => {
+            chip.addEventListener("click", () => {
+                const v = chip.dataset.v;
+                elBloco.querySelectorAll("[data-validade] .chip").forEach(c =>
+                    c.classList.toggle("selecionado", c === chip));
+                const blocos = Storage.blocos.ler("video", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i >= 0) {
+                    blocos[i].validade = v;
+                    Storage.blocos.salvar("video", dataAtual, blocos);
+                }
+            });
+        });
+
+        elBloco.querySelectorAll("[data-confianca] .chip").forEach(chip => {
+            chip.addEventListener("click", () => {
+                const c = chip.dataset.c;
+                elBloco.querySelectorAll("[data-confianca] .chip").forEach(x =>
+                    x.classList.toggle("selecionado", x === chip));
+                const blocos = Storage.blocos.ler("video", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i >= 0) {
+                    blocos[i].confiabilidade = c;
+                    Storage.blocos.salvar("video", dataAtual, blocos);
+                }
+            });
+        });
+
+        elBloco.querySelector("[data-rem]").addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("video", dataAtual).filter(x => x.id !== b.id);
+            Storage.blocos.salvar("video", dataAtual, blocos);
+            if (players[b.id]) {
+                try { players[b.id].destroy(); } catch(e) {}
+                delete players[b.id];
+            }
+            render();
+        });
+
+        elBloco.querySelector("[data-google-video]")?.addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("video", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            const q = (it?.tema || it?.titulo || "").trim();
+            if (!q) return alert("Preencha o tema primeiro.");
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(q + " vídeo")}`, "_blank");
+        });
+
+        const histSelect = elBloco.querySelector(`#hist_${b.id}`);
+        if (histSelect) {
+            obterHistoricoBuscas().forEach(t => {
+                const opt = document.createElement("option");
+                opt.value = t;
+                opt.textContent = t;
+                histSelect.appendChild(opt);
+            });
+            histSelect.addEventListener("change", () => {
+                if (!histSelect.value) return;
+                const blocos = Storage.blocos.ler("video", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i >= 0) {
+                    blocos[i].tema = histSelect.value;
+                    Storage.blocos.salvar("video", dataAtual, blocos);
+                    elBloco.querySelector('[data-campo="tema"]').value = histSelect.value;
+                }
+            });
+        }
+        elBloco.querySelector("[data-limpar-hist]")?.addEventListener("click", () => {
+            if (!confirm("Limpar todo o histórico de buscas?")) return;
+            limparHistoricoBuscas();
+            if (histSelect) histSelect.innerHTML = '<option value="">📚 Histórico de buscas…</option>';
+        });
+
+        const salvos = obterFiltrosSalvos();
+        const selOrdem   = elBloco.querySelector('[data-filtro-recomendar="ordem"]');
+        const selDur     = elBloco.querySelector('[data-filtro-recomendar="duracao"]');
+        const selPeriodo = elBloco.querySelector('[data-filtro-recomendar="periodo"]');
+        const chkLegenda = elBloco.querySelector('[data-filtro-recomendar="legenda"]');
+        if (salvos.ordem)   selOrdem.value   = salvos.ordem;
+        if (salvos.duracao) selDur.value     = salvos.duracao;
+        if (salvos.periodo) selPeriodo.value = salvos.periodo;
+        if (salvos.legenda) chkLegenda.checked = true;
+
+        async function recomendarVideos(ineditos) {
+            const blocos = Storage.blocos.ler("video", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            const q = (it?.tema || "").trim();
+            if (!q) return alert("Preencha o tema primeiro.");
+
+            const ordem   = selOrdem.value;
+            const duracao = selDur.value;
+            const periodo = selPeriodo.value;
+            const legenda = chkLegenda.checked;
+
+            const box = elBloco.querySelector(`#recv_${b.id}`);
+            const acoesExtra = elBloco.querySelector(`#acoes_extra_${b.id}`);
+            box.style.display = "grid";
+            box.innerHTML = `<div style="color:#888;font-size:13px;">Buscando…</div>`;
+
+            try {
+                const lista = await buscarVideosPorTema(q, { ordem, duracao, periodo, ineditos, legenda });
+                salvarBuscaNoHistorico(q);
+
+                if (!lista.length) {
+                    box.innerHTML = `<div style="color:#888;font-size:13px;">Nada encontrado. Tente outro filtro ou o Google.</div>`;
+                    acoesExtra.style.display = "none";
+                    return;
+                }
+
+                elBloco._ultimaRecomendacao = lista;
+
+                box.innerHTML = lista.map(v => {
+                    const jaFav = Storage.biblioteca.listar("video").some(x => x.id === v.vid);
+                    return `
+                    <div class="rec-video-card"
+                         data-vid="${esc(v.vid)}"
+                         data-vtitulo="${esc(v.titulo)}"
+                         data-vcanal="${esc(v.canal)}"
+                         data-vdur="${esc(v.dur)}">
+                        <div class="rec-video-thumb">
+                            <img src="${esc(v.thumb)}" alt="">
+                            ${v.dur ? `<span class="rec-video-dur">${esc(v.dur)}</span>` : ""}
+                        </div>
+                        <div class="rec-video-info">
+                            <div class="rec-video-titulo">${esc(v.titulo)}</div>
+                            <div class="rec-video-meta">${esc(v.canal)}${v.subs ? " · " + formatarVisualizacoes(v.subs) + " inscritos" : ""}</div>
+                            <div class="rec-video-stats">
+                                <div class="linha">
+                                    <span>👁️ ${formatarVisualizacoes(v.views)}</span>
+                                    <span class="sep">·</span>
+                                    <span>${formatarDataRelativa(v.publicado)}</span>
+                                    ${v.durCurta ? `<span class="sep">·</span><span>${v.durCurta}</span>` : ""}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rec-video-fav${jaFav ? " favoritado" : ""}" data-fav="${esc(v.vid)}" title="Favoritar">${jaFav ? "❤️" : "🤍"}</div>
+                    </div>
+                `;}).join("");
+
+                acoesExtra.style.display = "flex";
+
+                box.querySelectorAll(".rec-video-fav").forEach(coracao => {
+                    coracao.addEventListener("click", (ev) => {
+                        ev.stopPropagation();
+                        const vid = coracao.dataset.fav;
+                        const item = lista.find(x => x.vid === vid);
+                        if (!item) return;
+                        const existente = Storage.biblioteca.listar("video").find(x => x.id === vid);
+                        if (existente) {
+                            Storage.biblioteca.remover("video", vid);
+                            coracao.classList.remove("favoritado");
+                            coracao.textContent = "🤍";
+                        } else {
+                            Storage.biblioteca.adicionar("video", {
+                                id: vid,
+                                tema: q,
+                                titulo: item.titulo,
+                                canal: item.canal,
+                                videoId: vid,
+                                url: `https://www.youtube.com/watch?v=${vid}`,
+                                duracaoSeg: item.durSeg,
+                                minutoAtual: 0,
+                                thumb: item.thumb,
+                                pct: 0,
+                                status: "assistindo",
+                                valeReassistir: false,
+                                confiabilidade: "",
+                                capa: "",
+                            });
+                            coracao.classList.add("favoritado");
+                            coracao.textContent = "❤️";
+                        }
+                    });
+                });
+
+                box.querySelectorAll(".rec-video-card").forEach(card => {
+                    card.addEventListener("click", () => {
+                        const vid = card.dataset.vid;
+                        const blocos2 = Storage.blocos.ler("video", dataAtual);
+                        const i = blocos2.findIndex(x => x.id === b.id);
+                        if (i < 0) return;
+                        blocos2[i].videoId = vid;
+                        blocos2[i].url = `https://www.youtube.com/watch?v=${vid}`;
+                        blocos2[i].titulo = card.dataset.vtitulo;
+                        blocos2[i].canal  = card.dataset.vcanal;
+                        blocos2[i].duracaoSeg = parseDuracao(card.dataset.vdur);
+                        Storage.blocos.salvar("video", dataAtual, blocos2);
+                        render();
+                    });
+                });
+            } catch (e) {
+                box.innerHTML = `<div style="color:#888;font-size:13px;">Erro ao buscar. Tente o Google.</div>`;
+                acoesExtra.style.display = "none";
+            }
+        }
+
+        elBloco.querySelector("[data-recomendar-video]")?.addEventListener("click", () => recomendarVideos(false));
+        elBloco.querySelector("[data-recomendar-video-novo]")?.addEventListener("click", () => recomendarVideos(true));
+
+        elBloco.querySelector("[data-abrir-todos]")?.addEventListener("click", () => {
+            const lista = elBloco._ultimaRecomendacao || [];
+            if (!lista.length) return alert("Nenhuma recomendação ativa.");
+            if (!confirm(`Abrir ${lista.length} abas no YouTube?`)) return;
+            lista.forEach((v, idx) => {
+                setTimeout(() => window.open(`https://www.youtube.com/watch?v=${v.vid}`, "_blank"), idx * 150);
+            });
+        });
+
+        elBloco.querySelector("[data-salvar-filtros]")?.addEventListener("click", () => {
+            salvarFiltros({
+                ordem:   selOrdem.value,
+                duracao: selDur.value,
+                periodo: selPeriodo.value,
+                legenda: chkLegenda.checked,
+            });
+            alert("✅ Filtros salvos como padrão.");
+        });
+
+        setTimeout(() => {
+            if (b.videoId) aplicarPlayer(b.id, b.videoId, b.velocidade);
+            registrarVideoNaBiblioteca(b);
+        }, 0);
+
+        return elBloco;
+    }
+
+    // ==================================================
+    // ARTIGO → ESTUDAR
+    // ==================================================
+    function addBlocoArtigo() {
+        const blocos = Storage.blocos.ler("artigo", dataAtual);
+        blocos.push({
+            id: uid("blk"),
+            tema: "", titulo: "", autor: "", publicacao: "",
+            url: "", confiabilidade: "",
+            tempoPrevisto: "", progresso: 0,
+            trechos: [],
+            resumo1: "", resumo2: "", resumo3: "",
+            oQueFazer: "", proximaAcao: "",
+            criadoEm: Date.now(),
+        });
+        Storage.blocos.salvar("artigo", dataAtual, blocos);
+        render();
+    }
+
+    function renderEstudarArtigo() {
+        const blocos = Storage.blocos.ler("artigo", dataAtual);
+        const wrap = el("conteudo");
+        wrap.innerHTML = "";
+
+        if (blocos.length === 0) {
+            const vazio = document.createElement("div");
+            vazio.className = "vazio";
+            vazio.innerHTML = `
+                <p>Nenhum artigo registrado hoje ainda.</p>
+                <button class="btn-primario" id="btnAddArtigo">+ Adicionar artigo</button>
+            `;
+            wrap.appendChild(vazio);
+            vazio.querySelector("#btnAddArtigo").addEventListener("click", addBlocoArtigo);
+            return;
+        }
+
+        blocos.forEach((b, i) => wrap.appendChild(renderBlocoArtigo(b, i)));
+
+        const addWrap = document.createElement("div");
+        addWrap.style.marginTop = "10px";
+        addWrap.innerHTML = `<button class="btn-secundario" id="btnAddArtigo">+ Adicionar outro artigo hoje</button>`;
+        wrap.appendChild(addWrap);
+        addWrap.querySelector("#btnAddArtigo").addEventListener("click", addBlocoArtigo);
+    }
+
+    function renderBlocoArtigo(b, idx) {
+        const elBloco = document.createElement("div");
+        elBloco.className = "bloco-estudo";
+        elBloco.dataset.id = b.id;
+
+        elBloco.innerHTML = `
+            <div class="bloco-cabecalho">
+                <span class="bloco-titulo">Artigo ${idx + 1}</span>
+                <button class="bloco-remover" data-rem="${b.id}" title="Remover">×</button>
+            </div>
+
+            <div class="secao-titulo">📋 Antes de ler</div>
+
+            <label class="campo-label">Tema</label>
+            <input type="text" data-campo="tema" value="${esc(b.tema)}" placeholder="Ex.: marketing digital">
+
+            <label class="campo-label">🔎 Buscar artigos sobre o tema</label>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center;">
+                <span style="font-size:11px;color:#777;">Modo:</span>
+                <button type="button" class="chip" data-preset-artigo="tudo">🎯 Tudo</button>
+                <button type="button" class="chip" data-preset-artigo="pratico">🧠 Prático</button>
+                <button type="button" class="chip" data-preset-artigo="discussao">💬 Discussão</button>
+            </div>
+            <div class="chips" id="fontes_${b.id}" style="margin-bottom:8px;"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-secundario" data-recomendar-artigo="1">📄 Recomendar</button>
+                <button class="btn-secundario" data-google-artigo="1">🔍 Google</button>
+            </div>
+            <div class="recomendacoes" id="reca_${b.id}" style="display:none;"></div>
+
+            <label class="campo-label">Link do artigo</label>
+            <div class="linha-dupla">
+                <input type="text" data-campo="url" value="${esc(b.url)}" placeholder="https://...">
+                <button class="btn-secundario" data-buscar-meta-artigo="1">🔄 Buscar dados</button>
+            </div>
+            <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn-secundario" data-abrir-artigo="1">🔗 Abrir no navegador</button>
+            </div>
+
+            <label class="campo-label">Título</label>
+            <input type="text" data-campo="titulo" value="${esc(b.titulo)}" placeholder="(puxado automaticamente)">
+
+            <div class="linha-dupla">
+                <div>
+                    <label class="campo-label">Autor</label>
+                    <input type="text" data-campo="autor" value="${esc(b.autor)}" placeholder="(puxado)">
+                </div>
+                <div>
+                    <label class="campo-label">Publicação</label>
+                    <input type="text" data-campo="publicacao" value="${esc(b.publicacao)}" placeholder="(puxado)">
+                </div>
+            </div>
+
+            <label class="campo-label">Confiabilidade da publicação</label>
+            <div class="chips" data-confianca-artigo="${b.id}">
+                <div class="chip${b.confiabilidade === "alta" ? " selecionado" : ""}" data-c="alta">🟢 Confio</div>
+                <div class="chip${b.confiabilidade === "neutra" ? " selecionado" : ""}" data-c="neutra">🟡 Neutro</div>
+                <div class="chip${b.confiabilidade === "baixa" ? " selecionado" : ""}" data-c="baixa">🔴 Não confio</div>
+            </div>
+
+            <label class="campo-label">Tempo previsto (quanto vou dedicar)</label>
+            <input type="text" data-campo="tempoPrevisto" value="${esc(b.tempoPrevisto)}" placeholder="Ex.: 10 min">
+
+            <div class="secao-titulo" style="margin-top:22px;">📖 Lendo</div>
+
+            <label class="campo-label">Progresso</label>
+            <input type="range" class="progresso-slider" min="0" max="100" step="5" value="${b.progresso || 0}" data-campo="progresso">
+            <div class="progresso"><div style="width:${b.progresso || 0}%"></div></div>
+            <div class="progresso-texto">${b.progresso || 0}% lido</div>
+
+            <label class="campo-label">📌 Trechos marcados</label>
+            <div class="trechos-lista" data-trechos="${b.id}">
+                ${(b.trechos || []).map((t, i) => `
+                    <div class="trecho-item">
+                        <div class="trecho-texto">
+                            "${esc(t.texto || "")}"
+                            ${t.ref ? `<div class="trecho-ref">${esc(t.ref)}</div>` : ""}
+                        </div>
+                        <button class="trecho-remover" data-trecho-rem="${i}">×</button>
+                    </div>
+                `).join("") || `<div style="color:#666;font-size:12px;">Nenhum trecho marcado.</div>`}
+            </div>
+            <button class="btn-adicionar-trecho" data-add-trecho="1">➕ Adicionar trecho</button>
+
+            <div class="secao-titulo" style="margin-top:22px;">✅ Depois de ler</div>
+
+            <label class="campo-label">Resumo em 3 frases</label>
+            <div class="area-3frases">
+                <input type="text" data-campo="resumo1" value="${esc(b.resumo1)}" placeholder="1. …">
+                <input type="text" data-campo="resumo2" value="${esc(b.resumo2)}" placeholder="2. …">
+                <input type="text" data-campo="resumo3" value="${esc(b.resumo3)}" placeholder="3. …">
+            </div>
+
+            <label class="campo-label">O que vou fazer com isso</label>
+            <textarea data-campo="oQueFazer" rows="2">${esc(b.oQueFazer)}</textarea>
+
+            <label class="campo-label">Próxima ação</label>
+            <input type="text" data-campo="proximaAcao" value="${esc(b.proximaAcao)}" placeholder="Ex.: pesquisar o autor">
+        `;
+
+        elBloco.querySelectorAll("[data-campo]").forEach(input => {
+            input.addEventListener("input", () => {
+                const campo = input.dataset.campo;
+                const blocos = Storage.blocos.ler("artigo", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i < 0) return;
+
+                if (campo === "progresso") {
+                    blocos[i].progresso = Number(input.value);
+                    elBloco.querySelector(".progresso > div").style.width = input.value + "%";
+                    elBloco.querySelector(".progresso-texto").textContent = input.value + "% lido";
+                } else {
+                    blocos[i][campo] = input.value;
+                }
+                Storage.blocos.salvar("artigo", dataAtual, blocos);
+
+                if (campo === "url" || campo === "titulo" || campo === "autor" || campo === "publicacao" || campo === "progresso") {
+                    const at = Storage.blocos.ler("artigo", dataAtual).find(x => x.id === b.id);
+                    if (at) registrarArtigoNaBiblioteca(at);
+                }
+            });
+        });
+
+        elBloco.querySelector("[data-buscar-meta-artigo]")?.addEventListener("click", async () => {
+            const blocos = Storage.blocos.ler("artigo", dataAtual);
+            const i = blocos.findIndex(x => x.id === b.id);
+            if (i < 0) return;
+            const url = (blocos[i].url || "").trim();
+            if (!/^https?:\/\//i.test(url)) return alert("Cole uma URL válida.");
+
+            const btn = elBloco.querySelector("[data-buscar-meta-artigo]");
+            btn.textContent = "🔄 Buscando…";
+            btn.disabled = true;
+
+            try {
+                const meta = await buscarMetadadosArtigo(url);
+                const blocos2 = Storage.blocos.ler("artigo", dataAtual);
+                const j = blocos2.findIndex(x => x.id === b.id);
+                if (j >= 0) {
+                    if (meta.titulo)     blocos2[j].titulo     = meta.titulo;
+                    if (meta.autor)      blocos2[j].autor      = meta.autor;
+                    if (meta.publicacao) blocos2[j].publicacao = meta.publicacao;
+                    Storage.blocos.salvar("artigo", dataAtual, blocos2);
+                }
+            } catch (e) {
+                console.warn(e);
+                alert("Não consegui puxar automaticamente. Preencha manual.");
+            }
+            render();
+        });
+
+        elBloco.querySelector("[data-abrir-artigo]")?.addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("artigo", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            if (!it || !it.url) return alert("Cole o link primeiro.");
+            window.open(it.url, "_blank", "noopener");
+        });
+
+        elBloco.querySelectorAll("[data-confianca-artigo] .chip").forEach(chip => {
+            chip.addEventListener("click", () => {
+                const c = chip.dataset.c;
+                elBloco.querySelectorAll("[data-confianca-artigo] .chip").forEach(x =>
+                    x.classList.toggle("selecionado", x === chip));
+                const blocos = Storage.blocos.ler("artigo", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i >= 0) {
+                    blocos[i].confiabilidade = c;
+                    Storage.blocos.salvar("artigo", dataAtual, blocos);
+                }
+            });
+        });
+
+        elBloco.querySelector("[data-add-trecho]")?.addEventListener("click", () => {
+            const texto = prompt("Cole o trecho exato:");
+            if (!texto) return;
+            const ref = prompt("Referência (opcional — ex.: § 3):") || "";
+            const blocos = Storage.blocos.ler("artigo", dataAtual);
+            const i = blocos.findIndex(x => x.id === b.id);
+            if (i < 0) return;
+            blocos[i].trechos = blocos[i].trechos || [];
+            blocos[i].trechos.push({ texto, ref });
+            Storage.blocos.salvar("artigo", dataAtual, blocos);
+            render();
+        });
+
+        elBloco.querySelectorAll("[data-trecho-rem]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const idx = Number(btn.dataset.trechoRem);
+                const blocos = Storage.blocos.ler("artigo", dataAtual);
+                const i = blocos.findIndex(x => x.id === b.id);
+                if (i < 0) return;
+                blocos[i].trechos.splice(idx, 1);
+                Storage.blocos.salvar("artigo", dataAtual, blocos);
+                render();
+            });
+        });
+
+        elBloco.querySelector("[data-rem]").addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("artigo", dataAtual).filter(x => x.id !== b.id);
+            Storage.blocos.salvar("artigo", dataAtual, blocos);
+            render();
+        });
+
+        elBloco.querySelector("[data-google-artigo]")?.addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("artigo", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            const q = (it?.tema || "").trim();
+            if (!q) return alert("Preencha o tema primeiro.");
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(q + " artigo")}`, "_blank");
+        });
+
+        const fontesWrap = elBloco.querySelector(`#fontes_${b.id}`);
+        let fontesAtivas = obterFontesAtivas();
+
+        function renderChipsFontes() {
+            fontesWrap.innerHTML = FONTES_ARTIGO.map(f => {
+                const ativo = fontesAtivas.includes(f.id);
+                return `<div class="chip${ativo ? " selecionado" : ""}" data-fonte="${f.id}">${f.label}</div>`;
+            }).join("");
+
+            fontesWrap.querySelectorAll(".chip").forEach(chip => {
+                chip.addEventListener("click", () => {
+                    const id = chip.dataset.fonte;
+                    const i = fontesAtivas.indexOf(id);
+                    if (i >= 0) fontesAtivas.splice(i, 1);
+                    else fontesAtivas.push(id);
+                    if (fontesAtivas.length === 0) fontesAtivas = ["hn"];
+                    salvarFontesAtivas(fontesAtivas);
+                    renderChipsFontes();
+                });
+            });
+        }
+        renderChipsFontes();
+
+        elBloco.querySelectorAll("[data-preset-artigo]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const preset = btn.dataset.presetArtigo;
+                fontesAtivas = [...PRESETS_ARTIGO[preset]];
+                salvarFontesAtivas(fontesAtivas);
+                renderChipsFontes();
+            });
+        });
+
+        elBloco.querySelector("[data-recomendar-artigo]")?.addEventListener("click", async () => {
+            const blocos = Storage.blocos.ler("artigo", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            const q = (it?.tema || "").trim();
+            if (!q) return alert("Preencha o tema primeiro.");
+
+            const box = elBloco.querySelector(`#reca_${b.id}`);
+            box.style.display = "grid";
+            box.innerHTML = `<div style="color:#888;font-size:13px;">Buscando em ${fontesAtivas.length} fonte(s)…</div>`;
+
+            try {
+                const lista = await buscarArtigosPorTema(q, fontesAtivas);
+                if (!lista.length) {
+                    box.innerHTML = `<div style="color:#888;font-size:13px;">Nada encontrado. Tente outro modo ou o Google.</div>`;
+                    return;
+                }
+
+                box.innerHTML = lista.map(a => {
+                    const dataRel = formatarDataRelativa(a.publicado);
+                    const stats = [];
+                    if (a.pontos)      stats.push(`▲ ${a.pontos}`);
+                    if (a.comentarios) stats.push(`💬 ${a.comentarios}`);
+                    if (dataRel)       stats.push(dataRel);
+                    return `
+                        <div class="rec-artigo-card"
+                             data-art-titulo="${esc(a.titulo)}"
+                             data-art-url="${esc(a.url)}"
+                             data-art-fonte="${esc(a.fonte)}"
+                             data-art-autor="${esc(a.autor)}">
+                            <div class="rec-artigo-meta">
+                                <span class="rec-artigo-fonte">${esc(a.origem)}</span>
+                                ${a.fonte ? `<span>· ${esc(a.fonte)}</span>` : ""}
+                                ${a.autor ? `<span>· ${esc(a.autor)}</span>` : ""}
+                            </div>
+                            <div class="rec-artigo-titulo">${esc(a.titulo)}</div>
+                            ${stats.length ? `<div class="rec-artigo-stats">${stats.join(" · ")}</div>` : ""}
+                        </div>
+                    `;
+                }).join("");
+
+                verificarPagosDosCards(box);
+
+                box.querySelectorAll(".rec-artigo-card").forEach(card => {
+                    card.addEventListener("click", () => {
+                        const t = card.dataset.artTitulo;
+                        const l = card.dataset.artUrl;
+                        const f = card.dataset.artFonte;
+                        const au = card.dataset.artAutor;
+
+                        window.open(l, "_blank", "noopener");
+
+                        const blocos2 = Storage.blocos.ler("artigo", dataAtual);
+                        const i = blocos2.findIndex(x => x.id === b.id);
+                        if (i < 0) return;
+                        blocos2[i].titulo = t;
+                        blocos2[i].url = l;
+                        blocos2[i].publicacao = f;
+                        blocos2[i].autor = au;
+                        Storage.blocos.salvar("artigo", dataAtual, blocos2);
+
+                        registrarArtigoNaBiblioteca(blocos2[i]);
+                        render();
+                    });
+                });
+            } catch (e) {
+                console.error(e);
+                box.innerHTML = `<div style="color:#888;font-size:13px;">Erro ao buscar. Tente o Google.</div>`;
+            }
+        });
+
+        setTimeout(() => registrarArtigoNaBiblioteca(b), 0);
+        return elBloco;
+    }
+
+    // ==================================================
+    // NOTÍCIAS (NewsData.io) — PAINEL DEDICADO
+    // ==================================================
+    function renderNoticias() {
+        const prefs = obterPrefsNews();
+        if (prefs.edicao)  estado.newsEdicao  = prefs.edicao;
+        if (prefs.periodo) estado.newsPeriodo = prefs.periodo;
+        if (prefs.dominio !== undefined) estado.newsDominio = prefs.dominio;
+
+        const wrap = el("conteudo");
+        const historico = obterHistoricoNews();
+
+        wrap.innerHTML = `
+            <div class="gdelt-painel">
+                <div class="gdelt-busca-wrap">
+                    <input type="search" id="newsBusca" class="bib-busca" placeholder="🔎 Tema (ex.: marketing digital, IA, eleições)" value="${esc(estado.newsBusca)}">
+                    <button class="btn-primario" id="newsBtnBuscar">🔍 Buscar</button>
+                </div>
+
+                ${historico.length ? `
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;align-items:center;">
+                        <span style="font-size:11px;color:#777;">Recentes:</span>
+                        ${historico.map(h => `<button class="btn-secundario" data-hist-news="${esc(h)}" style="font-size:11px;padding:4px 10px;">${esc(h)}</button>`).join("")}
+                    </div>
+                ` : ""}
+
+                <div class="gdelt-linha-filtros">
+                    <div class="gdelt-grupo">
+                        <span class="rotulo">Edição:</span>
+                        <div class="chips">
+                            ${Object.entries(EDICOES_NEWS).map(([id, ed]) => `
+                                <div class="chip${estado.newsEdicao === id ? " selecionado" : ""}" data-news-edicao="${id}">${ed.label}</div>
+                            `).join("")}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gdelt-linha-filtros">
+                    <div class="gdelt-grupo">
+                        <span class="rotulo">Período:</span>
+                        <div class="chips">
+                            <div class="chip${estado.newsPeriodo === "24h" ? " selecionado" : ""}" data-news-periodo="24h">24h</div>
+                            <div class="chip${estado.newsPeriodo === "48h" ? " selecionado" : ""}" data-news-periodo="48h">48h</div>
+                            <div class="chip${estado.newsPeriodo === "tudo" ? " selecionado" : ""}" data-news-periodo="tudo">Tudo</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gdelt-linha-filtros">
+                    <div class="gdelt-grupo" style="flex:1;">
+                        <span class="rotulo">Domínio:</span>
+                        <input type="text" id="newsDominio" class="bib-busca" style="min-width:160px;flex:1;" placeholder="exame.com (opcional)" value="${esc(estado.newsDominio)}">
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="newsResultados"></div>
+        `;
+
+        function salvarPrefs() {
+            salvarPrefsNews({
+                edicao:  estado.newsEdicao,
+                periodo: estado.newsPeriodo,
+                dominio: estado.newsDominio,
+            });
+        }
+
+        const inputBusca = wrap.querySelector("#newsBusca");
+        inputBusca.addEventListener("input", e => { estado.newsBusca = e.target.value; });
+        inputBusca.addEventListener("keydown", e => {
+            if (e.key === "Enter") executarBuscaNews();
+        });
+
+        wrap.querySelector("#newsBtnBuscar").addEventListener("click", () => executarBuscaNews());
+
+        wrap.querySelectorAll("[data-hist-news]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                estado.newsBusca = btn.dataset.histNews;
+                inputBusca.value = estado.newsBusca;
+                executarBuscaNews();
+            });
+        });
+
+        wrap.querySelectorAll("[data-news-edicao]").forEach
