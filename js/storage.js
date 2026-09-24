@@ -167,7 +167,7 @@
             }
         }
 
-        // -------- Suporte --------
+                // -------- Suporte --------
         function suporta() {
             try {
                 localStorage.setItem("__teste_pratica__", "1");
@@ -177,6 +177,189 @@
                 return false;
             }
         }
+
+        // -------- SKILLS (CRUD) --------
+        function _lerTodasSkills() {
+            return lerJSONLocal(K.SKILLS, []);
+        }
+
+        function _salvarTodasSkills(lista) {
+            return salvarJSONLocal(K.SKILLS, lista);
+        }
+
+        function _idxSkill(lista, id) {
+            return lista.findIndex(s => s.id === id);
+        }
+
+        const skills = {
+            listar() {
+                return _lerTodasSkills();
+            },
+
+            listarAtivas() {
+                return _lerTodasSkills().filter(s => !s.arquivada);
+            },
+
+            ler(id) {
+                return _lerTodasSkills().find(s => s.id === id) || null;
+            },
+
+            criar(dados = {}) {
+                const lista = _lerTodasSkills();
+                const nova = {
+                    id: dados.id || gerarId("skill"),
+                    nome: dados.nome || "",
+                    icone: dados.icone || "🛠️",
+                    area: dados.area || "estudo",
+                    norte: {
+                        objetivo_final: dados.norte?.objetivo_final || "",
+                        frase: dados.norte?.frase || ""
+                    },
+                    frentes: dados.frentes || [],
+                    marcos: dados.marcos || {},
+                    midias: [],
+                    pontos_de_virada: [],
+                    feedback: [],
+                    config: {
+                        nivel: dados.config?.nivel || "aprendiz",
+                        regra_nivel: dados.config?.regra_nivel || { artesao: 3, mestre: 8, lenda: 15 },
+                        template_area_origem: dados.config?.template_area_origem || dados.area || "estudo"
+                    },
+                    arquivada: false,
+                    criado_em: agoraISO(),
+                    atualizado_em: agoraISO()
+                };
+                lista.push(nova);
+                _salvarTodasSkills(lista);
+                return nova;
+            },
+
+            atualizar(id, patch) {
+                const lista = _lerTodasSkills();
+                const i = _idxSkill(lista, id);
+                if (i < 0) return null;
+                lista[i] = { ...lista[i], ...patch, atualizado_em: agoraISO() };
+                _salvarTodasSkills(lista);
+                return lista[i];
+            },
+
+            remover(id) {
+                const lista = _lerTodasSkills().filter(s => s.id !== id);
+                _salvarTodasSkills(lista);
+            },
+
+            arquivar(id) {
+                return this.atualizar(id, { arquivada: true });
+            },
+
+            desarquivar(id) {
+                return this.atualizar(id, { arquivada: false });
+            },
+
+            // -------- Frentes --------
+            adicionarFrente(skillId, dados = {}) {
+                const lista = _lerTodasSkills();
+                const i = _idxSkill(lista, skillId);
+                if (i < 0) return null;
+                const nova = {
+                    id: dados.id || gerarId("fr"),
+                    nome: dados.nome || "",
+                    icone: dados.icone || "🎯",
+                    fase: dados.fase || "aprendendo",
+                    modo_sessao: dados.modo_sessao || "tempo",
+                    marco_ativo: dados.marco_ativo || null,
+                    marcos: dados.marcos || [],
+                    arquivada: false,
+                    criado_em: agoraISO()
+                };
+                lista[i].frentes.push(nova);
+                lista[i].atualizado_em = agoraISO();
+                _salvarTodasSkills(lista);
+                return nova;
+            },
+
+            atualizarFrente(skillId, frenteId, patch) {
+                const lista = _lerTodasSkills();
+                const i = _idxSkill(lista, skillId);
+                if (i < 0) return null;
+                const j = lista[i].frentes.findIndex(f => f.id === frenteId);
+                if (j < 0) return null;
+                lista[i].frentes[j] = { ...lista[i].frentes[j], ...patch };
+                lista[i].atualizado_em = agoraISO();
+                _salvarTodasSkills(lista);
+                return lista[i].frentes[j];
+            },
+
+            removerFrente(skillId, frenteId) {
+                const lista = _lerTodasSkills();
+                const i = _idxSkill(lista, skillId);
+                if (i < 0) return;
+                lista[i].frentes = lista[i].frentes.filter(f => f.id !== frenteId);
+                lista[i].atualizado_em = agoraISO();
+                _salvarTodasSkills(lista);
+            },
+
+            // -------- Marcos --------
+            adicionarMarco(skillId, dados = {}) {
+                const lista = _lerTodasSkills();
+                const i = _idxSkill(lista, skillId);
+                if (i < 0) return null;
+                const novo = {
+                    id: dados.id || gerarId("mc"),
+                    titulo: dados.titulo || "",
+                    frente: dados.frente || null,
+                    percentual: dados.percentual || 0,
+                    peso: dados.peso || 3,
+                    data_inicio: dados.data_inicio || dataHoje(),
+                    data_fim: null,
+                    prerequisito: dados.prerequisito || null,
+                    entregavel: dados.entregavel || null
+                };
+                lista[i].marcos[novo.id] = novo;
+                const j = lista[i].frentes.findIndex(f => f.id === novo.frente);
+                if (j >= 0 && !lista[i].frentes[j].marcos.includes(novo.id)) {
+                    lista[i].frentes[j].marcos.push(novo.id);
+                    if (!lista[i].frentes[j].marco_ativo) {
+                        lista[i].frentes[j].marco_ativo = novo.id;
+                    }
+                }
+                lista[i].atualizado_em = agoraISO();
+                _salvarTodasSkills(lista);
+                return novo;
+            },
+
+            atualizarMarco(skillId, marcoId, patch) {
+                const lista = _lerTodasSkills();
+                const i = _idxSkill(lista, skillId);
+                if (i < 0 || !lista[i].marcos[marcoId]) return null;
+                lista[i].marcos[marcoId] = { ...lista[i].marcos[marcoId], ...patch };
+                if (patch.percentual >= 100 && !lista[i].marcos[marcoId].data_fim) {
+                    lista[i].marcos[marcoId].data_fim = dataHoje();
+                }
+                lista[i].atualizado_em = agoraISO();
+                _salvarTodasSkills(lista);
+                return lista[i].marcos[marcoId];
+            },
+
+            removerMarco(skillId, marcoId) {
+                const lista = _lerTodasSkills();
+                const i = _idxSkill(lista, skillId);
+                if (i < 0) return;
+                delete lista[i].marcos[marcoId];
+                lista[i].frentes.forEach(f => {
+                    f.marcos = f.marcos.filter(m => m !== marcoId);
+                    if (f.marco_ativo === marcoId) {
+                        f.marco_ativo = f.marcos[0] || null;
+                    }
+                });
+                lista[i].atualizado_em = agoraISO();
+                _salvarTodasSkills(lista);
+            },
+
+            definirMarcoAtivo(skillId, frenteId, marcoId) {
+                return this.atualizarFrente(skillId, frenteId, { marco_ativo: marcoId });
+            }
+        };
 
         // -------- API pública básica --------
         return {
@@ -188,6 +371,7 @@
             lerJSON: lerJSONLocal,
             salvarJSON: salvarJSONLocal,
             suporta,
+            skills,
             _versao: "1.0.0"
         };
 
