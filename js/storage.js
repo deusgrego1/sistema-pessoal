@@ -356,8 +356,174 @@
                 _salvarTodasSkills(lista);
             },
 
-            definirMarcoAtivo(skillId, frenteId, marcoId) {
+                       definirMarcoAtivo(skillId, frenteId, marcoId) {
                 return this.atualizarFrente(skillId, frenteId, { marco_ativo: marcoId });
+            },
+
+            // -------- Mídias --------
+            adicionarMidia(skillId, dados = {}) {
+                const lista = _lerTodasSkills();
+                const i = _idxSkill(lista, skillId);
+                if (i < 0) return null;
+                const nova = {
+                    id: dados.id || gerarId("md"),
+                    tipo: dados.tipo || "video",
+                    origem: dados.origem || "manual",
+                    url: dados.url || "",
+                    fileId: dados.fileId || "",
+                    nome: dados.nome || "",
+                    nota: dados.nota || "",
+                    data: dados.data || dataHoje(),
+                    frente: dados.frente || null,
+                    contexto: dados.contexto || "geral"
+                };
+                lista[i].midias = lista[i].midias || [];
+                lista[i].midias.push(nova);
+                lista[i].atualizado_em = agoraISO();
+                _salvarTodasSkills(lista);
+                return nova;
+            },
+
+            atualizarMidia(skillId, midiaId, patch) {
+                const lista = _lerTodasSkills();
+                const i = _idxSkill(lista, skillId);
+                if (i < 0) return null;
+                const j = (lista[i].midias || []).findIndex(m => m.id === midiaId);
+                if (j < 0) return null;
+                lista[i].midias[j] = { ...lista[i].midias[j], ...patch };
+                lista[i].atualizado_em = agoraISO();
+                _salvarTodasSkills(lista);
+                return lista[i].midias[j];
+            },
+
+            removerMidia(skillId, midiaId) {
+                const lista = _lerTodasSkills();
+                const i = _idxSkill(lista, skillId);
+                if (i < 0) return;
+                lista[i].midias = (lista[i].midias || []).filter(m => m.id !== midiaId);
+                lista[i].atualizado_em = agoraISO();
+                _salvarTodasSkills(lista);
+            },
+
+            listarMidias(skillId, filtro = {}) {
+                const skill = this.ler(skillId);
+                if (!skill) return [];
+                let arr = skill.midias || [];
+                if (filtro.contexto) arr = arr.filter(m => m.contexto === filtro.contexto);
+                if (filtro.frente)   arr = arr.filter(m => m.frente === filtro.frente);
+                if (filtro.tipo)     arr = arr.filter(m => m.tipo === filtro.tipo);
+                return arr.sort((a, b) => (b.data || "").localeCompare(a.data || ""));
+            },
+
+            definirAntesDepois(skillId, antesId, depoisId) {
+                const lista = _lerTodasSkills();
+                const i = _idxSkill(lista, skillId);
+                if (i < 0) return;
+                (lista[i].midias || []).forEach(m => {
+                    if (m.id === antesId)  m.contexto = "antes";
+                    if (m.id === depoisId) m.contexto = "depois";
+                });
+                lista[i].atualizado_em = agoraISO();
+                _salvarTodasSkills(lista);
+            },
+
+            // -------- Pontos de virada --------
+            adicionarPontoVirada(skillId, dados = {}) {
+                const lista = _lerTodasSkills();
+                const i = _idxSkill(lista, skillId);
+                if (i < 0) return null;
+                const novo = {
+                    id: dados.id || gerarId("pv"),
+                    data: dados.data || dataHoje(),
+                    frente: dados.frente || null,
+                    texto: dados.texto || "",
+                    sessao_id: dados.sessao_id || null,
+                    criado_em: agoraISO()
+                };
+                lista[i].pontos_de_virada = lista[i].pontos_de_virada || [];
+                lista[i].pontos_de_virada.push(novo);
+                lista[i].atualizado_em = agoraISO();
+                _salvarTodasSkills(lista);
+                return novo;
+            },
+
+            atualizarPontoVirada(skillId, pvId, patch) {
+                const lista = _lerTodasSkills();
+                const i = _idxSkill(lista, skillId);
+                if (i < 0) return null;
+                const j = (lista[i].pontos_de_virada || []).findIndex(p => p.id === pvId);
+                if (j < 0) return null;
+                lista[i].pontos_de_virada[j] = { ...lista[i].pontos_de_virada[j], ...patch };
+                lista[i].atualizado_em = agoraISO();
+                _salvarTodasSkills(lista);
+                return lista[i].pontos_de_virada[j];
+            },
+
+            removerPontoVirada(skillId, pvId) {
+                const lista = _lerTodasSkills();
+                const i = _idxSkill(lista, skillId);
+                if (i < 0) return;
+                lista[i].pontos_de_virada = (lista[i].pontos_de_virada || []).filter(p => p.id !== pvId);
+                lista[i].atualizado_em = agoraISO();
+                _salvarTodasSkills(lista);
+            },
+
+            listarPontosVirada(skillId) {
+                const skill = this.ler(skillId);
+                if (!skill) return [];
+                return (skill.pontos_de_virada || [])
+                    .slice()
+                    .sort((a, b) => (b.data || "").localeCompare(a.data || ""));
+            },
+
+            // -------- Feedback --------
+            adicionarFeedback(skillId, dados = {}) {
+                const lista = _lerTodasSkills();
+                const i = _idxSkill(lista, skillId);
+                if (i < 0) return null;
+                const novo = {
+                    id: dados.id || gerarId("fb"),
+                    data: dados.data || dataHoje(),
+                    fonte: dados.fonte || "auto",
+                    nota: dados.nota || "amarelo",
+                    texto: dados.texto || "",
+                    frente: dados.frente || null,
+                    criado_em: agoraISO()
+                };
+                lista[i].feedback = lista[i].feedback || [];
+                lista[i].feedback.push(novo);
+                lista[i].atualizado_em = agoraISO();
+                _salvarTodasSkills(lista);
+                return novo;
+            },
+
+            atualizarFeedback(skillId, fbId, patch) {
+                const lista = _lerTodasSkills();
+                const i = _idxSkill(lista, skillId);
+                if (i < 0) return null;
+                const j = (lista[i].feedback || []).findIndex(f => f.id === fbId);
+                if (j < 0) return null;
+                lista[i].feedback[j] = { ...lista[i].feedback[j], ...patch };
+                lista[i].atualizado_em = agoraISO();
+                _salvarTodasSkills(lista);
+                return lista[i].feedback[j];
+            },
+
+            removerFeedback(skillId, fbId) {
+                const lista = _lerTodasSkills();
+                const i = _idxSkill(lista, skillId);
+                if (i < 0) return;
+                lista[i].feedback = (lista[i].feedback || []).filter(f => f.id !== fbId);
+                lista[i].atualizado_em = agoraISO();
+                _salvarTodasSkills(lista);
+            },
+
+            listarFeedback(skillId, filtro = {}) {
+                const skill = this.ler(skillId);
+                if (!skill) return [];
+                let arr = (skill.feedback || []).slice();
+                if (filtro.fonte) arr = arr.filter(f => f.fonte === filtro.fonte);
+                return arr.sort((a, b) => (b.data || "").localeCompare(a.data || ""));
             }
         };
 
