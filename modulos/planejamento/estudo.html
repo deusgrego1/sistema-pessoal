@@ -1107,11 +1107,17 @@
             border-radius: 10px;
             padding: 12px 14px;
             margin-bottom: 8px;
+            transition: border-color 0.2s, background 0.2s;
         }
+        .tempo-real-box.estourou {
+            background: #141a24;
+            border-color: #2c3a55;
+        }
+
         .tempo-real-display {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 10px;
             margin-bottom: 8px;
         }
         .tempo-real-valor {
@@ -1121,7 +1127,21 @@
             font-variant-numeric: tabular-nums;
             line-height: 1;
         }
+        .tempo-real-box.estourou .tempo-real-valor { color: #a8c4e8; }
+
+        .tempo-real-extra {
+            font-size: 11px;
+            color: #a8c4e8;
+            background: #1a2233;
+            border: 1px solid #2c3a55;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
         .tempo-real-ajustar {
+            margin-left: auto;
             background: none;
             border: 1px solid #333338;
             color: #888;
@@ -1136,21 +1156,43 @@
             color: #e0e0e0;
             border-color: #55555c;
         }
+
         .tempo-real-barra {
+            position: relative;
             height: 6px;
             background: #252529;
             border-radius: 3px;
             overflow: hidden;
             margin-bottom: 4px;
+            display: flex;
         }
-        .tempo-real-barra > div {
+        .tempo-real-barra-preenchido {
             height: 100%;
             background: linear-gradient(90deg, #4caf50, #66bb6a);
             transition: width 0.3s ease;
         }
+        .tempo-real-barra.estourou .tempo-real-barra-preenchido {
+            background: linear-gradient(90deg, #5a8ad4, #7aa8e8);
+        }
+        .tempo-real-barra-excesso {
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                #a8c4e8,
+                #a8c4e8 4px,
+                #7aa8e8 4px,
+                #7aa8e8 8px
+            );
+            transition: width 0.3s ease;
+        }
+
         .tempo-real-meta {
             font-size: 11px;
             color: #777;
+        }
+        .tempo-real-meta-extra {
+            color: #a8c4e8;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -1870,24 +1912,35 @@
 
             <div class="secao-titulo">📋 Antes de praticar</div>
 
-            <label class="campo-label">Skill</label>
-            <select data-campo="skillId">
-                <option value="">— escolha uma skill —</option>
-                ${skills.map(s => `
-                    <option value="${esc(s.id)}" ${b.skillId === s.id ? "selected" : ""}>${esc(s.icone)} ${esc(s.nome)}</option>
-                `).join("")}
-            </select>
-
-            ${skillAtual ? `
-                <label class="campo-label">Frente</label>
-                <select data-campo="frenteId">
-                    <option value="">— escolha uma frente —</option>
-                    ${frentesDisponiveis.map(f => `
-                        <option value="${esc(f.id)}" ${b.frenteId === f.id ? "selected" : ""}>${esc(f.icone)} ${esc(f.nome)}</option>
-                    `).join("")}
-                </select>
-            ` : ""}
-
+            <label class="campo-label">Tempo real</label>
+            ${(() => {
+                const real = Number(b.tempo_real_min) || 0;
+                const prev = Number(b.tempo_previsto_min) || 0;
+                const pct  = prev > 0 ? (real / prev) * 100 : 0;
+                const pctBarra = Math.min(100, pct);
+                const estourou = prev > 0 && real > prev;
+                const excesso = estourou ? real - prev : 0;
+                const excedentePct = estourou ? Math.min(100, ((real - prev) / prev) * 100) : 0;
+                return `
+                <div class="tempo-real-box ${estourou ? "estourou" : ""}">
+                    <div class="tempo-real-display">
+                        <span class="tempo-real-valor">${formatarTempoReal(b.tempo_real_min)}</span>
+                        ${estourou ? `<span class="tempo-real-extra">+${formatarTempoReal(excesso)} além</span>` : ""}
+                        <button type="button" class="tempo-real-ajustar" data-ajustar-tempo-real="${b.id}">ajustar</button>
+                    </div>
+                    ${prev > 0 ? `
+                        <div class="tempo-real-barra ${estourou ? "estourou" : ""}" title="Real vs previsto">
+                            <div class="tempo-real-barra-preenchido" style="width:${pctBarra}%"></div>
+                            ${estourou ? `<div class="tempo-real-barra-excesso" style="width:${excedentePct}%"></div>` : ""}
+                        </div>
+                        <div class="tempo-real-meta">
+                            previsto: ${prev} min
+                            ${estourou ? ` · <span class="tempo-real-meta-extra">estourou em ${Math.round(pct - 100)}%</span>` : ""}
+                        </div>
+                    ` : ""}
+                </div>
+                `;
+            })()}
             ${marcoAtivo ? `
                 <div class="marco-contexto">
                     <span class="marco-contexto-rotulo">🧭 Marco ativo</span>
