@@ -85,13 +85,62 @@
         animation: none;
     }
 }
-        
+
+/* Banner da Prática */
+.banner-pratica {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    background: #172017;
+    border: 1px solid #2e5a2e;
+    border-radius: 10px;
+    flex-wrap: wrap;
+}
+.banner-pratica-rotulo {
+    display: block;
+    font-size: 10px;
+    color: #4caf50;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 4px;
+}
+.banner-pratica-titulo {
+    font-size: 14px;
+    color: #eaeaea;
+    font-weight: 600;
+    line-height: 1.3;
+}
+.banner-pratica-acoes button {
+    padding: 9px 15px;
+    font-size: 13px;
+    background: #1a2a1a;
+    color: #a5d6a7;
+    border: 1px solid #2e5a2e;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: 0.15s;
+}
+.banner-pratica-acoes button:hover { background: #223a22; border-color: #4caf50; }        
     </style>
 </head>
 
 <body>
 
     <main class="container">
+
+        <div id="bannerPratica" class="banner-pratica" style="display:none;">
+            <div>
+                <span class="banner-pratica-rotulo">Sessão de prática</span>
+                <span class="banner-pratica-titulo" id="bannerPraticaTitulo"></span>
+            </div>
+            <div class="banner-pratica-acoes">
+                <button type="button" id="btnVoltarPratica">↩ Voltar pra Prática</button>
+            </div>
+        </div>
 
         <header class="header">
             <p class="eyebrow">FOCO</p>
@@ -383,6 +432,71 @@
         const tempoURL  = paramsURL.get("tempo");
         const origemURL = paramsURL.get("origem");
 
+        // ==================================================
+        // VÍNCULO COM PRÁTICA
+        // ==================================================
+        const skillIdURL   = paramsURL.get("skillId");
+        const frenteIdURL  = paramsURL.get("frenteId");
+        const blocoIdURL   = paramsURL.get("blocoId");
+        const dataBlocoURL = paramsURL.get("data");
+        const ehPratica    = origemURL === "pratica" && !!(skillIdURL && frenteIdURL && blocoIdURL);
+
+        let skillNome = "";
+        let frenteNome = "";
+        let tempoAcumuladoSeg = 0;
+        let contadorPausas = 0;
+
+        if (ehPratica) {
+            try {
+                const skills = JSON.parse(localStorage.getItem("pratica_skills") || "[]");
+                const s = skills.find(x => x.id === skillIdURL);
+                if (s) {
+                    skillNome = s.nome || "";
+                    const f = (s.frentes || []).find(x => x.id === frenteIdURL);
+                    if (f) frenteNome = f.nome || "";
+                }
+            } catch (e) {}
+        }
+
+        function gravarPacotePratica() {
+            if (!ehPratica || !blocoIdURL) return;
+            const pacote = {
+                tempo_real_min: Math.max(0, Math.round(tempoAcumuladoSeg / 60)),
+                pausas: contadorPausas,
+                distracoes: distracoes.length,
+                notas: (notasFoco.value || "").trim(),
+                skillId: skillIdURL,
+                frenteId: frenteIdURL,
+                blocoId: blocoIdURL,
+                data: dataBlocoURL || dataAtual,
+                timestamp: Date.now()
+            };
+            try {
+                localStorage.setItem(`estudo_foco_retorno_${blocoIdURL}`, JSON.stringify(pacote));
+            } catch (e) {}
+        }
+
+        function voltarParaPratica() {
+            gravarPacotePratica();
+            const d = dataBlocoURL || dataAtual;
+            window.location.href = `../planejamento/estudo.html?origem=foco&data=${d}`;
+        }
+
+        if (ehPratica) {
+            const banner = document.getElementById("bannerPratica");
+            const titulo = document.getElementById("bannerPraticaTitulo");
+            if (banner && titulo) {
+                banner.style.display = "flex";
+                const s = skillNome || "(skill)";
+                const f = frenteNome || "(frente)";
+                titulo.textContent = `${s} · ${f}`;
+            }
+            document.getElementById("btnVoltarPratica")?.addEventListener("click", voltarParaPratica);
+
+            // backup ao fechar/recarregar
+            window.addEventListener("beforeunload", gravarPacotePratica);
+        }
+
         if (tarefaURL) {
             tarefaFoco.value = tarefaURL;
             localStorage.setItem(chaveTarefa, tarefaURL);
@@ -596,8 +710,18 @@ card.classList.add("painel-lateral-direita");
             segundosRestantes--;
             if (segundosRestantes < 0) segundosRestantes = 0;
             atualizarDisplay(); atualizarBarra(); atualizarTitulo(); salvarEstado();
+
+            // backup do pacote a cada 5s
+            if (ehPratica && segundosRestantes % 5 === 0) {
+                tempoAcumuladoSeg = Math.max(0, duracaoTotal - segundosRestantes) + (tempoAcumuladoSegBase || 0);
+                gravarPacotePratica();
+            }
+
             if (segundosRestantes === 0) finalizarSessao();
         }
+
+        // guarda o valor anterior acumulado entre múltiplas sessões
+        let tempoAcumuladoSegBase = 0;
 
         function iniciarTimer() {
             if (rodando) {
@@ -625,6 +749,13 @@ card.classList.add("painel-lateral-direita");
             liberarWakeLock();
             document.title = "Foco";
             registrarSessao(tarefaFoco.value.trim(), duracaoTotal);
+
+            // acumula tempo executado pra devolver à Prática
+            if (ehPratica) {
+                tempoAcumuladoSeg += Math.max(0, duracaoTotal - segundosRestantes);
+                gravarPacotePratica();
+            }
+
             tocarBipe(); mostrarNotificacao();
             acoesFim.style.display = "block";
             limparEstado();
@@ -752,7 +883,13 @@ card.classList.add("painel-lateral-direita");
             });
         }
         botoesPausa.forEach(btn => {
-            btn.addEventListener("click", () => renderizarPausas(btn.dataset.cat));
+            btn.addEventListener("click", () => {
+                if (ehPratica) {
+                    contadorPausas++;
+                    gravarPacotePratica();
+                }
+                renderizarPausas(btn.dataset.cat);
+            });
         });
 
         // ==================================================
