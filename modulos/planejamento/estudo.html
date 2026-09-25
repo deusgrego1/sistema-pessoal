@@ -1084,6 +1084,21 @@
             margin-top: 20px;
             border-top: 1px solid #252529;
         }
+
+        .badge-em-foco {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 2px 8px;
+            background: #172017;
+            color: #a5d6a7;
+            font-size: 10px;
+            font-weight: 600;
+            border: 1px solid #2e5a2e;
+            border-radius: 10px;
+            font-variant-numeric: tabular-nums;
+            text-transform: none;
+            letter-spacing: 0;
+        }
     </style>
 </head>
 
@@ -1784,7 +1799,10 @@
 
         elBloco.innerHTML = `
             <div class="bloco-cabecalho">
-                <span class="bloco-titulo">Sessão ${idx + 1} · ${esc(skillNome)}${frenteNome ? " · " + esc(frenteNome) : ""}</span>
+                <span class="bloco-titulo">
+                    Sessão ${idx + 1} · ${esc(skillNome)}${frenteNome ? " · " + esc(frenteNome) : ""}
+                    <span class="badge-em-foco" data-em-foco="${esc(b.id)}" style="display:none;"></span>
+                </span>
                 <button class="bloco-remover" data-rem="${b.id}" title="Remover">×</button>
             </div>
 
@@ -5487,9 +5505,8 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
             if (pacote) aplicar.push({ chave: k, blocoId, pacote });
         }
 
-        if (!aplicar.length) return;
+        if (!aplicar.length) return 0;
 
-        // aplica em todos os blocos possíveis (procura em todas as datas)
         aplicar.forEach(({ chave, blocoId, pacote }) => {
             for (let d = 0; d < localStorage.length; d++) {
                 const ck = localStorage.key(d);
@@ -5518,7 +5535,66 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
         });
 
         console.log(`[foco] ${aplicar.length} retorno(s) aplicado(s).`);
+        return aplicar.length;
     }
+
+    // ---------- sincronização em tempo real com o foco ----------
+    // 1) cross-tab: escuta "storage" (dispara quando OUTRA aba escreve)
+    // 2) same-tab: polling local (o storage event não dispara na aba que escreve)
+    let _ultimoPacoteVisto = null;
+
+    function _tickSyncFoco() {
+        // aplica pacotes novos
+        const aplicados = aplicarRetornosFoco();
+
+        // descobre se há foco rodando pra algum bloco visível hoje
+        let emFoco = null;
+        for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (!k || !k.endsWith("_foco_estado")) continue;
+            try {
+                const est = JSON.parse(localStorage.getItem(k));
+                if (est && est.rodando && est.blocoId) {
+                    const seg = est.duracao - est.restante + Math.floor((Date.now() - est.inicio) / 1000);
+                    emFoco = { blocoId: est.blocoId, seg: Math.max(0, seg) };
+                    break;
+                }
+            } catch {}
+        }
+
+        // atualiza badge em-foco se mudou
+        const badgeAnterior = _ultimoPacoteVisto;
+        _ultimoPacoteVisto = emFoco ? emFoco.blocoId : null;
+
+        if (aplicados > 0) {
+            // re-render suave da lista de blocos se estamos na aba Praticar
+            if (estado.tipo === "pratica" && estado.subAba === "praticar") {
+                renderPraticarHoje();
+            }
+        } else if (estado.tipo === "pratica" && estado.subAba === "praticar") {
+            // atualiza badges de "em foco" sem re-render completo
+            document.querySelectorAll("[data-em-foco]").forEach(el => {
+                const id = el.dataset.emFoco;
+                if (emFoco && emFoco.blocoId === id) {
+                    const m = Math.floor(emFoco.seg / 60);
+                    const s = emFoco.seg % 60;
+                    el.textContent = `⏱️ em foco · ${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+                    el.style.display = "";
+                } else {
+                    el.style.display = "none";
+                }
+            });
+        }
+    }
+
+    window.addEventListener("storage", (ev) => {
+        if (!ev.key) return;
+        if (ev.key.startsWith("estudo_foco_retorno_")) {
+            _tickSyncFoco();
+        }
+    });
+
+    setInterval(_tickSyncFoco, 3000);
 
     aplicarRetornosFoco();
 
