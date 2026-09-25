@@ -904,7 +904,41 @@
         }
         .fb-remover:hover { color: #d45a5a; }
         .fb-texto { font-size: 13px; color: #d0d0d0; line-height: 1.4; }
-    </style>
+
+        /* ---------- Form de skill ---------- */
+        .form-skill {
+            background: #19191d;
+            border: 1px solid #2a2a30;
+            border-left: 3px solid #4caf50;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .form-skill-cabecalho {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .form-skill-titulo {
+            font-size: 11px;
+            color: #4caf50;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
+        .form-skill select {
+            width: 100%;
+            padding: 8px 12px;
+            background: #17171a;
+            border: 1px solid #333338;
+            color: #eaeaea;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+        }
+        .form-skill select:focus { border-color: #55555c; }    </style>
 </head>
 
 <body>
@@ -957,6 +991,56 @@
     ];
     const ABAS_APRENDIZADOS = { id: "aprendizados", label: "🧠 Aprendizados" };
 
+    const TEMPLATES_FRENTES = {
+        trabalho:       [
+            { nome: "gestão",        icone: "📋" },
+            { nome: "negociação",    icone: "🤝" },
+            { nome: "delegação",     icone: "📤" },
+            { nome: "apresentação",  icone: "🎤" },
+            { nome: "métricas",      icone: "📊" },
+        ],
+        negocio:        [
+            { nome: "vendas",        icone: "💸" },
+            { nome: "oferta",        icone: "🎁" },
+            { nome: "precificação",  icone: "🏷️" },
+            { nome: "funil",         icone: "🔻" },
+            { nome: "atendimento",   icone: "💬" },
+        ],
+        estudo:         [
+            { nome: "leitura ativa",    icone: "📖" },
+            { nome: "anotação",         icone: "✍️" },
+            { nome: "revisão",          icone: "🔁" },
+            { nome: "prática espaçada", icone: "📆" },
+            { nome: "pesquisa",         icone: "🔎" },
+        ],
+        corpo:          [
+            { nome: "força",              icone: "💪" },
+            { nome: "mobilidade",         icone: "🧘" },
+            { nome: "condicionamento",    icone: "🏃" },
+            { nome: "técnica de execução",icone: "🎯" },
+        ],
+        espiritualidade:[
+            { nome: "meditação",   icone: "🧘" },
+            { nome: "oração",      icone: "🙏" },
+            { nome: "leitura",     icone: "📖" },
+            { nome: "silêncio",    icone: "🤫" },
+            { nome: "gratidão",    icone: "✨" },
+        ],
+        relacoes:       [
+            { nome: "escuta",          icone: "👂" },
+            { nome: "conversa difícil",icone: "💬" },
+            { nome: "presença",        icone: "🧭" },
+            { nome: "vulnerabilidade", icone: "💚" },
+            { nome: "limites",         icone: "🚧" },
+        ],
+        projetos:       [
+            { nome: "planejamento",  icone: "🗺️" },
+            { nome: "execução",      icone: "⚙️" },
+            { nome: "revisão",       icone: "🔁" },
+            { nome: "comunicação",   icone: "📢" },
+            { nome: "foco",          icone: "🎯" },
+        ],
+    };
         const estado = {
         tipo: "livro",
         subAba: "estudar",
@@ -974,6 +1058,8 @@
         arsenalBusca: "",
         arsenalSkillAberta: null,
         arsenalFrenteExpandida: null,
+        arsenalFormAberto: false,       // true → mostra form de nova skill
+        arsenalEditandoId: null,        // id da skill sendo editada | null
     };
     const esc = Storage.escapeHTML;
     function el(id) { return document.getElementById(id); }
@@ -1176,6 +1262,8 @@
         }
 
         wrap.innerHTML = `
+            <div id="formSkillWrap">${estado.arsenalFormAberto ? renderFormSkill() : ""}</div>
+
             <div class="arsenal-stats">
                 <div><strong>${ativas.length}</strong> ${ativas.length === 1 ? "skill" : "skills"}</div>
                 <div>·</div>
@@ -1243,15 +1331,203 @@
                 renderArsenal();
             });
         });
+
+        // form de nova skill / edição
+        if (estado.arsenalFormAberto) ligarFormSkill(wrap);
+    }
+        function abrirFormNovaSkill() {
+        estado.arsenalFormAberto = true;
+        estado.arsenalEditandoId = null;
+        renderArsenal();
     }
 
-    function abrirFormNovaSkill() {
-        const nome = prompt("Nome da skill (ex.: Violão, Inglês, Copywriting):", "");
-        if (!nome) return;
-        const icone = (prompt("Ícone (emoji, opcional):", "🛠️") || "🛠️").trim() || "🛠️";
-        Storage.pratica.skills.criar({ nome, icone });
-        estado.arsenalSkillAberta = null;
-        render();
+    function fecharFormSkill() {
+        estado.arsenalFormAberto = false;
+        estado.arsenalEditandoId = null;
+        renderArsenal();
+    }
+
+    function renderFormSkill() {
+        const editando = estado.arsenalEditandoId
+            ? Storage.pratica.skills.ler(estado.arsenalEditandoId)
+            : null;
+
+        const skillBase = editando || { nome: "", icone: "🛠️", area: "estudo" };
+        const frentesExistentes = editando ? editando.frentes : [];
+
+        // por padrão, todas as frentes do template ficam marcadas pra criação
+        // (ou, se editando, só as do template que AINDA não existem ficam marcadas)
+        const nomesExistentes = frentesExistentes.map(f => f.nome.toLowerCase());
+
+        const areas = [
+            { id: "trabalho",        label: "💼 Trabalho" },
+            { id: "negocio",         label: "💰 Negócio" },
+            { id: "estudo",          label: "🧠 Estudo" },
+            { id: "corpo",           label: "🏋️ Corpo" },
+            { id: "espiritualidade", label: "🙏 Espiritualidade" },
+            { id: "relacoes",        label: "👥 Relações" },
+            { id: "projetos",        label: "🎯 Projetos" },
+        ];
+
+        return `
+            <div class="form-skill">
+                <div class="form-skill-cabecalho">
+                    <span class="form-skill-titulo">${editando ? "Editar skill" : "Nova skill"}</span>
+                    <button class="bloco-remover" id="btnFecharFormSkill" title="Fechar">×</button>
+                </div>
+
+                <div class="linha-dupla">
+                    <div style="flex:0 0 80px;">
+                        <label class="campo-label">Ícone</label>
+                        <input type="text" id="fsIcone" value="${esc(skillBase.icone)}" maxlength="4" style="text-align:center;font-size:20px;">
+                    </div>
+                    <div>
+                        <label class="campo-label">Nome</label>
+                        <input type="text" id="fsNome" value="${esc(skillBase.nome)}" placeholder="Ex.: Violão, Inglês, Copywriting">
+                    </div>
+                </div>
+
+                <label class="campo-label">Área</label>
+                <select id="fsArea">
+                    ${areas.map(a => `
+                        <option value="${a.id}" ${skillBase.area === a.id ? "selected" : ""}>${a.label}</option>
+                    `).join("")}
+                </select>
+
+                ${!editando ? `
+                    <label class="campo-label">Frentes sugeridas (clica pra marcar/desmarcar)</label>
+                    <div class="chips" id="fsFrentes"></div>
+                    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+                        <input type="text" id="fsNovaFrente" placeholder="adicionar frente custom…" style="flex:1;min-width:140px;">
+                        <button class="btn-secundario" id="btnAddFrenteCustom" type="button">+ adicionar</button>
+                    </div>
+                ` : `
+                    <label class="campo-label" style="margin-top:14px;">Frentes existentes</label>
+                    <div class="chips" style="opacity:0.6;">
+                        ${frentesExistentes.length
+                            ? frentesExistentes.map(f => `<span class="chip" style="cursor:default;">${esc(f.icone)} ${esc(f.nome)}</span>`).join("")
+                            : `<span style="font-size:12px;color:#666;">Nenhuma ainda — adicione no detalhe da skill.</span>`}
+                    </div>
+                `}
+
+                <div style="margin-top:18px;text-align:right;display:flex;gap:8px;justify-content:flex-end;">
+                    <button class="btn-secundario" id="btnCancelarFormSkill" type="button">Cancelar</button>
+                    <button class="btn-primario" id="btnSalvarFormSkill" type="button">${editando ? "Salvar" : "Criar skill"}</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function ligarFormSkill(wrap) {
+        const editando = estado.arsenalEditandoId;
+
+        // seleção de frentes (só no modo novo)
+        const selecionadas = new Set();
+        if (!editando) {
+            const skillBase = Storage.pratica.skills.ler(estado.arsenalEditandoId);
+            const areaInicial = "estudo";
+            (TEMPLATES_FRENTES[areaInicial] || []).forEach(t => selecionadas.add(t.nome.toLowerCase()));
+        }
+
+        const elFrentes = wrap.querySelector("#fsFrentes");
+        const elArea    = wrap.querySelector("#fsArea");
+
+        function redesenharFrentes() {
+            if (!elFrentes) return;
+            const area = elArea.value;
+            const lista = TEMPLATES_FRENTES[area] || [];
+            elFrentes.innerHTML = lista.map(t => {
+                const ativo = selecionadas.has(t.nome.toLowerCase());
+                return `<div class="chip${ativo ? " selecionado" : ""}" data-frente-nome="${esc(t.nome)}" data-frente-icone="${esc(t.icone)}">${esc(t.icone)} ${esc(t.nome)}</div>`;
+            }).join("");
+
+            elFrentes.querySelectorAll(".chip").forEach(c => {
+                c.addEventListener("click", () => {
+                    const nome = c.dataset.frenteNome;
+                    const key = nome.toLowerCase();
+                    if (selecionadas.has(key)) {
+                        selecionadas.delete(key);
+                        c.classList.remove("selecionado");
+                    } else {
+                        selecionadas.add(key);
+                        c.classList.add("selecionado");
+                    }
+                });
+            });
+        }
+
+        if (!editando) {
+            // area inicial = estudo
+            elArea.value = "estudo";
+            redesenharFrentes();
+
+            elArea.addEventListener("change", () => {
+                selecionadas.clear();
+                (TEMPLATES_FRENTES[elArea.value] || []).forEach(t => selecionadas.add(t.nome.toLowerCase()));
+                redesenharFrentes();
+            });
+
+            wrap.querySelector("#btnAddFrenteCustom")?.addEventListener("click", () => {
+                const input = wrap.querySelector("#fsNovaFrente");
+                const nome = (input.value || "").trim();
+                if (!nome) return;
+                const icone = "🎯";
+                const key = nome.toLowerCase();
+                if (!selecionadas.has(key)) {
+                    selecionadas.add(key);
+                    // injeta chip custom visual
+                    const chip = document.createElement("div");
+                    chip.className = "chip selecionado";
+                    chip.dataset.frenteNome = nome;
+                    chip.dataset.frenteIcone = icone;
+                    chip.innerHTML = `${icone} ${esc(nome)}`;
+                    chip.addEventListener("click", () => {
+                        selecionadas.delete(key);
+                        chip.remove();
+                    });
+                    elFrentes.appendChild(chip);
+                }
+                input.value = "";
+            });
+        }
+
+        // fechar / cancelar
+        wrap.querySelector("#btnFecharFormSkill")?.addEventListener("click", fecharFormSkill);
+        wrap.querySelector("#btnCancelarFormSkill")?.addEventListener("click", fecharFormSkill);
+
+        // salvar
+        wrap.querySelector("#btnSalvarFormSkill")?.addEventListener("click", () => {
+            const nome = (wrap.querySelector("#fsNome").value || "").trim();
+            if (!nome) return alert("Dá um nome pra skill.");
+            const icone = (wrap.querySelector("#fsIcone").value || "🛠️").trim() || "🛠️";
+            const area  = wrap.querySelector("#fsArea").value;
+
+            if (editando) {
+                Storage.pratica.skills.atualizar(editando, { nome, icone, area });
+            } else {
+                // cria skill
+                const skill = Storage.pratica.skills.criar({ nome, icone, area });
+
+                // adiciona frentes selecionadas
+                const chips = wrap.querySelectorAll("#fsFrentes .chip.selecionado, #fsFrentes .chip");
+                const vistas = new Set();
+                chips.forEach(c => {
+                    if (!c.classList.contains("selecionado")) return;
+                    const n = c.dataset.frenteNome;
+                    const key = (n || "").toLowerCase();
+                    if (!n || vistas.has(key)) return;
+                    vistas.add(key);
+                    Storage.pratica.skills.adicionarFrente(skill.id, {
+                        nome: n,
+                        icone: c.dataset.frenteIcone || "🎯"
+                    });
+                });
+            }
+
+            estado.arsenalFormAberto = false;
+            estado.arsenalEditandoId = null;
+            renderArsenal();
+        });
     }
 
         function renderDetalheSkill(skill) {
@@ -1272,10 +1548,10 @@
             <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
                 <button class="btn-secundario" id="btnVoltarArsenal">← Arsenal</button>
                 <div style="flex:1;"></div>
+                <button class="btn-secundario" id="btnEditarSkill">Editar</button>
                 <button class="btn-secundario" id="btnArquivarSkill">${skill.arquivada ? "Desarquivar" : "Arquivar"}</button>
                 <button class="btn-secundario" id="btnRemoverSkill" style="color:#d45a5a;">Remover</button>
             </div>
-
             <div class="skill-detalhe-cabecalho">
                 <span class="skill-detalhe-icone">${esc(skill.icone)}</span>
                 <div style="flex:1;min-width:0;">
@@ -1330,6 +1606,13 @@
         wrap.querySelector("#btnVoltarArsenal").addEventListener("click", () => {
             estado.arsenalSkillAberta = null;
             estado.arsenalFrenteExpandida = null;
+            renderArsenal();
+        });
+
+        wrap.querySelector("#btnEditarSkill").addEventListener("click", () => {
+            estado.arsenalSkillAberta = null;
+            estado.arsenalFormAberto = true;
+            estado.arsenalEditandoId = skill.id;
             renderArsenal();
         });
 
