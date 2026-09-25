@@ -181,6 +181,110 @@
         .link-subpagina:hover { background: #1e1e22; border-color: #3a3a40; }
         .link-subpagina h2 { font-size: 17px; margin-bottom: 5px; }
         .link-subpagina p { color: #999; font-size: 13px; }
+
+        /* ---------- Frentes exigidas (Trabalho ↔ Prática) ---------- */
+        .tarefa-wrapper { margin-bottom: 8px; }
+
+        .tarefa-frentes {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            margin: 4px 0 0 30px;
+        }
+
+        .frente-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px 4px 10px;
+            background: #1a2233;
+            border: 1px solid #2c3a55;
+            color: #a8c4e8;
+            border-radius: 14px;
+            font-size: 11px;
+        }
+        .frente-chip.alerta {
+            background: #331f1f;
+            border-color: #d45a5a;
+            color: #e08b8b;
+        }
+        .frente-chip .frente-gap {
+            font-variant-numeric: tabular-nums;
+            opacity: 0.75;
+            font-size: 10px;
+        }
+        .frente-chip-rm {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 14px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0;
+            opacity: 0.55;
+        }
+        .frente-chip-rm:hover { opacity: 1; }
+
+        .btn-add-frente {
+            padding: 4px 10px;
+            font-size: 11px;
+            background: #17171a;
+            border: 1px dashed #333338;
+            color: #888;
+            border-radius: 14px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.15s;
+        }
+        .btn-add-frente:hover { border-color: #55555c; color: #ccc; }
+
+        .btn-estuda-antes {
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #1a2233;
+            border: 1px solid #2c3a55;
+            color: #dfe8ff;
+            border-radius: 14px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.15s;
+        }
+        .btn-estuda-antes:hover { background: #232f4a; border-color: #4a5c85; }
+
+        .frente-picker {
+            padding: 4px 10px;
+            font-size: 11px;
+            background: #17171a;
+            border: 1px solid #2c3a55;
+            color: #eaeaea;
+            border-radius: 10px;
+            font-family: inherit;
+            outline: none;
+        }
+        .frente-picker:focus { border-color: #4a5c85; }
+
+        .estuda-antes-ok {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 20px;
+            background: #172017;
+            border: 1px solid #2e5a2e;
+            color: #a5d6a7;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 10000;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            animation: popIn 0.25s ease;
+        }
+        @keyframes popIn {
+            from { opacity: 0; transform: translate(-50%, 8px); }
+            to   { opacity: 1; transform: translate(-50%, 0); }
+        }
     </style>
 </head>
 
@@ -564,6 +668,36 @@
             if (s) tarefas = JSON.parse(s);
         } catch (e) { tarefas = []; }
 
+        // ---------- Prática: skills e frentes disponíveis ----------
+        function obterSkillsAtivas() {
+            try {
+                if (typeof Storage !== "undefined" && Storage.pratica) {
+                    return Storage.pratica.skills.listarAtivas();
+                }
+            } catch (e) {}
+            return [];
+        }
+
+        function obterFrente(skillId, frenteId) {
+            const s = obterSkillsAtivas().find(x => x.id === skillId);
+            if (!s) return null;
+            const f = (s.frentes || []).find(x => x.id === frenteId);
+            return f ? { skill: s, frente: f } : null;
+        }
+
+        function calcularGapDaFrente(skillId, frenteId) {
+            try {
+                if (typeof Storage !== "undefined" && Storage.pratica) {
+                    const skill = Storage.pratica.skills.ler(skillId);
+                    if (!skill) return null;
+                    const frente = (skill.frentes || []).find(f => f.id === frenteId);
+                    if (!frente) return null;
+                    return Storage.pratica.derivados.gapPorFrente(skill, frente);
+                }
+            } catch (e) {}
+            return null;
+        }
+
         const listaTarefas = document.getElementById("listaTarefas");
         const contador = document.getElementById("contadorTarefas");
 
@@ -574,16 +708,19 @@
         function renderTarefas() {
 
             listaTarefas.innerHTML = "";
+            const skills = obterSkillsAtivas();
 
             tarefas.forEach((t, i) => {
+
+                const wrapper = document.createElement("div");
+                wrapper.className = "tarefa-wrapper";
 
                 const linha = document.createElement("div");
                 linha.className = "tarefa-linha" + (t.concluida ? " concluida" : "");
 
-                // Prioridade — 3 botões
+                // Prioridade
                 const prioGrupo = document.createElement("div");
                 prioGrupo.className = "prio-grupo";
-
                 ["alta", "media", "baixa"].forEach(p => {
                     const btn = document.createElement("button");
                     btn.type = "button";
@@ -597,7 +734,6 @@
                     });
                     prioGrupo.appendChild(btn);
                 });
-
                 linha.appendChild(prioGrupo);
 
                 // Texto
@@ -637,7 +773,78 @@
                 });
                 linha.appendChild(btnRem);
 
-                listaTarefas.appendChild(linha);
+                wrapper.appendChild(linha);
+
+                // ---------- Sub-linha: frentes exigidas ----------
+                const frentes = t.frentes_exigidas || [];
+
+                const sub = document.createElement("div");
+                sub.className = "tarefa-frentes";
+
+                if (frentes.length) {
+                    frentes.forEach(fx => {
+                        const info = obterFrente(fx.skillId, fx.frenteId);
+                        if (!info) return;
+
+                        const gap = calcularGapDaFrente(fx.skillId, fx.frenteId);
+                        const alerta = gap !== null && gap > 50;
+
+                        const chip = document.createElement("span");
+                        chip.className = "frente-chip" + (alerta ? " alerta" : "");
+                        chip.title = gap !== null
+                            ? `gap ${gap}%${alerta ? " — você não domina isso ainda" : ""}`
+                            : "sem marco ativo";
+                        chip.innerHTML = `
+                            ${escFrente(info.frente.icone)} ${escFrente(info.frente.nome)}
+                            ${gap !== null ? `<span class="frente-gap">${gap}%</span>` : ""}
+                            <button type="button" class="frente-chip-rm" data-rm-frente="${i}:${escFrente(fx.skillId)}:${escFrente(fx.frenteId)}">×</button>
+                        `;
+                        sub.appendChild(chip);
+                    });
+
+                    // botão "Estuda antes" se tem alguma frente com alerta
+                    const precisaEstudar = frentes.some(fx => {
+                        const g = calcularGapDaFrente(fx.skillId, fx.frenteId);
+                        return g !== null && g > 50;
+                    });
+                    if (precisaEstudar) {
+                        const btn = document.createElement("button");
+                        btn.type = "button";
+                        btn.className = "btn-estuda-antes";
+                        btn.textContent = "📚 Estuda antes";
+                        btn.title = "Cria um aprendizado vinculado pra você treinar essa frente";
+                        btn.addEventListener("click", () => abrirEstudaAntes(i));
+                        sub.appendChild(btn);
+                    }
+                }
+
+                // botão de adicionar frente
+                if (skills.length) {
+                    const btnAdd = document.createElement("button");
+                    btnAdd.type = "button";
+                    btnAdd.className = "btn-add-frente";
+                    btnAdd.textContent = frentes.length ? "＋" : "🎯 vincular frente";
+                    btnAdd.addEventListener("click", () => mostrarPickerFrentes(sub, i));
+                    sub.appendChild(btnAdd);
+                }
+
+                wrapper.appendChild(sub);
+                listaTarefas.appendChild(wrapper);
+            });
+
+            // handlers de remover frente
+            listaTarefas.querySelectorAll("[data-rm-frente]").forEach(btn => {
+                btn.addEventListener("click", (ev) => {
+                    ev.stopPropagation();
+                    const [idx, sid, fid] = btn.dataset.rmFrente.split(":");
+                    const tarefa = tarefas[Number(idx)];
+                    if (!tarefa || !tarefa.frentes_exigidas) return;
+                    tarefa.frentes_exigidas = tarefa.frentes_exigidas.filter(
+                        fx => !(fx.skillId === sid && fx.frenteId === fid)
+                    );
+                    salvarTarefas();
+                    renderTarefas();
+                });
             });
 
             // Contador
@@ -645,6 +852,97 @@
             contador.textContent = tarefas.length === 0
                 ? ""
                 : `${feitas}/${tarefas.length} concluídas`;
+        }
+
+        function escFrente(s) {
+            return String(s ?? "").replace(/[&<>"']/g, c => ({
+                "&": "&amp;", "<": "&lt;", ">": "&gt;",
+                '"': "&quot;", "'": "&#39;"
+            }[c]));
+        }
+
+        function mostrarPickerFrentes(subEl, tarefaIdx) {
+            // remove picker aberto antes
+            subEl.querySelectorAll(".frente-picker").forEach(p => p.remove());
+
+            const skills = obterSkillsAtivas();
+            const picker = document.createElement("select");
+            picker.className = "frente-picker";
+            picker.innerHTML = `<option value="">— escolha skill · frente —</option>` +
+                skills.map(s => {
+                    const frentes = (s.frentes || []).filter(f => !f.arquivada);
+                    if (!frentes.length) return "";
+                    return `<optgroup label="${escFrente(s.icone + " " + s.nome)}">` +
+                        frentes.map(f => {
+                            const gap = calcularGapDaFrente(s.id, f.id);
+                            const gapTxt = gap !== null ? ` (gap ${gap}%)` : "";
+                            return `<option value="${escFrente(s.id)}::${escFrente(f.id)}">${escFrente(f.icone + " " + f.nome)}${gapTxt}</option>`;
+                        }).join("") +
+                    `</optgroup>`;
+                }).join("");
+
+            picker.addEventListener("change", () => {
+                const v = picker.value;
+                if (!v) { picker.remove(); return; }
+                const [skillId, frenteId] = v.split("::");
+                const t = tarefas[tarefaIdx];
+                t.frentes_exigidas = t.frentes_exigidas || [];
+                if (!t.frentes_exigidas.some(fx => fx.skillId === skillId && fx.frenteId === frenteId)) {
+                    t.frentes_exigidas.push({ skillId, frenteId });
+                }
+                salvarTarefas();
+                renderTarefas();
+            });
+
+            subEl.appendChild(picker);
+            picker.focus();
+        }
+
+        function abrirEstudaAntes(tarefaIdx) {
+            const t = tarefas[tarefaIdx];
+            if (!t || !t.frentes_exigidas || !t.frentes_exigidas.length) return;
+
+            // pega a frente com maior gap
+            let alvo = null, maiorGap = -1;
+            t.frentes_exigidas.forEach(fx => {
+                const g = calcularGapDaFrente(fx.skillId, fx.frenteId);
+                if (g !== null && g > maiorGap) {
+                    maiorGap = g;
+                    alvo = fx;
+                }
+            });
+            if (!alvo) return;
+
+            const info = obterFrente(alvo.skillId, alvo.frenteId);
+            if (!info) return;
+
+            const texto = `Estudar "${info.frente.nome}" pra tarefa: ${t.texto || "(sem texto)"}`;
+
+            try {
+                if (typeof Storage !== "undefined" && Storage.pratica) {
+                    Storage.aprendizados.adicionar({
+                        texto,
+                        fonte: `Trabalho: ${t.texto || ""}`,
+                        status: "testando",
+                        tipo: "tecnica",
+                        areas: ["trabalho"],
+                        impacto: "alto",
+                        vinculo_pratica: {
+                            skillId: alvo.skillId,
+                            frenteId: alvo.frenteId,
+                            marcoId: null,
+                            vinculado_em: Date.now()
+                        }
+                    });
+                    const b = document.createElement("div");
+                    b.className = "estuda-antes-ok";
+                    b.textContent = `✅ Aprendizado criado pra "${info.frente.nome}". O Treinador vai sugerir.`;
+                    document.body.appendChild(b);
+                    setTimeout(() => b.remove(), 3500);
+                }
+            } catch (e) {
+                console.warn("Falha ao criar aprendizado", e);
+            }
         }
 
         document.getElementById("btnAddTarefa").addEventListener("click", () => {
@@ -663,7 +961,11 @@
         renderTarefas();
     </script>
 
+<script src="../../js/storage.js"></script>
 <script src="../../js/app.js"></script>
+
+</body>
+</html>
     
 </body>
 </html>
