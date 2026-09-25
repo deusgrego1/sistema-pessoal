@@ -1830,6 +1830,17 @@
             <label class="campo-label">Reps previstas (opcional)</label>
             <input type="text" data-campo="reps_previstas" value="${esc(b.reps_previstas)}" placeholder="Ex.: 20 repetições, 3 séries">
 
+            ${b.skillId && b.frenteId ? `
+                <div style="margin-top:14px;">
+                    <button class="btn-primario" data-iniciar-foco="1" style="width:100%;">
+                        ▶ Iniciar sessão de foco
+                    </button>
+                    <div style="font-size:11px;color:#666;text-align:center;margin-top:6px;">
+                        Abre o timer já vinculado. Ao encerrar, o tempo volta pra cá.
+                    </div>
+                </div>
+            ` : ""}
+
             <div class="secao-titulo" style="margin-top:22px;">▶️ Durante</div>
 
             <label class="campo-label">Tempo real</label>
@@ -1950,6 +1961,23 @@
             const blocos = Storage.blocos.ler("pratica", dataAtual).filter(x => x.id !== b.id);
             Storage.blocos.salvar("pratica", dataAtual, blocos);
             render();
+        });
+
+        // --- iniciar sessão de foco ---
+        elBloco.querySelector("[data-iniciar-foco]")?.addEventListener("click", () => {
+            // garante que o bloco está salvo antes de sair
+            const blocos = Storage.blocos.ler("pratica", dataAtual);
+            const i = blocos.findIndex(x => x.id === b.id);
+            if (i < 0) return;
+
+            const params = new URLSearchParams({
+                origem: "pratica",
+                skillId: b.skillId,
+                frenteId: b.frenteId,
+                blocoId: b.id,
+                data: dataAtual,
+            });
+            window.location.href = `../foco/foco.html?${params.toString()}`;
         });
 
         return elBloco;
@@ -5441,6 +5469,57 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
         renderTipos();
         renderSubAbas();
         renderConteudo();
+    }
+
+    // ==================================================
+    // RETORNO DO FOCO — aplica tempo/notas nos blocos
+    // ==================================================
+    function aplicarRetornosFoco() {
+        const prefixo = "estudo_foco_retorno_";
+        const aplicar = [];
+
+        for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (!k || !k.startsWith(prefixo)) continue;
+            const blocoId = k.slice(prefixo.length);
+            let pacote = null;
+            try { pacote = JSON.parse(localStorage.getItem(k)); } catch {}
+            if (pacote) aplicar.push({ chave: k, blocoId, pacote });
+        }
+
+        if (!aplicar.length) return;
+
+        // aplica em todos os blocos possíveis (procura em todas as datas)
+        aplicar.forEach(({ chave, blocoId, pacote }) => {
+            for (let d = 0; d < localStorage.length; d++) {
+                const ck = localStorage.key(d);
+                if (!ck || !ck.startsWith("estudo_") || !ck.endsWith("_pratica_blocos")) continue;
+                let blocos = [];
+                try { blocos = JSON.parse(localStorage.getItem(ck)) || []; } catch {}
+                const i = blocos.findIndex(x => x.id === blocoId);
+                if (i < 0) continue;
+
+                if (pacote.tempo_real_min) blocos[i].tempo_real_min = pacote.tempo_real_min;
+                if (pacote.pausas)          blocos[i].pausas = pacote.pausas;
+                if (pacote.distracoes)      blocos[i].distracoes = pacote.distracoes;
+                if (pacote.notas && !blocos[i].o_que_funcionou) {
+                    blocos[i].o_que_funcionou = pacote.notas;
+                }
+
+                localStorage.setItem(ck, JSON.stringify(blocos));
+            }
+            localStorage.removeItem(chave);
+        });
+
+        console.log(`[foco] ${aplicar.length} retorno(s) aplicado(s).`);
+    }
+
+    aplicarRetornosFoco();
+
+    // volta automaticamente pra Praticar hoje se veio do foco
+    if (paramsURL.get("origem") === "foco") {
+        estado.tipo = "pratica";
+        estado.subAba = "praticar";
     }
 
     render();
