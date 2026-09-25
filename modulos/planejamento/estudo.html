@@ -975,6 +975,104 @@
             font-weight: 600;
             line-height: 1.3;
         }
+
+        /* ---------- Treinador ---------- */
+        .treinador { margin-bottom: 20px; }
+        .treinador-cabecalho {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+        .treinador-titulo {
+            font-size: 11px;
+            color: #4caf50;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
+        .treinador-sub {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .treinador-sugestoes {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sugestao-card {
+            background: #1c1c20;
+            border: 1px solid #2a2a30;
+            border-left: 3px solid #4caf50;
+            border-radius: 10px;
+            padding: 14px;
+            transition: 0.15s;
+        }
+        .sugestao-card:hover { background: #22222a; }
+
+        .sugestao-cabecalho {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .sugestao-icone {
+            font-size: 24px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .sugestao-titulo {
+            font-size: 14px;
+            color: #eaeaea;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        .sugestao-frente { color: #888; font-weight: 500; }
+        .sugestao-temp { margin-left: 4px; }
+        .sugestao-meta {
+            font-size: 11px;
+            color: #777;
+            margin-top: 2px;
+        }
+        .sugestao-alvo {
+            font-size: 13px;
+            color: #c5e1a5;
+            padding: 8px 10px;
+            background: #172017;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .sugestao-razoes {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .razao {
+            font-size: 10px;
+            padding: 2px 8px;
+            background: #252529;
+            color: #a0a0a0;
+            border-radius: 10px;
+            text-transform: lowercase;
+        }
+        .sugestao-acoes {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .treinador-rodape {
+            display: flex;
+            justify-content: center;
+            padding: 16px 0;
+            border-top: 1px solid #252529;
+            margin-top: 14px;
+        }
     </style>
 </head>
 
@@ -1099,12 +1197,54 @@
         arsenalEditandoId: null,        // id da skill sendo editada | null
     };
     const esc = Storage.escapeHTML;
-    function el(id) { return document.getElementById(id); }
+        function el(id) { return document.getElementById(id); }
     function uid(p) { return `${p}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`; }
     function temConteudoHoje(tipo) {
         return Storage.blocos.ler(tipo, dataAtual).length > 0;
     }
 
+    // ==================================================
+    // TREINADOR — helpers de rejeição
+    // ==================================================
+    const CHAVE_TREINADOR_REJEITADAS = "estudo_treinador_rejeitadas";
+
+    function obterRejeitadas() {
+        try { return JSON.parse(localStorage.getItem(CHAVE_TREINADOR_REJEITADAS)) || {}; }
+        catch { return {}; }
+    }
+    function rejeitarSugestao(skillId, frenteId) {
+        const rej = obterRejeitadas();
+        rej[`${skillId}::${frenteId}`] = Date.now();
+        localStorage.setItem(CHAVE_TREINADOR_REJEITADAS, JSON.stringify(rej));
+    }
+    function foiRejeitadaHoje(skillId, frenteId) {
+        const rej = obterRejeitadas();
+        const ts = rej[`${skillId}::${frenteId}`];
+        if (!ts) return false;
+        const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+        return ts >= hoje.getTime();
+    }
+    function limparRejeicoesAntigas() {
+        const rej = obterRejeitadas();
+        const ontem = new Date(); ontem.setHours(0, 0, 0, 0);
+        const corte = ontem.getTime();
+        Object.keys(rej).forEach(k => { if (rej[k] < corte) delete rej[k]; });
+        localStorage.setItem(CHAVE_TREINADOR_REJEITADAS, JSON.stringify(rej));
+    }
+
+    // lê todos os blocos de prática do localStorage
+    function lerTodosBlocosPratica() {
+        const out = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (!k.startsWith("estudo_") || !k.endsWith("_pratica_blocos")) continue;
+            try {
+                const arr = JSON.parse(localStorage.getItem(k));
+                if (Array.isArray(arr)) arr.forEach(b => out.push(b));
+            } catch {}
+        }
+        return out;
+    }
     // ==================================================
     // RESUMO / TIPOS / SUB-ABAS / CONTEÚDO
     // ==================================================
@@ -1226,7 +1366,194 @@
     // ==================================================
     // PRÁTICA — casca (Partes 6+ preenchem o conteúdo real)
     // ==================================================
-        function renderPraticarHoje() {
+            // ==================================================
+    // TREINADOR — cálculo de score
+    // ==================================================
+    function calcularSugestoesTreinador() {
+        limparRejeicoesAntigas();
+
+        const skills = Storage.pratica.derivados.listarComDerivados();
+        const d = Storage.pratica.derivados;
+        const blocosHoje = Storage.blocos.ler("pratica", dataAtual);
+        const skillsJaFeitas = new Set(blocosHoje.map(b => b.skillId).filter(Boolean));
+
+        // pontos fracos registrados por frente (últimos 7 dias)
+        const pontosFracos = {};
+        const todos = lerTodosBlocosPratica();
+        const corte = Date.now() - 7 * 86400000;
+        todos.forEach(b => {
+            if (!b.ponto_fraco || !b.frenteId) return;
+            // data do bloco vem de criado_em, se houver
+            if (b.criado_em && b.criado_em < corte) return;
+            pontosFracos[b.frenteId] = (pontosFracos[b.frenteId] || 0) + 1;
+        });
+
+        const sugestoes = [];
+
+        skills.forEach(skill => {
+            if (skill.arquivada) return;
+            skill.frentes.forEach(frente => {
+                if (frente.arquivada) return;
+                if (frente.fase === "aprendendo") return;
+
+                const temp = d.temperaturaPorFrente(skill, frente);
+                const gap = d.gapPorFrente(skill, frente);
+                const marco = frente.marco_ativo ? skill.marcos[frente.marco_ativo] : null;
+
+                let score = 0;
+                const razoes = [];
+
+                // temperatura
+                if (temp.emoji === "🧊") { score += 20; razoes.push(`congelada há ${temp.dias}d`); }
+                else if (temp.emoji === "❄️") { score += 15; razoes.push(`fria há ${temp.dias}d`); }
+                else if (temp.emoji === "🌤") { score += 10; razoes.push(`morna`); }
+                else if (temp.emoji === "🔥") { score += 5; razoes.push(`quente`); }
+                else { score += 8; razoes.push(`nova`); }
+
+                // gap / marco quase fechando
+                if (gap !== null) {
+                    if (gap < 15) { score += 25; razoes.push(`marco a ${100 - gap}% — quase!`); }
+                    else if (gap > 50) { score += 10; razoes.push(`gap alto (${gap}%)`); }
+                }
+
+                // ponto fraco registrado
+                if (pontosFracos[frente.id]) {
+                    score += 15;
+                    razoes.push(`ponto fraco recente`);
+                }
+
+                // já fez sessão dessa skill hoje
+                if (skillsJaFeitas.has(skill.id)) score -= 20;
+
+                // rejeitada hoje
+                if (foiRejeitadaHoje(skill.id, frente.id)) score -= 50;
+
+                let tempo = 25;
+                if (temp.emoji === "🧊") tempo = 5;
+                else if (temp.emoji === "❄️") tempo = 15;
+
+                let alvo = "";
+                if (marco) alvo = `Avançar em "${marco.titulo}"`;
+
+                sugestoes.push({
+                    skillId: skill.id,
+                    skillNome: skill.nome,
+                    skillIcone: skill.icone,
+                    frenteId: frente.id,
+                    frenteNome: frente.nome,
+                    frenteIcone: frente.icone,
+                    marco,
+                    temp,
+                    gap,
+                    score,
+                    razoes,
+                    tempo,
+                    alvo,
+                });
+            });
+        });
+
+        sugestoes.sort((a, b) => b.score - a.score);
+        return sugestoes.slice(0, 4);
+    }
+
+    function aceitarSugestao(sug) {
+        const blocos = Storage.blocos.ler("pratica", dataAtual);
+        blocos.push({
+            id: uid("blk"),
+            skillId: sug.skillId,
+            frenteId: sug.frenteId,
+            alvo_sessao: sug.alvo || "",
+            tempo_previsto_min: sug.tempo,
+            reps_previstas: "",
+            tempo_real_min: 0,
+            reps_realizadas: "",
+            energia: "",
+            dificuldade: "",
+            ponto_fraco: "",
+            feedback_fonte: "",
+            feedback_nota: "",
+            feedback_texto: "",
+            o_que_funcionou: "",
+            proxima_acao: "",
+            midia_url: "",
+            criado_em: Date.now(),
+        });
+        Storage.blocos.salvar("pratica", dataAtual, blocos);
+        render();
+    }
+
+    function renderSugestoesTreinador() {
+        const sugestoes = calcularSugestoesTreinador();
+
+        if (!sugestoes.length) {
+            return `
+                <div class="vazio">
+                    <div style="font-size:36px; margin-bottom:10px;">🛠️</div>
+                    <div>Sem sugestões por agora.</div>
+                    <p style="font-size:13px; color:#666; margin-top:8px;">
+                        Crie skills no <strong>Arsenal</strong> ou adicione uma sessão manual abaixo.
+                    </p>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="treinador">
+                <div class="treinador-cabecalho">
+                    <span class="treinador-titulo">🧭 Seu plano de hoje</span>
+                    <span class="treinador-sub">baseado em temperatura, gap e histórico</span>
+                </div>
+                <div class="treinador-sugestoes">
+                    ${sugestoes.map((s, i) => renderSugestaoCard(s, i)).join("")}
+                </div>
+            </div>
+        `;
+    }
+
+    function renderSugestaoCard(s, idx) {
+        const tempEmoji = s.temp.emoji || "🆕";
+        const gapTxt = s.gap === null ? "—" : s.gap + "%";
+        const alvoTxt = s.alvo || "(defina o alvo)";
+        const modo5 = s.tempo === 5;
+
+        return `
+            <div class="sugestao-card" data-idx="${idx}">
+                <div class="sugestao-cabecalho">
+                    <span class="sugestao-icone">${esc(s.skillIcone)}</span>
+                    <div style="flex:1;min-width:0;">
+                        <div class="sugestao-titulo">${esc(s.skillNome)} <span class="sugestao-frente">· ${esc(s.frenteNome)}</span> <span class="sugestao-temp">${tempEmoji}</span></div>
+                        <div class="sugestao-meta">gap ${gapTxt} · ${s.tempo} min${modo5 ? " (modo leve)" : ""}</div>
+                    </div>
+                </div>
+                <div class="sugestao-alvo">→ ${esc(alvoTxt)}</div>
+                ${s.razoes.length ? `<div class="sugestao-razoes">${s.razoes.map(r => `<span class="razao">${esc(r)}</span>`).join("")}</div>` : ""}
+                <div class="sugestao-acoes">
+                    <button class="btn-primario" data-aceitar="${idx}">Aceitar</button>
+                    <button class="btn-secundario" data-tirar="${idx}">Tirar</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function ligarSugestoesTreinador(wrap, sugestoes) {
+        wrap.querySelectorAll("[data-aceitar]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const s = sugestoes[Number(btn.dataset.aceitar)];
+                if (s) aceitarSugestao(s);
+            });
+        });
+        wrap.querySelectorAll("[data-tirar]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const s = sugestoes[Number(btn.dataset.tirar)];
+                if (!s) return;
+                rejeitarSugestao(s.skillId, s.frenteId);
+                render();
+            });
+        });
+    }
+
+    function renderPraticarHoje() {
         const blocos = Storage.blocos.ler("pratica", dataAtual);
         const wrap = el("conteudo");
         wrap.innerHTML = "";
@@ -1242,6 +1569,23 @@
                     </p>
                 </div>
             `;
+            return;
+        }
+
+        if (blocos.length === 0) {
+            const sugestoes = calcularSugestoesTreinador();
+            const treinadorHtml = renderSugestoesTreinador();
+
+            wrap.innerHTML = `
+                ${treinadorHtml}
+                <div class="treinador-rodape">
+                    <button class="btn-secundario" id="btnAddPraticaManual">+ Adicionar sessão manual</button>
+                </div>
+            `;
+
+            ligarSugestoesTreinador(wrap, sugestoes);
+
+            wrap.querySelector("#btnAddPraticaManual").addEventListener("click", addBlocoPratica);
             return;
         }
 
