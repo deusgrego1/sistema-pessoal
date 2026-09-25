@@ -589,11 +589,187 @@
             font-weight: 600;
             line-height: 1;
         }
-        .skill-detalhe-stats span {
+               .skill-detalhe-stats span {
             font-size: 11px;
             color: #777;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+        }
+
+        /* ---------- Norte ---------- */
+        .norte-card {
+            background: #19191d;
+            border: 1px solid #252529;
+            border-left: 3px solid #4caf50;
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+        .norte-titulo {
+            font-size: 11px;
+            color: #4caf50;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .norte-card .campo-label { margin-top: 10px; }
+        .norte-card .campo-label:first-of-type { margin-top: 0; }
+
+        /* ---------- Frentes ---------- */
+        .frentes-bloco { margin-top: 22px; }
+        .frentes-cabecalho {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .frentes-titulo {
+            font-size: 11px;
+            color: #4caf50;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
+
+        .frente-card {
+            background: #1c1c20;
+            border: 1px solid #2a2a30;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: 0.15s;
+        }
+        .frente-card.expandida { border-color: #3a3a45; }
+
+        .frente-cabecalho {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .frente-cabecalho:hover { background: #22222a; }
+        .frente-icone { font-size: 20px; line-height: 1; flex-shrink: 0; }
+        .frente-nome {
+            font-size: 14px;
+            color: #eaeaea;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+        .frente-temp { font-size: 13px; margin-left: 4px; }
+        .frente-meta {
+            font-size: 11px;
+            color: #888;
+            margin-top: 2px;
+        }
+        .frente-expandir {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0 6px;
+            flex-shrink: 0;
+        }
+        .frente-remover {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0 4px;
+            flex-shrink: 0;
+        }
+        .frente-remover:hover { color: #d45a5a; }
+
+        .frente-gap-bar {
+            height: 4px;
+            background: #252529;
+            overflow: hidden;
+        }
+        .frente-gap-bar > div {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #66bb6a);
+            transition: width 0.3s ease;
+        }
+
+        .frente-corpo {
+            padding: 12px 14px;
+            border-top: 1px solid #252529;
+            background: #17171b;
+        }
+
+        /* ---------- Marcos ---------- */
+        .marco-item {
+            padding: 10px 12px;
+            background: #1c1c20;
+            border: 1px solid #2a2a30;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .marco-item:hover { background: #22222a; border-color: #3a3a45; }
+        .marco-item.ativo {
+            border-color: #4caf50;
+            background: #172017;
+        }
+        .marco-linha-1 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .marco-radio {
+            color: #4caf50;
+            font-size: 14px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .marco-item:not(.ativo) .marco-radio { color: #555; }
+        .marco-titulo {
+            flex: 1;
+            font-size: 13px;
+            color: #eaeaea;
+            line-height: 1.3;
+            min-width: 0;
+        }
+        .marco-pct {
+            font-size: 12px;
+            color: #a5d6a7;
+            font-variant-numeric: tabular-nums;
+            flex-shrink: 0;
+        }
+        .marco-item:not(.ativo) .marco-pct { color: #888; }
+        .marco-remover {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0 4px;
+            flex-shrink: 0;
+        }
+        .marco-remover:hover { color: #d45a5a; }
+
+        .marco-bar {
+            height: 4px;
+            background: #252529;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+        .marco-bar > div {
+            height: 100%;
+            background: #4caf50;
+            transition: width 0.15s ease;
+        }
+        .marco-slider {
+            width: 100%;
+            margin: 0;
+            accent-color: #4caf50;
         }
     </style>
 </head>
@@ -664,6 +840,7 @@
         arsenalOrdem: "recentes",
         arsenalBusca: "",
         arsenalSkillAberta: null,
+        arsenalFrenteExpandida: null,
     };
     const esc = Storage.escapeHTML;
     function el(id) { return document.getElementById(id); }
@@ -944,7 +1121,7 @@
         render();
     }
 
-    function renderDetalheSkill(skill) {
+        function renderDetalheSkill(skill) {
         const wrap = el("conteudo");
         const d = skill._derivados || Storage.pratica.derivados.snapshotSkill(skill);
 
@@ -955,6 +1132,8 @@
         const streak = d.streak_atual || 0;
         const nivel = (d.nivel || "aprendiz");
         const nivelLabel = { aprendiz: "🔨 Aprendiz", artesao: "⚒️ Artesão", mestre: "🎯 Mestre", lenda: "👑 Lenda" }[nivel] || nivel;
+
+        const norte = skill.norte || {};
 
         wrap.innerHTML = `
             <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
@@ -979,16 +1158,41 @@
                 <div><strong>${streak > 0 ? "🔥 " + streak : "—"}</strong><span>streak</span></div>
             </div>
 
-            <div class="bloco-estudo" style="margin-top:20px;">
-                <div style="color:#888;font-size:13px;text-align:center;padding:20px;">
-                    🚧 <strong>Frentes, marcos, Bússola/Norte, mídias, pontos de virada e feedback</strong><br>
-                    serão adicionados na Parte 7.
+            <div class="norte-card">
+                <div class="norte-titulo">🧭 Norte</div>
+                <label class="campo-label">Objetivo final</label>
+                <input type="text" data-norte="objetivo_final" value="${esc(norte.objetivo_final || "")}" placeholder="Onde você quer chegar com essa skill?">
+                <label class="campo-label">Frase pessoal (opcional)</label>
+                <input type="text" data-norte="frase" value="${esc(norte.frase || "")}" placeholder="Uma frase que te lembra o porquê">
+            </div>
+
+            <div class="frentes-bloco">
+                <div class="frentes-cabecalho">
+                    <span class="frentes-titulo">Frentes</span>
+                    <button class="btn-secundario" id="btnNovaFrente">+ Nova frente</button>
                 </div>
+                ${skill.frentes.length
+                    ? skill.frentes.map(f => renderFrenteItem(skill, f)).join("")
+                    : `<div class="vazio" style="padding:20px;">Nenhuma frente ainda. Adicione a primeira.</div>`}
             </div>
         `;
 
+        // --- Norte: salva no input ---
+        wrap.querySelectorAll("[data-norte]").forEach(input => {
+            input.addEventListener("input", () => {
+                const campo = input.dataset.norte;
+                const skillAtual = Storage.pratica.skills.ler(skill.id);
+                const norteAtual = skillAtual.norte || {};
+                Storage.pratica.skills.atualizar(skill.id, {
+                    norte: { ...norteAtual, [campo]: input.value }
+                });
+            });
+        });
+
+        // --- Botões gerais ---
         wrap.querySelector("#btnVoltarArsenal").addEventListener("click", () => {
             estado.arsenalSkillAberta = null;
+            estado.arsenalFrenteExpandida = null;
             renderArsenal();
         });
 
@@ -1003,8 +1207,152 @@
             if (!confirm(`Remover "${skill.nome}"? Todos os marcos, mídias e histórico dessa skill serão apagados. Isso não pode ser desfeito.`)) return;
             Storage.pratica.skills.remover(skill.id);
             estado.arsenalSkillAberta = null;
+            estado.arsenalFrenteExpandida = null;
             renderArsenal();
         });
+
+        // --- Nova frente ---
+        wrap.querySelector("#btnNovaFrente").addEventListener("click", () => {
+            const nome = prompt("Nome da frente (ex.: técnica, speaking, headline):", "");
+            if (!nome) return;
+            const icone = (prompt("Ícone (emoji, opcional):", "🎯") || "🎯").trim() || "🎯";
+            Storage.pratica.skills.adicionarFrente(skill.id, { nome, icone });
+            renderArsenal();
+        });
+
+        // --- Frente: expandir/colapsar ---
+        wrap.querySelectorAll("[data-frente-toggle]").forEach(btn => {
+            btn.addEventListener("click", (ev) => {
+                ev.stopPropagation();
+                const fid = btn.dataset.frenteToggle;
+                estado.arsenalFrenteExpandida = (estado.arsenalFrenteExpandida === fid) ? null : fid;
+                renderArsenal();
+            });
+        });
+
+        // --- Frente: remover ---
+        wrap.querySelectorAll("[data-frente-remover]").forEach(btn => {
+            btn.addEventListener("click", (ev) => {
+                ev.stopPropagation();
+                const fid = btn.dataset.frenteRemover;
+                const fr = skill.frentes.find(f => f.id === fid);
+                if (!fr) return;
+                if (!confirm(`Remover a frente "${fr.nome}"? Os marcos dela também serão removidos.`)) return;
+                Storage.pratica.skills.removerFrente(skill.id, fid);
+                if (estado.arsenalFrenteExpandida === fid) estado.arsenalFrenteExpandida = null;
+                renderArsenal();
+            });
+        });
+
+        // --- Marco: definir como ativo ---
+        wrap.querySelectorAll("[data-marco-ativar]").forEach(row => {
+            row.addEventListener("click", () => {
+                const marcoId = row.dataset.marcoAtivar;
+                const frenteId = row.dataset.frenteId;
+                Storage.pratica.skills.definirMarcoAtivo(skill.id, frenteId, marcoId);
+                renderArsenal();
+            });
+        });
+
+        // --- Marco: slider de % ---
+        wrap.querySelectorAll("[data-marco-slider]").forEach(slider => {
+            slider.addEventListener("input", (ev) => {
+                ev.stopPropagation();
+                const marcoId = slider.dataset.marcoSlider;
+                const pct = Number(slider.value);
+                Storage.pratica.skills.atualizarMarco(skill.id, marcoId, { percentual: pct });
+                const label = slider.parentElement.querySelector(".marco-pct");
+                if (label) label.textContent = pct + "%";
+                const bar = slider.parentElement.querySelector(".marco-bar > div");
+                if (bar) bar.style.width = pct + "%";
+            });
+            slider.addEventListener("change", () => renderArsenal());
+        });
+
+        // --- Marco: remover ---
+        wrap.querySelectorAll("[data-marco-remover]").forEach(btn => {
+            btn.addEventListener("click", (ev) => {
+                ev.stopPropagation();
+                const marcoId = btn.dataset.marcoRemover;
+                if (!confirm("Remover este marco?")) return;
+                Storage.pratica.skills.removerMarco(skill.id, marcoId);
+                renderArsenal();
+            });
+        });
+
+        // --- Adicionar marco numa frente ---
+        wrap.querySelectorAll("[data-add-marco]").forEach(btn => {
+            btn.addEventListener("click", (ev) => {
+                ev.stopPropagation();
+                const fid = btn.dataset.addMarco;
+                const titulo = prompt("Título do marco (ex.: 'Blackbird inteira limpa'):", "");
+                if (!titulo) return;
+                Storage.pratica.skills.adicionarMarco(skill.id, { titulo, frente: fid });
+                renderArsenal();
+            });
+        });
+    }
+
+    function renderFrenteItem(skill, frente) {
+        const d = Storage.pratica.derivados;
+        const gap = d.gapPorFrente(skill, frente);
+        const temp = d.temperaturaPorFrente(skill, frente);
+        const nivel = d.nivelPorFrente(skill, frente);
+        const nivelLabel = { aprendiz: "🔨", artesao: "⚒️", mestre: "🎯", lenda: "👑" }[nivel] || "🔨";
+        const expandida = estado.arsenalFrenteExpandida === frente.id;
+
+        const gapTxt = gap === null ? "—" : gap + "%";
+        const gapPct = gap === null ? 0 : Math.max(0, Math.min(100, 100 - gap));
+        const tempEmoji = temp.emoji || "🆕";
+
+        const marcosIds = frente.marcos || [];
+        const marcos = marcosIds.map(id => skill.marcos[id]).filter(Boolean);
+        const ativo = frente.marco_ativo;
+
+        return `
+            <div class="frente-card ${expandida ? "expandida" : ""}">
+                <div class="frente-cabecalho" data-frente-toggle="${frente.id}">
+                    <span class="frente-icone">${esc(frente.icone)}</span>
+                    <div style="flex:1;min-width:0;">
+                        <div class="frente-nome">${esc(frente.nome)} <span class="frente-temp" title="Temperatura">${tempEmoji}</span></div>
+                        <div class="frente-meta">
+                            ${nivelLabel} ${marcos.length} marco${marcos.length === 1 ? "" : "s"} · gap ${gapTxt}
+                        </div>
+                    </div>
+                    <button class="frente-expandir" type="button" aria-label="Expandir">${expandida ? "▾" : "▸"}</button>
+                    <button class="frente-remover" type="button" data-frente-remover="${frente.id}" title="Remover frente">×</button>
+                </div>
+
+                <div class="frente-gap-bar">
+                    <div style="width:${gapPct}%"></div>
+                </div>
+
+                ${expandida ? `
+                    <div class="frente-corpo">
+                        ${marcos.length ? marcos.map(m => renderMarcoItem(skill, frente, m, ativo === m.id)).join("")
+                            : `<div style="color:#666;font-size:12px;padding:8px 0;">Nenhum marco ainda.</div>`}
+                        <button class="btn-secundario" data-add-marco="${frente.id}" style="margin-top:8px;">+ Adicionar marco</button>
+                    </div>
+                ` : ""}
+            </div>
+        `;
+    }
+
+    function renderMarcoItem(skill, frente, marco, ativo) {
+        const pct = Number(marco.percentual) || 0;
+        return `
+            <div class="marco-item ${ativo ? "ativo" : ""}" data-marco-ativar="${marco.id}" data-frente-id="${frente.id}" title="${ativo ? "Marco ativo" : "Clique para tornar ativo"}">
+                <div class="marco-linha-1">
+                    <span class="marco-radio">${ativo ? "●" : "○"}</span>
+                    <span class="marco-titulo">${esc(marco.titulo)}</span>
+                    <span class="marco-pct">${pct}%</span>
+                    <button class="marco-remover" type="button" data-marco-remover="${marco.id}" title="Remover">×</button>
+                </div>
+                <div class="marco-bar"><div style="width:${pct}%"></div></div>
+                <input type="range" class="marco-slider" min="0" max="100" step="5"
+                       value="${pct}" data-marco-slider="${marco.id}">
+            </div>
+        `;
     }
     function renderCardArsenal(s) {
         const d = s._derivados || {};
