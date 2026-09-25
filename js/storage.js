@@ -265,7 +265,7 @@
                     id: dados.id || gerarId("fr"),
                     nome: dados.nome || "",
                     icone: dados.icone || "🎯",
-                    fase: dados.fase || "aprendendo",
+                    fase: dados.fase || "treinando",
                     modo_sessao: dados.modo_sessao || "tempo",
                     marco_ativo: dados.marco_ativo || null,
                     marcos: dados.marcos || [],
