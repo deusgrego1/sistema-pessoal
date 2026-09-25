@@ -1194,6 +1194,72 @@
             color: #a8c4e8;
             font-weight: 600;
         }
+
+        /* ---------- Aprendizado vinculado ---------- */
+        .ap-vinculo {
+            font-size: 12px;
+            color: #a8c4e8;
+            background: #1a2233;
+            border: 1px solid #2c3a55;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+        }
+        .ap-vinculo strong { color: #dfe8ff; font-weight: 600; }
+
+        .ap-vinculo-form {
+            background: #17171a;
+            border: 1px solid #2a2a30;
+            border-radius: 10px;
+            padding: 14px;
+            margin-top: 12px;
+        }
+        .ap-vinculo-form select {
+            width: 100%;
+            padding: 8px 12px;
+            background: #0f0f12;
+            border: 1px solid #333338;
+            color: #eaeaea;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+        }
+        .ap-vinculo-form select:focus { border-color: #55555c; }
+
+        .ap-contexto {
+            background: #1a2233;
+            border: 1px solid #2c3a55;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+        }
+        .ap-contexto.aplicado {
+            background: #172017;
+            border-color: #2e5a2e;
+        }
+        .ap-contexto-rotulo {
+            display: block;
+            font-size: 10px;
+            color: #5a8ad4;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 6px;
+        }
+        .ap-contexto.aplicado .ap-contexto-rotulo { color: #4caf50; }
+        .ap-contexto-texto {
+            display: block;
+            font-size: 13px;
+            color: #dfe8ff;
+            line-height: 1.4;
+        }
+        .ap-contexto.aplicado .ap-contexto-texto { color: #a5d6a7; }
+        .ap-contexto-badge {
+            display: inline-block;
+            margin-top: 6px;
+            font-size: 11px;
+            color: #a5d6a7;
+        }
     </style>
 </head>
 
@@ -1316,6 +1382,7 @@
         arsenalFrenteExpandida: null,
         arsenalFormAberto: false,       // true → mostra form de nova skill
         arsenalEditandoId: null,        // id da skill sendo editada | null
+        aprVinculoAberto: null,         // id do aprendizado com form de vínculo aberto
     };
     const esc = Storage.escapeHTML;
         function el(id) { return document.getElementById(id); }
@@ -1564,6 +1631,17 @@
             pontosFracos[b.frenteId] = (pontosFracos[b.frenteId] || 0) + 1;
         });
 
+        // aprendizados vinculados a frentes (ainda em testando)
+        const aprendizadosVinculados = Storage.aprendizados.listar()
+            .filter(a => a.vinculo_pratica && a.status === "testando");
+
+        const apsPorFrente = {};
+        aprendizadosVinculados.forEach(a => {
+            const fid = a.vinculo_pratica.frenteId;
+            apsPorFrente[fid] = apsPorFrente[fid] || [];
+            apsPorFrente[fid].push(a);
+        });
+
         const sugestoes = [];
 
         skills.forEach(skill => {
@@ -1599,6 +1677,13 @@
                     razoes.push(`ponto fraco recente`);
                 }
 
+                // aprendizado vinculado aguardando aplicação
+                const apsFrente = apsPorFrente[frente.id] || [];
+                if (apsFrente.length) {
+                    score += 20;
+                    razoes.push(`${apsFrente.length} aprendizado${apsFrente.length > 1 ? "s" : ""} pra testar`);
+                }
+
                 // já fez sessão dessa skill hoje
                 if (skillsJaFeitas.has(skill.id)) score -= 20;
 
@@ -1623,6 +1708,16 @@
                 let alvo = "";
                 if (marco) alvo = `Avançar em "${marco.titulo}"`;
 
+                // se há aprendizado vinculado, usa ele como alvo
+                let alvoFinal = alvo;
+                let aprendizadoId = null;
+                if (apsFrente.length) {
+                    const ap = apsFrente[0];
+                    aprendizadoId = ap.id;
+                    const txt = (ap.texto || "").slice(0, 100);
+                    alvoFinal = `Testar: "${txt}"`;
+                }
+
                 sugestoes.push({
                     skillId: skill.id,
                     skillNome: skill.nome,
@@ -1636,7 +1731,8 @@
                     score,
                     razoes,
                     tempo,
-                    alvo,
+                    alvo: alvoFinal,
+                    aprendizadoId,
                 });
             });
         });
@@ -1651,6 +1747,7 @@
             id: uid("blk"),
             skillId: sug.skillId,
             frenteId: sug.frenteId,
+            aprendizadoId: sug.aprendizadoId || null,
             alvo_sessao: sug.alvo || "",
             tempo_previsto_min: sug.tempo,
             reps_previstas: "",
@@ -1912,7 +2009,23 @@
 
             <div class="secao-titulo">📋 Antes de praticar</div>
 
-            <label class="campo-label">Tempo real</label>
+            ${b.aprendizadoId ? (() => {
+                const ap = Storage.aprendizados.listar().find(x => x.id === b.aprendizadoId);
+                if (!ap) return "";
+                const aplicado = ap.status === "aplicado" || ap.status === "virou_habito";
+                return `
+                    <div class="ap-contexto ${aplicado ? "aplicado" : ""}">
+                        <span class="ap-contexto-rotulo">🧠 Aprendizado vinculado</span>
+                        <span class="ap-contexto-texto">"${esc((ap.texto || "").slice(0, 140))}"</span>
+                        ${aplicado
+                            ? `<span class="ap-contexto-badge">✅ aplicado</span>`
+                            : `<button class="btn-secundario" data-marcar-aplicado="${b.id}" style="margin-top:8px;">Marcar como aplicado</button>`
+                        }
+                    </div>
+                `;
+            })() : ""}
+
+            <label class="campo-label">Skill</label>
             ${(() => {
                 const real = Number(b.tempo_real_min) || 0;
                 const prev = Number(b.tempo_previsto_min) || 0;
@@ -2111,6 +2224,15 @@
         elBloco.querySelector("[data-rem]").addEventListener("click", () => {
             const blocos = Storage.blocos.ler("pratica", dataAtual).filter(x => x.id !== b.id);
             Storage.blocos.salvar("pratica", dataAtual, blocos);
+            render();
+        });
+
+        // --- marcar aprendizado como aplicado ---
+        elBloco.querySelector("[data-marcar-aplicado]")?.addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("pratica", dataAtual);
+            const it = blocos.find(x => x.id === b.id);
+            if (!it || !it.aprendizadoId) return;
+            Storage.aprendizados.atualizar(it.aprendizadoId, { status: "aplicado" });
             render();
         });
 
@@ -5503,12 +5625,20 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
             return;
         }
 
+        const skillsAtivas = Storage.pratica.skills.listarAtivas();
+        const podeVincular = (a) => a.status === "capturado" || a.status === "testando" || !a.status;
+
         listaEl.innerHTML = lista.map(a => {
             const tipoInfo = TIPOS_AP.find(t => t.id === a.tipo)?.label || "";
             const impInfo = IMPACTOS_AP.find(t => t.id === a.impacto)?.label || "";
             const stInfo = STATUS_AP.find(t => t.id === a.status)?.label || "";
             const areas = (a.areas || []).map(x =>
                 AREAS_AP.find(ar => ar.id === x)?.label || x).join(" · ");
+            const vinculo = a.vinculo_pratica;
+            const skillVinc = vinculo ? Storage.pratica.skills.ler(vinculo.skillId) : null;
+            const frenteVinc = skillVinc ? (skillVinc.frentes || []).find(f => f.id === vinculo.frenteId) : null;
+            const formAberto = estado.aprVinculoAberto === a.id;
+
             return `
                 <div class="ap-card">
                     <div class="ap-linha-1">
@@ -5518,10 +5648,21 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
                     </div>
                     <div class="ap-texto">${esc(a.texto || "")}</div>
                     ${a.fonte ? `<div class="ap-fonte">— ${esc(a.fonte)}</div>` : ""}
+                    ${vinculo && skillVinc ? `
+                        <div class="ap-vinculo">
+                            🧠 vinculado a <strong>${esc(skillVinc.icone)} ${esc(skillVinc.nome)}</strong>${frenteVinc ? ` · ${esc(frenteVinc.icone)} ${esc(frenteVinc.nome)}` : ""}
+                        </div>
+                    ` : ""}
                     <div class="ap-rodape">
                         ${stInfo ? `<span class="tag">${esc(stInfo)}</span>` : ""}
+                        ${podeVincular(a) && skillsAtivas.length ? `
+                            <button class="btn-secundario" data-vincular="${a.id}">
+                                ${vinculo ? "🔄 Editar vínculo" : "🧠 Quero praticar"}
+                            </button>
+                        ` : ""}
                         <button class="btn-secundario" data-rm="${a.id}" style="margin-left:auto;">remover</button>
                     </div>
+                    ${formAberto ? renderFormVinculo(a, skillsAtivas) : ""}
                 </div>
             `;
         }).join("");
@@ -5532,6 +5673,122 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
                 render();
             });
         });
+
+        // abrir/fechar form de vínculo
+        listaEl.querySelectorAll("[data-vincular]").forEach(b => {
+            b.addEventListener("click", () => {
+                const id = b.dataset.vincular;
+                estado.aprVinculoAberto = (estado.aprVinculoAberto === id) ? null : id;
+                renderAprendizados();
+            });
+        });
+
+        // select de skill → atualiza frentes
+        listaEl.querySelectorAll("[data-vinc-skill]").forEach(sel => {
+            sel.addEventListener("change", () => {
+                const form = sel.closest(".ap-vinculo-form");
+                const frentesSel = form.querySelector("[data-vinc-frente]");
+                const marcosSel  = form.querySelector("[data-vinc-marco]");
+                const skillId = sel.value;
+                const skill = skillId ? Storage.pratica.skills.ler(skillId) : null;
+                const frentes = skill ? (skill.frentes || []).filter(f => !f.arquivada) : [];
+
+                frentesSel.innerHTML = `<option value="">— escolha —</option>` +
+                    frentes.map(f => `<option value="${esc(f.id)}">${esc(f.icone)} ${esc(f.nome)}</option>`).join("");
+
+                marcosSel.innerHTML = `<option value="">(nenhum)</option>`;
+            });
+        });
+
+        // select de frente → atualiza marcos
+        listaEl.querySelectorAll("[data-vinc-frente]").forEach(sel => {
+            sel.addEventListener("change", () => {
+                const form = sel.closest(".ap-vinculo-form");
+                const skillSel = form.querySelector("[data-vinc-skill]");
+                const marcosSel = form.querySelector("[data-vinc-marco]");
+                const skill = skillSel.value ? Storage.pratica.skills.ler(skillSel.value) : null;
+                if (!skill) return;
+                const frente = (skill.frentes || []).find(f => f.id === sel.value);
+                const marcosIds = frente ? (frente.marcos || []) : [];
+                const marcos = marcosIds.map(id => skill.marcos[id]).filter(Boolean);
+                marcosSel.innerHTML = `<option value="">(nenhum)</option>` +
+                    marcos.map(m => `<option value="${esc(m.id)}">${esc(m.titulo)} · ${m.percentual || 0}%</option>`).join("");
+            });
+        });
+
+        // salvar vínculo
+        listaEl.querySelectorAll("[data-vinc-salvar]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const form = btn.closest(".ap-vinculo-form");
+                const id = form.dataset.apId;
+                const skillId = form.querySelector("[data-vinc-skill]").value;
+                const frenteId = form.querySelector("[data-vinc-frente]").value;
+                const marcoId = form.querySelector("[data-vinc-marco]").value;
+                if (!skillId || !frenteId) return alert("Escolha skill e frente.");
+
+                const patch = {
+                    vinculo_pratica: {
+                        skillId,
+                        frenteId,
+                        marcoId: marcoId || null,
+                        vinculado_em: Date.now()
+                    }
+                };
+                // se ainda não tem status, começa como "testando"
+                const ap = Storage.aprendizados.listar().find(x => x.id === id);
+                if (ap && (!ap.status || ap.status === "capturado")) {
+                    patch.status = "testando";
+                }
+                Storage.aprendizados.atualizar(id, patch);
+                estado.aprVinculoAberto = null;
+                renderAprendizados();
+            });
+        });
+
+        // cancelar vínculo
+        listaEl.querySelectorAll("[data-vinc-cancelar]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                estado.aprVinculoAberto = null;
+                renderAprendizados();
+            });
+        });
+
+        // desvincular
+        listaEl.querySelectorAll("[data-vinc-remover]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const id = btn.dataset.vincRemover;
+                Storage.aprendizados.atualizar(id, { vinculo_pratica: null });
+                renderAprendizados();
+            });
+        });
+    }
+
+    function renderFormVinculo(aprendizado, skills) {
+        return `
+            <div class="ap-vinculo-form" data-ap-id="${esc(aprendizado.id)}">
+                <label class="campo-label">Skill</label>
+                <select data-vinc-skill>
+                    <option value="">— escolha —</option>
+                    ${skills.map(s => `<option value="${esc(s.id)}">${esc(s.icone)} ${esc(s.nome)}</option>`).join("")}
+                </select>
+
+                <label class="campo-label">Frente</label>
+                <select data-vinc-frente>
+                    <option value="">— escolha —</option>
+                </select>
+
+                <label class="campo-label">Marco (opcional)</label>
+                <select data-vinc-marco>
+                    <option value="">(nenhum)</option>
+                </select>
+
+                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px;">
+                    ${aprendizado.vinculo_pratica ? `<button class="btn-secundario" data-vinc-remover="${esc(aprendizado.id)}" style="color:#d45a5a;margin-right:auto;">Desvincular</button>` : ""}
+                    <button class="btn-secundario" data-vinc-cancelar="1">Cancelar</button>
+                    <button class="btn-primario" data-vinc-salvar="1">Salvar vínculo</button>
+                </div>
+            </div>
+        `;
     }
 
     function abrirFormAp() {
