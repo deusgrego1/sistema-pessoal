@@ -766,11 +766,144 @@
             background: #4caf50;
             transition: width 0.15s ease;
         }
-        .marco-slider {
+                .marco-slider {
             width: 100%;
             margin: 0;
             accent-color: #4caf50;
         }
+
+        /* ---------- Seções (Timeline, PV, Feedback) ---------- */
+        .secao-bloco {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #252529;
+        }
+        .secao-bloco-cabecalho {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .secao-bloco-titulo {
+            font-size: 11px;
+            color: #4caf50;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
+
+        /* --- Timeline --- */
+        .timeline-lista { display: flex; flex-direction: column; gap: 8px; }
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: #1c1c20;
+            border: 1px solid #2a2a30;
+            border-radius: 8px;
+        }
+        .timeline-icone { font-size: 20px; line-height: 1; flex-shrink: 0; }
+        .timeline-info { flex: 1; min-width: 0; }
+        .timeline-nome {
+            font-size: 13px;
+            color: #eaeaea;
+            font-weight: 600;
+            line-height: 1.3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .timeline-ctx {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 500;
+            padding: 1px 6px;
+            background: #2a3a2a;
+            color: #a5d6a7;
+            border-radius: 8px;
+            margin-left: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .timeline-nota { font-size: 11px; color: #999; margin-top: 2px; }
+        .timeline-meta { font-size: 11px; color: #666; margin-top: 2px; }
+        .timeline-btn-ctx, .timeline-btn-rm {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0 6px;
+            flex-shrink: 0;
+        }
+        .timeline-btn-ctx:hover { color: #4caf50; }
+        .timeline-btn-rm:hover { color: #d45a5a; }
+
+        /* --- Pontos de virada --- */
+        .pv-lista { display: flex; flex-direction: column; gap: 8px; }
+        .pv-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 12px;
+            background: #1c1c20;
+            border-left: 3px solid #c9a44a;
+            border-radius: 8px;
+        }
+        .pv-icone {
+            font-size: 16px;
+            line-height: 1;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .pv-info { flex: 1; min-width: 0; }
+        .pv-texto { font-size: 13px; color: #eaeaea; line-height: 1.4; }
+        .pv-meta { font-size: 11px; color: #777; margin-top: 4px; }
+        .pv-remover {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0 4px;
+            flex-shrink: 0;
+        }
+        .pv-remover:hover { color: #d45a5a; }
+
+        /* --- Feedback --- */
+        .fb-lista { display: flex; flex-direction: column; gap: 8px; }
+        .fb-item {
+            padding: 10px 12px;
+            background: #1c1c20;
+            border-left: 3px solid #888;
+            border-radius: 8px;
+        }
+        .fb-cabecalho {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        .fb-fonte {
+            font-size: 11px;
+            color: #a8c4e8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        .fb-data { font-size: 11px; color: #666; }
+        .fb-remover {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0 4px;
+            margin-left: auto;
+        }
+        .fb-remover:hover { color: #d45a5a; }
+        .fb-texto { font-size: 13px; color: #d0d0d0; line-height: 1.4; }
     </style>
 </head>
 
@@ -1166,7 +1299,7 @@
                 <input type="text" data-norte="frase" value="${esc(norte.frase || "")}" placeholder="Uma frase que te lembra o porquê">
             </div>
 
-            <div class="frentes-bloco">
+                        <div class="frentes-bloco">
                 <div class="frentes-cabecalho">
                     <span class="frentes-titulo">Frentes</span>
                     <button class="btn-secundario" id="btnNovaFrente">+ Nova frente</button>
@@ -1175,6 +1308,10 @@
                     ? skill.frentes.map(f => renderFrenteItem(skill, f)).join("")
                     : `<div class="vazio" style="padding:20px;">Nenhuma frente ainda. Adicione a primeira.</div>`}
             </div>
+
+            ${renderTimelineMidias(skill)}
+            ${renderPontosVirada(skill)}
+            ${renderFeedbackLog(skill)}
         `;
 
         // --- Norte: salva no input ---
@@ -1280,7 +1417,7 @@
             });
         });
 
-        // --- Adicionar marco numa frente ---
+                // --- Adicionar marco numa frente ---
         wrap.querySelectorAll("[data-add-marco]").forEach(btn => {
             btn.addEventListener("click", (ev) => {
                 ev.stopPropagation();
@@ -1288,6 +1425,101 @@
                 const titulo = prompt("Título do marco (ex.: 'Blackbird inteira limpa'):", "");
                 if (!titulo) return;
                 Storage.pratica.skills.adicionarMarco(skill.id, { titulo, frente: fid });
+                renderArsenal();
+            });
+        });
+
+        // --- Mídia: adicionar ---
+        wrap.querySelector("[data-add-midia]")?.addEventListener("click", () => {
+            const tipo = prompt("Tipo (video / foto / audio / texto):", "video");
+            if (!tipo) return;
+            const url = prompt("URL (link do Drive, YouTube, etc):", "");
+            if (!url) return;
+            const nome = prompt("Nome/descrição curta:", "") || "";
+            const nota = prompt("Nota (opcional):", "") || "";
+            Storage.pratica.skills.adicionarMidia(skill.id, {
+                tipo: tipo.trim().toLowerCase(),
+                url: url.trim(),
+                nome: nome.trim(),
+                nota: nota.trim()
+            });
+            renderArsenal();
+        });
+
+        // --- Mídia: definir antes/depois ---
+        wrap.querySelectorAll("[data-midia-toggle-contexto]").forEach(btn => {
+            btn.addEventListener("click", (ev) => {
+                ev.stopPropagation();
+                const midiaId = btn.dataset.midiaToggleContexto;
+                const skillAtual = Storage.pratica.skills.ler(skill.id);
+                const midia = (skillAtual.midias || []).find(m => m.id === midiaId);
+                if (!midia) return;
+                const ciclo = ["geral", "antes", "depois"];
+                const atual = ciclo.indexOf(midia.contexto || "geral");
+                const proximo = ciclo[(atual + 1) % ciclo.length];
+                Storage.pratica.skills.atualizarMidia(skill.id, midiaId, { contexto: proximo });
+                renderArsenal();
+            });
+        });
+
+        // --- Mídia: remover ---
+        wrap.querySelectorAll("[data-midia-remover]").forEach(btn => {
+            btn.addEventListener("click", (ev) => {
+                ev.stopPropagation();
+                if (!confirm("Remover esta mídia?")) return;
+                Storage.pratica.skills.removerMidia(skill.id, btn.dataset.midiaRemover);
+                renderArsenal();
+            });
+        });
+
+        // --- Ponto de virada: adicionar ---
+        wrap.querySelector("[data-add-pv]")?.addEventListener("click", () => {
+            const texto = prompt("O que destravou? (1 linha):", "");
+            if (!texto) return;
+            const frentesDisponiveis = skill.frentes.map(f => f.nome).join(", ") || "(nenhuma)";
+            const frenteNome = prompt(`Em qual frente? (${frentesDisponiveis})`, "") || "";
+            const frente = skill.frentes.find(f =>
+                f.nome.toLowerCase() === frenteNome.trim().toLowerCase()
+            );
+            Storage.pratica.skills.adicionarPontoVirada(skill.id, {
+                texto: texto.trim(),
+                frente: frente ? frente.id : null
+            });
+            renderArsenal();
+        });
+
+        // --- Ponto de virada: remover ---
+        wrap.querySelectorAll("[data-pv-remover]").forEach(btn => {
+            btn.addEventListener("click", (ev) => {
+                ev.stopPropagation();
+                if (!confirm("Remover este ponto de virada?")) return;
+                Storage.pratica.skills.removerPontoVirada(skill.id, btn.dataset.pvRemover);
+                renderArsenal();
+            });
+        });
+
+        // --- Feedback: adicionar ---
+        wrap.querySelector("[data-add-fb]")?.addEventListener("click", () => {
+            const fonte = prompt("Fonte (auto / mentor / par / audiencia / outro):", "auto");
+            if (!fonte) return;
+            const nota = prompt("Nota (verde / amarelo / vermelho):", "amarelo");
+            if (!nota) return;
+            const texto = prompt("O que foi dito?", "");
+            if (!texto) return;
+            Storage.pratica.skills.adicionarFeedback(skill.id, {
+                fonte: fonte.trim().toLowerCase(),
+                nota: nota.trim().toLowerCase(),
+                texto: texto.trim()
+            });
+            renderArsenal();
+        });
+
+        // --- Feedback: remover ---
+        wrap.querySelectorAll("[data-fb-remover]").forEach(btn => {
+            btn.addEventListener("click", (ev) => {
+                ev.stopPropagation();
+                if (!confirm("Remover este feedback?")) return;
+                Storage.pratica.skills.removerFeedback(skill.id, btn.dataset.fbRemover);
                 renderArsenal();
             });
         });
@@ -1338,7 +1570,7 @@
         `;
     }
 
-    function renderMarcoItem(skill, frente, marco, ativo) {
+        function renderMarcoItem(skill, frente, marco, ativo) {
         const pct = Number(marco.percentual) || 0;
         return `
             <div class="marco-item ${ativo ? "ativo" : ""}" data-marco-ativar="${marco.id}" data-frente-id="${frente.id}" title="${ativo ? "Marco ativo" : "Clique para tornar ativo"}">
@@ -1351,6 +1583,115 @@
                 <div class="marco-bar"><div style="width:${pct}%"></div></div>
                 <input type="range" class="marco-slider" min="0" max="100" step="5"
                        value="${pct}" data-marco-slider="${marco.id}">
+            </div>
+        `;
+    }
+
+    // ---------- Timeline de mídias ----------
+    function renderTimelineMidias(skill) {
+        const midias = (skill.midias || []).slice().sort((a, b) => (b.data || "").localeCompare(a.data || ""));
+
+        const iconePorTipo = { video: "🎥", foto: "📸", audio: "🎙️", texto: "📝" };
+        const labelContexto = { antes: "antes", depois: "depois", ponto_de_virada: "ponto de virada", geral: "" };
+
+        return `
+            <div class="secao-bloco">
+                <div class="secao-bloco-cabecalho">
+                    <span class="secao-bloco-titulo">📸 Timeline</span>
+                    <button class="btn-secundario" data-add-midia="1">+ Adicionar mídia</button>
+                </div>
+                ${midias.length ? `
+                    <div class="timeline-lista">
+                        ${midias.map(m => {
+                            const icone = iconePorTipo[m.tipo] || "📎";
+                            const ctx = labelContexto[m.contexto] || "";
+                            return `
+                                <div class="timeline-item">
+                                    <span class="timeline-icone">${icone}</span>
+                                    <div class="timeline-info">
+                                        <div class="timeline-nome">
+                                            ${esc(m.nome || m.url || "(sem nome)")}
+                                            ${ctx ? `<span class="timeline-ctx">${esc(ctx)}</span>` : ""}
+                                        </div>
+                                        ${m.nota ? `<div class="timeline-nota">${esc(m.nota)}</div>` : ""}
+                                        <div class="timeline-meta">${esc(m.data || "")}</div>
+                                    </div>
+                                    <button class="timeline-btn-ctx" type="button" data-midia-toggle-contexto="${m.id}" title="Alternar contexto (geral → antes → depois)">◐</button>
+                                    <button class="timeline-btn-rm" type="button" data-midia-remover="${m.id}" title="Remover">×</button>
+                                </div>
+                            `;
+                        }).join("")}
+                    </div>
+                ` : `<div class="vazio" style="padding:16px;font-size:13px;">Nenhuma mídia registrada ainda.</div>`}
+            </div>
+        `;
+    }
+
+    // ---------- Pontos de virada ----------
+    function renderPontosVirada(skill) {
+        const pvs = (skill.pontos_de_virada || []).slice().sort((a, b) => (b.data || "").localeCompare(a.data || ""));
+
+        return `
+            <div class="secao-bloco">
+                <div class="secao-bloco-cabecalho">
+                    <span class="secao-bloco-titulo">⚡ Pontos de virada</span>
+                    <button class="btn-secundario" data-add-pv="1">+ Adicionar</button>
+                </div>
+                ${pvs.length ? `
+                    <div class="pv-lista">
+                        ${pvs.map(pv => {
+                            const f = skill.frentes.find(fr => fr.id === pv.frente);
+                            return `
+                                <div class="pv-item">
+                                    <div class="pv-icone">⚡</div>
+                                    <div class="pv-info">
+                                        <div class="pv-texto">${esc(pv.texto)}</div>
+                                        <div class="pv-meta">
+                                            ${esc(pv.data)}
+                                            ${f ? ` · ${esc(f.nome)}` : ""}
+                                        </div>
+                                    </div>
+                                    <button class="pv-remover" type="button" data-pv-remover="${pv.id}" title="Remover">×</button>
+                                </div>
+                            `;
+                        }).join("")}
+                    </div>
+                ` : `<div class="vazio" style="padding:16px;font-size:13px;">Nenhum ponto de virada ainda. Aperte quando algo destravar.</div>`}
+            </div>
+        `;
+    }
+
+    // ---------- Feedback ----------
+    function renderFeedbackLog(skill) {
+        const fbs = (skill.feedback || []).slice().sort((a, b) => (b.data || "").localeCompare(a.data || ""));
+
+        const corNota = { verde: "#4caf50", amarelo: "#c9a44a", vermelho: "#d45a5a" };
+        const labelFonte = { auto: "auto-avaliação", mentor: "mentor", par: "par", audiencia: "audiência", outro: "outro" };
+
+        return `
+            <div class="secao-bloco">
+                <div class="secao-bloco-cabecalho">
+                    <span class="secao-bloco-titulo">💬 Feedback</span>
+                    <button class="btn-secundario" data-add-fb="1">+ Adicionar</button>
+                </div>
+                ${fbs.length ? `
+                    <div class="fb-lista">
+                        ${fbs.map(fb => {
+                            const cor = corNota[fb.nota] || "#888";
+                            const fonteLabel = labelFonte[fb.fonte] || fb.fonte;
+                            return `
+                                <div class="fb-item" style="border-left-color:${cor};">
+                                    <div class="fb-cabecalho">
+                                        <span class="fb-fonte">${esc(fonteLabel)}</span>
+                                        <span class="fb-data">${esc(fb.data)}</span>
+                                        <button class="fb-remover" type="button" data-fb-remover="${fb.id}" title="Remover">×</button>
+                                    </div>
+                                    <div class="fb-texto">${esc(fb.texto)}</div>
+                                </div>
+                            `;
+                        }).join("")}
+                    </div>
+                ` : `<div class="vazio" style="padding:16px;font-size:13px;">Nenhum feedback registrado ainda.</div>`}
             </div>
         `;
     }
