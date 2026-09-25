@@ -458,11 +458,20 @@
             } catch (e) {}
         }
 
+        let tempoAcumuladoSegBase = 0;   // segundos fechados de sessões anteriores
+        let tempoCorrendoSeg = 0;        // segundos desta sessão em execução
+
+        function tempoTotalSeg() {
+            return Math.max(0, (tempoAcumuladoSegBase || 0) + (tempoCorrendoSeg || 0));
+        }
+
         function gravarPacotePratica() {
             if (!ehPratica || !blocoIdURL) return;
+            const seg = tempoTotalSeg();
             const pacote = {
-                tempo_real_min: Math.max(0, Math.round(tempoAcumuladoSeg / 60)),
-                pausas: contadorPausas,
+                tempo_real_seg: seg,
+                tempo_real_min: Math.round(seg / 60),
+                pausas: contadorPausas || 0,
                 distracoes: distracoes.length,
                 notas: (notasFoco.value || "").trim(),
                 skillId: skillIdURL,
@@ -473,7 +482,10 @@
             };
             try {
                 localStorage.setItem(`estudo_foco_retorno_${blocoIdURL}`, JSON.stringify(pacote));
-            } catch (e) {}
+                console.log("[foco→pratica] pacote gravado:", pacote);
+            } catch (e) {
+                console.warn("[foco→pratica] erro ao gravar", e);
+            }
         }
 
         function voltarParaPratica() {
@@ -711,17 +723,16 @@ card.classList.add("painel-lateral-direita");
             if (segundosRestantes < 0) segundosRestantes = 0;
             atualizarDisplay(); atualizarBarra(); atualizarTitulo(); salvarEstado();
 
-            // backup do pacote a cada 5s
-            if (ehPratica && segundosRestantes % 5 === 0) {
-                tempoAcumuladoSeg = Math.max(0, duracaoTotal - segundosRestantes) + (tempoAcumuladoSegBase || 0);
-                gravarPacotePratica();
+            // mantém o "tempo corrente" atualizado e faz backup a cada 5s
+            if (ehPratica) {
+                tempoCorrendoSeg = Math.max(0, duracaoTotal - segundosRestantes);
+                if (segundosRestantes % 5 === 0) {
+                    gravarPacotePratica();
+                }
             }
 
             if (segundosRestantes === 0) finalizarSessao();
         }
-
-        // guarda o valor anterior acumulado entre múltiplas sessões
-        let tempoAcumuladoSegBase = 0;
 
         function iniciarTimer() {
             if (rodando) {
@@ -750,9 +761,10 @@ card.classList.add("painel-lateral-direita");
             document.title = "Foco";
             registrarSessao(tarefaFoco.value.trim(), duracaoTotal);
 
-            // acumula tempo executado pra devolver à Prática
+            // fecha o tempo desta sessão no base
             if (ehPratica) {
-                tempoAcumuladoSeg += Math.max(0, duracaoTotal - segundosRestantes);
+                tempoAcumuladoSegBase += Math.max(0, duracaoTotal - segundosRestantes);
+                tempoCorrendoSeg = 0;
                 gravarPacotePratica();
             }
 
