@@ -1216,6 +1216,11 @@
         const rej = obterRejeitadas();
         rej[`${skillId}::${frenteId}`] = Date.now();
         localStorage.setItem(CHAVE_TREINADOR_REJEITADAS, JSON.stringify(rej));
+
+        // registra também no histórico de 7 dias (aprendizado passivo)
+        if (typeof registrarRejeicao7d === "function") {
+            registrarRejeicao7d(skillId, frenteId);
+        }
     }
     function foiRejeitadaHoje(skillId, frenteId) {
         const rej = obterRejeitadas();
@@ -1369,8 +1374,58 @@
             // ==================================================
     // TREINADOR — cálculo de score
     // ==================================================
+    const CHAVE_REJEICOES_7D = "estudo_treinador_rejeicoes_7d";
+
+    function obterRejeicoes7d() {
+        try { return JSON.parse(localStorage.getItem(CHAVE_REJEICOES_7D)) || {}; }
+        catch { return {}; }
+    }
+    function limparRejeicoes7d() {
+        const r = obterRejeicoes7d();
+        const corte = Date.now() - 7 * 86400000;
+        Object.keys(r).forEach(k => {
+            r[k] = (r[k] || []).filter(ts => ts >= corte);
+            if (!r[k].length) delete r[k];
+        });
+        localStorage.setItem(CHAVE_REJEICOES_7D, JSON.stringify(r));
+    }
+    function contarRejeicoes7d(skillId, frenteId) {
+        const r = obterRejeicoes7d();
+        return (r[`${skillId}::${frenteId}`] || []).length;
+    }
+    function registrarRejeicao7d(skillId, frenteId) {
+        const r = obterRejeicoes7d();
+        const k = `${skillId}::${frenteId}`;
+        r[k] = r[k] || [];
+        r[k].push(Date.now());
+        localStorage.setItem(CHAVE_REJEICOES_7D, JSON.stringify(r));
+    }
+
+    // Ajuste de tempo: olha os últimos blocos concluídos (tempo_real_min > 0)
+    // e calcula um multiplicador entre 0.8 e 1.4 pro tempo previsto vs real.
+    function _calcularAjusteTempo(skillId, frenteId) {
+        const todos = lerTodosBlocosPratica().filter(b =>
+            b.skillId === skillId && b.frenteId === frenteId &&
+            Number(b.tempo_real_min) > 0
+        );
+        if (todos.length < 3) return 1;
+
+        const ultimos = todos.slice(-5);
+        const somas = ultimos.map(b => {
+            const prev = Number(b.tempo_previsto_min) || 0;
+            const real = Number(b.tempo_real_min) || 0;
+            if (!prev) return null;
+            return real / prev;
+        }).filter(x => x !== null);
+
+        if (!somas.length) return 1;
+        const media = somas.reduce((a, b) => a + b, 0) / somas.length;
+        return Math.max(0.8, Math.min(1.4, media));
+    }
+
     function calcularSugestoesTreinador() {
         limparRejeicoesAntigas();
+        limparRejeicoes7d();
 
         const skills = Storage.pratica.derivados.listarComDerivados();
         const d = Storage.pratica.derivados;
@@ -1383,7 +1438,6 @@
         const corte = Date.now() - 7 * 86400000;
         todos.forEach(b => {
             if (!b.ponto_fraco || !b.frenteId) return;
-            // data do bloco vem de criado_em, se houver
             if (b.criado_em && b.criado_em < corte) return;
             pontosFracos[b.frenteId] = (pontosFracos[b.frenteId] || 0) + 1;
         });
@@ -1428,9 +1482,20 @@
                 // rejeitada hoje
                 if (foiRejeitadaHoje(skill.id, frente.id)) score -= 50;
 
+                // rejeitada 3x nos últimos 7 dias → não sugere mais
+                if (contarRejeicoes7d(skill.id, frente.id) >= 3) score -= 100;
+
                 let tempo = 25;
                 if (temp.emoji === "🧊") tempo = 5;
                 else if (temp.emoji === "❄️") tempo = 15;
+
+                // ajuste de tempo pelo histórico real
+                const fator = _calcularAjusteTempo(skill.id, frente.id);
+                if (fator !== 1) {
+                    tempo = Math.round(tempo * fator);
+                    // arredonda pra múltiplo de 5
+                    tempo = Math.max(5, Math.round(tempo / 5) * 5);
+                }
 
                 let alvo = "";
                 if (marco) alvo = `Avançar em "${marco.titulo}"`;
