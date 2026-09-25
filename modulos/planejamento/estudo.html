@@ -1260,6 +1260,63 @@
             font-size: 11px;
             color: #a5d6a7;
         }
+
+        /* ---------- Conteúdo → Prática ---------- */
+        .conteudo-pratica-bloco {
+            margin-top: 18px;
+            padding-top: 16px;
+            border-top: 1px solid #252529;
+        }
+        .conteudo-pratica-ok {
+            font-size: 12px;
+            color: #a5d6a7;
+            background: #172017;
+            border: 1px solid #2e5a2e;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+        }
+        .conteudo-pratica-btn {
+            width: 100%;
+            padding: 11px 16px;
+            font-size: 13px;
+            border-radius: 10px;
+        }
+
+        .conteudo-vinculo-form {
+            margin-top: 12px;
+            background: #17171a;
+            border: 1px solid #2a2a30;
+            border-left: 3px solid #5a8ad4;
+            border-radius: 10px;
+            padding: 14px;
+        }
+        .conteudo-vinculo-titulo {
+            font-size: 11px;
+            color: #5a8ad4;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .conteudo-vinculo-sub {
+            font-size: 12px;
+            color: #888;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+        .conteudo-vinculo-form select {
+            width: 100%;
+            padding: 8px 12px;
+            background: #0f0f12;
+            border: 1px solid #333338;
+            color: #eaeaea;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+        }
+        .conteudo-vinculo-form select:focus { border-color: #55555c; }
     </style>
 </head>
 
@@ -1383,6 +1440,7 @@
         arsenalFormAberto: false,       // true → mostra form de nova skill
         arsenalEditandoId: null,        // id da skill sendo editada | null
         aprVinculoAberto: null,         // id do aprendizado com form de vínculo aberto
+        conteudoVinculoAberto: null,    // { tipo, blocoId } | null
     };
     const esc = Storage.escapeHTML;
         function el(id) { return document.getElementById(id); }
@@ -1944,6 +2002,138 @@
         return m > 0 ? `${h}h ${m}min` : `${h}h`;
     }
 
+    // ==================================================
+    // CONTEÚDO → PRÁTICA (Livro, Vídeo, Artigo)
+    // ==================================================
+    function renderConteudoParaPratica(tipo, bloco) {
+        const aberto = estado.conteudoVinculoAberto &&
+                       estado.conteudoVinculoAberto.tipo === tipo &&
+                       estado.conteudoVinculoAberto.blocoId === bloco.id;
+        const vinculado = bloco.levadoParaPratica;
+
+        return `
+            <div class="conteudo-pratica-bloco">
+                ${vinculado && !aberto ? `
+                    <div class="conteudo-pratica-ok">🧠 Já vinculado à Prática</div>
+                ` : ""}
+                <button type="button" class="btn-secundario conteudo-pratica-btn" data-conteudo-toggle="${esc(tipo)}:${esc(bloco.id)}">
+                    ${aberto ? "Cancelar" : vinculado ? "🔄 Vincular de novo" : "🧠 Levar pra Prática"}
+                </button>
+                ${aberto ? renderFormConteudoParaPratica(tipo, bloco.id, bloco.titulo || bloco.tema) : ""}
+            </div>
+        `;
+    }
+
+    function renderFormConteudoParaPratica(tipo, blocoId, tituloSugerido) {
+        const skills = Storage.pratica.skills.listarAtivas();
+        if (!skills.length) {
+            return `<div class="conteudo-vinculo-form"><div style="color:#888;font-size:13px;">Você ainda não tem skills. Crie uma no <strong>Arsenal</strong> primeiro.</div></div>`;
+        }
+        return `
+            <div class="conteudo-vinculo-form" data-conteudo-id="${esc(blocoId)}" data-conteudo-tipo="${esc(tipo)}">
+                <div class="conteudo-vinculo-titulo">🧠 Levar pra Prática</div>
+                <div class="conteudo-vinculo-sub">Cria um aprendizado <em>testando</em> vinculado à skill escolhida. O Treinador passa a sugerir essa prática.</div>
+
+                <label class="campo-label">Skill</label>
+                <select data-cvp-skill>
+                    <option value="">— escolha —</option>
+                    ${skills.map(s => `<option value="${esc(s.id)}">${esc(s.icone)} ${esc(s.nome)}</option>`).join("")}
+                </select>
+
+                <label class="campo-label">Frente</label>
+                <select data-cvp-frente>
+                    <option value="">— escolha —</option>
+                </select>
+
+                <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px;">
+                    <button type="button" class="btn-secundario" data-cvp-cancelar="1">Cancelar</button>
+                    <button type="button" class="btn-primario" data-cvp-salvar="1">Criar vínculo</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function ligarConteudoParaPratica(container) {
+        if (!container) return;
+
+        // toggle do botão principal
+        container.querySelectorAll("[data-conteudo-toggle]").forEach(btn => {
+            btn.addEventListener("click", (ev) => {
+                ev.stopPropagation();
+                const [tipo, blocoId] = btn.dataset.conteudoToggle.split(":");
+                const atual = estado.conteudoVinculoAberto;
+                if (atual && atual.tipo === tipo && atual.blocoId === blocoId) {
+                    estado.conteudoVinculoAberto = null;
+                } else {
+                    estado.conteudoVinculoAberto = { tipo, blocoId };
+                }
+                render();
+            });
+        });
+
+        // select skill → atualiza frentes
+        container.querySelectorAll("[data-cvp-skill]").forEach(sel => {
+            sel.addEventListener("change", () => {
+                const form = sel.closest(".conteudo-vinculo-form");
+                const fsel = form.querySelector("[data-cvp-frente]");
+                const skill = sel.value ? Storage.pratica.skills.ler(sel.value) : null;
+                const frentes = skill ? (skill.frentes || []).filter(f => !f.arquivada) : [];
+                fsel.innerHTML = `<option value="">— escolha —</option>` +
+                    frentes.map(f => `<option value="${esc(f.id)}">${esc(f.icone)} ${esc(f.nome)}</option>`).join("");
+            });
+        });
+
+        // salvar
+        container.querySelectorAll("[data-cvp-salvar]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const form = btn.closest(".conteudo-vinculo-form");
+                const tipo = form.dataset.conteudoTipo;
+                const blocoId = form.dataset.conteudoId;
+                const skillId = form.querySelector("[data-cvp-skill]").value;
+                const frenteId = form.querySelector("[data-cvp-frente]").value;
+                if (!skillId || !frenteId) return alert("Escolha skill e frente.");
+
+                const blocos = Storage.blocos.ler(tipo, dataAtual);
+                const b = blocos.find(x => x.id === blocoId);
+                if (!b) return;
+
+                const titulo = b.titulo || b.tema || "conteúdo";
+                const tipoLabel = { livro: "Livro", video: "Vídeo", artigo: "Artigo" }[tipo] || tipo;
+                const verbo = tipo === "livro" ? "li" : tipo === "video" ? "assisti" : "estudei";
+                const texto = `Aplicar o que ${verbo} em "${titulo}"`;
+
+                Storage.aprendizados.adicionar({
+                    texto,
+                    fonte: `${tipoLabel}: ${titulo}`,
+                    status: "testando",
+                    tipo: "tecnica",
+                    areas: [],
+                    impacto: "",
+                    vinculo_pratica: { skillId, frenteId, marcoId: null, vinculado_em: Date.now() }
+                });
+
+                const blocosAtual = Storage.blocos.ler(tipo, dataAtual);
+                const i = blocosAtual.findIndex(x => x.id === blocoId);
+                if (i >= 0) {
+                    blocosAtual[i].levadoParaPratica = true;
+                    blocosAtual[i].levadoEm = Date.now();
+                    Storage.blocos.salvar(tipo, dataAtual, blocosAtual);
+                }
+
+                estado.conteudoVinculoAberto = null;
+                render();
+            });
+        });
+
+        // cancelar
+        container.querySelectorAll("[data-cvp-cancelar]").forEach(btn => {
+            btn.addEventListener("click", () => {
+                estado.conteudoVinculoAberto = null;
+                render();
+            });
+        });
+    }
+    
     function renderBlocoPratica(b, idx) {
         const elBloco = document.createElement("div");
         elBloco.className = "bloco-estudo";
@@ -3824,6 +4014,8 @@ async function buscarNoticiasBing(query, opts = {}) {
 
             <label class="campo-label">Próxima ação</label>
             <input type="text" data-campo="proximaAcao" value="${esc(b.proximaAcao)}" placeholder="Ex.: voltar da pág. 47">
+
+            ${renderConteudoParaPratica("livro", b)}
         `;
 
         elBloco.querySelectorAll("[data-campo]").forEach(input => {
@@ -3982,6 +4174,8 @@ async function buscarNoticiasBing(query, opts = {}) {
                 box.innerHTML = `<div style="color:#888;font-size:13px;">Erro ao buscar.</div>`;
             }
         });
+
+        ligarConteudoParaPratica(elBloco);
 
         return elBloco;
     }
@@ -4235,6 +4429,8 @@ async function buscarNoticiasBing(query, opts = {}) {
                     </div>
                 `).join("") || `<div style="color:#666;font-size:12px;">Nenhum momento marcado. Use o botão acima durante o play.</div>`}
             </div>
+
+            ${renderConteudoParaPratica("video", b)}
         `;
 
         elBloco.querySelectorAll("[data-campo]").forEach(input => {
@@ -4597,6 +4793,8 @@ async function buscarNoticiasBing(query, opts = {}) {
             registrarVideoNaBiblioteca(b);
         }, 0);
 
+           ligarConteudoParaPratica(elBloco);
+
         return elBloco;
     }
 
@@ -4743,6 +4941,8 @@ async function buscarNoticiasBing(query, opts = {}) {
 
             <label class="campo-label">Próxima ação</label>
             <input type="text" data-campo="proximaAcao" value="${esc(b.proximaAcao)}" placeholder="Ex.: pesquisar o autor">
+
+            ${renderConteudoParaPratica("artigo", b)}
         `;
 
         elBloco.querySelectorAll("[data-campo]").forEach(input => {
@@ -4959,6 +5159,8 @@ async function buscarNoticiasBing(query, opts = {}) {
         });
 
         setTimeout(() => registrarArtigoNaBiblioteca(b), 0);
+        ligarConteudoParaPratica(elBloco);
+
         return elBloco;
     }
 
