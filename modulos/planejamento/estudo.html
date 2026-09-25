@@ -5499,9 +5499,15 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
                 const i = blocos.findIndex(x => x.id === blocoId);
                 if (i < 0) continue;
 
-                if (pacote.tempo_real_min) blocos[i].tempo_real_min = pacote.tempo_real_min;
-                if (pacote.pausas)          blocos[i].pausas = pacote.pausas;
-                if (pacote.distracoes)      blocos[i].distracoes = pacote.distracoes;
+                if (typeof pacote.tempo_real_min === "number") {
+                    let min = pacote.tempo_real_min;
+                    if (min === 0 && typeof pacote.tempo_real_seg === "number" && pacote.tempo_real_seg > 30) {
+                        min = 1;
+                    }
+                    blocos[i].tempo_real_min = min;
+                }
+                if (typeof pacote.pausas === "number")     blocos[i].pausas = pacote.pausas;
+                if (typeof pacote.distracoes === "number") blocos[i].distracoes = pacote.distracoes;
                 if (pacote.notas && !blocos[i].o_que_funcionou) {
                     blocos[i].o_que_funcionou = pacote.notas;
                 }
