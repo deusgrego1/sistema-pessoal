@@ -1073,6 +1073,17 @@
             border-top: 1px solid #252529;
             margin-top: 14px;
         }
+
+        .sessoes-titulo {
+            font-size: 11px;
+            color: #4caf50;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            padding: 18px 0 10px;
+            margin-top: 20px;
+            border-top: 1px solid #252529;
+        }
     </style>
 </head>
 
@@ -1429,9 +1440,10 @@
 
         const skills = Storage.pratica.derivados.listarComDerivados();
         const d = Storage.pratica.derivados;
-        const blocosHoje = Storage.blocos.ler("pratica", dataAtual);
+                const blocosHoje = Storage.blocos.ler("pratica", dataAtual);
         const skillsJaFeitas = new Set(blocosHoje.map(b => b.skillId).filter(Boolean));
-
+        const frentesJaFeitas = new Set(blocosHoje.map(b => b.frenteId).filter(Boolean));
+        
         // pontos fracos registrados por frente (últimos 7 dias)
         const pontosFracos = {};
         const todos = lerTodosBlocosPratica();
@@ -1449,7 +1461,8 @@
             skill.frentes.forEach(frente => {
                 if (frente.arquivada) return;
                 if (frente.fase === "aprendendo") return;
-
+                if (frentesJaFeitas.has(frente.id)) return;
+                
                 const temp = d.temperaturaPorFrente(skill, frente);
                 const gap = d.gapPorFrente(skill, frente);
                 const marco = frente.marco_ativo ? skill.marcos[frente.marco_ativo] : null;
@@ -1654,23 +1667,29 @@
             return;
         }
 
-        if (blocos.length === 0) {
-            const vazio = document.createElement("div");
-            vazio.className = "vazio";
-            vazio.innerHTML = `
-                <p>Nenhuma sessão de prática registrada hoje ainda.</p>
-                <button class="btn-primario" id="btnAddPratica">+ Adicionar sessão</button>
-            `;
-            wrap.appendChild(vazio);
-            vazio.querySelector("#btnAddPratica").addEventListener("click", addBlocoPratica);
-            return;
+        // 1) Treinador sempre no topo
+        const sugestoes = calcularSugestoesTreinador();
+        const treinadorHtml = renderSugestoesTreinador();
+
+        const topo = document.createElement("div");
+        topo.innerHTML = treinadorHtml;
+        wrap.appendChild(topo);
+        ligarSugestoesTreinador(topo, sugestoes);
+
+        // 2) Blocos do dia (se houver)
+        if (blocos.length > 0) {
+            const titulo = document.createElement("div");
+            titulo.className = "sessoes-titulo";
+            titulo.innerHTML = `📝 Sessões de hoje`;
+            wrap.appendChild(titulo);
+
+            blocos.forEach((b, i) => wrap.appendChild(renderBlocoPratica(b, i)));
         }
 
-        blocos.forEach((b, i) => wrap.appendChild(renderBlocoPratica(b, i)));
-
+        // 3) Rodapé
         const addWrap = document.createElement("div");
-        addWrap.style.marginTop = "10px";
-        addWrap.innerHTML = `<button class="btn-secundario" id="btnAddPratica">+ Adicionar outra sessão hoje</button>`;
+        addWrap.className = "treinador-rodape";
+        addWrap.innerHTML = `<button class="btn-secundario" id="btnAddPratica">+ Adicionar sessão manual</button>`;
         wrap.appendChild(addWrap);
         addWrap.querySelector("#btnAddPratica").addEventListener("click", addBlocoPratica);
     }
