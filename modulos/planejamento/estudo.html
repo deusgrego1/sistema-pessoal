@@ -937,8 +937,45 @@
             font-family: inherit;
             font-size: 13px;
             outline: none;
+        }        
+        .form-skill select:focus { border-color: #55555c; }
+
+        /* ---------- Bloco de prática ---------- */
+        .bloco-estudo select {
+            width: 100%;
+            padding: 8px 12px;
+            background: #17171a;
+            border: 1px solid #333338;
+            color: #eaeaea;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
         }
-        .form-skill select:focus { border-color: #55555c; }    </style>
+        .bloco-estudo select:focus { border-color: #55555c; }
+
+        .marco-contexto {
+            background: #172017;
+            border: 1px solid #2e5a2e;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-top: 12px;
+        }
+        .marco-contexto-rotulo {
+            display: block;
+            font-size: 10px;
+            color: #4caf50;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        .marco-contexto-titulo {
+            font-size: 13px;
+            color: #eaeaea;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+    </style>
 </head>
 
 <body>
@@ -1189,17 +1226,305 @@
     // ==================================================
     // PRÁTICA — casca (Partes 6+ preenchem o conteúdo real)
     // ==================================================
-    function renderPraticarHoje() {
-        el("conteudo").innerHTML = `
-            <div class="vazio">
-                <div style="font-size:36px; margin-bottom:10px;">🛠️</div>
-                <div><strong>Praticar hoje</strong> será preenchido na Parte 10.</div>
-                <p style="font-size:13px; color:#666; margin-top:8px;">
-                    O Treinador e o bloco do dia vêm nas próximas partes.
-                    Por enquanto, dê uma olhada no <strong>Arsenal</strong>.
-                </p>
+        function renderPraticarHoje() {
+        const blocos = Storage.blocos.ler("pratica", dataAtual);
+        const wrap = el("conteudo");
+        wrap.innerHTML = "";
+
+        const skills = Storage.pratica.skills.listarAtivas();
+        if (!skills.length) {
+            wrap.innerHTML = `
+                <div class="vazio">
+                    <div style="font-size:36px; margin-bottom:10px;">🎯</div>
+                    <div>Você ainda não criou nenhuma skill.</div>
+                    <p style="font-size:13px; color:#666; margin-top:8px;">
+                        Vá no <strong>Arsenal</strong> e crie sua primeira skill antes de praticar.
+                    </p>
+                </div>
+            `;
+            return;
+        }
+
+        if (blocos.length === 0) {
+            const vazio = document.createElement("div");
+            vazio.className = "vazio";
+            vazio.innerHTML = `
+                <p>Nenhuma sessão de prática registrada hoje ainda.</p>
+                <button class="btn-primario" id="btnAddPratica">+ Adicionar sessão</button>
+            `;
+            wrap.appendChild(vazio);
+            vazio.querySelector("#btnAddPratica").addEventListener("click", addBlocoPratica);
+            return;
+        }
+
+        blocos.forEach((b, i) => wrap.appendChild(renderBlocoPratica(b, i)));
+
+        const addWrap = document.createElement("div");
+        addWrap.style.marginTop = "10px";
+        addWrap.innerHTML = `<button class="btn-secundario" id="btnAddPratica">+ Adicionar outra sessão hoje</button>`;
+        wrap.appendChild(addWrap);
+        addWrap.querySelector("#btnAddPratica").addEventListener("click", addBlocoPratica);
+    }
+
+    function addBlocoPratica() {
+        const blocos = Storage.blocos.ler("pratica", dataAtual);
+        blocos.push({
+            id: uid("blk"),
+            skillId: "",
+            frenteId: "",
+            alvo_sessao: "",
+            tempo_previsto_min: 0,
+            reps_previstas: "",
+            tempo_real_min: 0,
+            reps_realizadas: "",
+            energia: "",
+            dificuldade: "",
+            ponto_fraco: "",
+            feedback_fonte: "",
+            feedback_nota: "",
+            feedback_texto: "",
+            o_que_funcionou: "",
+            proxima_acao: "",
+            midia_url: "",
+            criado_em: Date.now(),
+        });
+        Storage.blocos.salvar("pratica", dataAtual, blocos);
+        render();
+    }
+
+    function salvarCampoPratica(blocoId, campo, valor) {
+        const blocos = Storage.blocos.ler("pratica", dataAtual);
+        const i = blocos.findIndex(x => x.id === blocoId);
+        if (i < 0) return;
+        blocos[i][campo] = valor;
+        Storage.blocos.salvar("pratica", dataAtual, blocos);
+    }
+
+    function renderBlocoPratica(b, idx) {
+        const elBloco = document.createElement("div");
+        elBloco.className = "bloco-estudo";
+        elBloco.dataset.id = b.id;
+
+        const skills = Storage.pratica.skills.listarAtivas();
+        const skillAtual = b.skillId ? Storage.pratica.skills.ler(b.skillId) : null;
+        const frentesDisponiveis = skillAtual ? skillAtual.frentes.filter(f => !f.arquivada) : [];
+
+        const chipsTempo = [
+            { v: 15,  label: "15 min" },
+            { v: 30,  label: "30 min" },
+            { v: 45,  label: "45 min" },
+            { v: 60,  label: "1h" },
+            { v: 90,  label: "1h30" },
+            { v: 120, label: "2h+" },
+        ];
+
+        const energias = [
+            { v: "alta",  label: "🔋 Alta" },
+            { v: "media", label: "🟡 Média" },
+            { v: "baixa", label: "🫙 Baixa" },
+        ];
+
+        const dificuldades = [
+            { v: "verde",    label: "🟢 Fácil" },
+            { v: "amarelo",  label: "🟡 Médio" },
+            { v: "vermelho", label: "🔴 Difícil" },
+        ];
+
+        const feedbackFontes = [
+            { v: "auto",      label: "Auto" },
+            { v: "mentor",    label: "Mentor" },
+            { v: "par",       label: "Par" },
+            { v: "audiencia", label: "Audiência" },
+            { v: "outro",     label: "Outro" },
+        ];
+
+        const feedbackNotas = [
+            { v: "verde",    label: "🟢" },
+            { v: "amarelo",  label: "🟡" },
+            { v: "vermelho", label: "🔴" },
+        ];
+
+        const skillNome = skillAtual ? `${skillAtual.icone} ${skillAtual.nome}` : "(escolha uma skill)";
+        const frenteAtual = b.frenteId && skillAtual
+            ? skillAtual.frentes.find(f => f.id === b.frenteId)
+            : null;
+        const frenteNome = frenteAtual ? `${frenteAtual.icone} ${frenteAtual.nome}` : "";
+
+        const marcoAtivo = frenteAtual && frenteAtual.marco_ativo && skillAtual
+            ? skillAtual.marcos[frenteAtual.marco_ativo]
+            : null;
+
+        elBloco.innerHTML = `
+            <div class="bloco-cabecalho">
+                <span class="bloco-titulo">Sessão ${idx + 1} · ${esc(skillNome)}${frenteNome ? " · " + esc(frenteNome) : ""}</span>
+                <button class="bloco-remover" data-rem="${b.id}" title="Remover">×</button>
             </div>
+
+            <div class="secao-titulo">📋 Antes de praticar</div>
+
+            <label class="campo-label">Skill</label>
+            <select data-campo="skillId">
+                <option value="">— escolha uma skill —</option>
+                ${skills.map(s => `
+                    <option value="${esc(s.id)}" ${b.skillId === s.id ? "selected" : ""}>${esc(s.icone)} ${esc(s.nome)}</option>
+                `).join("")}
+            </select>
+
+            ${skillAtual ? `
+                <label class="campo-label">Frente</label>
+                <select data-campo="frenteId">
+                    <option value="">— escolha uma frente —</option>
+                    ${frentesDisponiveis.map(f => `
+                        <option value="${esc(f.id)}" ${b.frenteId === f.id ? "selected" : ""}>${esc(f.icone)} ${esc(f.nome)}</option>
+                    `).join("")}
+                </select>
+            ` : ""}
+
+            ${marcoAtivo ? `
+                <div class="marco-contexto">
+                    <span class="marco-contexto-rotulo">🧭 Marco ativo</span>
+                    <span class="marco-contexto-titulo">${esc(marcoAtivo.titulo)}</span>
+                    <div class="marco-bar" style="margin-top:6px;"><div style="width:${marcoAtivo.percentual || 0}%"></div></div>
+                    <div class="progresso-texto">${marcoAtivo.percentual || 0}%</div>
+                </div>
+            ` : ""}
+
+            <label class="campo-label">O que vou praticar hoje (alvo da sessão)</label>
+            <input type="text" data-campo="alvo_sessao" value="${esc(b.alvo_sessao)}" placeholder="Ex.: compasso 23-30 @ 80bpm">
+
+            <label class="campo-label">Tempo previsto</label>
+            <div class="chips" data-chips="tempo_previsto_min">
+                ${chipsTempo.map(c => `
+                    <div class="chip${Number(b.tempo_previsto_min) === c.v ? " selecionado" : ""}" data-v="${c.v}">${c.label}</div>
+                `).join("")}
+            </div>
+
+            <label class="campo-label">Reps previstas (opcional)</label>
+            <input type="text" data-campo="reps_previstas" value="${esc(b.reps_previstas)}" placeholder="Ex.: 20 repetições, 3 séries">
+
+            <div class="secao-titulo" style="margin-top:22px;">▶️ Durante</div>
+
+            <label class="campo-label">Tempo real</label>
+            <div class="chips" data-chips="tempo_real_min">
+                ${chipsTempo.map(c => `
+                    <div class="chip${Number(b.tempo_real_min) === c.v ? " selecionado" : ""}" data-v="${c.v}">${c.label}</div>
+                `).join("")}
+            </div>
+
+            <label class="campo-label">Reps realizadas</label>
+            <input type="text" data-campo="reps_realizadas" value="${esc(b.reps_realizadas)}" placeholder="Ex.: 18 reps, falhei na última série">
+
+            <label class="campo-label">Energia</label>
+            <div class="chips" data-chips-radio="energia">
+                ${energias.map(e => `
+                    <div class="chip${b.energia === e.v ? " selecionado" : ""}" data-v="${e.v}">${e.label}</div>
+                `).join("")}
+            </div>
+
+            <label class="campo-label">Dificuldade percebida</label>
+            <div class="chips" data-chips-radio="dificuldade">
+                ${dificuldades.map(d => `
+                    <div class="chip${b.dificuldade === d.v ? " selecionado" : ""}" data-v="${d.v}">${d.label}</div>
+                `).join("")}
+            </div>
+
+            <label class="campo-label">Ponto fraco observado</label>
+            <textarea data-campo="ponto_fraco" rows="2" placeholder="Ex.: transição B→C atrasa em 85bpm">${esc(b.ponto_fraco)}</textarea>
+
+            <div class="secao-titulo" style="margin-top:22px;">✅ Depois</div>
+
+            <label class="campo-label">Feedback recebido</label>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+                <div class="chips" data-chips-radio="feedback_fonte" style="flex:1;">
+                    ${feedbackFontes.map(f => `
+                        <div class="chip${b.feedback_fonte === f.v ? " selecionado" : ""}" data-v="${f.v}">${f.label}</div>
+                    `).join("")}
+                </div>
+                <div class="chips" data-chips-radio="feedback_nota">
+                    ${feedbackNotas.map(n => `
+                        <div class="chip${b.feedback_nota === n.v ? " selecionado" : ""}" data-v="${n.v}">${n.label}</div>
+                    `).join("")}
+                </div>
+            </div>
+            <textarea data-campo="feedback_texto" rows="2" placeholder="O que foi dito / percebido">${esc(b.feedback_texto)}</textarea>
+
+            <label class="campo-label">O que funcionou</label>
+            <textarea data-campo="o_que_funcionou" rows="2" placeholder="Ex.: metrônomo mais alto no fone ajudou">${esc(b.o_que_funcionou)}</textarea>
+
+            <label class="campo-label">Próxima ação</label>
+            <input type="text" data-campo="proxima_acao" value="${esc(b.proxima_acao)}" placeholder="Ex.: subir pra 85bpm amanhã">
+
+            <label class="campo-label">Link de mídia (opcional)</label>
+            <input type="text" data-campo="midia_url" value="${esc(b.midia_url)}" placeholder="https://drive.google.com/... (vídeo/áudio/foto da sessão)">
         `;
+
+        // --- inputs simples ---
+        elBloco.querySelectorAll("[data-campo]").forEach(input => {
+            input.addEventListener("input", () => {
+                const campo = input.dataset.campo;
+                salvarCampoPratica(b.id, campo, input.value);
+            });
+        });
+
+        // --- selects (skill e frente) precisam re-render ---
+        elBloco.querySelector('[data-campo="skillId"]')?.addEventListener("change", (ev) => {
+            const novoSkillId = ev.target.value;
+            const blocos = Storage.blocos.ler("pratica", dataAtual);
+            const i = blocos.findIndex(x => x.id === b.id);
+            if (i < 0) return;
+            blocos[i].skillId = novoSkillId;
+            blocos[i].frenteId = ""; // reset frente ao trocar de skill
+            Storage.blocos.salvar("pratica", dataAtual, blocos);
+            render();
+        });
+
+        elBloco.querySelector('[data-campo="frenteId"]')?.addEventListener("change", (ev) => {
+            salvarCampoPratica(b.id, "frenteId", ev.target.value);
+            render();
+        });
+
+        // --- chips de tempo (single select) ---
+        elBloco.querySelectorAll('[data-chips]').forEach(grupo => {
+            const campo = grupo.dataset.chips;
+            grupo.querySelectorAll(".chip").forEach(chip => {
+                chip.addEventListener("click", () => {
+                    const jaSel = chip.classList.contains("selecionado");
+                    grupo.querySelectorAll(".chip").forEach(c => c.classList.remove("selecionado"));
+                    if (jaSel) {
+                        salvarCampoPratica(b.id, campo, 0);
+                    } else {
+                        chip.classList.add("selecionado");
+                        salvarCampoPratica(b.id, campo, Number(chip.dataset.v));
+                    }
+                });
+            });
+        });
+
+        // --- chips radio (energia, dificuldade, feedback_fonte, feedback_nota) ---
+        elBloco.querySelectorAll('[data-chips-radio]').forEach(grupo => {
+            const campo = grupo.dataset.chipsRadio;
+            grupo.querySelectorAll(".chip").forEach(chip => {
+                chip.addEventListener("click", () => {
+                    const jaSel = chip.classList.contains("selecionado");
+                    grupo.querySelectorAll(".chip").forEach(c => c.classList.remove("selecionado"));
+                    if (jaSel) {
+                        salvarCampoPratica(b.id, campo, "");
+                    } else {
+                        chip.classList.add("selecionado");
+                        salvarCampoPratica(b.id, campo, chip.dataset.v);
+                    }
+                });
+            });
+        });
+
+        // --- remover bloco ---
+        elBloco.querySelector("[data-rem]").addEventListener("click", () => {
+            const blocos = Storage.blocos.ler("pratica", dataAtual).filter(x => x.id !== b.id);
+            Storage.blocos.salvar("pratica", dataAtual, blocos);
+            render();
+        });
+
+        return elBloco;
     }
 
         function renderArsenal() {
