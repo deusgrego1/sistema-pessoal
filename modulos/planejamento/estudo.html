@@ -1099,6 +1099,59 @@
             text-transform: none;
             letter-spacing: 0;
         }
+
+        /* ---------- Tempo real (read-only + barra) ---------- */
+        .tempo-real-box {
+            background: #17171a;
+            border: 1px solid #2a2a30;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+        }
+        .tempo-real-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .tempo-real-valor {
+            font-size: 24px;
+            font-weight: 600;
+            color: #eaeaea;
+            font-variant-numeric: tabular-nums;
+            line-height: 1;
+        }
+        .tempo-real-ajustar {
+            background: none;
+            border: 1px solid #333338;
+            color: #888;
+            font-size: 11px;
+            padding: 3px 9px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.15s;
+        }
+        .tempo-real-ajustar:hover {
+            color: #e0e0e0;
+            border-color: #55555c;
+        }
+        .tempo-real-barra {
+            height: 6px;
+            background: #252529;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+        .tempo-real-barra > div {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #66bb6a);
+            transition: width 0.3s ease;
+        }
+        .tempo-real-meta {
+            font-size: 11px;
+            color: #777;
+        }
     </style>
 </head>
 
@@ -1743,6 +1796,15 @@
         Storage.blocos.salvar("pratica", dataAtual, blocos);
     }
 
+    function formatarTempoReal(min) {
+        min = Number(min) || 0;
+        if (min <= 0) return "—";
+        if (min < 60) return min + " min";
+        const h = Math.floor(min / 60);
+        const m = min % 60;
+        return m > 0 ? `${h}h ${m}min` : `${h}h`;
+    }
+
     function renderBlocoPratica(b, idx) {
         const elBloco = document.createElement("div");
         elBloco.className = "bloco-estudo";
@@ -1862,10 +1924,17 @@
             <div class="secao-titulo" style="margin-top:22px;">▶️ Durante</div>
 
             <label class="campo-label">Tempo real</label>
-            <div class="chips" data-chips="tempo_real_min">
-                ${chipsTempo.map(c => `
-                    <div class="chip${Number(b.tempo_real_min) === c.v ? " selecionado" : ""}" data-v="${c.v}">${c.label}</div>
-                `).join("")}
+            <div class="tempo-real-box">
+                <div class="tempo-real-display">
+                    <span class="tempo-real-valor">${formatarTempoReal(b.tempo_real_min)}</span>
+                    <button type="button" class="tempo-real-ajustar" data-ajustar-tempo-real="${b.id}">ajustar</button>
+                </div>
+                ${Number(b.tempo_previsto_min) > 0 ? `
+                    <div class="tempo-real-barra" title="Real vs previsto">
+                        <div style="width:${Math.min(100, ((Number(b.tempo_real_min) || 0) / Number(b.tempo_previsto_min)) * 100)}%"></div>
+                    </div>
+                    <div class="tempo-real-meta">previsto: ${b.tempo_previsto_min} min</div>
+                ` : ""}
             </div>
 
             <label class="campo-label">Reps realizadas</label>
@@ -1972,6 +2041,17 @@
                     }
                 });
             });
+        });
+
+        // --- ajustar tempo real manualmente ---
+        elBloco.querySelector("[data-ajustar-tempo-real]")?.addEventListener("click", () => {
+            const atual = Number(b.tempo_real_min) || 0;
+            const novo = prompt(`Tempo real em minutos (atual: ${atual}):`, String(atual));
+            if (novo === null) return;
+            const n = parseInt(novo, 10);
+            if (isNaN(n) || n < 0) return alert("Valor inválido.");
+            salvarCampoPratica(b.id, "tempo_real_min", n);
+            render();
         });
 
         // --- remover bloco ---
