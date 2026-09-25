@@ -516,12 +516,84 @@
             color: #888;
             margin-bottom: 10px;
         }
-        .arsenal-meta .sep { margin: 0 4px; color: #444; }
-        .arsenal-rodape {
+                .arsenal-rodape {
             display: flex;
             justify-content: space-between;
             font-size: 11px;
             color: #777;
+        }
+
+        .arsenal-stats {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+            background: #19191d;
+            border: 1px solid #252529;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #888;
+            align-items: center;
+        }
+        .arsenal-stats strong { color: #eaeaea; font-weight: 600; }
+
+        .arsenal-filtros {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .skill-detalhe-cabecalho {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .skill-detalhe-icone {
+            font-size: 42px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        .skill-detalhe-nome {
+            font-size: 22px;
+            color: #fff;
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: 4px;
+        }
+        .skill-detalhe-sub {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .skill-detalhe-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 10px;
+        }
+        .skill-detalhe-stats > div {
+            background: #1c1c20;
+            border: 1px solid #2a2a30;
+            border-radius: 10px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .skill-detalhe-stats strong {
+            font-size: 20px;
+            color: #fff;
+            font-weight: 600;
+            line-height: 1;
+        }
+        .skill-detalhe-stats span {
+            font-size: 11px;
+            color: #777;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
     </style>
 </head>
@@ -576,7 +648,7 @@
     ];
     const ABAS_APRENDIZADOS = { id: "aprendizados", label: "🧠 Aprendizados" };
 
-    const estado = {
+        const estado = {
         tipo: "livro",
         subAba: "estudar",
         bibFiltro: "todos",
@@ -588,8 +660,11 @@
         newsPeriodo: "48h",
         newsDominio: "",
         newsModo: "lista",
+        arsenalFiltro: "todas",
+        arsenalOrdem: "recentes",
+        arsenalBusca: "",
+        arsenalSkillAberta: null,
     };
-
     const esc = Storage.escapeHTML;
     function el(id) { return document.getElementById(id); }
     function uid(p) { return `${p}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`; }
@@ -731,11 +806,51 @@
         `;
     }
 
-    function renderArsenal() {
+        function renderArsenal() {
         const wrap = el("conteudo");
-        const comDerivados = Storage.pratica.derivados.listarComDerivados();
 
-        if (!comDerivados.length) {
+        // se uma skill estava aberta, checa se ainda existe
+        if (estado.arsenalSkillAberta) {
+            const skill = Storage.pratica.skills.ler(estado.arsenalSkillAberta);
+            if (!skill) { estado.arsenalSkillAberta = null; }
+            else return renderDetalheSkill(skill);
+        }
+
+        const todas = Storage.pratica.derivados.listarComDerivados();
+        const arquivadas = todas.filter(s => s.arquivada);
+        const ativas     = todas.filter(s => !s.arquivada);
+
+        // filtro
+        let lista = estado.arsenalFiltro === "arquivadas" ? [...arquivadas] : [...ativas];
+        if (estado.arsenalFiltro !== "arquivadas" && estado.arsenalFiltro !== "todas") {
+            const mapa = { quentes: "🔥", mornas: "🌤", frias: "❄️", congeladas: "🧊" };
+            const alvo = mapa[estado.arsenalFiltro];
+            if (alvo) lista = lista.filter(s => (s._derivados?.temperatura_geral || "🆕") === alvo);
+        }
+
+        // busca
+        if (estado.arsenalBusca.trim()) {
+            const q = estado.arsenalBusca.toLowerCase();
+            lista = lista.filter(s => (s.nome || "").toLowerCase().includes(q));
+        }
+
+        // ordenação
+        if (estado.arsenalOrdem === "az") {
+            lista.sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
+        } else if (estado.arsenalOrdem === "gap") {
+            lista.sort((a, b) => (b._derivados?.gap_medio ?? -1) - (a._derivados?.gap_medio ?? -1));
+        } else if (estado.arsenalOrdem === "streak") {
+            lista.sort((a, b) => (b._derivados?.streak_atual || 0) - (a._derivados?.streak_atual || 0));
+        } else {
+            lista.sort((a, b) => (b.atualizado_em || "").localeCompare(a.atualizado_em || ""));
+        }
+
+        // stats
+        const congeladas = ativas.filter(s => (s._derivados?.temperatura_geral || "") === "🧊").length;
+        const adormecidas = ativas.filter(s => (s._derivados?.temperatura_geral || "") === "❄️").length;
+
+        // se não tem NENHUMA skill no sistema (nem ativa, nem arquivada)
+        if (!todas.length) {
             wrap.innerHTML = `
                 <div class="vazio">
                     <div style="font-size:36px; margin-bottom:10px;">🎯</div>
@@ -746,26 +861,151 @@
                     <button class="btn-primario" id="btnNovaSkill" style="margin-top:14px;">+ Criar primeira skill</button>
                 </div>
             `;
-        } else {
-            wrap.innerHTML = `
-                <div class="bib-controles" style="margin-bottom:14px;">
-                    <button class="btn-primario" id="btnNovaSkill">+ Nova skill</button>
-                </div>
-                <div class="arsenal-grade">
-                    ${comDerivados.map(renderCardArsenal).join("")}
-                </div>
-            `;
+            wrap.querySelector("#btnNovaSkill")?.addEventListener("click", abrirFormNovaSkill);
+            return;
         }
 
-        wrap.querySelector("#btnNovaSkill")?.addEventListener("click", () => {
-            const nome = prompt("Nome da skill (ex.: Violão, Inglês, Copywriting):", "");
-            if (!nome) return;
-            const icone = (prompt("Ícone (emoji, opcional):", "🛠️") || "🛠️").trim() || "🛠️";
-            Storage.pratica.skills.criar({ nome, icone });
-            render();
+        wrap.innerHTML = `
+            <div class="arsenal-stats">
+                <div><strong>${ativas.length}</strong> ${ativas.length === 1 ? "skill" : "skills"}</div>
+                <div>·</div>
+                <div><strong>${adormecidas}</strong> fria${adormecidas === 1 ? "" : "s"}</div>
+                <div>·</div>
+                <div><strong>${congeladas}</strong> congelada${congeladas === 1 ? "" : "s"}</div>
+            </div>
+
+            <div class="bib-controles" style="margin-bottom:12px;">
+                <input type="search" class="bib-busca" id="arsenalBusca" placeholder="🔍 Buscar skill" value="${esc(estado.arsenalBusca)}">
+                <button class="btn-primario" id="btnNovaSkill">+ Nova skill</button>
+            </div>
+
+            <div class="arsenal-filtros">
+                <button class="btn-secundario ${estado.arsenalFiltro === "todas" ? "btn-primario" : ""}" data-af="todas">Todas</button>
+                <button class="btn-secundario ${estado.arsenalFiltro === "quentes" ? "btn-primario" : ""}" data-af="quentes">🔥 Quentes</button>
+                <button class="btn-secundario ${estado.arsenalFiltro === "mornas" ? "btn-primario" : ""}" data-af="mornas">🌤 Mornas</button>
+                <button class="btn-secundario ${estado.arsenalFiltro === "frias" ? "btn-primario" : ""}" data-af="frias">❄️ Frias</button>
+                <button class="btn-secundario ${estado.arsenalFiltro === "congeladas" ? "btn-primario" : ""}" data-af="congeladas">🧊 Congeladas</button>
+                <button class="btn-secundario ${estado.arsenalFiltro === "arquivadas" ? "btn-primario" : ""}" data-af="arquivadas">📦 Arquivadas</button>
+            </div>
+
+            <div class="arsenal-filtros" style="margin-bottom:16px;">
+                <span style="font-size:11px;color:#777;align-self:center;">Ordenar:</span>
+                <button class="btn-secundario ${estado.arsenalOrdem === "recentes" ? "btn-primario" : ""}" data-ao="recentes">Recentes</button>
+                <button class="btn-secundario ${estado.arsenalOrdem === "az" ? "btn-primario" : ""}" data-ao="az">A-Z</button>
+                <button class="btn-secundario ${estado.arsenalOrdem === "gap" ? "btn-primario" : ""}" data-ao="gap">Maior gap</button>
+                <button class="btn-secundario ${estado.arsenalOrdem === "streak" ? "btn-primario" : ""}" data-ao="streak">Streak</button>
+            </div>
+
+            ${lista.length ? `
+                <div class="arsenal-grade">
+                    ${lista.map(renderCardArsenal).join("")}
+                </div>
+            ` : `<div class="vazio">Nenhuma skill neste filtro.</div>`}
+        `;
+
+        // handlers
+        wrap.querySelector("#btnNovaSkill")?.addEventListener("click", abrirFormNovaSkill);
+
+        wrap.querySelector("#arsenalBusca")?.addEventListener("input", e => {
+            estado.arsenalBusca = e.target.value;
+            renderArsenal();
+            const input = wrap.querySelector("#arsenalBusca");
+            if (input) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); }
+        });
+
+        wrap.querySelectorAll("[data-af]").forEach(b => {
+            b.addEventListener("click", () => {
+                estado.arsenalFiltro = b.dataset.af;
+                renderArsenal();
+            });
+        });
+
+        wrap.querySelectorAll("[data-ao]").forEach(b => {
+            b.addEventListener("click", () => {
+                estado.arsenalOrdem = b.dataset.ao;
+                renderArsenal();
+            });
+        });
+
+        wrap.querySelectorAll(".arsenal-card").forEach(card => {
+            card.addEventListener("click", () => {
+                estado.arsenalSkillAberta = card.dataset.id;
+                renderArsenal();
+            });
         });
     }
 
+    function abrirFormNovaSkill() {
+        const nome = prompt("Nome da skill (ex.: Violão, Inglês, Copywriting):", "");
+        if (!nome) return;
+        const icone = (prompt("Ícone (emoji, opcional):", "🛠️") || "🛠️").trim() || "🛠️";
+        Storage.pratica.skills.criar({ nome, icone });
+        estado.arsenalSkillAberta = null;
+        render();
+    }
+
+    function renderDetalheSkill(skill) {
+        const wrap = el("conteudo");
+        const d = skill._derivados || Storage.pratica.derivados.snapshotSkill(skill);
+
+        const temp = d.temperatura_geral || "🆕";
+        const gap  = (d.gap_medio === null || d.gap_medio === undefined) ? "—" : d.gap_medio + "%";
+        const sessoes = d.sessoes_total || 0;
+        const tempoH = d.tempo_total_min ? (d.tempo_total_min / 60).toFixed(1) + "h" : "0h";
+        const streak = d.streak_atual || 0;
+        const nivel = (d.nivel || "aprendiz");
+        const nivelLabel = { aprendiz: "🔨 Aprendiz", artesao: "⚒️ Artesão", mestre: "🎯 Mestre", lenda: "👑 Lenda" }[nivel] || nivel;
+
+        wrap.innerHTML = `
+            <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+                <button class="btn-secundario" id="btnVoltarArsenal">← Arsenal</button>
+                <div style="flex:1;"></div>
+                <button class="btn-secundario" id="btnArquivarSkill">${skill.arquivada ? "Desarquivar" : "Arquivar"}</button>
+                <button class="btn-secundario" id="btnRemoverSkill" style="color:#d45a5a;">Remover</button>
+            </div>
+
+            <div class="skill-detalhe-cabecalho">
+                <span class="skill-detalhe-icone">${esc(skill.icone)}</span>
+                <div style="flex:1;min-width:0;">
+                    <div class="skill-detalhe-nome">${esc(skill.nome)}</div>
+                    <div class="skill-detalhe-sub">${nivelLabel} · ${skill.frentes.length} frente${skill.frentes.length === 1 ? "" : "s"} · ${temp}</div>
+                </div>
+            </div>
+
+            <div class="skill-detalhe-stats">
+                <div><strong>${gap}</strong><span>gap médio</span></div>
+                <div><strong>${sessoes}</strong><span>sessõe${sessoes === 1 ? "m" : "s"}</span></div>
+                <div><strong>${tempoH}</strong><span>tempo total</span></div>
+                <div><strong>${streak > 0 ? "🔥 " + streak : "—"}</strong><span>streak</span></div>
+            </div>
+
+            <div class="bloco-estudo" style="margin-top:20px;">
+                <div style="color:#888;font-size:13px;text-align:center;padding:20px;">
+                    🚧 <strong>Frentes, marcos, Bússola/Norte, mídias, pontos de virada e feedback</strong><br>
+                    serão adicionados na Parte 7.
+                </div>
+            </div>
+        `;
+
+        wrap.querySelector("#btnVoltarArsenal").addEventListener("click", () => {
+            estado.arsenalSkillAberta = null;
+            renderArsenal();
+        });
+
+        wrap.querySelector("#btnArquivarSkill").addEventListener("click", () => {
+            if (skill.arquivada) Storage.pratica.skills.desarquivar(skill.id);
+            else Storage.pratica.skills.arquivar(skill.id);
+            estado.arsenalSkillAberta = null;
+            renderArsenal();
+        });
+
+        wrap.querySelector("#btnRemoverSkill").addEventListener("click", () => {
+            if (!confirm(`Remover "${skill.nome}"? Todos os marcos, mídias e histórico dessa skill serão apagados. Isso não pode ser desfeito.`)) return;
+            Storage.pratica.skills.remover(skill.id);
+            estado.arsenalSkillAberta = null;
+            renderArsenal();
+        });
+    }
     function renderCardArsenal(s) {
         const d = s._derivados || {};
         const temp   = d.temperatura_geral || "🆕";
