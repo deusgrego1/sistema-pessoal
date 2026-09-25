@@ -489,12 +489,39 @@
         }
 
         function voltarParaPratica() {
+            // para o timer e solta travas antes de sair
+            if (intervalId) { clearInterval(intervalId); intervalId = null; }
+            rodando = false;
+            try { liberarWakeLock(); } catch (e) {}
+
             gravarPacotePratica();
+            limparEstado();
+
             const d = dataBlocoURL || dataAtual;
             window.location.href = `../planejamento/estudo.html?origem=foco&data=${d}`;
         }
 
         if (ehPratica) {
+            // detecta se é uma NOVA sessão de prática (blocoId diferente do último)
+            const chaveUltimoBloco = `planejamento_${dataAtual}_foco_ultimo_bloco`;
+            const ultimoBloco = localStorage.getItem(chaveUltimoBloco);
+            const ehNovaSessaoPratica = ultimoBloco !== blocoIdURL;
+
+            if (ehNovaSessaoPratica) {
+                // limpa notas, tarefa e distrações da sessão anterior
+                localStorage.removeItem(chaveNotas);
+                localStorage.removeItem(chaveTarefa);
+                localStorage.removeItem(chaveDistancias);
+                localStorage.removeItem(chaveEstado);
+                notasFoco.value = "";
+                tarefaFoco.value = "";
+                distracoes = [];
+                renderizarDistracoes();
+                localStorage.setItem(chaveUltimoBloco, blocoIdURL);
+                // garante timer zerado
+                resetTimer();
+            }
+
             const banner = document.getElementById("bannerPratica");
             const titulo = document.getElementById("bannerPraticaTitulo");
             if (banner && titulo) {
@@ -640,9 +667,11 @@ card.classList.add("painel-lateral-direita");
         function salvarEstado() {
             localStorage.setItem(chaveEstado, JSON.stringify({
                 rodando, inicio: inicioSessao,
-                duracao: duracaoTotal, restante: segundosRestantes
+                duracao: duracaoTotal, restante: segundosRestantes,
+                blocoId: blocoIdURL || null
             }));
         }
+        
         function limparEstado() { localStorage.removeItem(chaveEstado); }
 
         function restaurarEstado() {
@@ -650,6 +679,12 @@ card.classList.add("painel-lateral-direita");
             try { salvo = JSON.parse(localStorage.getItem(chaveEstado)); }
             catch (e) { salvo = null; }
             if (!salvo || typeof salvo !== "object") return;
+
+            // se é sessão de prática e o estado é de OUTRO bloco, ignora
+            if (ehPratica && salvo.blocoId && salvo.blocoId !== blocoIdURL) {
+                limparEstado();
+                return;
+            }
 
             if (salvo.duracao) {
                 duracaoTotal = salvo.duracao;
