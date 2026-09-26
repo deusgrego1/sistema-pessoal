@@ -1721,8 +1721,8 @@
 
     // Ajuste de tempo: olha os últimos blocos concluídos (tempo_real_min > 0)
     // e calcula um multiplicador entre 0.8 e 1.4 pro tempo previsto vs real.
-    function _calcularAjusteTempo(skillId, frenteId) {
-        const todos = lerTodosBlocosPratica().filter(b =>
+    function _calcularAjusteTempo(skillId, frenteId, todosBlocos) {
+        const todos = todosBlocos.filter(b =>>
             b.skillId === skillId && b.frenteId === frenteId &&
             Number(b.tempo_real_min) > 0
         );
@@ -1828,7 +1828,7 @@
                 else if (temp.emoji === "❄️") tempo = 15;
 
                 // ajuste de tempo pelo histórico real
-                const fator = _calcularAjusteTempo(skill.id, frente.id);
+                const fator = _calcularAjusteTempo(skill.id, frente.id, todos);
                 if (fator !== 1) {
                     tempo = Math.round(tempo * fator);
                     // arredonda pra múltiplo de 5
@@ -6189,7 +6189,8 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
                     if (min === 0 && typeof pacote.tempo_real_seg === "number" && pacote.tempo_real_seg > 30) {
                         min = 1;
                     }
-                    blocos[i].tempo_real_min = min;
+                    // Acumula o tempo em vez de sobrescrever
+                    blocos[i].tempo_real_min = (Number(blocos[i].tempo_real_min) || 0) + min;
                 }
                 if (typeof pacote.pausas === "number")     blocos[i].pausas = pacote.pausas;
                 if (typeof pacote.distracoes === "number") blocos[i].distracoes = pacote.distracoes;
