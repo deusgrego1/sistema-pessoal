@@ -2564,19 +2564,23 @@
         // se não tem NENHUMA skill no sistema (nem ativa, nem arquivada)
         if (!todas.length) {
             wrap.innerHTML = `
-                <div class="vazio">
-                    <div style="font-size:36px; margin-bottom:10px;">🎯</div>
-                    <div>Nenhuma skill no Arsenal ainda.</div>
-                    <p style="font-size:13px; color:#666; margin-top:8px;">
-                        Skills são as habilidades que você treina (violão, inglês, copy…).
-                    </p>
-                    <button class="btn-primario" id="btnNovaSkill" style="margin-top:14px;">+ Criar primeira skill</button>
-                </div>
+                <div id="formSkillWrap">${estado.arsenalFormAberto ? renderFormSkill() : ""}</div>
+                ${estado.arsenalFormAberto ? "" : `
+                    <div class="vazio">
+                        <div style="font-size:36px; margin-bottom:10px;">🎯</div>
+                        <div>Nenhuma skill no Arsenal ainda.</div>
+                        <p style="font-size:13px; color:#666; margin-top:8px;">
+                            Skills são as habilidades que você treina (violão, inglês, copy…).
+                        </p>
+                        <button class="btn-primario" id="btnNovaSkill" style="margin-top:14px;">+ Criar primeira skill</button>
+                    </div>
+                `}
             `;
             wrap.querySelector("#btnNovaSkill")?.addEventListener("click", abrirFormNovaSkill);
+            if (estado.arsenalFormAberto) ligarFormSkill(wrap);
             return;
         }
-
+            
         wrap.innerHTML = `
             <div id="formSkillWrap">${estado.arsenalFormAberto ? renderFormSkill() : ""}</div>
 
