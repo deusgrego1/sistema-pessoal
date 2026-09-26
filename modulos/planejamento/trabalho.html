@@ -285,6 +285,72 @@
             from { opacity: 0; transform: translate(-50%, 8px); }
             to   { opacity: 1; transform: translate(-50%, 0); }
         }
+
+        /* ---------- Templates de job ---------- */
+        .templates-linha {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            padding: 10px 12px;
+            background: #17171a;
+            border: 1px solid #252529;
+            border-radius: 10px;
+        }
+        .templates-rotulo {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .template-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 6px 5px 12px;
+            background: #1a2233;
+            border: 1px solid #2c3a55;
+            color: #a8c4e8;
+            border-radius: 14px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.15s;
+            font-weight: 500;
+        }
+        .template-chip:hover {
+            background: #232f4a;
+            border-color: #4a5c85;
+            color: #dfe8ff;
+        }
+        .template-chip-nome { user-select: none; }
+        .template-chip-rm {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 14px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0 4px;
+            opacity: 0.55;
+        }
+        .template-chip-rm:hover { opacity: 1; }
+
+        .btn-salvar-template {
+            padding: 4px 10px;
+            font-size: 11px;
+            background: #17171a;
+            border: 1px dashed #333338;
+            color: #888;
+            border-radius: 14px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.15s;
+        }
+        .btn-salvar-template:hover {
+            border-color: #55555c;
+            color: #ccc;
+        }
     </style>
 </head>
 
@@ -371,6 +437,9 @@
                     <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
                         No máximo 5. Menos é mais.
                     </p>
+
+                    <div id="templatesBox"></div>
+
                     <div id="listaTarefas"></div>
                     <button type="button" class="btn-adicionar" id="btnAddTarefa">
                         ＋ Adicionar tarefa
@@ -378,7 +447,6 @@
                     <div class="contador-tarefas" id="contadorTarefas"></div>
                 </div>
             </div>
-
 
             <!-- PRÓXIMA AÇÃO -->
 
@@ -698,6 +766,41 @@
             return null;
         }
 
+        // ---------- Templates de job ----------
+        const CHAVE_TEMPLATES = "estudo_trabalho_templates";
+
+        function obterTemplates() {
+            try {
+                const raw = localStorage.getItem(CHAVE_TEMPLATES);
+                const arr = raw ? JSON.parse(raw) : [];
+                return Array.isArray(arr) ? arr : [];
+            } catch { return []; }
+        }
+        function salvarTemplates(arr) {
+            localStorage.setItem(CHAVE_TEMPLATES, JSON.stringify(arr));
+        }
+        function criarTemplate(nome, frentesExigidas) {
+            const lista = obterTemplates();
+            const novo = {
+                id: `tpl_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
+                nome: nome.trim(),
+                frentes: frentesExigidas.map(fx => ({ skillId: fx.skillId, frenteId: fx.frenteId })),
+                criado_em: Date.now()
+            };
+            lista.push(novo);
+            salvarTemplates(lista);
+            return novo;
+        }
+        function removerTemplate(id) {
+            const lista = obterTemplates().filter(t => t.id !== id);
+            salvarTemplates(lista);
+        }
+        function resumoFrentesTemplate(tpl) {
+            return tpl.frentes.map(fx => {
+                const info = obterFrente(fx.skillId, fx.frenteId);
+                return info ? `${info.frente.icone} ${info.frente.nome}` : "(frente removida)";
+            }).join(" · ");
+        }
         const listaTarefas = document.getElementById("listaTarefas");
         const contador = document.getElementById("contadorTarefas");
 
@@ -828,6 +931,17 @@
                     sub.appendChild(btnAdd);
                 }
 
+                // botão de salvar como template (só se já tem frentes)
+                if (frentes.length >= 2) {
+                    const btnTpl = document.createElement("button");
+                    btnTpl.type = "button";
+                    btnTpl.className = "btn-salvar-template";
+                    btnTpl.textContent = "💾 salvar como template";
+                    btnTpl.title = "Reusa essas frentes em outras tarefas";
+                    btnTpl.addEventListener("click", () => salvarTarefaComoTemplate(i));
+                    sub.appendChild(btnTpl);
+                }
+
                 wrapper.appendChild(sub);
                 listaTarefas.appendChild(wrapper);
             });
@@ -852,6 +966,80 @@
             contador.textContent = tarefas.length === 0
                 ? ""
                 : `${feitas}/${tarefas.length} concluídas`;
+        }
+
+        // ---------- Render templates ----------
+        function renderTemplates() {
+            const box = document.getElementById("templatesBox");
+            if (!box) return;
+            const templates = obterTemplates();
+
+            if (!templates.length) {
+                box.innerHTML = "";
+                return;
+            }
+
+            box.innerHTML = `
+                <div class="templates-linha">
+                    <span class="templates-rotulo">⚡ Templates:</span>
+                    ${templates.map(t => `
+                        <div class="template-chip" data-tpl-aplicar="${escFrente(t.id)}" title="${escFrente(resumoFrentesTemplate(t))}">
+                            <span class="template-chip-nome">${escFrente(t.nome)}</span>
+                            <button type="button" class="template-chip-rm" data-tpl-remover="${escFrente(t.id)}">×</button>
+                        </div>
+                    `).join("")}
+                </div>
+            `;
+
+            box.querySelectorAll("[data-tpl-aplicar]").forEach(chip => {
+                chip.addEventListener("click", (ev) => {
+                    if (ev.target.closest("[data-tpl-remover]")) return;
+                    aplicarTemplate(chip.dataset.tplAplicar);
+                });
+            });
+            box.querySelectorAll("[data-tpl-remover]").forEach(btn => {
+                btn.addEventListener("click", (ev) => {
+                    ev.stopPropagation();
+                    const id = btn.dataset.tplRemover;
+                    const t = obterTemplates().find(x => x.id === id);
+                    if (!t) return;
+                    if (!confirm(`Remover template "${t.nome}"?`)) return;
+                    removerTemplate(id);
+                    renderTemplates();
+                });
+            });
+        }
+
+        function aplicarTemplate(id) {
+            const tpl = obterTemplates().find(t => t.id === id);
+            if (!tpl) return;
+            if (tarefas.length >= 5) return alert("Máximo de 5 tarefas.");
+
+            // cria tarefa nova sem texto ainda, com as frentes do template
+            tarefas.push({
+                texto: "",
+                prioridade: "media",
+                concluida: false,
+                frentes_exigidas: tpl.frentes.map(fx => ({ skillId: fx.skillId, frenteId: fx.frenteId }))
+            });
+            salvarTarefas();
+            renderTarefas();
+
+            // foca no último input pra você digitar o texto
+            const inputs = listaTarefas.querySelectorAll(".tarefa-input");
+            if (inputs.length) inputs[inputs.length - 1].focus();
+        }
+
+        // ---------- Salvar template a partir de uma tarefa ----------
+        function salvarTarefaComoTemplate(idx) {
+            const t = tarefas[idx];
+            if (!t || !t.frentes_exigidas || !t.frentes_exigidas.length) {
+                return alert("Essa tarefa não tem frentes pra virar template.");
+            }
+            const nome = prompt("Nome do template (ex.: 'Edição simples', 'Copy de landing'):", "");
+            if (!nome || !nome.trim()) return;
+            criarTemplate(nome, t.frentes_exigidas);
+            renderTemplates();
         }
 
         function escFrente(s) {
@@ -950,15 +1138,15 @@
                 alert("Máximo de 5 tarefas. Menos é mais.");
                 return;
             }
-            tarefas.push({ texto: "", prioridade: "media", concluida: false });
+            tarefas.push({ texto: "", prioridade: "media", concluida: false, frentes_exigidas: [] });
             salvarTarefas();
             renderTarefas();
-            // Foca no último input
             const inputs = listaTarefas.querySelectorAll(".tarefa-input");
             if (inputs.length) inputs[inputs.length - 1].focus();
         });
 
         renderTarefas();
+        renderTemplates();
     </script>
 
 <script src="../../js/storage.js"></script>
