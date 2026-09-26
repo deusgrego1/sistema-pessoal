@@ -118,6 +118,51 @@
         .vazio-mini {
             color: #777; font-size: 13px; padding: 8px 0;
         }
+
+        /* ---------- Prática da semana ---------- */
+        .pratica-skill-linha {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 0; border-bottom: 1px solid #252529; font-size: 14px;
+        }
+        .pratica-skill-linha:last-child { border-bottom: none; }
+        .pratica-skill-linha .nome { color: #ccc; }
+        .pratica-skill-linha .contagem { color: #f5f5f5; font-weight: 600; }
+
+        .pratica-marco-item {
+            padding: 10px 12px;
+            background: linear-gradient(135deg, #172017 0%, #1c1c20 100%);
+            border-left: 3px solid #4caf50;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #e0e0e0;
+        }
+        .pratica-marco-item .nome { color: #a5d6a7; font-weight: 600; }
+        .pratica-marco-item .data-tag { color: #777; font-size: 11px; margin-right: 6px; }
+
+        .pratica-pv-item {
+            padding: 10px 12px;
+            background: linear-gradient(135deg, #1a1612 0%, #1c1c20 100%);
+            border-left: 3px solid #d4a94a;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #e0e0e0;
+        }
+        .pratica-pv-item .nome { color: #e0b851; font-weight: 600; font-size: 11px; }
+        .pratica-pv-item .texto { display: block; margin-top: 3px; color: #d0d0d0; }
+        .pratica-pv-item .data-tag { color: #777; font-size: 11px; margin-right: 6px; }
+
+        .pratica-alerta {
+            padding: 10px 12px;
+            background: #331f1f;
+            border-left: 3px solid #d45a5a;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #e08b8b;
+            margin-bottom: 6px;
+        }
+        .pratica-alerta .nome { font-weight: 600; }
     </style>
 </head>
 
@@ -212,6 +257,40 @@
                     <label class="campo-label" style="margin-top:20px;">Notas de treino da semana</label>
                     <textarea id="notasTreinoSemana" rows="4"
                         placeholder="Ex.: Semana boa de treino, subi cargas em 3 exercícios. Perna ainda travada na corrida."></textarea>
+                </div>
+            </div>
+
+
+            <!-- PRÁTICA NA SEMANA -->
+
+            <div class="module-card modo-completo" style="align-items: flex-start;">
+                <span class="icon">🧠</span>
+                <div style="width: 100%;">
+                    <h2>Prática na semana</h2>
+
+                    <p style="color:#888; font-size:13px; margin: 6px 0 12px;">
+                        O que você treinou, o que fechou e o que está esfriando.
+                    </p>
+
+                    <div id="praticaResumoSemana"><p class="vazio-mini">Carregando…</p></div>
+
+                    <p style="color:#888; font-size:13px; margin: 20px 0 12px;">
+                        Marcos fechados nesta semana.
+                    </p>
+
+                    <div id="praticaMarcosSemana"><p class="vazio-mini">Carregando…</p></div>
+
+                    <p style="color:#888; font-size:13px; margin: 20px 0 12px;">
+                        Pontos de virada.
+                    </p>
+
+                    <div id="praticaPVSemana"><p class="vazio-mini">Carregando…</p></div>
+
+                    <p style="color:#888; font-size:13px; margin: 20px 0 12px;">
+                        Skills que precisam de atenção.
+                    </p>
+
+                    <div id="praticaAlertaSemana"></div>
                 </div>
             </div>
 
@@ -824,7 +903,179 @@
         });
     </script>
 
+<script src="../../js/storage.js"></script>
 <script src="../../js/app.js"></script>
-    
+
+<script>
+    // ==================================================
+    // PRÁTICA NA SEMANA
+    // ==================================================
+    (function renderPraticaSemana() {
+        const dias = diasDaSemana(segunda);
+        const elResumo  = document.getElementById("praticaResumoSemana");
+        const elMarcos  = document.getElementById("praticaMarcosSemana");
+        const elPV      = document.getElementById("praticaPVSemana");
+        const elAlerta  = document.getElementById("praticaAlertaSemana");
+        if (!elResumo) return;
+
+        // --- coleta blocos de prática da semana ---
+        const blocosSemana = [];
+        dias.forEach(data => {
+            try {
+                const raw = localStorage.getItem(`estudo_${data}_pratica_blocos`);
+                if (!raw) return;
+                const arr = JSON.parse(raw);
+                if (Array.isArray(arr)) arr.forEach(b => blocosSemana.push({ ...b, _data: data }));
+            } catch (e) {}
+        });
+
+        // --- skills + derivaods ---
+        let skills = [];
+        let temStorage = false;
+        try {
+            if (typeof Storage !== "undefined" && Storage.pratica) {
+                skills = Storage.pratica.skills.listar();
+                temStorage = true;
+            }
+        } catch (e) {}
+
+        // fallback: lê cru do localStorage
+        if (!temStorage) {
+            try {
+                const raw = localStorage.getItem("pratica_skills");
+                if (raw) skills = JSON.parse(raw) || [];
+            } catch (e) {}
+        }
+
+        const skillsPorId = {};
+        skills.forEach(s => { skillsPorId[s.id] = s; });
+
+        // ---------- Resumo (topo) ----------
+        const totalSessoes = blocosSemana.length;
+        const tempoTotalMin = blocosSemana.reduce((acc, b) => acc + (Number(b.tempo_real_min) || 0), 0);
+
+        const porSkill = {};
+        blocosSemana.forEach(b => {
+            if (!b.skillId) return;
+            porSkill[b.skillId] = porSkill[b.skillId] || { sessoes: 0, tempo: 0 };
+            porSkill[b.skillId].sessoes++;
+            porSkill[b.skillId].tempo += Number(b.tempo_real_min) || 0;
+        });
+
+        function formatarTempoMin(min) {
+            min = Number(min) || 0;
+            if (min < 60) return `${min}min`;
+            const h = Math.floor(min / 60);
+            const m = min % 60;
+            return m > 0 ? `${h}h ${m}min` : `${h}h`;
+        }
+
+        if (!totalSessoes) {
+            elResumo.innerHTML = `<p class="vazio-mini">Nenhuma sessão de prática nesta semana.</p>`;
+        } else {
+            const linhasSkills = Object.keys(porSkill).map(sid => {
+                const s = skillsPorId[sid];
+                const nome = s ? `${s.icone} ${s.nome}` : "(skill removida)";
+                const dados = porSkill[sid];
+                return `<div class="pratica-skill-linha">
+                    <span class="nome">${nome}</span>
+                    <span class="contagem">${dados.sessoes}x · ${formatarTempoMin(dados.tempo)}</span>
+                </div>`;
+            }).join("");
+
+            elResumo.innerHTML = `
+                <div class="panorama-linha">
+                    <span class="panorama-label">Sessões de prática</span>
+                    <span class="panorama-valor">${totalSessoes}</span>
+                </div>
+                <div class="panorama-linha">
+                    <span class="panorama-label">Tempo total</span>
+                    <span class="panorama-valor">${formatarTempoMin(tempoTotalMin)}</span>
+                </div>
+                <div style="margin-top:12px;">${linhasSkills}</div>
+            `;
+        }
+
+        // ---------- Marcos fechados na semana ----------
+        const marcosFechados = [];
+        skills.forEach(s => {
+            Object.values(s.marcos || {}).forEach(m => {
+                if (!m.data_fim) return;
+                if (m.data_fim >= segunda && m.data_fim <= domingoISO) {
+                    marcosFechados.push({ skill: s, marco: m });
+                }
+            });
+        });
+
+        if (!marcosFechados.length) {
+            elMarcos.innerHTML = `<p class="vazio-mini">Nenhum marco fechado nesta semana.</p>`;
+        } else {
+            marcosFechados.sort((a, b) => a.marco.data_fim.localeCompare(b.marco.data_fim));
+            elMarcos.innerHTML = marcosFechados.map(({ skill, marco }) => {
+                const [y, m, d] = marco.data_fim.split("-");
+                return `<div class="pratica-marco-item">
+                    <span class="data-tag">${d}/${m}</span>
+                    <span class="nome">${skill.icone} ${skill.nome}</span> · ${marco.titulo}
+                </div>`;
+            }).join("");
+        }
+
+        // ---------- Pontos de virada na semana ----------
+        const pvsSemana = [];
+        skills.forEach(s => {
+            (s.pontos_de_virada || []).forEach(pv => {
+                if (pv.data >= segunda && pv.data <= domingoISO) {
+                    pvsSemana.push({ skill: s, pv });
+                }
+            });
+        });
+
+        if (!pvsSemana.length) {
+            elPV.innerHTML = `<p class="vazio-mini">Nenhum ponto de virada nesta semana.</p>`;
+        } else {
+            pvsSemana.sort((a, b) => a.pv.data.localeCompare(b.pv.data));
+            elPV.innerHTML = pvsSemana.map(({ skill, pv }) => {
+                const [y, m, d] = pv.data.split("-");
+                const frente = (skill.frentes || []).find(f => f.id === pv.frente);
+                const frenteTxt = frente ? ` · ${frente.icone} ${frente.nome}` : "";
+                return `<div class="pratica-pv-item">
+                    <span class="data-tag">${d}/${m}</span>
+                    <span class="nome">${skill.icone} ${skill.nome}${frenteTxt}</span>
+                    <span class="texto">⚡ "${pv.texto || ""}"</span>
+                </div>`;
+            }).join("");
+        }
+
+        // ---------- Skills esfriando / congeladas ----------
+        if (!temStorage) {
+            elAlerta.innerHTML = `<p class="vazio-mini">Storage.pratica indisponível.</p>`;
+        } else {
+            const ativas = Storage.pratica.skills.listarAtivas();
+            const alertas = [];
+            ativas.forEach(s => {
+                const t = Storage.pratica.derivados.temperaturaGeral(s);
+                if (t.emoji === "🧊" || t.emoji === "❄️") {
+                    alertas.push({ skill: s, temp: t });
+                }
+            });
+
+            if (!alertas.length) {
+                elAlerta.innerHTML = `<p class="vazio-mini">Nenhuma skill esfriando. Bom trabalho.</p>`;
+            } else {
+                alertas.sort((a, b) => (b.temp.dias || 0) - (a.temp.dias || 0));
+                elAlerta.innerHTML = alertas.map(({ skill, temp }) => {
+                    const emoji = temp.emoji;
+                    const dias = temp.dias;
+                    const label = temp.label;
+                    return `<div class="pratica-alerta">
+                        ${emoji} <span class="nome">${skill.icone} ${skill.nome}</span>
+                        — ${label}, última prática há ${dias} dias
+                    </div>`;
+                }).join("");
+            }
+        }
+    })();
+</script>
+
 </body>
 </html>
