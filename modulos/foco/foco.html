@@ -962,6 +962,27 @@
             resultadoSorteio.innerHTML = `🎲 <strong>Faça agora:</strong><br><br>${escolhida}`;
         });
 
+                // ==================================================
+        // VÍNCULO COM TRABALHO — setup final
+        // ==================================================
+        if (ehTrabalho) {
+            const banner = document.getElementById("bannerPratica");
+            const rotulo = document.getElementById("bannerPraticaRotulo");
+            const titulo = document.getElementById("bannerPraticaTitulo");
+            const btn = document.getElementById("btnVoltarPratica");
+
+            if (banner && rotulo && titulo && btn) {
+                banner.style.display = "flex";
+                rotulo.textContent = "Sessão de trabalho";
+                const tarefaAtual = (tarefaFoco.value || "").trim() || "(sem tarefa)";
+                titulo.textContent = tarefaAtual;
+                btn.textContent = "↩ Voltar pro Trabalho";
+                btn.addEventListener("click", voltarParaTrabalho);
+            }
+
+            window.addEventListener("beforeunload", gravarPacoteTrabalho);
+        }
+
         // ==================================================
         // VÍNCULO COM PRÁTICA — setup final
         // (roda DEPOIS de tudo estar definido)
