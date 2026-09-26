@@ -132,7 +132,7 @@
 
     <main class="container">
 
-              <div id="bannerPratica" class="banner-pratica" style="display:none;">
+        <div id="bannerPratica" class="banner-pratica" style="display:none;">
             <div>
                 <span class="banner-pratica-rotulo" id="bannerPraticaRotulo">Sessão de prática</span>
                 <span class="banner-pratica-titulo" id="bannerPraticaTitulo"></span>
@@ -141,7 +141,7 @@
                 <button type="button" id="btnVoltarPratica">↩ Voltar</button>
             </div>
         </div>
-        
+
         <header class="header">
             <p class="eyebrow">FOCO</p>
             <h1>🎯 Foco</h1>
@@ -426,7 +426,7 @@
         // ==================================================
         // VÍNCULO COM PRÁTICA — só leitura
         // ==================================================
-                const skillIdURL   = paramsURL.get("skillId");
+        const skillIdURL   = paramsURL.get("skillId");
         const frenteIdURL  = paramsURL.get("frenteId");
         const blocoIdURL   = paramsURL.get("blocoId");
         const dataBlocoURL = paramsURL.get("data");
@@ -436,9 +436,9 @@
         let skillNome  = "";
         let frenteNome = "";
         let contadorPausas = 0;
-        let tempoAcumuladoSegBase = 0;   // segundos fechados de sessões anteriores
-        let tempoCorrendoSeg = 0;        // segundos desta sessão em execução
-        let tarefaVinculadaIdx = null;   // hint de índice pra matching no retorno
+        let tempoAcumuladoSegBase = 0;
+        let tempoCorrendoSeg = 0;
+        let tarefaVinculadaIdx = null;
 
         if (ehPratica) {
             try {
@@ -453,7 +453,7 @@
         }
 
         // ==================================================
-        // ESTADO GLOBAL (distrações, timer, etc)
+        // ESTADO GLOBAL
         // ==================================================
         let rodando           = false;
         let duracaoTotal      = Number(tempoFoco.value) * 60;
@@ -482,7 +482,7 @@
         } catch (e) { distracoes = []; }
 
         // ==================================================
-        // FUNÇÕES AUXILIARES DE VÍNCULO COM PRÁTICA
+        // AUXILIARES DE VÍNCULO
         // ==================================================
         function tempoTotalSeg() {
             return Math.max(0, (tempoAcumuladoSegBase || 0) + (tempoCorrendoSeg || 0));
@@ -526,7 +526,7 @@
             const texto = (tarefaFoco.value || "").trim();
             if (!texto) return;
             const seg = tempoTotalSeg();
-            if (seg < 30) return;   // sessão muito curta não registra
+            if (seg < 30) return;
             const pacote = {
                 tarefaTexto: texto,
                 tarefaIdx: (typeof tarefaVinculadaIdx === "number") ? tarefaVinculadaIdx : null,
@@ -615,25 +615,6 @@
                 li.appendChild(spanTexto);
                 li.appendChild(spanAcao);
 
-        if (ehTrabalho) {
-            const banner = document.getElementById("bannerPratica");
-            const rotulo = document.getElementById("bannerPraticaRotulo");
-            const titulo = document.getElementById("bannerPraticaTitulo");
-            const btn = document.getElementById("btnVoltarPratica");
-
-            if (banner && rotulo && titulo && btn) {
-                banner.style.display = "flex";
-                rotulo.textContent = "Sessão de trabalho";
-                const tarefaAtual = (tarefaFoco.value || "").trim() || "(sem tarefa)";
-                titulo.textContent = tarefaAtual;
-                btn.textContent = "↩ Voltar pro Trabalho";
-                btn.addEventListener("click", voltarParaTrabalho);
-            }
-
-            window.addEventListener("beforeunload", gravarPacoteTrabalho);
-        }
-
-                
                 if (!t.concluida) {
                     const idxTarefa = tarefas.findIndex(x => (x.texto || "").trim() === texto);
                     li.addEventListener("click", () => {
@@ -651,7 +632,6 @@
                         li.classList.add("usada");
                         spanAcao.textContent = "✓ em uso";
 
-                        // atualiza o banner se for sessão de trabalho
                         if (ehTrabalho) {
                             const titulo = document.getElementById("bannerPraticaTitulo");
                             if (titulo) titulo.textContent = texto || "(sem tarefa)";
@@ -779,13 +759,12 @@
             if (segundosRestantes < 0) segundosRestantes = 0;
             atualizarDisplay(); atualizarBarra(); atualizarTitulo(); salvarEstado();
 
-             if (ehPratica || ehTrabalho) {
+            if (ehPratica || ehTrabalho) {
                 tempoCorrendoSeg = Math.max(0, duracaoTotal - segundosRestantes);
                 if (segundosRestantes % 5 === 0) {
                     if (ehPratica) gravarPacotePratica();
                     if (ehTrabalho) gravarPacoteTrabalho();
                 }
-            }
             }
 
             if (segundosRestantes === 0) finalizarSessao();
@@ -818,10 +797,11 @@
             document.title = "Foco";
             registrarSessao(tarefaFoco.value.trim(), duracaoTotal);
 
-            if (ehPratica) {
+            if (ehPratica || ehTrabalho) {
                 tempoAcumuladoSegBase += Math.max(0, duracaoTotal - segundosRestantes);
                 tempoCorrendoSeg = 0;
-                gravarPacotePratica();
+                if (ehPratica) gravarPacotePratica();
+                if (ehTrabalho) gravarPacoteTrabalho();
             }
 
             tocarBipe(); mostrarNotificacao();
@@ -943,9 +923,10 @@
         }
         botoesPausa.forEach(btn => {
             btn.addEventListener("click", () => {
-                if (ehPratica) {
+                if (ehPratica || ehTrabalho) {
                     contadorPausas++;
-                    gravarPacotePratica();
+                    if (ehPratica) gravarPacotePratica();
+                    if (ehTrabalho) gravarPacoteTrabalho();
                 }
                 renderizarPausas(btn.dataset.cat);
             });
@@ -962,7 +943,7 @@
             resultadoSorteio.innerHTML = `🎲 <strong>Faça agora:</strong><br><br>${escolhida}`;
         });
 
-                // ==================================================
+        // ==================================================
         // VÍNCULO COM TRABALHO — setup final
         // ==================================================
         if (ehTrabalho) {
@@ -985,7 +966,6 @@
 
         // ==================================================
         // VÍNCULO COM PRÁTICA — setup final
-        // (roda DEPOIS de tudo estar definido)
         // ==================================================
         if (ehPratica) {
             const chaveUltimoBloco = `planejamento_${dataAtual}_foco_ultimo_bloco`;
