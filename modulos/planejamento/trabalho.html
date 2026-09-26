@@ -351,6 +351,43 @@
             border-color: #55555c;
             color: #ccc;
         }
+
+        /* ---------- Rodapé da tarefa (tempo + foco) ---------- */
+        .tarefa-rodape {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 4px 0 0 30px;
+        }
+        .tarefa-tempo {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #a8c4e8;
+            background: #1a2233;
+            border: 1px solid #2c3a55;
+            border-radius: 14px;
+            padding: 3px 10px;
+            font-variant-numeric: tabular-nums;
+        }
+        .btn-focar-tarefa {
+            padding: 3px 12px;
+            font-size: 11px;
+            background: #17171a;
+            border: 1px solid #333338;
+            color: #a5d6a7;
+            border-radius: 14px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.15s;
+            font-weight: 600;
+        }
+        .btn-focar-tarefa:hover {
+            background: #172017;
+            border-color: #2e5a2e;
+            color: #a5d6a7;
+        }
     </style>
 </head>
 
@@ -729,12 +766,66 @@
         // TAREFAS COM PRIORIDADE
         // ==================================================
 
-        const chaveTarefas = PREFIXO + "tarefas";
+               const chaveTarefas = PREFIXO + "tarefas";
         let tarefas = [];
         try {
             const s = localStorage.getItem(chaveTarefas);
             if (s) tarefas = JSON.parse(s);
         } catch (e) { tarefas = []; }
+
+        // ---------- Aplicar retornos do Foco ----------
+        function aplicarRetornosFocoTrabalho() {
+            const prefixo = "estudo_trabalho_foco_retorno_";
+            const chaves = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (k && k.startsWith(prefixo)) chaves.push(k);
+            }
+            if (!chaves.length) return 0;
+
+            let aplicados = 0;
+            chaves.forEach(k => {
+                let p = null;
+                try { p = JSON.parse(localStorage.getItem(k)); } catch {}
+                if (!p || !p.tarefaTexto) { localStorage.removeItem(k); return; }
+
+                let idx = -1;
+                // 1) por idx, se o texto bater
+                if (typeof p.tarefaIdx === "number" &&
+                    tarefas[p.tarefaIdx] &&
+                    (tarefas[p.tarefaIdx].texto || "").trim() === p.tarefaTexto) {
+                    idx = p.tarefaIdx;
+                }
+                // 2) por texto exato
+                if (idx < 0) {
+                    idx = tarefas.findIndex(t => (t.texto || "").trim() === p.tarefaTexto);
+                }
+                // 3) case-insensitive
+                if (idx < 0) {
+                    const lower = p.tarefaTexto.toLowerCase();
+                    idx = tarefas.findIndex(t => (t.texto || "").trim().toLowerCase() === lower);
+                }
+                if (idx < 0) {
+                    console.warn("[foco→trabalho] tarefa não encontrada:", p.tarefaTexto, "— pacote mantido");
+                    return;
+                }
+
+                const t = tarefas[idx];
+                t.tempo_foco_min = (Number(t.tempo_foco_min) || 0) + Number(p.tempo_real_min || 0);
+                t.sessoes_foco   = (Number(t.sessoes_foco)   || 0) + 1;
+                t.ultimo_foco_em = p.timestamp;
+                aplicados++;
+                localStorage.removeItem(k);
+            });
+
+            if (aplicados) {
+                salvarTarefas();
+                console.log(`[foco→trabalho] ${aplicados} retorno(s) aplicado(s).`);
+            }
+            return aplicados;
+        }
+
+        aplicarRetornosFocoTrabalho();
 
         // ---------- Prática: skills e frentes disponíveis ----------
         function obterSkillsAtivas() {
@@ -943,6 +1034,45 @@
                 }
 
                 wrapper.appendChild(sub);
+
+                // ---------- Rodapé: tempo + botão focar ----------
+                const rodape = document.createElement("div");
+                rodape.className = "tarefa-rodape";
+
+                if (t.tempo_foco_min > 0) {
+                    const min = Number(t.tempo_foco_min);
+                    let txt;
+                    if (min < 60) txt = `${min} min`;
+                    else {
+                        const h = Math.floor(min / 60);
+                        const m = min % 60;
+                        txt = m > 0 ? `${h}h ${m}min` : `${h}h`;
+                    }
+                    const badge = document.createElement("span");
+                    badge.className = "tarefa-tempo";
+                    badge.textContent = `⏱️ ${txt} em foco`;
+                    rodape.appendChild(badge);
+                }
+
+                const btnFocar = document.createElement("button");
+                btnFocar.type = "button";
+                btnFocar.className = "btn-focar-tarefa";
+                btnFocar.textContent = "🎯 Focar";
+                btnFocar.title = "Abrir o Foco já vinculado a essa tarefa";
+                btnFocar.addEventListener("click", (ev) => {
+                    ev.stopPropagation();
+                    const txt = (t.texto || "").trim();
+                    if (!txt) return alert("Escreve o texto da tarefa primeiro.");
+                    const params = new URLSearchParams({
+                        origem: "trabalho",
+                        tarefa: txt,
+                        data: dataAtual
+                    });
+                    window.location.href = `../foco/foco.html?${params.toString()}`;
+                });
+                rodape.appendChild(btnFocar);
+
+                wrapper.appendChild(rodape);
                 listaTarefas.appendChild(wrapper);
             });
 
