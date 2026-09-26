@@ -424,7 +424,7 @@
         const origemURL = paramsURL.get("origem");
 
         // ==================================================
-        // VÍNCULO COM PRÁTICA — só leitura
+        // VÍNCULO COM PRÁTICA E TRABALHO
         // ==================================================
         const skillIdURL   = paramsURL.get("skillId");
         const frenteIdURL  = paramsURL.get("frenteId");
@@ -482,7 +482,7 @@
         } catch (e) { distracoes = []; }
 
         // ==================================================
-        // AUXILIARES DE VÍNCULO
+        // FLUXO DE SINCRONIZAÇÃO (FIX: OVERWRITE & RACE CONDITION)
         // ==================================================
         function tempoTotalSeg() {
             return Math.max(0, (tempoAcumuladoSegBase || 0) + (tempoCorrendoSeg || 0));
@@ -491,9 +491,11 @@
         function gravarPacotePratica() {
             if (!ehPratica || !blocoIdURL) return;
             const seg = tempoTotalSeg();
+            if (seg < 30) return; // Filtra tempos irrelevantes
+
             const pacote = {
                 tempo_real_seg: seg,
-                tempo_real_min: Math.round(seg / 60),
+                tempo_real_min: Math.max(1, Math.round(seg / 60)),
                 pausas: contadorPausas || 0,
                 distracoes: distracoes.length,
                 notas: (notasFoco.value || "").trim(),
@@ -504,21 +506,22 @@
                 timestamp: Date.now()
             };
             try {
-                localStorage.setItem(`estudo_foco_retorno_${blocoIdURL}`, JSON.stringify(pacote));
-                console.log("[foco→pratica] pacote gravado:", pacote);
+                // FLUSH SEGURO: A chave única garante que o estudo.html leia tudo sem ser sobrescrito
+                const uid = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+                localStorage.setItem(`estudo_foco_retorno_${blocoIdURL}_${uid}`, JSON.stringify(pacote));
+                
+                // Zera os contadores após despachar o pacote pra evitar contagem em dobro
+                tempoAcumuladoSegBase = 0;
+                tempoCorrendoSeg = 0;
+                contadorPausas = 0;
+                distracoes = [];
+                salvarDistracoes();
+                renderizarDistracoes();
+                notasFoco.value = "";
+                localStorage.removeItem(chaveNotas);
             } catch (e) {
                 console.warn("[foco→pratica] erro ao gravar", e);
             }
-        }
-
-        function voltarParaPratica() {
-            if (intervalId) { clearInterval(intervalId); intervalId = null; }
-            rodando = false;
-            try { liberarWakeLock(); } catch (e) {}
-            gravarPacotePratica();
-            limparEstado();
-            const d = dataBlocoURL || dataAtual;
-            window.location.href = `../planejamento/estudo.html?origem=foco&data=${d}`;
         }
 
         function gravarPacoteTrabalho() {
@@ -527,6 +530,7 @@
             if (!texto) return;
             const seg = tempoTotalSeg();
             if (seg < 30) return;
+
             const pacote = {
                 tarefaTexto: texto,
                 tarefaIdx: (typeof tarefaVinculadaIdx === "number") ? tarefaVinculadaIdx : null,
@@ -538,25 +542,43 @@
                 timestamp: Date.now()
             };
             try {
-                const chave = `estudo_trabalho_foco_retorno_${Date.now()}_${Math.random().toString(36).slice(2,6)}`;
+                // FLUSH SEGURO: A chave única garante pacotes limpos para o trabalho.html processar
+                const uid = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+                const chave = `estudo_trabalho_foco_retorno_${uid}`;
                 localStorage.setItem(chave, JSON.stringify(pacote));
-                console.log("[foco→trabalho] pacote gravado:", pacote);
+                
+                // Zera o ponteiro local de progresso para não duplicar tempo na volta
+                tempoAcumuladoSegBase = 0;
+                tempoCorrendoSeg = 0;
+                distracoes = [];
+                salvarDistracoes();
+                renderizarDistracoes();
+                notasFoco.value = "";
+                localStorage.removeItem(chaveNotas);
             } catch (e) {
                 console.warn("[foco→trabalho] erro ao gravar", e);
             }
+        }
+
+        function voltarParaPratica() {
+            if (intervalId) { clearInterval(intervalId); intervalId = null; }
+            rodando = false;
+            try { liberarWakeLock(); } catch (e) {}
+            // O evento beforeunload cuida de despachar os pacotes e limpar o estado com segurança
+            const d = dataBlocoURL || dataAtual;
+            window.location.href = `../planejamento/estudo.html?origem=foco&data=${d}`;
         }
 
         function voltarParaTrabalho() {
             if (intervalId) { clearInterval(intervalId); intervalId = null; }
             rodando = false;
             try { liberarWakeLock(); } catch (e) {}
-            gravarPacoteTrabalho();
-            limparEstado();
+            // O evento beforeunload cuida de despachar os pacotes e limpar o estado com segurança
             window.location.href = `../planejamento/trabalho.html?data=${dataAtual}`;
         }
 
         // ==================================================
-        // TAREFAS DO TRABALHO
+        // TAREFAS DO TRABALHO (UI INLINE)
         // ==================================================
         function carregarTarefasDoTrabalho() {
             if (origemURL !== "trabalho") return;
@@ -581,7 +603,7 @@
 
             const tarefaAtual = (tarefaFoco.value || "").trim();
 
-            tarefas.forEach(t => {
+            tarefas.forEach((t, indexTarefaOriginal) => {
                 const texto = (t.texto || "").trim();
                 if (!texto) return;
 
@@ -608,6 +630,7 @@
                 } else if (texto === tarefaAtual) {
                     li.classList.add("usada");
                     spanAcao.textContent = "✓ em uso";
+                    tarefaVinculadaIdx = indexTarefaOriginal;
                 } else {
                     spanAcao.textContent = "usar →";
                 }
@@ -616,11 +639,10 @@
                 li.appendChild(spanAcao);
 
                 if (!t.concluida) {
-                    const idxTarefa = tarefas.findIndex(x => (x.texto || "").trim() === texto);
                     li.addEventListener("click", () => {
                         tarefaFoco.value = texto;
                         localStorage.setItem(chaveTarefa, texto);
-                        tarefaVinculadaIdx = idxTarefa >= 0 ? idxTarefa : null;
+                        tarefaVinculadaIdx = indexTarefaOriginal;
 
                         ul.querySelectorAll("li").forEach(el => {
                             if (el.dataset.concluida === "1") return;
@@ -647,7 +669,7 @@
         }
 
         // ==================================================
-        // TIMER
+        // TIMER V2
         // ==================================================
         function formatarTempo(s) {
             const m = String(Math.floor(s / 60)).padStart(2, "0");
@@ -707,6 +729,8 @@
                 }
             } else if (typeof salvo.restante === "number") {
                 segundosRestantes = Math.max(0, Math.min(salvo.restante, duracaoTotal));
+                // Resgata o tempo já consumido caso venha de um refresh com timer pausado
+                tempoCorrendoSeg = Math.max(0, duracaoTotal - segundosRestantes);
                 if (segundosRestantes < duracaoTotal) btnIniciar.textContent = "▶️ Continuar";
             }
         }
@@ -761,10 +785,6 @@
 
             if (ehPratica || ehTrabalho) {
                 tempoCorrendoSeg = Math.max(0, duracaoTotal - segundosRestantes);
-                if (segundosRestantes % 5 === 0) {
-                    if (ehPratica) gravarPacotePratica();
-                    if (ehTrabalho) gravarPacoteTrabalho();
-                }
             }
 
             if (segundosRestantes === 0) finalizarSessao();
@@ -810,11 +830,16 @@
         }
 
         function resetTimer() {
+            // Flush do progresso atual antes de limpar o timer, para evitar perda do tempo já decorrido!
+            if (ehPratica) gravarPacotePratica();
+            if (ehTrabalho) gravarPacoteTrabalho();
+
             clearInterval(intervalId);
             rodando = false;
             btnIniciar.textContent = "▶️ Iniciar";
             duracaoTotal = Number(tempoFoco.value) * 60;
             segundosRestantes = duracaoTotal;
+            tempoCorrendoSeg = 0; // Estado local espelhado para 0
             inicioSessao = null;
             atualizarDisplay(); atualizarBarra();
             document.title = "Foco";
@@ -932,9 +957,6 @@
             });
         });
 
-        // ==================================================
-        // SORTEIO
-        // ==================================================
         btnSorteio.addEventListener("click", () => {
             const listaAtual = pausas[categoriaAtiva] || [];
             if (listaAtual.length === 0) return;
@@ -944,7 +966,7 @@
         });
 
         // ==================================================
-        // VÍNCULO COM TRABALHO — setup final
+        // INICIALIZAÇÕES & VÍNCULOS
         // ==================================================
         if (ehTrabalho) {
             const banner = document.getElementById("bannerPratica");
@@ -960,13 +982,8 @@
                 btn.textContent = "↩ Voltar pro Trabalho";
                 btn.addEventListener("click", voltarParaTrabalho);
             }
-
-            window.addEventListener("beforeunload", gravarPacoteTrabalho);
         }
 
-        // ==================================================
-        // VÍNCULO COM PRÁTICA — setup final
-        // ==================================================
         if (ehPratica) {
             const chaveUltimoBloco = `planejamento_${dataAtual}_foco_ultimo_bloco`;
             const ultimoBloco = localStorage.getItem(chaveUltimoBloco);
@@ -993,13 +1010,15 @@
                 titulo.textContent = `${s} · ${f}`;
             }
             document.getElementById("btnVoltarPratica")?.addEventListener("click", voltarParaPratica);
-
-            window.addEventListener("beforeunload", gravarPacotePratica);
         }
 
-        // ==================================================
-        // URL — tarefa/tempo (fora do escopo de prática)
-        // ==================================================
+        // Antes do unload, flush com segurança garantida.
+        window.addEventListener("beforeunload", () => {
+            if (ehPratica) gravarPacotePratica();
+            if (ehTrabalho) gravarPacoteTrabalho();
+            limparEstado();
+        });
+
         if (tarefaURL && !ehPratica) {
             tarefaFoco.value = tarefaURL;
             localStorage.setItem(chaveTarefa, tarefaURL);
@@ -1021,9 +1040,6 @@
             }
         }
 
-        // ==================================================
-        // INICIALIZA
-        // ==================================================
         restaurarEstado();
         atualizarDisplay();
         atualizarBarra();
@@ -1036,8 +1052,6 @@
 
     })();
     </script>
-
     <script src="../../js/app.js"></script>
-
 </body>
 </html>
