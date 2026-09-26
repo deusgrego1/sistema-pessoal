@@ -6268,6 +6268,17 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
         estado.subAba = "praticar";
     }
 
+    // abre direto no Arsenal filtrado, se veio da home com hash
+    if (location.hash === "#arsenal-congeladas") {
+        estado.tipo = "pratica";
+        estado.subAba = "arsenal";
+        estado.arsenalFiltro = "congeladas";
+    } else if (location.hash === "#arsenal-frias") {
+        estado.tipo = "pratica";
+        estado.subAba = "arsenal";
+        estado.arsenalFiltro = "frias";
+    }
+
     render();
 </script>
 </body>
