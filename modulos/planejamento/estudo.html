@@ -1722,7 +1722,7 @@
     // Ajuste de tempo: olha os últimos blocos concluídos (tempo_real_min > 0)
     // e calcula um multiplicador entre 0.8 e 1.4 pro tempo previsto vs real.
     function _calcularAjusteTempo(skillId, frenteId, todosBlocos) {
-        const todos = todosBlocos.filter(b =>>
+        const todos = todosBlocos.filter(b =>
             b.skillId === skillId && b.frenteId === frenteId &&
             Number(b.tempo_real_min) > 0
         );
@@ -5332,14 +5332,6 @@ async function buscarNoticiasBing(query, opts = {}) {
                 if (estado.newsBusca) executarBuscaNews();
             });
         });
-
-        wrap.querySelectorAll("[data-news-edicao]").forEach(chip => {
-    chip.addEventListener("click", () => {
-        estado.newsEdicao = chip.dataset.newsEdicao;
-        wrap.querySelectorAll("[data-news-edicao]").forEach(c => c.classList.toggle("selecionado", c === chip));
-        salvarPrefs();
-    });
-});
 
 wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
     chip.addEventListener("click", () => {
