@@ -25,51 +25,45 @@
         .resumo-valor { color: #fff; font-size: 24px; font-weight: 600; line-height: 1; }
 
         .picker-estudo {
-    position: absolute;
-    z-index: 1000;
-    background: #1c1c20;
-    border: 1px solid #2a2a30;
-    border-radius: 10px;
-    padding: 6px;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.5);
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 170px;
-}
-.picker-estudo-opcao {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    padding: 9px 12px;
-    background: none;
-    border: none;
-    color: #ddd;
-    font-family: inherit;
-    font-size: 13px;
-    cursor: pointer;
-    border-radius: 6px;
-    text-align: left;
-    transition: 0.15s;
-}
-.picker-estudo-opcao:hover {
-    background: #252529;
-    color: #fff;
-}
-.picker-estudo-count {
-    font-size: 11px;
-    color: #777;
-    font-variant-numeric: tabular-nums;
-    background: #252529;
-    padding: 1px 7px;
-    border-radius: 10px;
-}
-.picker-estudo-opcao:hover .picker-estudo-count {
-    background: #333;
-    color: #bbb;
-}
-        
+            position: absolute;
+            z-index: 1000;
+            background: #1c1c20;
+            border: 1px solid #2a2a30;
+            border-radius: 10px;
+            padding: 6px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 170px;
+        }
+        .picker-estudo-opcao {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 9px 12px;
+            background: none;
+            border: none;
+            color: #ddd;
+            font-family: inherit;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 6px;
+            text-align: left;
+            transition: 0.15s;
+        }
+        .picker-estudo-opcao:hover { background: #252529; color: #fff; }
+        .picker-estudo-count {
+            font-size: 11px;
+            color: #777;
+            font-variant-numeric: tabular-nums;
+            background: #252529;
+            padding: 1px 7px;
+            border-radius: 10px;
+        }
+        .picker-estudo-opcao:hover .picker-estudo-count { background: #333; color: #bbb; }
+
         .resumo-sub {
             display: block;
             margin-top: 6px;
@@ -78,23 +72,12 @@
             line-height: 1.3;
         }
 
-        .resumo-card-pratica {
-            border-color: #2c3a55;
-        }
-        .resumo-card-pratica:hover {
-            background: #1a2235;
-            border-color: #5a8ad4;
-        }
+        .resumo-card-pratica { border-color: #2c3a55; }
+        .resumo-card-pratica:hover { background: #1a2235; border-color: #5a8ad4; }
         .resumo-card-pratica .resumo-valor { color: #dfe8ff; }
 
-        .resumo-card-congelada {
-            border-color: #2c3a55;
-            background: #141a24;
-        }
-        .resumo-card-congelada:hover {
-            background: #1a2235;
-            border-color: #5a8ad4;
-        }
+        .resumo-card-congelada { border-color: #2c3a55; background: #141a24; }
+        .resumo-card-congelada:hover { background: #1a2235; border-color: #5a8ad4; }
         .resumo-card-congelada .resumo-valor { color: #a8c4e8; }
         .resumo-card-congelada .resumo-rotulo { color: #5a8ad4; }
 
@@ -158,7 +141,6 @@
         }
         .progresso > div { height: 100%; background: #4caf50; transition: width 0.3s ease; }
         .progresso-texto { font-size: 12px; color: #888; margin-top: 4px; }
-
         .progresso-slider { width: 100%; margin: 6px 0 4px; accent-color: #4caf50; }
 
         .bloco-estudo {
@@ -272,9 +254,7 @@
             text-transform: uppercase; letter-spacing: 0.5px;
             min-width: 62px;
         }
-        .gdelt-busca-wrap {
-            display: flex; gap: 8px; margin-bottom: 12px;
-        }
+        .gdelt-busca-wrap { display: flex; gap: 8px; margin-bottom: 12px; }
         .gdelt-busca-wrap input { flex: 1; }
         .gdelt-timeline {
             display: flex; align-items: flex-end; gap: 2px;
@@ -549,7 +529,7 @@
             font-size: 13px; opacity: 0;
             transition: opacity 0.15s ease; white-space: nowrap;
         }
-                .botao-foco-flutuante:hover .texto-foco { opacity: 1; }
+        .botao-foco-flutuante:hover .texto-foco { opacity: 1; }
 
         /* ---------- Prática · Arsenal ---------- */
         .arsenal-grade {
@@ -585,12 +565,8 @@
             margin-bottom: 6px;
             line-height: 1.3;
         }
-        .arsenal-meta {
-            font-size: 11px;
-            color: #888;
-            margin-bottom: 10px;
-        }
-                .arsenal-rodape {
+        .arsenal-meta { font-size: 11px; color: #888; margin-bottom: 10px; }
+        .arsenal-rodape {
             display: flex;
             justify-content: space-between;
             font-size: 11px;
@@ -626,11 +602,7 @@
             align-items: center;
             margin-bottom: 18px;
         }
-        .skill-detalhe-icone {
-            font-size: 42px;
-            line-height: 1;
-            flex-shrink: 0;
-        }
+        .skill-detalhe-icone { font-size: 42px; line-height: 1; flex-shrink: 0; }
         .skill-detalhe-nome {
             font-size: 22px;
             color: #fff;
@@ -638,10 +610,7 @@
             line-height: 1.2;
             margin-bottom: 4px;
         }
-        .skill-detalhe-sub {
-            font-size: 12px;
-            color: #888;
-        }
+        .skill-detalhe-sub { font-size: 12px; color: #888; }
 
         .skill-detalhe-stats {
             display: grid;
@@ -663,7 +632,7 @@
             font-weight: 600;
             line-height: 1;
         }
-               .skill-detalhe-stats span {
+        .skill-detalhe-stats span {
             font-size: 11px;
             color: #777;
             text-transform: uppercase;
@@ -733,11 +702,7 @@
             line-height: 1.2;
         }
         .frente-temp { font-size: 13px; margin-left: 4px; }
-        .frente-meta {
-            font-size: 11px;
-            color: #888;
-            margin-top: 2px;
-        }
+        .frente-meta { font-size: 11px; color: #888; margin-top: 2px; }
         .frente-expandir {
             background: none;
             border: none;
@@ -786,10 +751,7 @@
             transition: 0.15s;
         }
         .marco-item:hover { background: #22222a; border-color: #3a3a45; }
-        .marco-item.ativo {
-            border-color: #4caf50;
-            background: #172017;
-        }
+        .marco-item.ativo { border-color: #4caf50; background: #172017; }
         .marco-linha-1 {
             display: flex;
             align-items: center;
@@ -840,7 +802,7 @@
             background: #4caf50;
             transition: width 0.15s ease;
         }
-                .marco-slider {
+        .marco-slider {
             width: 100%;
             margin: 0;
             accent-color: #4caf50;
@@ -866,7 +828,6 @@
             font-weight: 600;
         }
 
-        /* --- Timeline --- */
         .timeline-lista { display: flex; flex-direction: column; gap: 8px; }
         .timeline-item {
             display: flex;
@@ -914,7 +875,6 @@
         .timeline-btn-ctx:hover { color: #4caf50; }
         .timeline-btn-rm:hover { color: #d45a5a; }
 
-        /* --- Pontos de virada --- */
         .pv-lista { display: flex; flex-direction: column; gap: 8px; }
         .pv-item {
             display: flex;
@@ -925,12 +885,7 @@
             border-left: 3px solid #c9a44a;
             border-radius: 8px;
         }
-        .pv-icone {
-            font-size: 16px;
-            line-height: 1;
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
+        .pv-icone { font-size: 16px; line-height: 1; flex-shrink: 0; margin-top: 1px; }
         .pv-info { flex: 1; min-width: 0; }
         .pv-texto { font-size: 13px; color: #eaeaea; line-height: 1.4; }
         .pv-meta { font-size: 11px; color: #777; margin-top: 4px; }
@@ -945,7 +900,6 @@
         }
         .pv-remover:hover { color: #d45a5a; }
 
-        /* --- Feedback --- */
         .fb-lista { display: flex; flex-direction: column; gap: 8px; }
         .fb-item {
             padding: 10px 12px;
@@ -1011,10 +965,9 @@
             font-family: inherit;
             font-size: 13px;
             outline: none;
-        }        
+        }
         .form-skill select:focus { border-color: #55555c; }
 
-        /* ---------- Bloco de prática ---------- */
         .bloco-estudo select {
             width: 100%;
             padding: 8px 12px;
@@ -1066,10 +1019,7 @@
             letter-spacing: 1.5px;
             font-weight: 600;
         }
-        .treinador-sub {
-            font-size: 11px;
-            color: #666;
-        }
+        .treinador-sub { font-size: 11px; color: #666; }
 
         .treinador-sugestoes {
             display: flex;
@@ -1093,11 +1043,7 @@
             align-items: center;
             margin-bottom: 8px;
         }
-        .sugestao-icone {
-            font-size: 24px;
-            line-height: 1;
-            flex-shrink: 0;
-        }
+        .sugestao-icone { font-size: 24px; line-height: 1; flex-shrink: 0; }
         .sugestao-titulo {
             font-size: 14px;
             color: #eaeaea;
@@ -1106,11 +1052,7 @@
         }
         .sugestao-frente { color: #888; font-weight: 500; }
         .sugestao-temp { margin-left: 4px; }
-        .sugestao-meta {
-            font-size: 11px;
-            color: #777;
-            margin-top: 2px;
-        }
+        .sugestao-meta { font-size: 11px; color: #777; margin-top: 2px; }
         .sugestao-alvo {
             font-size: 13px;
             color: #c5e1a5;
@@ -1174,7 +1116,7 @@
             letter-spacing: 0;
         }
 
-        /* ---------- Tempo real (read-only + barra) ---------- */
+        /* ---------- Tempo real ---------- */
         .tempo-real-box {
             background: #17171a;
             border: 1px solid #2a2a30;
@@ -1183,11 +1125,7 @@
             margin-bottom: 8px;
             transition: border-color 0.2s, background 0.2s;
         }
-        .tempo-real-box.estourou {
-            background: #141a24;
-            border-color: #2c3a55;
-        }
-
+        .tempo-real-box.estourou { background: #141a24; border-color: #2c3a55; }
         .tempo-real-display {
             display: flex;
             align-items: center;
@@ -1202,7 +1140,6 @@
             line-height: 1;
         }
         .tempo-real-box.estourou .tempo-real-valor { color: #a8c4e8; }
-
         .tempo-real-extra {
             font-size: 11px;
             color: #a8c4e8;
@@ -1213,7 +1150,6 @@
             font-weight: 600;
             letter-spacing: 0.3px;
         }
-
         .tempo-real-ajustar {
             margin-left: auto;
             background: none;
@@ -1226,11 +1162,7 @@
             font-family: inherit;
             transition: 0.15s;
         }
-        .tempo-real-ajustar:hover {
-            color: #e0e0e0;
-            border-color: #55555c;
-        }
-
+        .tempo-real-ajustar:hover { color: #e0e0e0; border-color: #55555c; }
         .tempo-real-barra {
             position: relative;
             height: 6px;
@@ -1259,15 +1191,8 @@
             );
             transition: width 0.3s ease;
         }
-
-        .tempo-real-meta {
-            font-size: 11px;
-            color: #777;
-        }
-        .tempo-real-meta-extra {
-            color: #a8c4e8;
-            font-weight: 600;
-        }
+        .tempo-real-meta { font-size: 11px; color: #777; }
+        .tempo-real-meta-extra { color: #a8c4e8; font-weight: 600; }
 
         /* ---------- Aprendizado vinculado ---------- */
         .ap-vinculo {
@@ -1308,10 +1233,7 @@
             padding: 10px 12px;
             margin-bottom: 12px;
         }
-        .ap-contexto.aplicado {
-            background: #172017;
-            border-color: #2e5a2e;
-        }
+        .ap-contexto.aplicado { background: #172017; border-color: #2e5a2e; }
         .ap-contexto-rotulo {
             display: block;
             font-size: 10px;
@@ -1393,7 +1315,6 @@
         .conteudo-vinculo-form select:focus { border-color: #55555c; }
     </style>
 </head>
-
 <body>
 <main class="container">
 
@@ -1493,7 +1414,8 @@
             { nome: "foco",          icone: "🎯" },
         ],
     };
-        const estado = {
+
+    const estado = {
         tipo: "livro",
         subAba: "estudar",
         bibFiltro: "todos",
@@ -1510,19 +1432,19 @@
         arsenalBusca: "",
         arsenalSkillAberta: null,
         arsenalFrenteExpandida: null,
-        arsenalFormAberto: false,       // true → mostra form de nova skill
-        arsenalEditandoId: null,        // id da skill sendo editada | null
-        aprVinculoAberto: null,         // id do aprendizado com form de vínculo aberto
-        conteudoVinculoAberto: null,    // { tipo, blocoId } | null
+        arsenalFormAberto: false,
+        arsenalEditandoId: null,
+        aprVinculoAberto: null,
+        conteudoVinculoAberto: null,
     };
     const esc = Storage.escapeHTML;
-        function el(id) { return document.getElementById(id); }
+
+    function el(id) { return document.getElementById(id); }
     function uid(p) { return `${p}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`; }
     function temConteudoHoje(tipo) {
         return Storage.blocos.ler(tipo, dataAtual).length > 0;
     }
-
-    // ==================================================
+        // ==================================================
     // TREINADOR — helpers de rejeição
     // ==================================================
     const CHAVE_TREINADOR_REJEITADAS = "estudo_treinador_rejeitadas";
@@ -1536,7 +1458,6 @@
         rej[`${skillId}::${frenteId}`] = Date.now();
         localStorage.setItem(CHAVE_TREINADOR_REJEITADAS, JSON.stringify(rej));
 
-        // registra também no histórico de 7 dias (aprendizado passivo)
         if (typeof registrarRejeicao7d === "function") {
             registrarRejeicao7d(skillId, frenteId);
         }
@@ -1556,7 +1477,6 @@
         localStorage.setItem(CHAVE_TREINADOR_REJEITADAS, JSON.stringify(rej));
     }
 
-    // lê todos os blocos de prática do localStorage
     function lerTodosBlocosPratica() {
         const out = [];
         for (let i = 0; i < localStorage.length; i++) {
@@ -1570,100 +1490,99 @@
         return out;
     }
 
-// ==================================================
-// PICKER DO RESUMO — escolhe pra onde ir quando há vários tipos
-// ==================================================
-function tiposComConteudoHoje() {
-    return TIPOS
-        .map(t => ({
-            id: t.id,
-            label: t.label,
-            count: Storage.blocos.ler(t.id, dataAtual).length,
-        }))
-        .filter(t => t.count > 0);
-}
+    // ==================================================
+    // PICKER DO RESUMO
+    // ==================================================
+    function tiposComConteudoHoje() {
+        return TIPOS
+            .map(t => ({
+                id: t.id,
+                label: t.label,
+                count: Storage.blocos.ler(t.id, dataAtual).length,
+            }))
+            .filter(t => t.count > 0);
+    }
 
-function tiposComBibliotecaAtiva() {
-    return ["livro", "video", "artigo"]
-        .map(tid => {
-            const n = Storage.biblioteca.listar(tid)
-                .filter(b => b.status !== "concluido").length;
-            if (n === 0) return null;
-            const t = TIPOS.find(x => x.id === tid);
-            return { id: tid, label: t ? t.label : tid, count: n };
-        })
-        .filter(Boolean);
-}
+    function tiposComBibliotecaAtiva() {
+        return ["livro", "video", "artigo"]
+            .map(tid => {
+                const n = Storage.biblioteca.listar(tid)
+                    .filter(b => b.status !== "concluido").length;
+                if (n === 0) return null;
+                const t = TIPOS.find(x => x.id === tid);
+                return { id: tid, label: t ? t.label : tid, count: n };
+            })
+            .filter(Boolean);
+    }
 
-function abrirPickerResumo(anchorEl, modo, opcoes) {
-    document.querySelectorAll(".picker-estudo").forEach(p => p.remove());
+    function abrirPickerResumo(anchorEl, modo, opcoes) {
+        document.querySelectorAll(".picker-estudo").forEach(p => p.remove());
 
-    const picker = document.createElement("div");
-    picker.className = "picker-estudo";
-    Object.assign(picker.style, {
-        position: "fixed",
-        zIndex: "9999",
-        background: "#1c1c20",
-        border: "1px solid #2a2a30",
-        borderRadius: "10px",
-        padding: "6px",
-        boxShadow: "0 6px 24px rgba(0,0,0,0.5)",
-        display: "flex",
-        flexDirection: "column",
-        gap: "2px",
-        minWidth: "180px",
-    });
-
-    picker.innerHTML = opcoes.map(o => `
-        <button class="picker-estudo-opcao" data-tipo="${esc(o.id)}"
-                style="display:flex;justify-content:space-between;align-items:center;gap:12px;
-                       padding:9px 12px;background:none;border:none;color:#ddd;
-                       font-family:inherit;font-size:13px;cursor:pointer;
-                       border-radius:6px;text-align:left;width:100%;">
-            <span>${esc(o.label)}</span>
-            <span style="font-size:11px;color:#777;background:#252529;
-                         padding:1px 7px;border-radius:10px;">${o.count}</span>
-        </button>
-    `).join("");
-
-    document.body.appendChild(picker);
-
-    const rect = anchorEl.getBoundingClientRect();
-    picker.style.top  = (rect.bottom + 6) + "px";
-    picker.style.left = rect.left + "px";
-
-    requestAnimationFrame(() => {
-        const pr = picker.getBoundingClientRect();
-        if (pr.right > window.innerWidth - 10) {
-            picker.style.left = Math.max(10, window.innerWidth - pr.width - 10) + "px";
-        }
-        if (pr.bottom > window.innerHeight - 10) {
-            picker.style.top = Math.max(10, rect.top - pr.height - 6) + "px";
-        }
-    });
-
-    picker.querySelectorAll("[data-tipo]").forEach(btn => {
-        btn.addEventListener("click", (ev) => {
-            ev.stopPropagation();
-            estado.tipo   = btn.dataset.tipo;
-            estado.subAba = (modo === "biblioteca") ? "biblioteca" : "estudar";
-            picker.remove();
-            render();
+        const picker = document.createElement("div");
+        picker.className = "picker-estudo";
+        Object.assign(picker.style, {
+            position: "fixed",
+            zIndex: "9999",
+            background: "#1c1c20",
+            border: "1px solid #2a2a30",
+            borderRadius: "10px",
+            padding: "6px",
+            boxShadow: "0 6px 24px rgba(0,0,0,0.5)",
+            display: "flex",
+            flexDirection: "column",
+            gap: "2px",
+            minWidth: "180px",
         });
-    });
 
-    setTimeout(() => {
-        function fechar(ev) {
-            if (picker.contains(ev.target)) return;
-            picker.remove();
-            document.removeEventListener("click", fechar);
-            document.removeEventListener("scroll", fechar, true);
-        }
-        document.addEventListener("click", fechar);
-        document.addEventListener("scroll", fechar, true);
-    }, 0);
-}
-    
+        picker.innerHTML = opcoes.map(o => `
+            <button class="picker-estudo-opcao" data-tipo="${esc(o.id)}"
+                    style="display:flex;justify-content:space-between;align-items:center;gap:12px;
+                           padding:9px 12px;background:none;border:none;color:#ddd;
+                           font-family:inherit;font-size:13px;cursor:pointer;
+                           border-radius:6px;text-align:left;width:100%;">
+                <span>${esc(o.label)}</span>
+                <span style="font-size:11px;color:#777;background:#252529;
+                             padding:1px 7px;border-radius:10px;">${o.count}</span>
+            </button>
+        `).join("");
+
+        document.body.appendChild(picker);
+
+        const rect = anchorEl.getBoundingClientRect();
+        picker.style.top  = (rect.bottom + 6) + "px";
+        picker.style.left = rect.left + "px";
+
+        requestAnimationFrame(() => {
+            const pr = picker.getBoundingClientRect();
+            if (pr.right > window.innerWidth - 10) {
+                picker.style.left = Math.max(10, window.innerWidth - pr.width - 10) + "px";
+            }
+            if (pr.bottom > window.innerHeight - 10) {
+                picker.style.top = Math.max(10, rect.top - pr.height - 6) + "px";
+            }
+        });
+
+        picker.querySelectorAll("[data-tipo]").forEach(btn => {
+            btn.addEventListener("click", (ev) => {
+                ev.stopPropagation();
+                estado.tipo   = btn.dataset.tipo;
+                estado.subAba = (modo === "biblioteca") ? "biblioteca" : "estudar";
+                picker.remove();
+                render();
+            });
+        });
+
+        setTimeout(() => {
+            function fechar(ev) {
+                if (picker.contains(ev.target)) return;
+                picker.remove();
+                document.removeEventListener("click", fechar);
+                document.removeEventListener("scroll", fechar, true);
+            }
+            document.addEventListener("click", fechar);
+            document.addEventListener("scroll", fechar, true);
+        }, 0);
+    }
     // ==================================================
     // RESUMO / TIPOS / SUB-ABAS / CONTEÚDO
     // ==================================================
@@ -1671,12 +1590,12 @@ function abrirPickerResumo(anchorEl, modo, opcoes) {
         const blocosHoje = TIPOS.reduce(
             (acc, t) => acc + Storage.blocos.ler(t.id, dataAtual).length, 0
         );
-        const emAndamento = Storage.biblioteca.listar("livro")
-            .filter(b => b.status !== "concluido").length;
+        const emAndamento = ["livro", "video", "artigo"]
+            .reduce((acc, t) => acc + Storage.biblioteca.listar(t)
+                .filter(b => b.status !== "concluido").length, 0);
         const apsAtivos = Storage.aprendizados.listar()
             .filter(a => a.status !== "descartado").length;
 
-        // ---------- Prática ----------
         const sessoesPraticaHoje = Storage.blocos.ler("pratica", dataAtual).length;
         const skillsAtivas = Storage.pratica.skills.listarAtivas();
         const congeladas = skillsAtivas.filter(s => {
@@ -1684,7 +1603,6 @@ function abrirPickerResumo(anchorEl, modo, opcoes) {
             return d.emoji === "🧊";
         });
 
-        // rótulo do card de prática: mostra sugestões pendentes quando o dia tá vazio
         let praticaValor = sessoesPraticaHoje;
         let praticaRotulo = "Sessões de prática";
         if (sessoesPraticaHoje === 0 && skillsAtivas.length) {
@@ -1724,88 +1642,47 @@ function abrirPickerResumo(anchorEl, modo, opcoes) {
             ${skillsCongeladasHtml}
         `;
 
-el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
-    card.addEventListener("click", () => {
-        const ir = card.dataset.ir;
+        el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
+            card.addEventListener("click", () => {
+                const ir = card.dataset.ir;
 
-        if (ir === "estudar") {
-            const tipos = tiposComConteudoHoje();
-            if (tipos.length === 0) {
-                estado.tipo = "livro"; estado.subAba = "estudar"; render();
-            } else if (tipos.length === 1) {
-                estado.tipo = tipos[0].id; estado.subAba = "estudar"; render();
-            } else {
-                abrirPickerResumo(card, "estudar", tipos);
-            }
-            return;
-        }
+                if (ir === "estudar") {
+                    const tipos = tiposComConteudoHoje();
+                    if (tipos.length === 0) {
+                        estado.tipo = "livro"; estado.subAba = "estudar"; render();
+                    } else if (tipos.length === 1) {
+                        estado.tipo = tipos[0].id; estado.subAba = "estudar"; render();
+                    } else {
+                        abrirPickerResumo(card, "estudar", tipos);
+                    }
+                    return;
+                }
 
-        if (ir === "biblioteca") {
-            const tipos = tiposComBibliotecaAtiva();
-            if (tipos.length === 0) {
-                estado.tipo = "livro"; estado.subAba = "biblioteca"; render();
-            } else if (tipos.length === 1) {
-                estado.tipo = tipos[0].id; estado.subAba = "biblioteca"; render();
-            } else {
-                abrirPickerResumo(card, "biblioteca", tipos);
-            }
-            return;
-        }
+                if (ir === "biblioteca") {
+                    const tipos = tiposComBibliotecaAtiva();
+                    if (tipos.length === 0) {
+                        estado.tipo = "livro"; estado.subAba = "biblioteca"; render();
+                    } else if (tipos.length === 1) {
+                        estado.tipo = tipos[0].id; estado.subAba = "biblioteca"; render();
+                    } else {
+                        abrirPickerResumo(card, "biblioteca", tipos);
+                    }
+                    return;
+                }
 
-        if (ir === "aprendizados") {
-            estado.tipo = "aprendizados";
-        } else if (ir === "pratica") {
-            estado.tipo = "pratica";
-            estado.subAba = "praticar";
-        } else if (ir === "congeladas") {
-            estado.tipo = "pratica";
-            estado.subAba = "arsenal";
-            estado.arsenalFiltro = "congeladas";
-        }
-        render();
-    });
-});
-
-        // ---------- ESTUDOS HOJE ----------
-        if (ir === "estudar") {
-            const tipos = tiposComConteudoHoje();
-            if (tipos.length === 0) {
-                estado.tipo = "livro"; estado.subAba = "estudar"; render();
-            } else if (tipos.length === 1) {
-                estado.tipo = tipos[0].id; estado.subAba = "estudar"; render();
-            } else {
-                abrirPickerResumo(card, "estudar", tipos);
-            }
-            return;
-        }
-
-        // ---------- EM ANDAMENTO (biblioteca) ----------
-        if (ir === "biblioteca") {
-            const tipos = tiposComBibliotecaAtiva();
-            if (tipos.length === 0) {
-                estado.tipo = "livro"; estado.subAba = "biblioteca"; render();
-            } else if (tipos.length === 1) {
-                estado.tipo = tipos[0].id; estado.subAba = "biblioteca"; render();
-            } else {
-                abrirPickerResumo(card, "biblioteca", tipos);
-            }
-            return;
-        }
-
-        // ---------- DEMAIS CARDS (inalterado) ----------
-        if (ir === "aprendizados") {
-            estado.tipo = "aprendizados";
-        } else if (ir === "pratica") {
-            estado.tipo = "pratica";
-            estado.subAba = "praticar";
-        } else if (ir === "congeladas") {
-            estado.tipo = "pratica";
-            estado.subAba = "arsenal";
-            estado.arsenalFiltro = "congeladas";
-        }
-        render();
-    });
-});
+                if (ir === "aprendizados") {
+                    estado.tipo = "aprendizados";
+                } else if (ir === "pratica") {
+                    estado.tipo = "pratica";
+                    estado.subAba = "praticar";
+                } else if (ir === "congeladas") {
+                    estado.tipo = "pratica";
+                    estado.subAba = "arsenal";
+                    estado.arsenalFiltro = "congeladas";
+                }
+                render();
+            });
+        });
     }
 
     function renderTipos() {
@@ -1836,7 +1713,7 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             if (estado.tipo === "artigo") {
                 abas.push({ id: "noticias", label: "📰 Notícias" });
             }
-                } else if (estado.tipo === "aprendizados") {
+        } else if (estado.tipo === "aprendizados") {
             abas = [];
         } else if (estado.tipo === "pratica") {
             abas = [
@@ -1870,13 +1747,13 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
         if (estado.tipo === "artigo" && estado.subAba === "estudar")    return renderEstudarArtigo();
         if (estado.tipo === "artigo" && estado.subAba === "biblioteca") return renderBibliotecaArtigo();
         if (estado.tipo === "artigo" && estado.subAba === "noticias")   return renderNoticias();
-                if (estado.tipo === "aprendizados")                             return renderAprendizados();
+        if (estado.tipo === "aprendizados")                             return renderAprendizados();
         if (estado.tipo === "pratica" && estado.subAba === "praticar")  return renderPraticarHoje();
         if (estado.tipo === "pratica" && estado.subAba === "arsenal")   return renderArsenal();
         return renderEmConstrucao();
     }
 
-        function renderEmConstrucao() {
+    function renderEmConstrucao() {
         const tipoInfo = TIPOS.find(t => t.id === estado.tipo) || { label: "?" };
         el("conteudo").innerHTML = `
             <div class="em-construcao">
@@ -1888,11 +1765,7 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             </div>
         `;
     }
-
-    // ==================================================
-    // PRÁTICA — casca (Partes 6+ preenchem o conteúdo real)
-    // ==================================================
-            // ==================================================
+        // ==================================================
     // TREINADOR — cálculo de score
     // ==================================================
     const CHAVE_REJEICOES_7D = "estudo_treinador_rejeicoes_7d";
@@ -1922,8 +1795,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
         localStorage.setItem(CHAVE_REJEICOES_7D, JSON.stringify(r));
     }
 
-    // Ajuste de tempo: olha os últimos blocos concluídos (tempo_real_min > 0)
-    // e calcula um multiplicador entre 0.8 e 1.4 pro tempo previsto vs real.
     function _calcularAjusteTempo(skillId, frenteId, todosBlocos) {
         const todos = todosBlocos.filter(b =>
             b.skillId === skillId && b.frenteId === frenteId &&
@@ -1950,11 +1821,10 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
 
         const skills = Storage.pratica.derivados.listarComDerivados();
         const d = Storage.pratica.derivados;
-                const blocosHoje = Storage.blocos.ler("pratica", dataAtual);
+        const blocosHoje = Storage.blocos.ler("pratica", dataAtual);
         const skillsJaFeitas = new Set(blocosHoje.map(b => b.skillId).filter(Boolean));
         const frentesJaFeitas = new Set(blocosHoje.map(b => b.frenteId).filter(Boolean));
-        
-        // pontos fracos registrados por frente (últimos 7 dias)
+
         const pontosFracos = {};
         const todos = lerTodosBlocosPratica();
         const corte = Date.now() - 7 * 86400000;
@@ -1964,7 +1834,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             pontosFracos[b.frenteId] = (pontosFracos[b.frenteId] || 0) + 1;
         });
 
-        // aprendizados vinculados a frentes (ainda em testando)
         const aprendizadosVinculados = Storage.aprendizados.listar()
             .filter(a => a.vinculo_pratica && a.status === "testando");
 
@@ -1983,7 +1852,7 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
                 if (frente.arquivada) return;
                 if (frente.fase === "aprendendo") return;
                 if (frentesJaFeitas.has(frente.id)) return;
-                
+
                 const temp = d.temperaturaPorFrente(skill, frente);
                 const gap = d.gapPorFrente(skill, frente);
                 const marco = frente.marco_ativo ? skill.marcos[frente.marco_ativo] : null;
@@ -1991,57 +1860,45 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
                 let score = 0;
                 const razoes = [];
 
-                // temperatura
                 if (temp.emoji === "🧊") { score += 20; razoes.push(`congelada há ${temp.dias}d`); }
                 else if (temp.emoji === "❄️") { score += 15; razoes.push(`fria há ${temp.dias}d`); }
                 else if (temp.emoji === "🌤") { score += 10; razoes.push(`morna`); }
                 else if (temp.emoji === "🔥") { score += 5; razoes.push(`quente`); }
                 else { score += 8; razoes.push(`nova`); }
 
-                // gap / marco quase fechando
                 if (gap !== null) {
                     if (gap < 15) { score += 25; razoes.push(`marco a ${100 - gap}% — quase!`); }
                     else if (gap > 50) { score += 10; razoes.push(`gap alto (${gap}%)`); }
                 }
 
-                // ponto fraco registrado
                 if (pontosFracos[frente.id]) {
                     score += 15;
                     razoes.push(`ponto fraco recente`);
                 }
 
-                // aprendizado vinculado aguardando aplicação
                 const apsFrente = apsPorFrente[frente.id] || [];
                 if (apsFrente.length) {
                     score += 20;
                     razoes.push(`${apsFrente.length} aprendizado${apsFrente.length > 1 ? "s" : ""} pra testar`);
                 }
 
-                // já fez sessão dessa skill hoje
                 if (skillsJaFeitas.has(skill.id)) score -= 20;
-
-                // rejeitada hoje
                 if (foiRejeitadaHoje(skill.id, frente.id)) score -= 50;
-
-                // rejeitada 3x nos últimos 7 dias → não sugere mais
                 if (contarRejeicoes7d(skill.id, frente.id) >= 3) score -= 100;
 
                 let tempo = 25;
                 if (temp.emoji === "🧊") tempo = 5;
                 else if (temp.emoji === "❄️") tempo = 15;
 
-                // ajuste de tempo pelo histórico real
                 const fator = _calcularAjusteTempo(skill.id, frente.id, todos);
                 if (fator !== 1) {
                     tempo = Math.round(tempo * fator);
-                    // arredonda pra múltiplo de 5
                     tempo = Math.max(5, Math.round(tempo / 5) * 5);
                 }
 
                 let alvo = "";
                 if (marco) alvo = `Avançar em "${marco.titulo}"`;
 
-                // se há aprendizado vinculado, usa ele como alvo
                 let alvoFinal = alvo;
                 let aprendizadoId = null;
                 if (apsFrente.length) {
@@ -2202,12 +2059,10 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             `;
 
             ligarSugestoesTreinador(wrap, sugestoes);
-
             wrap.querySelector("#btnAddPraticaManual").addEventListener("click", addBlocoPratica);
             return;
         }
 
-        // 1) Treinador sempre no topo
         const sugestoes = calcularSugestoesTreinador();
         const treinadorHtml = renderSugestoesTreinador();
 
@@ -2216,7 +2071,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
         wrap.appendChild(topo);
         ligarSugestoesTreinador(topo, sugestoes);
 
-        // 2) Blocos do dia (se houver)
         if (blocos.length > 0) {
             const titulo = document.createElement("div");
             titulo.className = "sessoes-titulo";
@@ -2226,7 +2080,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             blocos.forEach((b, i) => wrap.appendChild(renderBlocoPratica(b, i)));
         }
 
-        // 3) Rodapé
         const addWrap = document.createElement("div");
         addWrap.className = "treinador-rodape";
         addWrap.innerHTML = `<button class="btn-secundario" id="btnAddPratica">+ Adicionar sessão manual</button>`;
@@ -2331,7 +2184,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
     function ligarConteudoParaPratica(container) {
         if (!container) return;
 
-        // toggle do botão principal
         container.querySelectorAll("[data-conteudo-toggle]").forEach(btn => {
             btn.addEventListener("click", (ev) => {
                 ev.stopPropagation();
@@ -2346,7 +2198,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             });
         });
 
-        // select skill → atualiza frentes
         container.querySelectorAll("[data-cvp-skill]").forEach(sel => {
             sel.addEventListener("change", () => {
                 const form = sel.closest(".conteudo-vinculo-form");
@@ -2358,7 +2209,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             });
         });
 
-        // salvar
         container.querySelectorAll("[data-cvp-salvar]").forEach(btn => {
             btn.addEventListener("click", () => {
                 const form = btn.closest(".conteudo-vinculo-form");
@@ -2400,7 +2250,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             });
         });
 
-        // cancelar
         container.querySelectorAll("[data-cvp-cancelar]").forEach(btn => {
             btn.addEventListener("click", () => {
                 estado.conteudoVinculoAberto = null;
@@ -2408,7 +2257,7 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             });
         });
     }
-    
+
     function renderBlocoPratica(b, idx) {
         const elBloco = document.createElement("div");
         elBloco.className = "bloco-estudo";
@@ -2490,7 +2339,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
                 `;
             })() : ""}
 
-            <label class="campo-label">Skill</label>
             ${(() => {
                 const real = Number(b.tempo_real_min) || 0;
                 const prev = Number(b.tempo_previsto_min) || 0;
@@ -2615,7 +2463,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             <input type="text" data-campo="midia_url" value="${esc(b.midia_url)}" placeholder="https://drive.google.com/... (vídeo/áudio/foto da sessão)">
         `;
 
-        // --- inputs simples ---
         elBloco.querySelectorAll("[data-campo]").forEach(input => {
             input.addEventListener("input", () => {
                 const campo = input.dataset.campo;
@@ -2623,14 +2470,13 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             });
         });
 
-        // --- selects (skill e frente) precisam re-render ---
         elBloco.querySelector('[data-campo="skillId"]')?.addEventListener("change", (ev) => {
             const novoSkillId = ev.target.value;
             const blocos = Storage.blocos.ler("pratica", dataAtual);
             const i = blocos.findIndex(x => x.id === b.id);
             if (i < 0) return;
             blocos[i].skillId = novoSkillId;
-            blocos[i].frenteId = ""; // reset frente ao trocar de skill
+            blocos[i].frenteId = "";
             Storage.blocos.salvar("pratica", dataAtual, blocos);
             render();
         });
@@ -2640,7 +2486,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             render();
         });
 
-        // --- chips de tempo (single select) ---
         elBloco.querySelectorAll('[data-chips]').forEach(grupo => {
             const campo = grupo.dataset.chips;
             grupo.querySelectorAll(".chip").forEach(chip => {
@@ -2657,7 +2502,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             });
         });
 
-        // --- chips radio (energia, dificuldade, feedback_fonte, feedback_nota) ---
         elBloco.querySelectorAll('[data-chips-radio]').forEach(grupo => {
             const campo = grupo.dataset.chipsRadio;
             grupo.querySelectorAll(".chip").forEach(chip => {
@@ -2674,7 +2518,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             });
         });
 
-        // --- ajustar tempo real manualmente ---
         elBloco.querySelector("[data-ajustar-tempo-real]")?.addEventListener("click", () => {
             const atual = Number(b.tempo_real_min) || 0;
             const novo = prompt(`Tempo real em minutos (atual: ${atual}):`, String(atual));
@@ -2685,14 +2528,12 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             render();
         });
 
-        // --- remover bloco ---
         elBloco.querySelector("[data-rem]").addEventListener("click", () => {
             const blocos = Storage.blocos.ler("pratica", dataAtual).filter(x => x.id !== b.id);
             Storage.blocos.salvar("pratica", dataAtual, blocos);
             render();
         });
 
-        // --- marcar aprendizado como aplicado ---
         elBloco.querySelector("[data-marcar-aplicado]")?.addEventListener("click", () => {
             const blocos = Storage.blocos.ler("pratica", dataAtual);
             const it = blocos.find(x => x.id === b.id);
@@ -2701,9 +2542,7 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             render();
         });
 
-        // --- iniciar sessão de foco ---
         elBloco.querySelector("[data-iniciar-foco]")?.addEventListener("click", () => {
-            // garante que o bloco está salvo antes de sair
             const blocos = Storage.blocos.ler("pratica", dataAtual);
             const i = blocos.findIndex(x => x.id === b.id);
             if (i < 0) return;
@@ -2721,10 +2560,9 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
         return elBloco;
     }
 
-        function renderArsenal() {
+    function renderArsenal() {
         const wrap = el("conteudo");
 
-        // se uma skill estava aberta, checa se ainda existe
         if (estado.arsenalSkillAberta) {
             const skill = Storage.pratica.skills.ler(estado.arsenalSkillAberta);
             if (!skill) { estado.arsenalSkillAberta = null; }
@@ -2735,7 +2573,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
         const arquivadas = todas.filter(s => s.arquivada);
         const ativas     = todas.filter(s => !s.arquivada);
 
-        // filtro
         let lista = estado.arsenalFiltro === "arquivadas" ? [...arquivadas] : [...ativas];
         if (estado.arsenalFiltro !== "arquivadas" && estado.arsenalFiltro !== "todas") {
             const mapa = { quentes: "🔥", mornas: "🌤", frias: "❄️", congeladas: "🧊" };
@@ -2743,13 +2580,11 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             if (alvo) lista = lista.filter(s => (s._derivados?.temperatura_geral || "🆕") === alvo);
         }
 
-        // busca
         if (estado.arsenalBusca.trim()) {
             const q = estado.arsenalBusca.toLowerCase();
             lista = lista.filter(s => (s.nome || "").toLowerCase().includes(q));
         }
 
-        // ordenação
         if (estado.arsenalOrdem === "az") {
             lista.sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
         } else if (estado.arsenalOrdem === "gap") {
@@ -2760,11 +2595,9 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             lista.sort((a, b) => (b.atualizado_em || "").localeCompare(a.atualizado_em || ""));
         }
 
-        // stats
         const congeladas = ativas.filter(s => (s._derivados?.temperatura_geral || "") === "🧊").length;
         const adormecidas = ativas.filter(s => (s._derivados?.temperatura_geral || "") === "❄️").length;
 
-        // se não tem NENHUMA skill no sistema (nem ativa, nem arquivada)
         if (!todas.length) {
             wrap.innerHTML = `
                 <div id="formSkillWrap">${estado.arsenalFormAberto ? renderFormSkill() : ""}</div>
@@ -2783,7 +2616,7 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             if (estado.arsenalFormAberto) ligarFormSkill(wrap);
             return;
         }
-            
+
         wrap.innerHTML = `
             <div id="formSkillWrap">${estado.arsenalFormAberto ? renderFormSkill() : ""}</div>
 
@@ -2824,7 +2657,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             ` : `<div class="vazio">Nenhuma skill neste filtro.</div>`}
         `;
 
-        // handlers
         wrap.querySelector("#btnNovaSkill")?.addEventListener("click", abrirFormNovaSkill);
 
         wrap.querySelector("#arsenalBusca")?.addEventListener("input", e => {
@@ -2855,10 +2687,10 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             });
         });
 
-        // form de nova skill / edição
         if (estado.arsenalFormAberto) ligarFormSkill(wrap);
     }
-        function abrirFormNovaSkill() {
+
+    function abrirFormNovaSkill() {
         estado.arsenalFormAberto = true;
         estado.arsenalEditandoId = null;
         renderArsenal();
@@ -2877,10 +2709,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
 
         const skillBase = editando || { nome: "", icone: "🛠️", area: "estudo" };
         const frentesExistentes = editando ? editando.frentes : [];
-
-        // por padrão, todas as frentes do template ficam marcadas pra criação
-        // (ou, se editando, só as do template que AINDA não existem ficam marcadas)
-        const nomesExistentes = frentesExistentes.map(f => f.nome.toLowerCase());
 
         const areas = [
             { id: "trabalho",        label: "💼 Trabalho" },
@@ -2944,10 +2772,8 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
     function ligarFormSkill(wrap) {
         const editando = estado.arsenalEditandoId;
 
-        // seleção de frentes (só no modo novo)
         const selecionadas = new Set();
         if (!editando) {
-            const skillBase = Storage.pratica.skills.ler(estado.arsenalEditandoId);
             const areaInicial = "estudo";
             (TEMPLATES_FRENTES[areaInicial] || []).forEach(t => selecionadas.add(t.nome.toLowerCase()));
         }
@@ -2980,7 +2806,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
         }
 
         if (!editando) {
-            // area inicial = estudo
             elArea.value = "estudo";
             redesenharFrentes();
 
@@ -2998,7 +2823,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
                 const key = nome.toLowerCase();
                 if (!selecionadas.has(key)) {
                     selecionadas.add(key);
-                    // injeta chip custom visual
                     const chip = document.createElement("div");
                     chip.className = "chip selecionado";
                     chip.dataset.frenteNome = nome;
@@ -3014,11 +2838,9 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             });
         }
 
-        // fechar / cancelar
         wrap.querySelector("#btnFecharFormSkill")?.addEventListener("click", fecharFormSkill);
         wrap.querySelector("#btnCancelarFormSkill")?.addEventListener("click", fecharFormSkill);
 
-        // salvar
         wrap.querySelector("#btnSalvarFormSkill")?.addEventListener("click", () => {
             const nome = (wrap.querySelector("#fsNome").value || "").trim();
             if (!nome) return alert("Dá um nome pra skill.");
@@ -3028,10 +2850,8 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             if (editando) {
                 Storage.pratica.skills.atualizar(editando, { nome, icone, area });
             } else {
-                // cria skill
                 const skill = Storage.pratica.skills.criar({ nome, icone, area });
 
-                // adiciona frentes selecionadas
                 const chips = wrap.querySelectorAll("#fsFrentes .chip.selecionado, #fsFrentes .chip");
                 const vistas = new Set();
                 chips.forEach(c => {
@@ -3053,8 +2873,7 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             renderArsenal();
         });
     }
-
-        function renderDetalheSkill(skill) {
+    function renderDetalheSkill(skill) {
         const wrap = el("conteudo");
         const d = skill._derivados || Storage.pratica.derivados.snapshotSkill(skill);
 
@@ -3099,7 +2918,7 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
                 <input type="text" data-norte="frase" value="${esc(norte.frase || "")}" placeholder="Uma frase que te lembra o porquê">
             </div>
 
-                        <div class="frentes-bloco">
+            <div class="frentes-bloco">
                 <div class="frentes-cabecalho">
                     <span class="frentes-titulo">Frentes</span>
                     <button class="btn-secundario" id="btnNovaFrente">+ Nova frente</button>
@@ -3114,7 +2933,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             ${renderFeedbackLog(skill)}
         `;
 
-        // --- Norte: salva no input ---
         wrap.querySelectorAll("[data-norte]").forEach(input => {
             input.addEventListener("input", () => {
                 const campo = input.dataset.norte;
@@ -3126,7 +2944,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             });
         });
 
-        // --- Botões gerais ---
         wrap.querySelector("#btnVoltarArsenal").addEventListener("click", () => {
             estado.arsenalSkillAberta = null;
             estado.arsenalFrenteExpandida = null;
@@ -3155,7 +2972,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             renderArsenal();
         });
 
-        // --- Nova frente ---
         wrap.querySelector("#btnNovaFrente").addEventListener("click", () => {
             const nome = prompt("Nome da frente (ex.: técnica, speaking, headline):", "");
             if (!nome) return;
@@ -3164,7 +2980,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             renderArsenal();
         });
 
-        // --- Frente: expandir/colapsar ---
         wrap.querySelectorAll("[data-frente-toggle]").forEach(btn => {
             btn.addEventListener("click", (ev) => {
                 ev.stopPropagation();
@@ -3174,7 +2989,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             });
         });
 
-        // --- Frente: remover ---
         wrap.querySelectorAll("[data-frente-remover]").forEach(btn => {
             btn.addEventListener("click", (ev) => {
                 ev.stopPropagation();
@@ -3188,7 +3002,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             });
         });
 
-        // --- Marco: definir como ativo ---
         wrap.querySelectorAll("[data-marco-ativar]").forEach(row => {
             row.addEventListener("click", () => {
                 const marcoId = row.dataset.marcoAtivar;
@@ -3198,7 +3011,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             });
         });
 
-        // --- Marco: slider de % ---
         wrap.querySelectorAll("[data-marco-slider]").forEach(slider => {
             slider.addEventListener("input", (ev) => {
                 ev.stopPropagation();
@@ -3213,7 +3025,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             slider.addEventListener("change", () => renderArsenal());
         });
 
-        // --- Marco: remover ---
         wrap.querySelectorAll("[data-marco-remover]").forEach(btn => {
             btn.addEventListener("click", (ev) => {
                 ev.stopPropagation();
@@ -3224,7 +3035,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             });
         });
 
-                // --- Adicionar marco numa frente ---
         wrap.querySelectorAll("[data-add-marco]").forEach(btn => {
             btn.addEventListener("click", (ev) => {
                 ev.stopPropagation();
@@ -3236,7 +3046,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             });
         });
 
-        // --- Mídia: adicionar ---
         wrap.querySelector("[data-add-midia]")?.addEventListener("click", () => {
             const tipo = prompt("Tipo (video / foto / audio / texto):", "video");
             if (!tipo) return;
@@ -3253,7 +3062,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             renderArsenal();
         });
 
-        // --- Mídia: definir antes/depois ---
         wrap.querySelectorAll("[data-midia-toggle-contexto]").forEach(btn => {
             btn.addEventListener("click", (ev) => {
                 ev.stopPropagation();
@@ -3269,7 +3077,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             });
         });
 
-        // --- Mídia: remover ---
         wrap.querySelectorAll("[data-midia-remover]").forEach(btn => {
             btn.addEventListener("click", (ev) => {
                 ev.stopPropagation();
@@ -3279,7 +3086,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             });
         });
 
-        // --- Ponto de virada: adicionar ---
         wrap.querySelector("[data-add-pv]")?.addEventListener("click", () => {
             const texto = prompt("O que destravou? (1 linha):", "");
             if (!texto) return;
@@ -3295,7 +3101,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             renderArsenal();
         });
 
-        // --- Ponto de virada: remover ---
         wrap.querySelectorAll("[data-pv-remover]").forEach(btn => {
             btn.addEventListener("click", (ev) => {
                 ev.stopPropagation();
@@ -3305,7 +3110,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             });
         });
 
-        // --- Feedback: adicionar ---
         wrap.querySelector("[data-add-fb]")?.addEventListener("click", () => {
             const fonte = prompt("Fonte (auto / mentor / par / audiencia / outro):", "auto");
             if (!fonte) return;
@@ -3321,7 +3125,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             renderArsenal();
         });
 
-        // --- Feedback: remover ---
         wrap.querySelectorAll("[data-fb-remover]").forEach(btn => {
             btn.addEventListener("click", (ev) => {
                 ev.stopPropagation();
@@ -3377,7 +3180,7 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
         `;
     }
 
-        function renderMarcoItem(skill, frente, marco, ativo) {
+    function renderMarcoItem(skill, frente, marco, ativo) {
         const pct = Number(marco.percentual) || 0;
         return `
             <div class="marco-item ${ativo ? "ativo" : ""}" data-marco-ativar="${marco.id}" data-frente-id="${frente.id}" title="${ativo ? "Marco ativo" : "Clique para tornar ativo"}">
@@ -3394,7 +3197,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
         `;
     }
 
-    // ---------- Timeline de mídias ----------
     function renderTimelineMidias(skill) {
         const midias = (skill.midias || []).slice().sort((a, b) => (b.data || "").localeCompare(a.data || ""));
 
@@ -3434,7 +3236,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
         `;
     }
 
-    // ---------- Pontos de virada ----------
     function renderPontosVirada(skill) {
         const pvs = (skill.pontos_de_virada || []).slice().sort((a, b) => (b.data || "").localeCompare(a.data || ""));
 
@@ -3468,7 +3269,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
         `;
     }
 
-    // ---------- Feedback ----------
     function renderFeedbackLog(skill) {
         const fbs = (skill.feedback || []).slice().sort((a, b) => (b.data || "").localeCompare(a.data || ""));
 
@@ -3502,6 +3302,7 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
             </div>
         `;
     }
+
     function renderCardArsenal(s) {
         const d = s._derivados || {};
         const temp   = d.temperatura_geral || "🆕";
@@ -3529,7 +3330,7 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
         `;
     }
 
-        // ==================================================
+    // ==================================================
     // AUXILIARES DE VÍDEO
     // ==================================================
     const players = {};
@@ -3780,9 +3581,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
         };
     }
 
-    // ==================================================
-    // BUSCA DE ARTIGOS — 4 fontes
-    // ==================================================
     const FONTES_ARTIGO = [
         { id: "hn",     label: "🟠 HN" },
         { id: "reddit", label: "🔴 Reddit" },
@@ -3814,7 +3612,6 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
         localStorage.setItem(CHAVE_FONTES_ARTIGO, JSON.stringify(arr));
     }
 
-    // ---------- Notícias (NewsData.io): prefs + histórico + edições ----------
     const CHAVE_NEWS_PREFS = "estudo_news_filtros_preferidos";
     const CHAVE_NEWS_HIST  = "estudo_news_historico_buscas";
 
@@ -3908,64 +3705,64 @@ el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
         .sort((a, b) => (b._ts || 0) - (a._ts || 0));
     }
 
-const EDICOES_BING = {
-    BR: { lang: "pt-BR", cc: "BR" },
-    US: { lang: "en-US", cc: "US" },
-    PT: { lang: "pt-PT", cc: "PT" },
-    ES: { lang: "es-ES", cc: "ES" },
-    GB: { lang: "en-GB", cc: "GB" },
-    FR: { lang: "fr-FR", cc: "FR" },
-};
+    const EDICOES_BING = {
+        BR: { lang: "pt-BR", cc: "BR" },
+        US: { lang: "en-US", cc: "US" },
+        PT: { lang: "pt-PT", cc: "PT" },
+        ES: { lang: "es-ES", cc: "ES" },
+        GB: { lang: "en-GB", cc: "GB" },
+        FR: { lang: "fr-FR", cc: "FR" },
+    };
 
-async function buscarNoticiasBing(query, opts = {}) {
-    const { edicao, periodo, dominio } = opts;
-    const ed = EDICOES_BING[edicao] || EDICOES_BING.BR;
+    async function buscarNoticiasBing(query, opts = {}) {
+        const { edicao, periodo, dominio } = opts;
+        const ed = EDICOES_BING[edicao] || EDICOES_BING.BR;
 
-    let q = query.trim();
-    if (dominio && dominio.trim()) q += ` site:${dominio.trim()}`;
+        let q = query.trim();
+        if (dominio && dominio.trim()) q += ` site:${dominio.trim()}`;
 
-    const url = `https://www.bing.com/news/search?q=${encodeURIComponent(q)}&format=rss&setlang=${ed.lang}&cc=${ed.cc}`;
-    console.log("[news] bing:", q, "| edição:", edicao);
+        const url = `https://www.bing.com/news/search?q=${encodeURIComponent(q)}&format=rss&setlang=${ed.lang}&cc=${ed.cc}`;
+        console.log("[news] bing:", q, "| edição:", edicao);
 
-    const r = await fetchComFallback(url);
-    const xml = await r.text();
-    const doc = new DOMParser().parseFromString(xml, "text/xml");
-    const itens = Array.from(doc.getElementsByTagName("item"));
+        const r = await fetchComFallback(url);
+        const xml = await r.text();
+        const doc = new DOMParser().parseFromString(xml, "text/xml");
+        const itens = Array.from(doc.getElementsByTagName("item"));
 
-    const agora = Date.now();
-    const limiteMs = (PERIODOS_NEWS[periodo] || PERIODOS_NEWS.tudo).horas * 3600 * 1000;
+        const agora = Date.now();
+        const limiteMs = (PERIODOS_NEWS[periodo] || PERIODOS_NEWS.tudo).horas * 3600 * 1000;
 
-    return itens.map(item => {
-        const txt = tag => item.getElementsByTagName(tag)[0]?.textContent || "";
+        return itens.map(item => {
+            const txt = tag => item.getElementsByTagName(tag)[0]?.textContent || "";
 
-        const linkBing = txt("link");
-        let real = linkBing;
-        try { real = new URL(linkBing).searchParams.get("url") || linkBing; } catch {}
+            const linkBing = txt("link");
+            let real = linkBing;
+            try { real = new URL(linkBing).searchParams.get("url") || linkBing; } catch {}
 
-        let dom = "";
-        try { dom = new URL(real).hostname.replace(/^www\./, ""); } catch {}
+            let dom = "";
+            try { dom = new URL(real).hostname.replace(/^www\./, ""); } catch {}
 
-        const pub = txt("pubDate") ? new Date(txt("pubDate")) : null;
-        const ts = pub && !isNaN(pub) ? pub.getTime() : 0;
+            const pub = txt("pubDate") ? new Date(txt("pubDate")) : null;
+            const ts = pub && !isNaN(pub) ? pub.getTime() : 0;
 
-        return {
-            titulo: txt("title"),
-            url: real,
-            autor: "",
-            publicado: ts ? new Date(ts).toISOString() : "",
-            fonte: dom,
-            origem: "Notícias",
-            pontos: 0,
-            comentarios: 0,
-            portal: txt("News:Source") || dom,
-            _ts: ts,
-        };
-    })
-    .filter(a => a.titulo && a.url)
-    .filter(a => !a._ts || (agora - a._ts) <= limiteMs)
-    .sort((a, b) => (b._ts || 0) - (a._ts || 0));
-}
-    
+            return {
+                titulo: txt("title"),
+                url: real,
+                autor: "",
+                publicado: ts ? new Date(ts).toISOString() : "",
+                fonte: dom,
+                origem: "Notícias",
+                pontos: 0,
+                comentarios: 0,
+                portal: txt("News:Source") || dom,
+                _ts: ts,
+            };
+        })
+        .filter(a => a.titulo && a.url)
+        .filter(a => !a._ts || (agora - a._ts) <= limiteMs)
+        .sort((a, b) => (b._ts || 0) - (a._ts || 0));
+    }
+
     async function buscarTimelineNoticias(query, opts = {}) {
         const { edicao } = opts;
         const lista = await buscarNoticiasNewsData(query, { edicao, periodo: "tudo" });
@@ -3983,7 +3780,6 @@ async function buscarNoticiasBing(query, opts = {}) {
         }));
     }
 
-    // ---------- cadeia de proxies ----------
     const WORKER_PROXY = "https://ancient-truth-1e.germanco1324.workers.dev/?url=";
 
     const PROXIES_FALLBACK = [
@@ -4167,7 +3963,7 @@ async function buscarNoticiasBing(query, opts = {}) {
         await Promise.all(Array.from({ length: concorrencia }, worker));
     }
 
-        // ==================================================
+    // ==================================================
     // LIVRO → ESTUDAR
     // ==================================================
     function renderEstudarLivro() {
@@ -4455,10 +4251,8 @@ async function buscarNoticiasBing(query, opts = {}) {
         });
 
         ligarConteudoParaPratica(elBloco);
-
         return elBloco;
     }
-
     // ==================================================
     // VÍDEO → ESTUDAR
     // ==================================================
@@ -5072,7 +4866,7 @@ async function buscarNoticiasBing(query, opts = {}) {
             registrarVideoNaBiblioteca(b);
         }, 0);
 
-           ligarConteudoParaPratica(elBloco);
+        ligarConteudoParaPratica(elBloco);
 
         return elBloco;
     }
@@ -5444,7 +5238,7 @@ async function buscarNoticiasBing(query, opts = {}) {
     }
 
     // ==================================================
-    // NOTÍCIAS (NewsData.io) — PAINEL DEDICADO
+    // NOTÍCIAS (NewsData.io + Bing fallback)
     // ==================================================
     function renderNoticias() {
         const prefs = obterPrefsNews();
@@ -5536,13 +5330,13 @@ async function buscarNoticiasBing(query, opts = {}) {
             });
         });
 
-wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
-    chip.addEventListener("click", () => {
-        estado.newsPeriodo = chip.dataset.newsPeriodo;
-        wrap.querySelectorAll("[data-news-periodo]").forEach(c => c.classList.toggle("selecionado", c === chip));
-        salvarPrefs();
-    });
-});
+        wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
+            chip.addEventListener("click", () => {
+                estado.newsPeriodo = chip.dataset.newsPeriodo;
+                wrap.querySelectorAll("[data-news-periodo]").forEach(c => c.classList.toggle("selecionado", c === chip));
+                salvarPrefs();
+            });
+        });
 
         const inputDom = wrap.querySelector("#newsDominio");
         inputDom.addEventListener("input", e => { estado.newsDominio = e.target.value; });
@@ -5648,7 +5442,7 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
         if (estado.newsBusca) executarBuscaNews();
     }
 
-        // ==================================================
+    // ==================================================
     // BIBLIOTECA LIVRO
     // ==================================================
     function registrarNaBiblioteca(item, pct) {
@@ -6147,7 +5941,6 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
             });
         });
 
-        // abrir/fechar form de vínculo
         listaEl.querySelectorAll("[data-vincular]").forEach(b => {
             b.addEventListener("click", () => {
                 const id = b.dataset.vincular;
@@ -6156,7 +5949,6 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
             });
         });
 
-        // select de skill → atualiza frentes
         listaEl.querySelectorAll("[data-vinc-skill]").forEach(sel => {
             sel.addEventListener("change", () => {
                 const form = sel.closest(".ap-vinculo-form");
@@ -6173,7 +5965,6 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
             });
         });
 
-        // select de frente → atualiza marcos
         listaEl.querySelectorAll("[data-vinc-frente]").forEach(sel => {
             sel.addEventListener("change", () => {
                 const form = sel.closest(".ap-vinculo-form");
@@ -6189,7 +5980,6 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
             });
         });
 
-        // salvar vínculo
         listaEl.querySelectorAll("[data-vinc-salvar]").forEach(btn => {
             btn.addEventListener("click", () => {
                 const form = btn.closest(".ap-vinculo-form");
@@ -6207,7 +5997,6 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
                         vinculado_em: Date.now()
                     }
                 };
-                // se ainda não tem status, começa como "testando"
                 const ap = Storage.aprendizados.listar().find(x => x.id === id);
                 if (ap && (!ap.status || ap.status === "capturado")) {
                     patch.status = "testando";
@@ -6218,7 +6007,6 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
             });
         });
 
-        // cancelar vínculo
         listaEl.querySelectorAll("[data-vinc-cancelar]").forEach(btn => {
             btn.addEventListener("click", () => {
                 estado.aprVinculoAberto = null;
@@ -6226,7 +6014,6 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
             });
         });
 
-        // desvincular
         listaEl.querySelectorAll("[data-vinc-remover]").forEach(btn => {
             btn.addEventListener("click", () => {
                 const id = btn.dataset.vincRemover;
@@ -6384,7 +6171,6 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
                     if (min === 0 && typeof pacote.tempo_real_seg === "number" && pacote.tempo_real_seg > 30) {
                         min = 1;
                     }
-                    // Acumula o tempo em vez de sobrescrever
                     blocos[i].tempo_real_min = (Number(blocos[i].tempo_real_min) || 0) + min;
                 }
                 if (typeof pacote.pausas === "number")     blocos[i].pausas = pacote.pausas;
@@ -6402,16 +6188,11 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
         return aplicar.length;
     }
 
-    // ---------- sincronização em tempo real com o foco ----------
-    // 1) cross-tab: escuta "storage" (dispara quando OUTRA aba escreve)
-    // 2) same-tab: polling local (o storage event não dispara na aba que escreve)
     let _ultimoPacoteVisto = null;
 
     function _tickSyncFoco() {
-        // aplica pacotes novos
         const aplicados = aplicarRetornosFoco();
 
-        // descobre se há foco rodando pra algum bloco visível hoje
         let emFoco = null;
         for (let i = 0; i < localStorage.length; i++) {
             const k = localStorage.key(i);
@@ -6426,17 +6207,14 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
             } catch {}
         }
 
-        // atualiza badge em-foco se mudou
         const badgeAnterior = _ultimoPacoteVisto;
         _ultimoPacoteVisto = emFoco ? emFoco.blocoId : null;
 
         if (aplicados > 0) {
-            // re-render suave da lista de blocos se estamos na aba Praticar
             if (estado.tipo === "pratica" && estado.subAba === "praticar") {
                 renderPraticarHoje();
             }
         } else if (estado.tipo === "pratica" && estado.subAba === "praticar") {
-            // atualiza badges de "em foco" sem re-render completo
             document.querySelectorAll("[data-em-foco]").forEach(el => {
                 const id = el.dataset.emFoco;
                 if (emFoco && emFoco.blocoId === id) {
@@ -6462,13 +6240,11 @@ wrap.querySelectorAll("[data-news-periodo]").forEach(chip => {
 
     aplicarRetornosFoco();
 
-    // volta automaticamente pra Praticar hoje se veio do foco
     if (paramsURL.get("origem") === "foco") {
         estado.tipo = "pratica";
         estado.subAba = "praticar";
     }
 
-    // abre direto no Arsenal filtrado, se veio da home com hash
     if (location.hash === "#arsenal-congeladas") {
         estado.tipo = "pratica";
         estado.subAba = "arsenal";
