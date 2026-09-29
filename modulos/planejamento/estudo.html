@@ -24,6 +24,52 @@
         }
         .resumo-valor { color: #fff; font-size: 24px; font-weight: 600; line-height: 1; }
 
+        .picker-estudo {
+    position: absolute;
+    z-index: 1000;
+    background: #1c1c20;
+    border: 1px solid #2a2a30;
+    border-radius: 10px;
+    padding: 6px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 170px;
+}
+.picker-estudo-opcao {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 9px 12px;
+    background: none;
+    border: none;
+    color: #ddd;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 6px;
+    text-align: left;
+    transition: 0.15s;
+}
+.picker-estudo-opcao:hover {
+    background: #252529;
+    color: #fff;
+}
+.picker-estudo-count {
+    font-size: 11px;
+    color: #777;
+    font-variant-numeric: tabular-nums;
+    background: #252529;
+    padding: 1px 7px;
+    border-radius: 10px;
+}
+.picker-estudo-opcao:hover .picker-estudo-count {
+    background: #333;
+    color: #bbb;
+}
+        
         .resumo-sub {
             display: block;
             margin-top: 6px;
@@ -1524,6 +1570,9 @@
         }
         return out;
     }
+
+
+    
     // ==================================================
     // RESUMO / TIPOS / SUB-ABAS / CONTEÚDO
     // ==================================================
@@ -1584,25 +1633,50 @@
             ${skillsCongeladasHtml}
         `;
 
-        el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
-            card.addEventListener("click", () => {
-                const ir = card.dataset.ir;
-                if (ir === "aprendizados") {
-                    estado.tipo = "aprendizados";
-                } else if (ir === "pratica") {
-                    estado.tipo = "pratica";
-                    estado.subAba = "praticar";
-                } else if (ir === "congeladas") {
-                    estado.tipo = "pratica";
-                    estado.subAba = "arsenal";
-                    estado.arsenalFiltro = "congeladas";
-                } else {
-                    estado.tipo = "livro";
-                    estado.subAba = ir;
-                }
-                render();
-            });
-        });
+el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
+    card.addEventListener("click", () => {
+        const ir = card.dataset.ir;
+
+        // ---------- ESTUDOS HOJE ----------
+        if (ir === "estudar") {
+            const tipos = tiposComConteudoHoje();
+            if (tipos.length === 0) {
+                estado.tipo = "livro"; estado.subAba = "estudar"; render();
+            } else if (tipos.length === 1) {
+                estado.tipo = tipos[0].id; estado.subAba = "estudar"; render();
+            } else {
+                abrirPickerResumo(card, "estudar", tipos);
+            }
+            return;
+        }
+
+        // ---------- EM ANDAMENTO (biblioteca) ----------
+        if (ir === "biblioteca") {
+            const tipos = tiposComBibliotecaAtiva();
+            if (tipos.length === 0) {
+                estado.tipo = "livro"; estado.subAba = "biblioteca"; render();
+            } else if (tipos.length === 1) {
+                estado.tipo = tipos[0].id; estado.subAba = "biblioteca"; render();
+            } else {
+                abrirPickerResumo(card, "biblioteca", tipos);
+            }
+            return;
+        }
+
+        // ---------- DEMAIS CARDS (inalterado) ----------
+        if (ir === "aprendizados") {
+            estado.tipo = "aprendizados";
+        } else if (ir === "pratica") {
+            estado.tipo = "pratica";
+            estado.subAba = "praticar";
+        } else if (ir === "congeladas") {
+            estado.tipo = "pratica";
+            estado.subAba = "arsenal";
+            estado.arsenalFiltro = "congeladas";
+        }
+        render();
+    });
+});
     }
 
     function renderTipos() {
