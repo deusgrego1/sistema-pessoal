@@ -1570,7 +1570,99 @@
         return out;
     }
 
+// ==================================================
+// PICKER DO RESUMO — escolhe pra onde ir quando há vários tipos
+// ==================================================
+function tiposComConteudoHoje() {
+    return TIPOS
+        .map(t => ({
+            id: t.id,
+            label: t.label,
+            count: Storage.blocos.ler(t.id, dataAtual).length,
+        }))
+        .filter(t => t.count > 0);
+}
 
+function tiposComBibliotecaAtiva() {
+    return ["livro", "video", "artigo"]
+        .map(tid => {
+            const n = Storage.biblioteca.listar(tid)
+                .filter(b => b.status !== "concluido").length;
+            if (n === 0) return null;
+            const t = TIPOS.find(x => x.id === tid);
+            return { id: tid, label: t ? t.label : tid, count: n };
+        })
+        .filter(Boolean);
+}
+
+function abrirPickerResumo(anchorEl, modo, opcoes) {
+    document.querySelectorAll(".picker-estudo").forEach(p => p.remove());
+
+    const picker = document.createElement("div");
+    picker.className = "picker-estudo";
+    Object.assign(picker.style, {
+        position: "fixed",
+        zIndex: "9999",
+        background: "#1c1c20",
+        border: "1px solid #2a2a30",
+        borderRadius: "10px",
+        padding: "6px",
+        boxShadow: "0 6px 24px rgba(0,0,0,0.5)",
+        display: "flex",
+        flexDirection: "column",
+        gap: "2px",
+        minWidth: "180px",
+    });
+
+    picker.innerHTML = opcoes.map(o => `
+        <button class="picker-estudo-opcao" data-tipo="${esc(o.id)}"
+                style="display:flex;justify-content:space-between;align-items:center;gap:12px;
+                       padding:9px 12px;background:none;border:none;color:#ddd;
+                       font-family:inherit;font-size:13px;cursor:pointer;
+                       border-radius:6px;text-align:left;width:100%;">
+            <span>${esc(o.label)}</span>
+            <span style="font-size:11px;color:#777;background:#252529;
+                         padding:1px 7px;border-radius:10px;">${o.count}</span>
+        </button>
+    `).join("");
+
+    document.body.appendChild(picker);
+
+    const rect = anchorEl.getBoundingClientRect();
+    picker.style.top  = (rect.bottom + 6) + "px";
+    picker.style.left = rect.left + "px";
+
+    requestAnimationFrame(() => {
+        const pr = picker.getBoundingClientRect();
+        if (pr.right > window.innerWidth - 10) {
+            picker.style.left = Math.max(10, window.innerWidth - pr.width - 10) + "px";
+        }
+        if (pr.bottom > window.innerHeight - 10) {
+            picker.style.top = Math.max(10, rect.top - pr.height - 6) + "px";
+        }
+    });
+
+    picker.querySelectorAll("[data-tipo]").forEach(btn => {
+        btn.addEventListener("click", (ev) => {
+            ev.stopPropagation();
+            estado.tipo   = btn.dataset.tipo;
+            estado.subAba = (modo === "biblioteca") ? "biblioteca" : "estudar";
+            picker.remove();
+            render();
+        });
+    });
+
+    setTimeout(() => {
+        function fechar(ev) {
+            if (picker.contains(ev.target)) return;
+            picker.remove();
+            document.removeEventListener("click", fechar);
+            document.removeEventListener("scroll", fechar, true);
+        }
+        document.addEventListener("click", fechar);
+        document.addEventListener("scroll", fechar, true);
+    }, 0);
+}
     
     // ==================================================
     // RESUMO / TIPOS / SUB-ABAS / CONTEÚDO
@@ -1635,6 +1727,44 @@
 el("resumoEstudo").querySelectorAll(".resumo-card").forEach(card => {
     card.addEventListener("click", () => {
         const ir = card.dataset.ir;
+
+        if (ir === "estudar") {
+            const tipos = tiposComConteudoHoje();
+            if (tipos.length === 0) {
+                estado.tipo = "livro"; estado.subAba = "estudar"; render();
+            } else if (tipos.length === 1) {
+                estado.tipo = tipos[0].id; estado.subAba = "estudar"; render();
+            } else {
+                abrirPickerResumo(card, "estudar", tipos);
+            }
+            return;
+        }
+
+        if (ir === "biblioteca") {
+            const tipos = tiposComBibliotecaAtiva();
+            if (tipos.length === 0) {
+                estado.tipo = "livro"; estado.subAba = "biblioteca"; render();
+            } else if (tipos.length === 1) {
+                estado.tipo = tipos[0].id; estado.subAba = "biblioteca"; render();
+            } else {
+                abrirPickerResumo(card, "biblioteca", tipos);
+            }
+            return;
+        }
+
+        if (ir === "aprendizados") {
+            estado.tipo = "aprendizados";
+        } else if (ir === "pratica") {
+            estado.tipo = "pratica";
+            estado.subAba = "praticar";
+        } else if (ir === "congeladas") {
+            estado.tipo = "pratica";
+            estado.subAba = "arsenal";
+            estado.arsenalFiltro = "congeladas";
+        }
+        render();
+    });
+});
 
         // ---------- ESTUDOS HOJE ----------
         if (ir === "estudar") {
