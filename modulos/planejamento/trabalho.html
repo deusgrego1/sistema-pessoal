@@ -188,7 +188,25 @@
             transition: 0.2s;
         }
 
-        .link-subpagina:hover { background: #1e1e22; border-color: #3a3a40; }
+                .link-subpagina:hover { background: #1e1e22; border-color: #3a3a40; }
+
+        .foco-virar-tarefa {
+            margin-top: 10px;
+            padding: 8px 14px;
+            font-size: 12px;
+            background: #1a2233;
+            border: 1px solid #2c3a55;
+            color: #a8c4e8;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.15s;
+        }
+        .foco-virar-tarefa:hover {
+            background: #232f4a;
+            border-color: #4a5c85;
+            color: #dfe8ff;
+        }
         .link-subpagina h2 { font-size: 17px; margin-bottom: 5px; }
         .link-subpagina p { color: #999; font-size: 13px; }
 
@@ -1359,6 +1377,50 @@
 
         renderTarefas();
         renderTemplates();
+
+        // ==================================================
+        // FOCO PRINCIPAL → VIRA TAREFA PRIORITÁRIA
+        // ==================================================
+        const campoFoco = document.getElementById("focoPrincipal");
+        const wrapFoco = campoFoco.parentElement;
+
+        const btnVirarTarefa = document.createElement("button");
+        btnVirarTarefa.type = "button";
+        btnVirarTarefa.className = "foco-virar-tarefa";
+        btnVirarTarefa.textContent = "📋 Virar tarefa prioritária";
+        btnVirarTarefa.style.display = "none";
+        wrapFoco.appendChild(btnVirarTarefa);
+
+        function atualizarBtnVirarTarefa() {
+            const temTexto = (campoFoco.value || "").trim().length > 0;
+            const jaExiste = tarefas.some(t =>
+                (t.texto || "").trim().toLowerCase() === (campoFoco.value || "").trim().toLowerCase()
+            );
+            const listaCheia = tarefas.length >= 5;
+            btnVirarTarefa.style.display = (temTexto && !jaExiste && !listaCheia) ? "" : "none";
+        }
+
+        campoFoco.addEventListener("input", atualizarBtnVirarTarefa);
+
+        btnVirarTarefa.addEventListener("click", () => {
+            const txt = (campoFoco.value || "").trim();
+            if (!txt) return;
+            if (tarefas.length >= 5) return alert("Máximo de 5 tarefas. Menos é mais.");
+            if (tarefas.some(t => (t.texto || "").trim().toLowerCase() === txt.toLowerCase())) {
+                return alert("Essa tarefa já existe na lista.");
+            }
+            tarefas.unshift({
+                texto: txt,
+                prioridade: "alta",
+                concluida: false,
+                frentes_exigidas: []
+            });
+            salvarTarefas();
+            renderTarefas();
+            atualizarBtnVirarTarefa();
+        });
+
+        atualizarBtnVirarTarefa();
     </script>
 
 </body>
