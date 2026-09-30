@@ -144,6 +144,16 @@
 
         .tarefa-remover:hover { color: #e55; }
 
+        .tarefa-duplicar {
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0 4px;
+            flex-shrink: 0;
+        }
+        .tarefa-duplicar:hover { color: #a8c4e8; }
         .btn-adicionar {
             width: 100%;
             padding: 10px;
@@ -746,19 +756,63 @@
 
         campoLink.value = localStorage.getItem(chaveLink) || "";
 
-        function atualizarPreview() {
+        function escHtml(s) {
+            return String(s ?? "").replace(/[&<>"']/g, c => ({
+                "&": "&amp;", "<": "&lt;", ">": "&gt;",
+                '"': "&quot;", "'": "&#39;"
+            }[c]));
+        }
+
+        let _previewTimer = null;
+        let _ultimoPreviewUrl = "";
+
+        function renderPreviewBasico(url) {
+            preview.innerHTML = `<a href="${escHtml(url)}" target="_blank" rel="noopener">🔗 Abrir link</a>`;
+        }
+
+        async function atualizarPreview() {
             const url = campoLink.value.trim();
-            if (/^https?:\/\//i.test(url)) {
-                preview.innerHTML = `<a href="${url}" target="_blank" rel="noopener">🔗 Abrir link</a>`;
-            } else {
+            if (!/^https?:\/\//i.test(url)) {
                 preview.innerHTML = "";
+                _ultimoPreviewUrl = "";
+                return;
+            }
+            if (url === _ultimoPreviewUrl) return;
+            _ultimoPreviewUrl = url;
+
+            renderPreviewBasico(url);
+
+            try {
+                const api = `https://api.microlink.io/?url=${encodeURIComponent(url)}`;
+                const r = await fetch(api);
+                if (!r.ok) return;
+                const j = await r.json();
+                if (campoLink.value.trim() !== url) return;
+                const d = (j && j.data) || {};
+                const titulo = d.title || url;
+                let dominio = "";
+                try { dominio = new URL(url).hostname.replace(/^www\./, ""); } catch {}
+                const img = (d.image && d.image.url) || (d.logo && d.logo.url) || "";
+                preview.innerHTML = `
+                    <a href="${escHtml(url)}" target="_blank" rel="noopener" style="display:flex;gap:10px;align-items:center;max-width:100%;">
+                        ${img ? `<img src="${escHtml(img)}" alt="" style="width:40px;height:40px;object-fit:cover;border-radius:6px;background:#252529;flex-shrink:0;">` : ""}
+                        <span style="display:flex;flex-direction:column;gap:2px;min-width:0;overflow:hidden;">
+                            <strong style="font-size:13px;color:#dfe8ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(titulo)}</strong>
+                            <span style="font-size:11px;color:#888;">${escHtml(dominio)}</span>
+                        </span>
+                    </a>
+                `;
+            } catch (e) {
+                // mantém o preview básico
             }
         }
         atualizarPreview();
 
         campoLink.addEventListener("input", () => {
             localStorage.setItem(chaveLink, campoLink.value);
-            atualizarPreview();
+            clearTimeout(_previewTimer);
+            _ultimoPreviewUrl = "";
+            _previewTimer = setTimeout(atualizarPreview, 700);
         });
 
 
@@ -953,6 +1007,32 @@
                     renderTarefas();
                 });
                 linha.appendChild(check);
+
+                // Duplicar
+                const btnDup = document.createElement("button");
+                btnDup.type = "button";
+                btnDup.className = "tarefa-duplicar";
+                btnDup.textContent = "⧉";
+                btnDup.title = "Duplicar tarefa";
+                btnDup.addEventListener("click", () => {
+                    if (tarefas.length >= 5) {
+                        alert("Máximo de 5 tarefas. Menos é mais.");
+                        return;
+                    }
+                    const copia = {
+                        texto: t.texto || "",
+                        prioridade: t.prioridade || "media",
+                        concluida: false,
+                        frentes_exigidas: JSON.parse(JSON.stringify(t.frentes_exigidas || [])),
+                        tempo_foco_min: 0,
+                        sessoes_foco: 0,
+                        ultimo_foco_em: null,
+                    };
+                    tarefas.splice(i + 1, 0, copia);
+                    salvarTarefas();
+                    renderTarefas();
+                });
+                linha.appendChild(btnDup);
 
                 // Remover
                 const btnRem = document.createElement("button");
