@@ -80,6 +80,17 @@
 
         .tarefa-linha.concluida { opacity: 0.5; }
 
+        .tarefa-linha.prio-alta {
+            border-color: #d45a5a;
+            background: linear-gradient(90deg, #2a1a1a 0%, #1c1c20 30%);
+        }
+        .tarefa-linha.prio-alta::before {
+            content: "▲";
+            color: #d45a5a;
+            font-size: 10px;
+            margin-right: 4px;
+            flex-shrink: 0;
+        }
         .prio-grupo {
             display: flex;
             gap: 3px;
@@ -973,7 +984,17 @@
             localStorage.setItem(chaveTarefas, JSON.stringify(tarefas));
         }
 
+        const ORDEM_PRIO = { alta: 0, media: 1, baixa: 2 };
+
         function renderTarefas() {
+
+            // ordena: alta primeiro, depois media, depois baixa
+            // dentro do mesmo nível, mantém a ordem original
+            tarefas.sort((a, b) => {
+                const pa = ORDEM_PRIO[a.prioridade] ?? 1;
+                const pb = ORDEM_PRIO[b.prioridade] ?? 1;
+                return pa - pb;
+            });
 
             listaTarefas.innerHTML = "";
             const skills = obterSkillsAtivas();
@@ -984,7 +1005,8 @@
                 wrapper.className = "tarefa-wrapper";
 
                 const linha = document.createElement("div");
-                linha.className = "tarefa-linha" + (t.concluida ? " concluida" : "");
+                const classePrio = t.prioridade === "alta" ? " prio-alta" : "";
+                linha.className = "tarefa-linha" + (t.concluida ? " concluida" : "") + classePrio;
 
                 // Prioridade
                 const prioGrupo = document.createElement("div");
