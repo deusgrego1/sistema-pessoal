@@ -165,6 +165,45 @@
             flex-shrink: 0;
         }
         .tarefa-duplicar:hover { color: #a8c4e8; }
+
+        /* Inbox de ideias */
+        .inbox-ideia {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 10px 12px;
+            background: #1c1c20;
+            border: 1px solid #252529;
+            border-radius: 10px;
+            margin-bottom: 6px;
+        }
+        .inbox-ideia-texto {
+            flex: 1;
+            font-size: 13px;
+            color: #e0e0e0;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            min-width: 0;
+        }
+        .inbox-ideia-acoes {
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .inbox-ideia-btn {
+            background: none;
+            border: 1px solid #333338;
+            color: #888;
+            font-size: 13px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .inbox-ideia-btn:hover { color: #e0e0e0; border-color: #55555c; }
+        .inbox-ideia-btn.inbox-ideia-rm { color: #666; }
+        .inbox-ideia-btn.inbox-ideia-rm:hover { color: #d45a5a; border-color: #d45a5a; }
+
         .btn-adicionar {
             width: 100%;
             padding: 10px;
@@ -291,6 +330,25 @@
             transition: 0.15s;
         }
         .btn-estuda-antes:hover { background: #232f4a; border-color: #4a5c85; }
+
+        .tarefa-badge-aprendizado {
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #1a2233;
+            border: 1px solid #2c3a55;
+            color: #a8c4e8;
+            border-radius: 14px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.15s;
+            margin-left: 4px;
+        }
+        .tarefa-badge-aprendizado:hover {
+            background: #232f4a;
+            border-color: #4a5c85;
+            color: #dfe8ff;
+        }
 
         .frente-picker {
             padding: 4px 10px;
@@ -556,15 +614,22 @@
 
             <!-- IDEIAS -->
 
-            <div class="module-card">
+            <div class="module-card" style="align-items:flex-start;">
                 <span class="icon">💡</span>
-                <div>
+                <div style="width:100%;">
                     <h2>Ideias / observações</h2>
                     <textarea
                         id="ideiasObs"
                         placeholder="Registre ideias, observações ou informações importantes."
-                        rows="4"
+                        rows="3"
                     ></textarea>
+
+                    <label class="campo-label">📥 Inbox de ideias</label>
+                    <div style="display:flex;gap:8px;margin-bottom:8px;">
+                        <input type="text" id="novaIdeiaInput" placeholder="Nova ideia rápida..." style="flex:1;">
+                        <button type="button" class="btn-adicionar" id="btnAdicionarIdeia" style="width:auto;padding:8px 16px;">+ Adicionar</button>
+                    </div>
+                    <div id="inboxIdeias"></div>
                 </div>
             </div>
 
@@ -849,601 +914,3 @@
 
         // ==================================================
         // TAREFAS COM PRIORIDADE
-        // ==================================================
-
-               const chaveTarefas = PREFIXO + "tarefas";
-        let tarefas = [];
-        try {
-            const s = localStorage.getItem(chaveTarefas);
-            if (s) tarefas = JSON.parse(s);
-        } catch (e) { tarefas = []; }
-
-        // ---------- Aplicar retornos do Foco ----------
-        function aplicarRetornosFocoTrabalho() {
-            const prefixo = "estudo_trabalho_foco_retorno_";
-            const chaves = [];
-            for (let i = 0; i < localStorage.length; i++) {
-                const k = localStorage.key(i);
-                if (k && k.startsWith(prefixo)) chaves.push(k);
-            }
-            if (!chaves.length) return 0;
-
-            let aplicados = 0;
-            chaves.forEach(k => {
-                let p = null;
-                try { p = JSON.parse(localStorage.getItem(k)); } catch {}
-                if (!p || !p.tarefaTexto) { localStorage.removeItem(k); return; }
-
-                let idx = -1;
-                // 1) por idx, se o texto bater
-                if (typeof p.tarefaIdx === "number" &&
-                    tarefas[p.tarefaIdx] &&
-                    (tarefas[p.tarefaIdx].texto || "").trim() === p.tarefaTexto) {
-                    idx = p.tarefaIdx;
-                }
-                // 2) por texto exato
-                if (idx < 0) {
-                    idx = tarefas.findIndex(t => (t.texto || "").trim() === p.tarefaTexto);
-                }
-                // 3) case-insensitive
-                if (idx < 0) {
-                    const lower = p.tarefaTexto.toLowerCase();
-                    idx = tarefas.findIndex(t => (t.texto || "").trim().toLowerCase() === lower);
-                }
-                if (idx < 0) {
-                    console.warn("[foco→trabalho] tarefa não encontrada:", p.tarefaTexto, "— pacote mantido");
-                    return;
-                }
-
-                const t = tarefas[idx];
-                t.tempo_foco_min = (Number(t.tempo_foco_min) || 0) + Number(p.tempo_real_min || 0);
-                t.sessoes_foco   = (Number(t.sessoes_foco)   || 0) + 1;
-                t.ultimo_foco_em = p.timestamp;
-                aplicados++;
-                localStorage.removeItem(k);
-            });
-
-            if (aplicados) {
-                salvarTarefas();
-                console.log(`[foco→trabalho] ${aplicados} retorno(s) aplicado(s).`);
-            }
-            return aplicados;
-        }
-
-        aplicarRetornosFocoTrabalho();
-
-        // ---------- Prática: skills e frentes disponíveis ----------
-        function obterSkillsAtivas() {
-            try {
-                if (typeof Storage !== "undefined" && Storage.pratica) {
-                    return Storage.pratica.skills.listarAtivas();
-                }
-            } catch (e) {}
-            return [];
-        }
-
-        function obterFrente(skillId, frenteId) {
-            const s = obterSkillsAtivas().find(x => x.id === skillId);
-            if (!s) return null;
-            const f = (s.frentes || []).find(x => x.id === frenteId);
-            return f ? { skill: s, frente: f } : null;
-        }
-
-        function calcularGapDaFrente(skillId, frenteId) {
-            try {
-                if (typeof Storage !== "undefined" && Storage.pratica) {
-                    const skill = Storage.pratica.skills.ler(skillId);
-                    if (!skill) return null;
-                    const frente = (skill.frentes || []).find(f => f.id === frenteId);
-                    if (!frente) return null;
-                    return Storage.pratica.derivados.gapPorFrente(skill, frente);
-                }
-            } catch (e) {}
-            return null;
-        }
-
-        // ---------- Templates de job ----------
-        const CHAVE_TEMPLATES = "estudo_trabalho_templates";
-
-        function obterTemplates() {
-            try {
-                const raw = localStorage.getItem(CHAVE_TEMPLATES);
-                const arr = raw ? JSON.parse(raw) : [];
-                return Array.isArray(arr) ? arr : [];
-            } catch { return []; }
-        }
-        function salvarTemplates(arr) {
-            localStorage.setItem(CHAVE_TEMPLATES, JSON.stringify(arr));
-        }
-        function criarTemplate(nome, frentesExigidas) {
-            const lista = obterTemplates();
-            const novo = {
-                id: `tpl_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
-                nome: nome.trim(),
-                frentes: frentesExigidas.map(fx => ({ skillId: fx.skillId, frenteId: fx.frenteId })),
-                criado_em: Date.now()
-            };
-            lista.push(novo);
-            salvarTemplates(lista);
-            return novo;
-        }
-        function removerTemplate(id) {
-            const lista = obterTemplates().filter(t => t.id !== id);
-            salvarTemplates(lista);
-        }
-        function resumoFrentesTemplate(tpl) {
-            return tpl.frentes.map(fx => {
-                const info = obterFrente(fx.skillId, fx.frenteId);
-                return info ? `${info.frente.icone} ${info.frente.nome}` : "(frente removida)";
-            }).join(" · ");
-        }
-        const listaTarefas = document.getElementById("listaTarefas");
-        const contador = document.getElementById("contadorTarefas");
-
-        function salvarTarefas() {
-            localStorage.setItem(chaveTarefas, JSON.stringify(tarefas));
-        }
-
-        const ORDEM_PRIO = { alta: 0, media: 1, baixa: 2 };
-
-        function renderTarefas() {
-
-            // ordena: alta primeiro, depois media, depois baixa
-            // dentro do mesmo nível, mantém a ordem original
-            tarefas.sort((a, b) => {
-                const pa = ORDEM_PRIO[a.prioridade] ?? 1;
-                const pb = ORDEM_PRIO[b.prioridade] ?? 1;
-                return pa - pb;
-            });
-
-            listaTarefas.innerHTML = "";
-            const skills = obterSkillsAtivas();
-
-            tarefas.forEach((t, i) => {
-
-                const wrapper = document.createElement("div");
-                wrapper.className = "tarefa-wrapper";
-
-                const linha = document.createElement("div");
-                const classePrio = t.prioridade === "alta" ? " prio-alta" : "";
-                linha.className = "tarefa-linha" + (t.concluida ? " concluida" : "") + classePrio;
-
-                // Prioridade
-                const prioGrupo = document.createElement("div");
-                prioGrupo.className = "prio-grupo";
-                ["alta", "media", "baixa"].forEach(p => {
-                    const btn = document.createElement("button");
-                    btn.type = "button";
-                    btn.className = "prio-btn" + (t.prioridade === p ? " ativo" : "");
-                    btn.dataset.prio = p;
-                    btn.title = p.charAt(0).toUpperCase() + p.slice(1);
-                    btn.addEventListener("click", () => {
-                        t.prioridade = p;
-                        salvarTarefas();
-                        renderTarefas();
-                    });
-                    prioGrupo.appendChild(btn);
-                });
-                linha.appendChild(prioGrupo);
-
-                // Texto
-                const input = document.createElement("input");
-                input.type = "text";
-                input.className = "tarefa-input";
-                input.value = t.texto || "";
-                input.placeholder = "O que fazer?";
-                input.addEventListener("input", () => {
-                    t.texto = input.value;
-                    salvarTarefas();
-                });
-                linha.appendChild(input);
-
-                // Checkbox
-                const check = document.createElement("input");
-                check.type = "checkbox";
-                check.className = "tarefa-check";
-                check.checked = !!t.concluida;
-                check.addEventListener("change", () => {
-                    t.concluida = check.checked;
-                    salvarTarefas();
-                    renderTarefas();
-                });
-                linha.appendChild(check);
-
-                // Duplicar
-                const btnDup = document.createElement("button");
-                btnDup.type = "button";
-                btnDup.className = "tarefa-duplicar";
-                btnDup.textContent = "⧉";
-                btnDup.title = "Duplicar tarefa";
-                btnDup.addEventListener("click", () => {
-                    if (tarefas.length >= 5) {
-                        alert("Máximo de 5 tarefas. Menos é mais.");
-                        return;
-                    }
-                    const copia = {
-                        texto: t.texto || "",
-                        prioridade: t.prioridade || "media",
-                        concluida: false,
-                        frentes_exigidas: JSON.parse(JSON.stringify(t.frentes_exigidas || [])),
-                        tempo_foco_min: 0,
-                        sessoes_foco: 0,
-                        ultimo_foco_em: null,
-                    };
-                    tarefas.splice(i + 1, 0, copia);
-                    salvarTarefas();
-                    renderTarefas();
-                });
-                linha.appendChild(btnDup);
-
-                // Remover
-                const btnRem = document.createElement("button");
-                btnRem.type = "button";
-                btnRem.className = "tarefa-remover";
-                btnRem.textContent = "×";
-                btnRem.title = "Remover";
-                btnRem.addEventListener("click", () => {
-                    tarefas.splice(i, 1);
-                    salvarTarefas();
-                    renderTarefas();
-                });
-                linha.appendChild(btnRem);
-
-                wrapper.appendChild(linha);
-
-                // ---------- Sub-linha: frentes exigidas ----------
-                const frentes = t.frentes_exigidas || [];
-
-                const sub = document.createElement("div");
-                sub.className = "tarefa-frentes";
-
-                if (frentes.length) {
-                    frentes.forEach(fx => {
-                        const info = obterFrente(fx.skillId, fx.frenteId);
-                        if (!info) return;
-
-                        const gap = calcularGapDaFrente(fx.skillId, fx.frenteId);
-                        const alerta = gap !== null && gap > 50;
-
-                        const chip = document.createElement("span");
-                        chip.className = "frente-chip" + (alerta ? " alerta" : "");
-                        chip.title = gap !== null
-                            ? `gap ${gap}%${alerta ? " — você não domina isso ainda" : ""}`
-                            : "sem marco ativo";
-                        chip.innerHTML = `
-                            ${escFrente(info.frente.icone)} ${escFrente(info.frente.nome)}
-                            ${gap !== null ? `<span class="frente-gap">${gap}%</span>` : ""}
-                            <button type="button" class="frente-chip-rm" data-rm-frente="${i}:${escFrente(fx.skillId)}:${escFrente(fx.frenteId)}">×</button>
-                        `;
-                        sub.appendChild(chip);
-                    });
-
-                    // botão "Estuda antes" se tem alguma frente com alerta
-                    const precisaEstudar = frentes.some(fx => {
-                        const g = calcularGapDaFrente(fx.skillId, fx.frenteId);
-                        return g !== null && g > 50;
-                    });
-                    if (precisaEstudar) {
-                        const btn = document.createElement("button");
-                        btn.type = "button";
-                        btn.className = "btn-estuda-antes";
-                        btn.textContent = "📚 Estuda antes";
-                        btn.title = "Cria um aprendizado vinculado pra você treinar essa frente";
-                        btn.addEventListener("click", () => abrirEstudaAntes(i));
-                        sub.appendChild(btn);
-                    }
-                }
-
-                // botão de adicionar frente
-                if (skills.length) {
-                    const btnAdd = document.createElement("button");
-                    btnAdd.type = "button";
-                    btnAdd.className = "btn-add-frente";
-                    btnAdd.textContent = frentes.length ? "＋" : "🎯 vincular frente";
-                    btnAdd.addEventListener("click", () => mostrarPickerFrentes(sub, i));
-                    sub.appendChild(btnAdd);
-                }
-
-                // botão de salvar como template (só se já tem frentes)
-                if (frentes.length >= 2) {
-                    const btnTpl = document.createElement("button");
-                    btnTpl.type = "button";
-                    btnTpl.className = "btn-salvar-template";
-                    btnTpl.textContent = "💾 salvar como template";
-                    btnTpl.title = "Reusa essas frentes em outras tarefas";
-                    btnTpl.addEventListener("click", () => salvarTarefaComoTemplate(i));
-                    sub.appendChild(btnTpl);
-                }
-
-                wrapper.appendChild(sub);
-
-                // ---------- Rodapé: tempo + botão focar ----------
-                const rodape = document.createElement("div");
-                rodape.className = "tarefa-rodape";
-
-                if (t.tempo_foco_min > 0) {
-                    const min = Number(t.tempo_foco_min);
-                    let txt;
-                    if (min < 60) txt = `${min} min`;
-                    else {
-                        const h = Math.floor(min / 60);
-                        const m = min % 60;
-                        txt = m > 0 ? `${h}h ${m}min` : `${h}h`;
-                    }
-                    const badge = document.createElement("span");
-                    badge.className = "tarefa-tempo";
-                    badge.textContent = `⏱️ ${txt} em foco`;
-                    rodape.appendChild(badge);
-                }
-
-                const btnFocar = document.createElement("button");
-                btnFocar.type = "button";
-                btnFocar.className = "btn-focar-tarefa";
-                btnFocar.textContent = "🎯 Focar";
-                btnFocar.title = "Abrir o Foco já vinculado a essa tarefa";
-                btnFocar.addEventListener("click", (ev) => {
-                    ev.stopPropagation();
-                    const txt = (t.texto || "").trim();
-                    if (!txt) return alert("Escreve o texto da tarefa primeiro.");
-                    const params = new URLSearchParams({
-                        origem: "trabalho",
-                        tarefa: txt,
-                        data: dataAtual
-                    });
-                    window.location.href = `../foco/foco.html?${params.toString()}`;
-                });
-                rodape.appendChild(btnFocar);
-
-                wrapper.appendChild(rodape);
-                listaTarefas.appendChild(wrapper);
-            });
-
-            // handlers de remover frente
-            listaTarefas.querySelectorAll("[data-rm-frente]").forEach(btn => {
-                btn.addEventListener("click", (ev) => {
-                    ev.stopPropagation();
-                    const [idx, sid, fid] = btn.dataset.rmFrente.split(":");
-                    const tarefa = tarefas[Number(idx)];
-                    if (!tarefa || !tarefa.frentes_exigidas) return;
-                    tarefa.frentes_exigidas = tarefa.frentes_exigidas.filter(
-                        fx => !(fx.skillId === sid && fx.frenteId === fid)
-                    );
-                    salvarTarefas();
-                    renderTarefas();
-                });
-            });
-
-            // Contador
-            const feitas = tarefas.filter(t => t.concluida).length;
-            contador.textContent = tarefas.length === 0
-                ? ""
-                : `${feitas}/${tarefas.length} concluídas`;
-        }
-
-        // ---------- Render templates ----------
-        function renderTemplates() {
-            const box = document.getElementById("templatesBox");
-            if (!box) return;
-            const templates = obterTemplates();
-
-            if (!templates.length) {
-                box.innerHTML = "";
-                return;
-            }
-
-            box.innerHTML = `
-                <div class="templates-linha">
-                    <span class="templates-rotulo">⚡ Templates:</span>
-                    ${templates.map(t => `
-                        <div class="template-chip" data-tpl-aplicar="${escFrente(t.id)}" title="${escFrente(resumoFrentesTemplate(t))}">
-                            <span class="template-chip-nome">${escFrente(t.nome)}</span>
-                            <button type="button" class="template-chip-rm" data-tpl-remover="${escFrente(t.id)}">×</button>
-                        </div>
-                    `).join("")}
-                </div>
-            `;
-
-            box.querySelectorAll("[data-tpl-aplicar]").forEach(chip => {
-                chip.addEventListener("click", (ev) => {
-                    if (ev.target.closest("[data-tpl-remover]")) return;
-                    aplicarTemplate(chip.dataset.tplAplicar);
-                });
-            });
-            box.querySelectorAll("[data-tpl-remover]").forEach(btn => {
-                btn.addEventListener("click", (ev) => {
-                    ev.stopPropagation();
-                    const id = btn.dataset.tplRemover;
-                    const t = obterTemplates().find(x => x.id === id);
-                    if (!t) return;
-                    if (!confirm(`Remover template "${t.nome}"?`)) return;
-                    removerTemplate(id);
-                    renderTemplates();
-                });
-            });
-        }
-
-        function aplicarTemplate(id) {
-            const tpl = obterTemplates().find(t => t.id === id);
-            if (!tpl) return;
-            if (tarefas.length >= 5) return alert("Máximo de 5 tarefas.");
-
-            // cria tarefa nova sem texto ainda, com as frentes do template
-            tarefas.push({
-                texto: "",
-                prioridade: "media",
-                concluida: false,
-                frentes_exigidas: tpl.frentes.map(fx => ({ skillId: fx.skillId, frenteId: fx.frenteId }))
-            });
-            salvarTarefas();
-            renderTarefas();
-
-            // foca no último input pra você digitar o texto
-            const inputs = listaTarefas.querySelectorAll(".tarefa-input");
-            if (inputs.length) inputs[inputs.length - 1].focus();
-        }
-
-        // ---------- Salvar template a partir de uma tarefa ----------
-        function salvarTarefaComoTemplate(idx) {
-            const t = tarefas[idx];
-            if (!t || !t.frentes_exigidas || !t.frentes_exigidas.length) {
-                return alert("Essa tarefa não tem frentes pra virar template.");
-            }
-            const nome = prompt("Nome do template (ex.: 'Edição simples', 'Copy de landing'):", "");
-            if (!nome || !nome.trim()) return;
-            criarTemplate(nome, t.frentes_exigidas);
-            renderTemplates();
-        }
-
-        function escFrente(s) {
-            return String(s ?? "").replace(/[&<>"']/g, c => ({
-                "&": "&amp;", "<": "&lt;", ">": "&gt;",
-                '"': "&quot;", "'": "&#39;"
-            }[c]));
-        }
-
-        function mostrarPickerFrentes(subEl, tarefaIdx) {
-            // remove picker aberto antes
-            subEl.querySelectorAll(".frente-picker").forEach(p => p.remove());
-
-            const skills = obterSkillsAtivas();
-            const picker = document.createElement("select");
-            picker.className = "frente-picker";
-            picker.innerHTML = `<option value="">— escolha skill · frente —</option>` +
-                skills.map(s => {
-                    const frentes = (s.frentes || []).filter(f => !f.arquivada);
-                    if (!frentes.length) return "";
-                    return `<optgroup label="${escFrente(s.icone + " " + s.nome)}">` +
-                        frentes.map(f => {
-                            const gap = calcularGapDaFrente(s.id, f.id);
-                            const gapTxt = gap !== null ? ` (gap ${gap}%)` : "";
-                            return `<option value="${escFrente(s.id)}::${escFrente(f.id)}">${escFrente(f.icone + " " + f.nome)}${gapTxt}</option>`;
-                        }).join("") +
-                    `</optgroup>`;
-                }).join("");
-
-            picker.addEventListener("change", () => {
-                const v = picker.value;
-                if (!v) { picker.remove(); return; }
-                const [skillId, frenteId] = v.split("::");
-                const t = tarefas[tarefaIdx];
-                t.frentes_exigidas = t.frentes_exigidas || [];
-                if (!t.frentes_exigidas.some(fx => fx.skillId === skillId && fx.frenteId === frenteId)) {
-                    t.frentes_exigidas.push({ skillId, frenteId });
-                }
-                salvarTarefas();
-                renderTarefas();
-            });
-
-            subEl.appendChild(picker);
-            picker.focus();
-        }
-
-        function abrirEstudaAntes(tarefaIdx) {
-            const t = tarefas[tarefaIdx];
-            if (!t || !t.frentes_exigidas || !t.frentes_exigidas.length) return;
-
-            // pega a frente com maior gap
-            let alvo = null, maiorGap = -1;
-            t.frentes_exigidas.forEach(fx => {
-                const g = calcularGapDaFrente(fx.skillId, fx.frenteId);
-                if (g !== null && g > maiorGap) {
-                    maiorGap = g;
-                    alvo = fx;
-                }
-            });
-            if (!alvo) return;
-
-            const info = obterFrente(alvo.skillId, alvo.frenteId);
-            if (!info) return;
-
-            const texto = `Estudar "${info.frente.nome}" pra tarefa: ${t.texto || "(sem texto)"}`;
-
-            try {
-                if (typeof Storage !== "undefined" && Storage.pratica) {
-                    Storage.aprendizados.adicionar({
-                        texto,
-                        fonte: `Trabalho: ${t.texto || ""}`,
-                        status: "testando",
-                        tipo: "tecnica",
-                        areas: ["trabalho"],
-                        impacto: "alto",
-                        vinculo_pratica: {
-                            skillId: alvo.skillId,
-                            frenteId: alvo.frenteId,
-                            marcoId: null,
-                            vinculado_em: Date.now()
-                        }
-                    });
-                    const b = document.createElement("div");
-                    b.className = "estuda-antes-ok";
-                    b.textContent = `✅ Aprendizado criado pra "${info.frente.nome}". O Treinador vai sugerir.`;
-                    document.body.appendChild(b);
-                    setTimeout(() => b.remove(), 3500);
-                }
-            } catch (e) {
-                console.warn("Falha ao criar aprendizado", e);
-            }
-        }
-
-        document.getElementById("btnAddTarefa").addEventListener("click", () => {
-            if (tarefas.length >= 5) {
-                alert("Máximo de 5 tarefas. Menos é mais.");
-                return;
-            }
-            tarefas.push({ texto: "", prioridade: "media", concluida: false, frentes_exigidas: [] });
-            salvarTarefas();
-            renderTarefas();
-            const inputs = listaTarefas.querySelectorAll(".tarefa-input");
-            if (inputs.length) inputs[inputs.length - 1].focus();
-        });
-
-        renderTarefas();
-        renderTemplates();
-
-        // ==================================================
-        // FOCO PRINCIPAL → VIRA TAREFA PRIORITÁRIA
-        // ==================================================
-        const campoFoco = document.getElementById("focoPrincipal");
-        const wrapFoco = campoFoco.parentElement;
-
-        const btnVirarTarefa = document.createElement("button");
-        btnVirarTarefa.type = "button";
-        btnVirarTarefa.className = "foco-virar-tarefa";
-        btnVirarTarefa.textContent = "📋 Virar tarefa prioritária";
-        btnVirarTarefa.style.display = "none";
-        wrapFoco.appendChild(btnVirarTarefa);
-
-        function atualizarBtnVirarTarefa() {
-            const temTexto = (campoFoco.value || "").trim().length > 0;
-            const jaExiste = tarefas.some(t =>
-                (t.texto || "").trim().toLowerCase() === (campoFoco.value || "").trim().toLowerCase()
-            );
-            const listaCheia = tarefas.length >= 5;
-            btnVirarTarefa.style.display = (temTexto && !jaExiste && !listaCheia) ? "" : "none";
-        }
-
-        campoFoco.addEventListener("input", atualizarBtnVirarTarefa);
-
-        btnVirarTarefa.addEventListener("click", () => {
-            const txt = (campoFoco.value || "").trim();
-            if (!txt) return;
-            if (tarefas.length >= 5) return alert("Máximo de 5 tarefas. Menos é mais.");
-            if (tarefas.some(t => (t.texto || "").trim().toLowerCase() === txt.toLowerCase())) {
-                return alert("Essa tarefa já existe na lista.");
-            }
-            tarefas.unshift({
-                texto: txt,
-                prioridade: "alta",
-                concluida: false,
-                frentes_exigidas: []
-            });
-            salvarTarefas();
-            renderTarefas();
-            atualizarBtnVirarTarefa();
-        });
-
-        atualizarBtnVirarTarefa();
-    </script>
-
-</body>
-</html>
