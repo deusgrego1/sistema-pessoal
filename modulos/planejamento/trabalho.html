@@ -91,6 +91,7 @@
             margin-right: 4px;
             flex-shrink: 0;
         }
+
         .prio-grupo {
             display: flex;
             gap: 3px;
@@ -165,6 +166,45 @@
             flex-shrink: 0;
         }
         .tarefa-duplicar:hover { color: #a8c4e8; }
+
+        /* Inbox de ideias */
+        .inbox-ideia {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 10px 12px;
+            background: #1c1c20;
+            border: 1px solid #252529;
+            border-radius: 10px;
+            margin-bottom: 6px;
+        }
+        .inbox-ideia-texto {
+            flex: 1;
+            font-size: 13px;
+            color: #e0e0e0;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            min-width: 0;
+        }
+        .inbox-ideia-acoes {
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .inbox-ideia-btn {
+            background: none;
+            border: 1px solid #333338;
+            color: #888;
+            font-size: 13px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .inbox-ideia-btn:hover { color: #e0e0e0; border-color: #55555c; }
+        .inbox-ideia-btn.inbox-ideia-rm { color: #666; }
+        .inbox-ideia-btn.inbox-ideia-rm:hover { color: #d45a5a; border-color: #d45a5a; }
+
         .btn-adicionar {
             width: 100%;
             padding: 10px;
@@ -291,6 +331,25 @@
             transition: 0.15s;
         }
         .btn-estuda-antes:hover { background: #232f4a; border-color: #4a5c85; }
+
+        .tarefa-badge-aprendizado {
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #1a2233;
+            border: 1px solid #2c3a55;
+            color: #a8c4e8;
+            border-radius: 14px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.15s;
+            margin-left: 4px;
+        }
+        .tarefa-badge-aprendizado:hover {
+            background: #232f4a;
+            border-color: #4a5c85;
+            color: #dfe8ff;
+        }
 
         .frente-picker {
             padding: 4px 10px;
@@ -556,15 +615,22 @@
 
             <!-- IDEIAS -->
 
-            <div class="module-card">
+            <div class="module-card" style="align-items:flex-start;">
                 <span class="icon">💡</span>
-                <div>
+                <div style="width:100%;">
                     <h2>Ideias / observações</h2>
                     <textarea
                         id="ideiasObs"
                         placeholder="Registre ideias, observações ou informações importantes."
-                        rows="4"
+                        rows="3"
                     ></textarea>
+
+                    <label class="campo-label">📥 Inbox de ideias</label>
+                    <div style="display:flex;gap:8px;margin-bottom:8px;">
+                        <input type="text" id="novaIdeiaInput" placeholder="Nova ideia rápida..." style="flex:1;">
+                        <button type="button" class="btn-adicionar" id="btnAdicionarIdeia" style="width:auto;padding:8px 16px;">+ Adicionar</button>
+                    </div>
+                    <div id="inboxIdeias"></div>
                 </div>
             </div>
 
@@ -587,9 +653,7 @@
         </a>
 
     </main>
-
-
-    <script src="../../js/storage.js"></script>
+        <script src="../../js/storage.js"></script>
     <script src="../../js/app.js"></script>
     <script>
         // ==================================================
@@ -778,7 +842,7 @@
 
 
         // ==================================================
-        // LINK DE REFERÊNCIA
+        // LINK DE REFERÊNCIA  (A.1: preview Microlink)
         // ==================================================
 
         const chaveLink = PREFIXO + "link_ref";
@@ -851,66 +915,13 @@
         // TAREFAS COM PRIORIDADE
         // ==================================================
 
-               const chaveTarefas = PREFIXO + "tarefas";
+        const chaveTarefas = PREFIXO + "tarefas";
         let tarefas = [];
         try {
             const s = localStorage.getItem(chaveTarefas);
             if (s) tarefas = JSON.parse(s);
         } catch (e) { tarefas = []; }
 
-        // ---------- Aplicar retornos do Foco ----------
-        function aplicarRetornosFocoTrabalho() {
-            const prefixo = "estudo_trabalho_foco_retorno_";
-            const chaves = [];
-            for (let i = 0; i < localStorage.length; i++) {
-                const k = localStorage.key(i);
-                if (k && k.startsWith(prefixo)) chaves.push(k);
-            }
-            if (!chaves.length) return 0;
-
-            let aplicados = 0;
-            chaves.forEach(k => {
-                let p = null;
-                try { p = JSON.parse(localStorage.getItem(k)); } catch {}
-                if (!p || !p.tarefaTexto) { localStorage.removeItem(k); return; }
-
-                let idx = -1;
-                // 1) por idx, se o texto bater
-                if (typeof p.tarefaIdx === "number" &&
-                    tarefas[p.tarefaIdx] &&
-                    (tarefas[p.tarefaIdx].texto || "").trim() === p.tarefaTexto) {
-                    idx = p.tarefaIdx;
-                }
-                // 2) por texto exato
-                if (idx < 0) {
-                    idx = tarefas.findIndex(t => (t.texto || "").trim() === p.tarefaTexto);
-                }
-                // 3) case-insensitive
-                if (idx < 0) {
-                    const lower = p.tarefaTexto.toLowerCase();
-                    idx = tarefas.findIndex(t => (t.texto || "").trim().toLowerCase() === lower);
-                }
-                if (idx < 0) {
-                    console.warn("[foco→trabalho] tarefa não encontrada:", p.tarefaTexto, "— pacote mantido");
-                    return;
-                }
-
-                const t = tarefas[idx];
-                t.tempo_foco_min = (Number(t.tempo_foco_min) || 0) + Number(p.tempo_real_min || 0);
-                t.sessoes_foco   = (Number(t.sessoes_foco)   || 0) + 1;
-                t.ultimo_foco_em = p.timestamp;
-                aplicados++;
-                localStorage.removeItem(k);
-            });
-
-            if (aplicados) {
-                salvarTarefas();
-                console.log(`[foco→trabalho] ${aplicados} retorno(s) aplicado(s).`);
-            }
-            return aplicados;
-        }
-
-        aplicarRetornosFocoTrabalho();
 
         // ---------- Prática: skills e frentes disponíveis ----------
         function obterSkillsAtivas() {
@@ -941,6 +952,27 @@
             } catch (e) {}
             return null;
         }
+
+        // ---------- Aprendizados pendentes nas frentes (B.3) ----------
+        function contarAprendizadosPendentes(frentesExigidas) {
+            if (!frentesExigidas || !frentesExigidas.length) return 0;
+            try {
+                const aps = Storage.aprendizados.listar().filter(a =>
+                    a.vinculo_pratica && a.status === "testando"
+                );
+                let count = 0;
+                frentesExigidas.forEach(fx => {
+                    aps.forEach(a => {
+                        if (a.vinculo_pratica.skillId === fx.skillId &&
+                            a.vinculo_pratica.frenteId === fx.frenteId) {
+                            count++;
+                        }
+                    });
+                });
+                return count;
+            } catch { return 0; }
+        }
+
 
         // ---------- Templates de job ----------
         const CHAVE_TEMPLATES = "estudo_trabalho_templates";
@@ -977,6 +1009,7 @@
                 return info ? `${info.frente.icone} ${info.frente.nome}` : "(frente removida)";
             }).join(" · ");
         }
+
         const listaTarefas = document.getElementById("listaTarefas");
         const contador = document.getElementById("contadorTarefas");
 
@@ -984,12 +1017,66 @@
             localStorage.setItem(chaveTarefas, JSON.stringify(tarefas));
         }
 
+
+        // ---------- Aplicar retornos do Foco (B.3: retorna afetadas) ----------
+        function aplicarRetornosFocoTrabalho() {
+            const prefixo = "estudo_trabalho_foco_retorno_";
+            const chaves = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (k && k.startsWith(prefixo)) chaves.push(k);
+            }
+            if (!chaves.length) return { aplicados: 0, tarefasAfetadas: [] };
+
+            let aplicados = 0;
+            const tarefasAfetadas = [];
+            chaves.forEach(k => {
+                let p = null;
+                try { p = JSON.parse(localStorage.getItem(k)); } catch {}
+                if (!p || !p.tarefaTexto) { localStorage.removeItem(k); return; }
+
+                let idx = -1;
+                if (typeof p.tarefaIdx === "number" &&
+                    tarefas[p.tarefaIdx] &&
+                    (tarefas[p.tarefaIdx].texto || "").trim() === p.tarefaTexto) {
+                    idx = p.tarefaIdx;
+                }
+                if (idx < 0) {
+                    idx = tarefas.findIndex(t => (t.texto || "").trim() === p.tarefaTexto);
+                }
+                if (idx < 0) {
+                    const lower = p.tarefaTexto.toLowerCase();
+                    idx = tarefas.findIndex(t => (t.texto || "").trim().toLowerCase() === lower);
+                }
+                if (idx < 0) {
+                    console.warn("[foco→trabalho] tarefa não encontrada:", p.tarefaTexto, "— pacote mantido");
+                    return;
+                }
+
+                const t = tarefas[idx];
+                t.tempo_foco_min = (Number(t.tempo_foco_min) || 0) + Number(p.tempo_real_min || 0);
+                t.sessoes_foco   = (Number(t.sessoes_foco)   || 0) + 1;
+                t.ultimo_foco_em = p.timestamp;
+                aplicados++;
+                tarefasAfetadas.push({ texto: t.texto, min: p.tempo_real_min });
+                localStorage.removeItem(k);
+            });
+
+            if (aplicados) {
+                salvarTarefas();
+                console.log(`[foco→trabalho] ${aplicados} retorno(s) aplicado(s).`);
+            }
+            return { aplicados, tarefasAfetadas };
+        }
+
+        const _retornoFoco = aplicarRetornosFocoTrabalho();
+
+
         const ORDEM_PRIO = { alta: 0, media: 1, baixa: 2 };
 
         function renderTarefas() {
 
             // ordena: alta primeiro, depois media, depois baixa
-            // dentro do mesmo nível, mantém a ordem original
             tarefas.sort((a, b) => {
                 const pa = ORDEM_PRIO[a.prioridade] ?? 1;
                 const pb = ORDEM_PRIO[b.prioridade] ?? 1;
@@ -1050,7 +1137,7 @@
                 });
                 linha.appendChild(check);
 
-                // Duplicar
+                // Duplicar (A.1)
                 const btnDup = document.createElement("button");
                 btnDup.type = "button";
                 btnDup.className = "tarefa-duplicar";
@@ -1132,6 +1219,20 @@
                         btn.addEventListener("click", () => abrirEstudaAntes(i));
                         sub.appendChild(btn);
                     }
+                }
+
+                // Badge de aprendizado pendente (B.3)
+                const pendentes = contarAprendizadosPendentes(frentes);
+                if (pendentes > 0) {
+                    const badge = document.createElement("button");
+                    badge.type = "button";
+                    badge.className = "tarefa-badge-aprendizado";
+                    badge.textContent = `📚 ${pendentes} aprendizado${pendentes > 1 ? "s" : ""} esperando prática`;
+                    badge.title = "Ver no Estudo";
+                    badge.addEventListener("click", () => {
+                        window.open("estudo.html", "_blank");
+                    });
+                    sub.appendChild(badge);
                 }
 
                 // botão de adicionar frente
@@ -1220,6 +1321,7 @@
                 : `${feitas}/${tarefas.length} concluídas`;
         }
 
+
         // ---------- Render templates ----------
         function renderTemplates() {
             const box = document.getElementById("templatesBox");
@@ -1267,7 +1369,6 @@
             if (!tpl) return;
             if (tarefas.length >= 5) return alert("Máximo de 5 tarefas.");
 
-            // cria tarefa nova sem texto ainda, com as frentes do template
             tarefas.push({
                 texto: "",
                 prioridade: "media",
@@ -1277,7 +1378,6 @@
             salvarTarefas();
             renderTarefas();
 
-            // foca no último input pra você digitar o texto
             const inputs = listaTarefas.querySelectorAll(".tarefa-input");
             if (inputs.length) inputs[inputs.length - 1].focus();
         }
@@ -1302,7 +1402,6 @@
         }
 
         function mostrarPickerFrentes(subEl, tarefaIdx) {
-            // remove picker aberto antes
             subEl.querySelectorAll(".frente-picker").forEach(p => p.remove());
 
             const skills = obterSkillsAtivas();
@@ -1342,7 +1441,6 @@
             const t = tarefas[tarefaIdx];
             if (!t || !t.frentes_exigidas || !t.frentes_exigidas.length) return;
 
-            // pega a frente com maior gap
             let alvo = null, maiorGap = -1;
             t.frentes_exigidas.forEach(fx => {
                 const g = calcularGapDaFrente(fx.skillId, fx.frenteId);
@@ -1400,8 +1498,9 @@
         renderTarefas();
         renderTemplates();
 
+
         // ==================================================
-        // FOCO PRINCIPAL → VIRA TAREFA PRIORITÁRIA
+        // FOCO PRINCIPAL → VIRA TAREFA PRIORITÁRIA  (A.2)
         // ==================================================
         const campoFoco = document.getElementById("focoPrincipal");
         const wrapFoco = campoFoco.parentElement;
@@ -1443,6 +1542,143 @@
         });
 
         atualizarBtnVirarTarefa();
+
+
+        // ==================================================
+        // INBOX DE IDEIAS  (B.2)
+        // ==================================================
+        const CHAVE_INBOX = PREFIXO + "ideias_inbox";
+
+        function obterInbox() {
+            try {
+                const raw = localStorage.getItem(CHAVE_INBOX);
+                return raw ? JSON.parse(raw) : [];
+            } catch { return []; }
+        }
+        function salvarInbox(arr) {
+            localStorage.setItem(CHAVE_INBOX, JSON.stringify(arr));
+        }
+
+        let inboxIdeias = obterInbox();
+        const inboxWrap = document.getElementById("inboxIdeias");
+        const inputNovaIdeia = document.getElementById("novaIdeiaInput");
+        const btnAddIdeia = document.getElementById("btnAdicionarIdeia");
+
+        function mostrarToast(msg) {
+            const t = document.createElement("div");
+            t.className = "estuda-antes-ok";
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 2500);
+        }
+
+        function renderInbox() {
+            if (!inboxIdeias.length) {
+                inboxWrap.innerHTML = `<div style="font-size:12px;color:#666;padding:6px 0;">Nenhuma ideia no inbox.</div>`;
+                return;
+            }
+            inboxWrap.innerHTML = inboxIdeias.map((item, idx) => `
+                <div class="inbox-ideia">
+                    <div class="inbox-ideia-texto">${escFrente(item.texto)}</div>
+                    <div class="inbox-ideia-acoes">
+                        <button class="inbox-ideia-btn" data-acao="aprendizado" data-idx="${idx}" title="Virar aprendizado">🧠</button>
+                        <button class="inbox-ideia-btn" data-acao="tarefa" data-idx="${idx}" title="Virar tarefa">📋</button>
+                        <button class="inbox-ideia-btn inbox-ideia-rm" data-acao="remover" data-idx="${idx}" title="Remover">×</button>
+                    </div>
+                </div>
+            `).join("");
+
+            inboxWrap.querySelectorAll("[data-acao]").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const idx = Number(btn.dataset.idx);
+                    const acao = btn.dataset.acao;
+                    const item = inboxIdeias[idx];
+                    if (!item) return;
+
+                    if (acao === "remover") {
+                        inboxIdeias.splice(idx, 1);
+                        salvarInbox(inboxIdeias);
+                        renderInbox();
+                        return;
+                    }
+
+                    if (acao === "aprendizado") {
+                        try {
+                            Storage.aprendizados.adicionar({
+                                texto: item.texto,
+                                fonte: "Inbox do Trabalho",
+                                status: "capturado",
+                                tipo: "insight",
+                                areas: ["trabalho"],
+                                impacto: "",
+                            });
+                            inboxIdeias.splice(idx, 1);
+                            salvarInbox(inboxIdeias);
+                            renderInbox();
+                            mostrarToast("✅ Aprendizado criado");
+                        } catch (e) {
+                            alert("Erro ao criar aprendizado: " + e.message);
+                        }
+                        return;
+                    }
+
+                    if (acao === "tarefa") {
+                        if (tarefas.length >= 5) return alert("Máximo de 5 tarefas. Menos é mais.");
+                        tarefas.push({
+                            texto: item.texto,
+                            prioridade: "media",
+                            concluida: false,
+                            frentes_exigidas: [],
+                        });
+                        salvarTarefas();
+                        renderTarefas();
+                        inboxIdeias.splice(idx, 1);
+                        salvarInbox(inboxIdeias);
+                        renderInbox();
+                        mostrarToast("✅ Tarefa criada");
+                        return;
+                    }
+                });
+            });
+        }
+
+        function adicionarIdeia() {
+            const txt = (inputNovaIdeia.value || "").trim();
+            if (!txt) return;
+            inboxIdeias.push({ texto: txt, criado_em: Date.now() });
+            salvarInbox(inboxIdeias);
+            inputNovaIdeia.value = "";
+            renderInbox();
+        }
+
+        btnAddIdeia.addEventListener("click", adicionarIdeia);
+        inputNovaIdeia.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") adicionarIdeia();
+        });
+
+        renderInbox();
+
+
+        // ==================================================
+        // PERGUNTA "TERMINOU?" APÓS VOLTAR DO FOCO  (B.3)
+        // ==================================================
+        if (_retornoFoco && _retornoFoco.aplicados > 0) {
+            setTimeout(() => {
+                _retornoFoco.tarefasAfetadas.forEach((info, i) => {
+                    setTimeout(() => {
+                        const t = tarefas.find(x => (x.texto || "").trim() === info.texto);
+                        if (!t || t.concluida) return;
+                        const min = info.min || 0;
+                        const txt = min > 0 ? ` (${min}min)` : "";
+                        if (confirm(`Você focou em:\n\n"${t.texto}"${txt}\n\nTerminou essa tarefa?`)) {
+                            t.concluida = true;
+                            salvarTarefas();
+                            renderTarefas();
+                        }
+                    }, i * 400);
+                });
+            }, 500);
+        }
     </script>
 
 </body>
