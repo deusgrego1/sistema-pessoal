@@ -725,8 +725,7 @@
         const dataParam = paramsURL.get("data");
         const dataAtual = (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam)) ? dataParam : dataHoje;
         const PREFIXO = `planejamento_${dataAtual}_trabalho_edicao_`;
-        const YOUTUBE_API_KEY = "AIzaSyB2yCJE_a6wDZ7wVBHWfRWjXDrYDpqYQ-g";
-
+        const YOUTUBE_API_KEY = "AIzaSyB2mJE_ad6wDZ7wVBHWfRWjXDrYDpqYQ-g";
         function uid(p) { return `${p}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`; }
         function escHtml(s) {
             return String(s ?? "").replace(/[&<>"']/g, c => ({
