@@ -53,32 +53,23 @@
         }
         .pendencia-item.concluida { opacity: 0.5; }
         .pendencia-item.agora { border-color:#4caf50;background:#172017; }
-        .pendencia-check { width:18px;height:18px;cursor:pointer;flex-shrink:0; }
+        .pendencia-check { width:18px;height:18px;cursor:pointer;flex-shrink:0; accent-color:#4caf50; }
         .pendencia-input {
             flex:1;background:transparent;border:none;padding:4px 0;
             font-size:14px;color:#e0e0e0;outline:none;font-family:inherit;min-width:0;
         }
         .pendencia-input::placeholder { color: #555; }
         .pendencia-item.concluida .pendencia-input { text-decoration:line-through;color:#777; }
-               .pendencia-rm, .entrega-item-rm {
-            background: transparent !important;
-            background-color: transparent !important;
-            border: none !important;
-            appearance: none;
-            -webkit-appearance: none;
-            color: #777;
-            font-size: 18px;
-            line-height: 1;
-            cursor: pointer;
-            padding: 4px 8px;
-            flex-shrink: 0;
-            border-radius: 6px;
-            font-family: inherit;
+        .pendencia-rm, .entrega-item-rm {
+            background:transparent !important;
+            background-color:transparent !important;
+            border:none !important;
+            appearance:none; -webkit-appearance:none;
+            color:#777; font-size:18px; line-height:1;
+            cursor:pointer; padding:4px 8px; flex-shrink:0;
+            border-radius:6px; font-family:inherit;
         }
-        .pendencia-rm:hover, .entrega-item-rm:hover {
-            color: #d45a5a;
-            background-color: #2a1a1a !important;
-        }
+        .pendencia-rm:hover, .entrega-item-rm:hover { color:#d45a5a; background-color:#2a1a1a !important; }
         .btn-add-pendencia, .btn-add-item {
             width:100%;padding:8px;font-size:12px;cursor:pointer;
             border:1px dashed #444;background:transparent;color:#888;
@@ -114,38 +105,23 @@
         .entrega-corpo {
             padding:12px 14px;border-top:1px solid #252529;background:#17171b;
         }
-        .entrega-item {
-            display:flex;align-items:center;gap:8px;padding:6px 0;
-        }
-               .entrega-item input[type="checkbox"] {
-            cursor:pointer;
-            flex-shrink:0;
-            width:18px;
-            height:18px;
-            accent-color: #4caf50;
+        .entrega-item { display:flex;align-items:center;gap:8px;padding:6px 0; }
+        .entrega-item input[type="checkbox"] {
+            cursor:pointer; flex-shrink:0;
+            width:18px; height:18px; accent-color:#4caf50;
         }
         .entrega-item-texto {
-            flex:1;
-            background:#0f0f12;
-            border:1px solid #333338;
-            padding:8px 12px;
-            font-size:13px;
-            color:#eaeaea;
-            outline:none;
-            font-family:inherit;
-            border-radius:8px;
-            min-width:0;
+            flex:1; background:#0f0f12; border:1px solid #333338;
+            padding:8px 12px; font-size:13px; color:#eaeaea;
+            outline:none; font-family:inherit; border-radius:8px; min-width:0;
         }
         .entrega-item-texto::placeholder { color: #777; }
         .entrega-item-texto:focus {
-            border-color: #5a8ad4;
-            background:#141418;
-            box-shadow: 0 0 0 3px rgba(90,138,212,0.15);
+            border-color:#5a8ad4; background:#141418;
+            box-shadow:0 0 0 3px rgba(90,138,212,0.15);
         }
-        .entrega-item.feito .entrega-item-texto {
-            text-decoration:line-through;
-            color:#777;
-        }        .entrega-acoes {
+        .entrega-item.feito .entrega-item-texto { text-decoration:line-through;color:#777; }
+        .entrega-acoes {
             display:flex;gap:8px;justify-content:flex-end;margin-top:10px;
             padding-top:10px;border-top:1px solid #252529;
         }
@@ -167,9 +143,7 @@
             border-radius:10px;transition:0.15s;font-family:inherit;
         }
         .btn-add-entrega:hover { border-color:#666;color:#ccc;background:#1a1a1e; }
-        .entrega-sub {
-            font-size:11px;color:#777;margin-top:4px;
-        }
+        .entrega-sub { font-size:11px;color:#777;margin-top:4px; }
 
         /* TAREFAS GERAIS */
         .tarefa-linha {
@@ -197,12 +171,12 @@
             padding:4px 0!important;font-size:14px;color:#e0e0e0;outline:none;font-family:inherit;
         }
         .tarefa-input::placeholder { color: #555; }
-        .tarefa-check { width:20px;height:20px;cursor:pointer;flex-shrink:0; }
+        .tarefa-check { width:20px;height:20px;cursor:pointer;flex-shrink:0; accent-color:#4caf50; }
         .tarefa-remover {
-            background:none;border:none;color:#a33;font-size:18px;
-            cursor:pointer;padding:0 4px;flex-shrink:0;
+            background:transparent;border:none;color:#a33;font-size:18px;
+            cursor:pointer;padding:4px 8px;flex-shrink:0;border-radius:6px;
         }
-        .tarefa-remover:hover { color: #e55; }
+        .tarefa-remover:hover { color:#e55; background-color:#2a1a1a; }
         .btn-adicionar-tarefa {
             width:100%;padding:10px;font-size:13px;cursor:pointer;
             border:1px dashed #444;background:transparent;color:#999;
@@ -210,9 +184,7 @@
         }
         .btn-adicionar-tarefa:hover { border-color:#666;color:#ccc;background:#1a1a1e; }
         .contador-tarefas { color:#888;font-size:12px;text-align:right;margin-top:8px; }
-        .tarefa-rodape {
-            display:flex;align-items:center;gap:8px;margin:4px 0 0 30px;
-        }
+        .tarefa-rodape { display:flex;align-items:center;gap:8px;margin:4px 0 0 30px; }
         .tarefa-tempo {
             display:inline-flex;align-items:center;gap:6px;font-size:11px;
             color:#a8c4e8;background:#1a2233;border:1px solid #2c3a55;
@@ -233,6 +205,283 @@
             outline:none;resize:vertical;
         }
         .notas-area:focus { border-color:#55555c; }
+
+        /* ========== SUB-ABAS ========== */
+        .sub-abas {
+            display: flex; gap: 20px;
+            border-bottom: 1px solid #252529; margin-bottom: 18px;
+        }
+        .sub-aba {
+            padding: 8px 0; font-size: 13px; color: #888;
+            cursor: pointer; border-bottom: 2px solid transparent;
+            transition: 0.15s;
+        }
+        .sub-aba:hover { color: #ccc; }
+        .sub-aba.ativa { color: #fff; border-bottom-color: #4caf50; }
+
+        /* ========== SALA DE REFERÊNCIA ========== */
+        .ref-busca-linha {
+            display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;
+        }
+        .ref-busca-linha input[type="text"] { flex: 1; min-width: 180px; }
+        .ref-filtros {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px; margin-bottom: 12px;
+        }
+        .ref-filtros select, .ref-filtros input { width: 100%; }
+        .ref-tipos {
+            display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;
+        }
+        .ref-tipo-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 12px; font-size: 12px;
+            border: 1px solid #333338; background: #1a1a1e; color: #bbb;
+            border-radius: 16px; cursor: pointer; user-select: none;
+            transition: 0.15s;
+        }
+        .ref-tipo-chip:hover { background: #222228; color: #e0e0e0; }
+        .ref-tipo-chip.ativo {
+            background: #1a2233; border-color: #5a8ad4;
+            color: #dfe8ff; font-weight: 600;
+        }
+        .ref-tipo-chip .dur-exemplo {
+            font-size: 10px; color: #777; margin-left: 2px;
+        }
+        .ref-tipo-chip.ativo .dur-exemplo { color: #a8c4e8; }
+
+        .ref-resultados {
+            display: grid; grid-template-columns: 1fr;
+            gap: 10px; margin-top: 14px;
+        }
+        .ref-card {
+            display: flex; gap: 10px; padding: 8px;
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-radius: 8px; cursor: pointer;
+            transition: 0.15s; position: relative;
+        }
+        .ref-card:hover { background: #24242a; border-color: #4a5c85; }
+        .ref-card-thumb {
+            width: 110px; height: 62px; flex-shrink: 0;
+            background: #252529; border-radius: 4px;
+            overflow: hidden; position: relative;
+        }
+        .ref-card-thumb img { width:100%; height:100%; object-fit:cover; }
+        .ref-card-dur {
+            position: absolute; bottom: 3px; right: 3px;
+            background: rgba(0,0,0,0.82); color: #fff;
+            padding: 1px 5px; font-size: 10px;
+            border-radius: 3px; font-variant-numeric: tabular-nums;
+        }
+        .ref-card-info { flex: 1; min-width: 0; }
+        .ref-card-titulo {
+            font-size: 13px; color: #eaeaea; font-weight: 600;
+            line-height: 1.3; margin-bottom: 4px;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .ref-card-meta { font-size: 11px; color: #888; }
+        .ref-card-salvar {
+            position: absolute; top: 6px; right: 6px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 50%; width: 26px; height: 26px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 13px; color: #ddd;
+            transition: 0.15s; padding: 0;
+        }
+        .ref-card-salvar:hover { background: rgba(0,0,0,0.85); }
+        .ref-card-salvar.salvo {
+            background: #4caf50; border-color: #4caf50; color: #fff;
+        }
+
+        .ref-salvas-lista {
+            display: flex; flex-direction: column; gap: 8px; margin-top: 12px;
+        }
+        .ref-salva-item {
+            display: flex; gap: 10px; align-items: center;
+            padding: 10px 12px;
+            background: #1c1c20; border: 1px solid #252529;
+            border-radius: 8px;
+        }
+        .ref-salva-titulo {
+            flex: 1; font-size: 13px; color: #eaeaea;
+            line-height: 1.3; min-width: 0;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .ref-salva-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+        .ref-salva-tag {
+            font-size: 10px; padding: 2px 7px;
+            background: #1a2233; border: 1px solid #2c3a55;
+            color: #a8c4e8; border-radius: 10px;
+        }
+        .ref-salva-rm {
+            background: transparent; border: none;
+            color: #777; font-size: 18px; cursor: pointer;
+            padding: 4px 8px; flex-shrink: 0; border-radius: 6px;
+        }
+        .ref-salva-rm:hover { color: #d45a5a; background: #2a1a1a; }
+
+        /* ========== BANCO DE SOLUÇÕES (MACETES) ========== */
+        .macete-form {
+            background: #19191d; border: 1px solid #2a2a30;
+            border-left: 3px solid #5a8ad4; border-radius: 10px;
+            padding: 14px; margin-bottom: 16px;
+        }
+        .macete-form-titulo {
+            font-size: 11px; color: #5a8ad4;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            font-weight: 600; margin-bottom: 10px;
+        }
+        .macete-lista { display: flex; flex-direction: column; gap: 10px; }
+        .macete-card {
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-left: 3px solid #5a8ad4; border-radius: 10px;
+            padding: 12px 14px;
+        }
+        .macete-titulo {
+            font-size: 14px; color: #eaeaea; font-weight: 600;
+            margin-bottom: 4px; line-height: 1.3;
+        }
+        .macete-problema {
+            font-size: 12px; color: #999; line-height: 1.4;
+            margin-bottom: 6px;
+        }
+        .macete-solucao {
+            font-size: 13px; color: #dfe8ff; line-height: 1.5;
+            white-space: pre-wrap; background: #141a24;
+            padding: 8px 10px; border-radius: 6px; margin-bottom: 8px;
+        }
+        .macete-rodape { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+        .macete-rodape .tag {
+            font-size: 10px; padding: 2px 7px;
+            background: #1a2233; border: 1px solid #2c3a55;
+            color: #a8c4e8; border-radius: 10px;
+        }
+        .macete-rodape .ctx {
+            font-size: 10px; color: #777; font-style: italic;
+        }
+        .macete-rm {
+            background: transparent; border: none;
+            color: #777; font-size: 16px; cursor: pointer;
+            padding: 4px 8px; margin-left: auto; border-radius: 6px;
+        }
+        .macete-rm:hover { color: #d45a5a; background: #2a1a1a; }
+        .macete-sugeridos {
+            padding: 10px 12px; background: #1a2233;
+            border: 1px solid #2c3a55; border-radius: 10px;
+            margin-bottom: 14px; font-size: 12px; color: #a8c4e8;
+        }
+        .macete-sugeridos strong { color: #dfe8ff; }
+
+        /* ========== PAINEL SUGESTOR ========== */
+        .btn-sugerir {
+            width: 100%; padding: 12px 18px; font-size: 14px;
+            background: linear-gradient(135deg, #1a2233 0%, #232f4a 100%);
+            border: 1px solid #2c3a55; color: #dfe8ff;
+            border-radius: 10px; cursor: pointer;
+            font-family: inherit; font-weight: 600;
+            transition: 0.15s; margin-bottom: 16px;
+        }
+        .btn-sugerir:hover { border-color: #4a5c85; transform: translateY(-1px); }
+
+        .painel-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65); z-index: 9000;
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px; backdrop-filter: blur(3px);
+        }
+        .painel-sugestor {
+            background: #19191d; border: 1px solid #2a2a30;
+            border-radius: 14px; max-width: 520px; width: 100%;
+            max-height: 85vh; overflow-y: auto;
+            padding: 20px; box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+        }
+        .painel-sugestor-cabecalho {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .painel-sugestor-titulo {
+            font-size: 14px; color: #dfe8ff;
+            font-weight: 600; letter-spacing: 0.5px;
+        }
+        .painel-sugestor-fechar {
+            background: transparent; border: none;
+            color: #777; font-size: 22px; cursor: pointer;
+            padding: 4px 8px; border-radius: 6px; line-height: 1;
+        }
+        .painel-sugestor-fechar:hover { color: #d45a5a; background: #2a1a1a; }
+        .painel-rotulo {
+            display: block; font-size: 11px; color: #888;
+            text-transform: uppercase; letter-spacing: 1px; margin: 14px 0 8px;
+        }
+        .painel-rotulo:first-of-type { margin-top: 0; }
+        .painel-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        .painel-chip {
+            padding: 8px 14px; font-size: 12px; cursor: pointer;
+            border: 1px solid #333338; background: #1a1a1e;
+            color: #bbb; border-radius: 18px;
+            transition: 0.15s; user-select: none;
+        }
+        .painel-chip:hover { background: #222228; color: #e0e0e0; }
+        .painel-chip.ativo {
+            background: #1a2233; border-color: #5a8ad4;
+            color: #dfe8ff; font-weight: 600;
+        }
+        .painel-btn-confirmar {
+            width: 100%; padding: 10px; font-size: 13px;
+            background: #172017; border: 1px solid #2e5a2e; color: #a5d6a7;
+            border-radius: 10px; cursor: pointer; font-family: inherit;
+            font-weight: 600; margin-top: 16px; transition: 0.15s;
+        }
+        .painel-btn-confirmar:hover { background: #223a22; border-color: #4caf50; }
+        .painel-btn-confirmar:disabled {
+            opacity: 0.4; cursor: not-allowed; background: #1a1a1e;
+            border-color: #333338; color: #666;
+        }
+
+        .sugestao-resultado {
+            margin-top: 18px; padding: 16px;
+            background: #1c1c20; border: 1px solid #2a2a30;
+            border-left: 3px solid #4caf50; border-radius: 10px;
+        }
+        .sugestao-resultado-rotulo {
+            font-size: 10px; color: #4caf50;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            font-weight: 600; margin-bottom: 6px;
+        }
+        .sugestao-resultado-texto {
+            font-size: 15px; color: #eaeaea;
+            line-height: 1.4; margin-bottom: 8px;
+        }
+        .sugestao-resultado-motivo {
+            font-size: 12px; color: #888;
+            line-height: 1.4; margin-bottom: 12px;
+        }
+        .sugestao-resultado-acoes {
+            display: flex; gap: 8px; justify-content: flex-end;
+        }
+        .btn-sugestao {
+            padding: 8px 16px; font-size: 12px; border-radius: 18px;
+            cursor: pointer; font-family: inherit;
+            transition: 0.15s; font-weight: 600;
+        }
+        .btn-sugestao.aceitar {
+            background: #172017; border: 1px solid #2e5a2e; color: #a5d6a7;
+        }
+        .btn-sugestao.aceitar:hover { background: #223a22; border-color: #4caf50; }
+        .btn-sugestao.tirar {
+            background: #1a1a1e; border: 1px solid #333338; color: #888;
+        }
+        .btn-sugestao.tirar:hover { color: #d45a5a; border-color: #d45a5a; }
+        .sugestao-vazio {
+            margin-top: 18px; padding: 20px;
+            text-align: center; color: #777;
+            font-size: 13px; font-style: italic;
+        }
+
+        .aba-conteudo { display: none; }
+        .aba-conteudo.ativa { display: block; }
     </style>
 </head>
 <body>
@@ -247,103 +496,217 @@
 
         <section class="modules">
 
-            <!-- CARD PROJETO -->
-            <div class="module-card" style="align-items: flex-start;">
-                <span class="icon">🎬</span>
-                <div style="width: 100%;">
-                    <h2>Projeto</h2>
+            <!-- SUB-ABAS -->
+            <div class="sub-abas" id="subAbas">
+                <div class="sub-aba ativa" data-aba="editar">📝 Editar hoje</div>
+                <div class="sub-aba" data-aba="referencias">🎞️ Referências</div>
+                <div class="sub-aba" data-aba="macetes">🛠️ Macetes</div>
+            </div>
 
-                    <div style="display:flex;gap:10px;">
-                        <div style="flex:2;">
-                            <label class="campo-label">Nome do projeto</label>
-                            <input type="text" id="projNome" placeholder="Ex.: Reels lançamento">
+            <!-- ============== ABA: EDITAR HOJE ============== -->
+            <div class="aba-conteudo ativa" data-aba="editar">
+
+                <button type="button" class="btn-sugerir" id="btnSugerir">🧭 Sugerir próxima ação</button>
+
+                <!-- CARD PROJETO -->
+                <div class="module-card" style="align-items: flex-start;">
+                    <span class="icon">🎬</span>
+                    <div style="width: 100%;">
+                        <h2>Projeto</h2>
+
+                        <div style="display:flex;gap:10px;">
+                            <div style="flex:2;">
+                                <label class="campo-label">Nome do projeto</label>
+                                <input type="text" id="projNome" placeholder="Ex.: Reels lançamento">
+                            </div>
+                            <div style="flex:1;">
+                                <label class="campo-label">Pra quem</label>
+                                <input type="text" id="projCliente" placeholder="App X / eu mesmo">
+                            </div>
                         </div>
-                        <div style="flex:1;">
-                            <label class="campo-label">Pra quem</label>
-                            <input type="text" id="projCliente" placeholder="App X / eu mesmo">
+
+                        <label class="campo-label">Prazo</label>
+                        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                            <input type="date" id="projPrazo" style="flex:1;min-width:160px;">
+                            <label class="checkbox-legenda">
+                                <input type="checkbox" id="projSemPrazo">
+                                <span>sem prazo</span>
+                            </label>
                         </div>
+
+                        <label class="campo-label">Status</label>
+                        <div class="chips status-linha" id="chipsStatus">
+                            <div class="chip status-recebendo" data-status="recebendo_material">📥 Recebendo material</div>
+                            <div class="chip status-em-corte"  data-status="em_corte">✂️ Em corte</div>
+                            <div class="chip status-aguardando" data-status="aguardando">⏳ Aguardando</div>
+                            <div class="chip status-entregue"  data-status="entregue">✅ Entregue</div>
+                        </div>
+
+                        <label class="campo-label">📁 Pasta do projeto</label>
+                        <input type="text" id="projPasta" placeholder="https://drive.google.com/...">
+
+                        <label class="campo-label">▶ Agora</label>
+                        <div class="agora-box" id="agoraBox">
+                            <span class="agora-rotulo">Agora</span>
+                            <span class="agora-texto vazio" id="agoraTexto">Nada pendente ainda.</span>
+                        </div>
+
+                        <button type="button" class="btn-focar-job" id="btnFocarJob">▶ Focar no job</button>
                     </div>
-
-                    <label class="campo-label">Prazo</label>
-                    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                        <input type="date" id="projPrazo" style="flex:1;min-width:160px;">
-                        <label class="checkbox-legenda">
-                            <input type="checkbox" id="projSemPrazo">
-                            <span>sem prazo</span>
-                        </label>
-                    </div>
-
-                    <label class="campo-label">Status</label>
-                    <div class="chips status-linha" id="chipsStatus">
-                        <div class="chip status-recebendo" data-status="recebendo_material">📥 Recebendo material</div>
-                        <div class="chip status-em-corte"  data-status="em_corte">✂️ Em corte</div>
-                        <div class="chip status-aguardando" data-status="aguardando">⏳ Aguardando</div>
-                        <div class="chip status-entregue"  data-status="entregue">✅ Entregue</div>
-                    </div>
-
-                    <label class="campo-label">📁 Pasta do projeto</label>
-                    <input type="text" id="projPasta" placeholder="https://drive.google.com/...">
-
-                    <label class="campo-label">▶ Agora</label>
-                    <div class="agora-box" id="agoraBox">
-                        <span class="agora-rotulo">Agora</span>
-                        <span class="agora-texto vazio" id="agoraTexto">Nada pendente ainda.</span>
-                    </div>
-
-                    <button type="button" class="btn-focar-job" id="btnFocarJob">▶ Focar no job</button>
                 </div>
+
+                <!-- PENDÊNCIAS DO JOB -->
+                <div class="module-card" style="align-items: flex-start;">
+                    <span class="icon">📋</span>
+                    <div style="width: 100%;">
+                        <h2>Pendências do job</h2>
+                        <p style="color:#888;font-size:13px;margin:6px 0 12px;">
+                            Lista livre — sem ordem, marca o que quiser.
+                        </p>
+                        <div id="listaPendencias"></div>
+                        <button type="button" class="btn-add-pendencia" id="btnAddPendencia">＋ Adicionar pendência</button>
+                    </div>
+                </div>
+
+                <!-- ENTREGAS -->
+                <div class="module-card" style="align-items: flex-start;">
+                    <span class="icon">📦</span>
+                    <div style="width: 100%;">
+                        <h2>Entregas</h2>
+                        <p style="color:#888;font-size:13px;margin:6px 0 12px;">
+                            Cada envio vira uma entrega. O feedback do cliente vira itens dentro dela.
+                        </p>
+                        <div id="listaEntregas"></div>
+                        <button type="button" class="btn-add-entrega" id="btnAddEntrega">＋ Nova entrega</button>
+                    </div>
+                </div>
+
+                <!-- TAREFAS GERAIS -->
+                <div class="module-card" style="align-items: flex-start;">
+                    <span class="icon">📋</span>
+                    <div style="width: 100%;">
+                        <h2>Tarefas gerais</h2>
+                        <p style="color:#888;font-size:13px;margin:6px 0 12px;">
+                            O que não é do job. Máx 5.
+                        </p>
+                        <div id="listaTarefas"></div>
+                        <button type="button" class="btn-adicionar-tarefa" id="btnAddTarefa">＋ Adicionar tarefa</button>
+                        <div class="contador-tarefas" id="contadorTarefas"></div>
+                    </div>
+                </div>
+
+                <!-- NOTAS -->
+                <div class="module-card" style="align-items: flex-start;">
+                    <span class="icon">📝</span>
+                    <div style="width: 100%;">
+                        <h2>Notas do projeto</h2>
+                        <p style="color:#888;font-size:13px;margin:6px 0 12px;">
+                            Códigos, macetes, links soltos.
+                        </p>
+                        <textarea class="notas-area" id="notasProjeto" placeholder="Opcional."></textarea>
+                    </div>
+                </div>
+
             </div>
 
-            <!-- PENDÊNCIAS DO JOB -->
-            <div class="module-card" style="align-items: flex-start;">
-                <span class="icon">📋</span>
-                <div style="width: 100%;">
-                    <h2>Pendências do job</h2>
-                    <p style="color:#888;font-size:13px;margin:6px 0 12px;">
-                        Lista livre — sem ordem, marca o que quiser.
-                    </p>
-                    <div id="listaPendencias"></div>
-                    <button type="button" class="btn-add-pendencia" id="btnAddPendencia">＋ Adicionar pendência</button>
+            <!-- ============== ABA: REFERÊNCIAS ============== -->
+            <div class="aba-conteudo" data-aba="referencias">
+
+                <div class="module-card" style="align-items: flex-start;">
+                    <span class="icon">🎞️</span>
+                    <div style="width: 100%;">
+                        <h2>Sala de Referência</h2>
+                        <p style="color:#888;font-size:13px;margin:6px 0 12px;">
+                            Busque referências no YouTube e salve pra usar depois.
+                        </p>
+
+                        <div class="ref-busca-linha">
+                            <input type="text" id="refBusca" placeholder="O que você quer ver? Ex.: corte rápido, transição seca...">
+                            <button type="button" class="btn-sugerir" id="refBtnBuscar" style="width:auto;margin:0;padding:10px 18px;">🔍 Buscar</button>
+                        </div>
+
+                        <label class="campo-label">Tipo de vídeo</label>
+                        <div class="ref-tipos" id="refTipos"></div>
+
+                        <label class="campo-label">O que você quer ver</label>
+                        <div class="ref-tipos" id="refQuerVer"></div>
+
+                        <label class="campo-label">Duração (deixe em branco pra usar a do tipo)</label>
+                        <input type="text" id="refDuracaoCustom" placeholder="Ex.: 30s, 1min, 5-10min, qualquer">
+
+                        <div class="ref-filtros" style="margin-top:12px;">
+                            <div>
+                                <label class="campo-label" style="margin-top:0;">Ordenar por</label>
+                                <select id="refOrdem">
+                                    <option value="relevance">Relevância</option>
+                                    <option value="viewCount">Mais vistos</option>
+                                    <option value="date">Mais recentes</option>
+                                    <option value="rating">Melhor avaliados</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="campo-label" style="margin-top:0;">Período</label>
+                                <select id="refPeriodo">
+                                    <option value="any">Qualquer</option>
+                                    <option value="mes">Último mês</option>
+                                    <option value="ano">Último ano</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="ref-resultados" id="refResultados"></div>
+                    </div>
                 </div>
+
+                <div class="module-card" style="align-items: flex-start;">
+                    <span class="icon">💾</span>
+                    <div style="width: 100%;">
+                        <h2>Referências salvas</h2>
+                        <p style="color:#888;font-size:13px;margin:6px 0 12px;">
+                            Sua biblioteca pessoal de referências.
+                        </p>
+                        <div class="ref-salvas-lista" id="refSalvasLista"></div>
+                    </div>
+                </div>
+
             </div>
 
-            <!-- ENTREGAS -->
-            <div class="module-card" style="align-items: flex-start;">
-                <span class="icon">📦</span>
-                <div style="width: 100%;">
-                    <h2>Entregas</h2>
-                    <p style="color:#888;font-size:13px;margin:6px 0 12px;">
-                        Cada envio vira uma entrega. O feedback do cliente vira itens dentro dela.
-                    </p>
-                    <div id="listaEntregas"></div>
-                    <button type="button" class="btn-add-entrega" id="btnAddEntrega">＋ Nova entrega</button>
-                </div>
-            </div>
+            <!-- ============== ABA: MACETES ============== -->
+            <div class="aba-conteudo" data-aba="macetes">
 
-            <!-- TAREFAS GERAIS -->
-            <div class="module-card" style="align-items: flex-start;">
-                <span class="icon">📋</span>
-                <div style="width: 100%;">
-                    <h2>Tarefas gerais</h2>
-                    <p style="color:#888;font-size:13px;margin:6px 0 12px;">
-                        O que não é do job. Máx 5.
-                    </p>
-                    <div id="listaTarefas"></div>
-                    <button type="button" class="btn-adicionar-tarefa" id="btnAddTarefa">＋ Adicionar tarefa</button>
-                    <div class="contador-tarefas" id="contadorTarefas"></div>
-                </div>
-            </div>
+                <div class="module-card" style="align-items: flex-start;">
+                    <span class="icon">🛠️</span>
+                    <div style="width: 100%;">
+                        <h2>Banco de Soluções</h2>
+                        <p style="color:#888;font-size:13px;margin:6px 0 12px;">
+                            Seus macetes técnicos. Quando travou em algo, salva aqui.
+                        </p>
 
-            <!-- NOTAS -->
-            <div class="module-card" style="align-items: flex-start;">
-                <span class="icon">📝</span>
-                <div style="width: 100%;">
-                    <h2>Notas do projeto</h2>
-                    <p style="color:#888;font-size:13px;margin:6px 0 12px;">
-                        Códigos, macetes, links soltos.
-                    </p>
-                    <textarea class="notas-area" id="notasProjeto" placeholder="Opcional."></textarea>
+                        <div id="maceteSugeridos"></div>
+
+                        <div class="macete-form">
+                            <div class="macete-form-titulo">＋ Novo macete</div>
+                            <label class="campo-label" style="margin-top:0;">Título</label>
+                            <input type="text" id="maceteTitulo" placeholder="Ex.: Como tirar ruído no DaVinci">
+
+                            <label class="campo-label">Problema que resolve</label>
+                            <input type="text" id="maceteProblema" placeholder="Ex.: áudio com chiado de fundo">
+
+                            <label class="campo-label">Solução</label>
+                            <textarea class="notas-area" id="maceteSolucao" placeholder="Passo a passo, ou link..." style="min-height:70px;"></textarea>
+
+                            <label class="campo-label">Tags (separe por vírgula)</label>
+                            <input type="text" id="maceteTags" placeholder="áudio, ruído, davinci, correção">
+
+                            <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+                                <button type="button" class="btn-entrega enviar" id="maceteSalvar">Salvar macete</button>
+                            </div>
+                        </div>
+
+                        <div class="macete-lista" id="maceteLista"></div>
+                    </div>
                 </div>
+
             </div>
 
         </section>
@@ -354,7 +717,7 @@
     <script src="../../js/app.js"></script>
     <script>
         // ==================================================
-        // DATA + PREFIXO
+        // DATA + PREFIXO + HELPERS
         // ==================================================
         const hoje = new Date();
         const dataHoje = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,"0")}-${String(hoje.getDate()).padStart(2,"0")}`;
@@ -362,20 +725,53 @@
         const dataParam = paramsURL.get("data");
         const dataAtual = (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam)) ? dataParam : dataHoje;
         const PREFIXO = `planejamento_${dataAtual}_trabalho_edicao_`;
+        const YOUTUBE_API_KEY = "AIzaSyB2yCJE_a6wDZ7wVBHWfRWjXDrYDpqYQ-g";
 
-        function uid(p) {
-            return `${p}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`;
-        }
+        function uid(p) { return `${p}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`; }
         function escHtml(s) {
             return String(s ?? "").replace(/[&<>"']/g, c => ({
                 "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
             }[c]));
         }
-        function fmtBR(iso) {
-            if (!iso) return "";
-            const [y, m, d] = iso.split("-");
-            return `${d}/${m}/${y}`;
+        function fmtBR(iso) { if (!iso) return ""; const [y,m,d] = iso.split("-"); return `${d}/${m}/${y}`; }
+        function fmtDurSeg(seg) {
+            seg = Number(seg) || 0;
+            if (!seg) return "";
+            const h = Math.floor(seg / 3600);
+            const m = Math.floor((seg % 3600) / 60);
+            const s = Math.floor(seg % 60);
+            if (h > 0) return `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+            return `${m}:${String(s).padStart(2,"0")}`;
         }
+        function toast(msg) {
+            const t = document.createElement("div");
+            t.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:12px 20px;background:#172017;border:1px solid #2e5a2e;color:#a5d6a7;border-radius:10px;font-size:13px;font-weight:600;z-index:10000;box-shadow:0 8px 24px rgba(0,0,0,0.5);`;
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 2500);
+        }
+
+        // ==================================================
+        // SUB-ABAS
+        // ==================================================
+        const CHAVE_ABA = PREFIXO + "aba_ativa";
+        let abaAtual = localStorage.getItem(CHAVE_ABA) || "editar";
+
+        function trocarAba(id) {
+            abaAtual = id;
+            localStorage.setItem(CHAVE_ABA, id);
+            document.querySelectorAll(".sub-aba").forEach(el => {
+                el.classList.toggle("ativa", el.dataset.aba === id);
+            });
+            document.querySelectorAll(".aba-conteudo").forEach(el => {
+                el.classList.toggle("ativa", el.dataset.aba === id);
+            });
+        }
+
+        document.querySelectorAll(".sub-aba").forEach(el => {
+            el.addEventListener("click", () => trocarAba(el.dataset.aba));
+        });
+        trocarAba(abaAtual);
 
         // ==================================================
         // BARRA DE DATAS
@@ -413,19 +809,14 @@
             try { return JSON.parse(localStorage.getItem(CHAVE_PROJETO)) || {}; }
             catch { return {}; }
         }
-        function salvarProjeto(p) {
-            localStorage.setItem(CHAVE_PROJETO, JSON.stringify(p));
-        }
+        function salvarProjeto(p) { localStorage.setItem(CHAVE_PROJETO, JSON.stringify(p)); }
         let projeto = lerProjeto();
 
         ["nome:projNome","cliente:projCliente","pasta:projPasta"].forEach(par => {
             const [campo, id] = par.split(":");
             const el = document.getElementById(id);
             el.value = projeto[campo] || "";
-            el.addEventListener("input", () => {
-                projeto[campo] = el.value;
-                salvarProjeto(projeto);
-            });
+            el.addEventListener("input", () => { projeto[campo] = el.value; salvarProjeto(projeto); });
         });
 
         const elPrazo = document.getElementById("projPrazo");
@@ -465,11 +856,8 @@
         // ==================================================
         const CHAVE_PEND = PREFIXO + "pendencias_job";
         function lerPendencias() {
-            try {
-                const raw = localStorage.getItem(CHAVE_PEND);
-                const arr = raw ? JSON.parse(raw) : [];
-                return Array.isArray(arr) ? arr : [];
-            } catch { return []; }
+            try { const r = localStorage.getItem(CHAVE_PEND); const a = r ? JSON.parse(r) : []; return Array.isArray(a) ? a : []; }
+            catch { return []; }
         }
         function salvarPendencias(arr) { localStorage.setItem(CHAVE_PEND, JSON.stringify(arr)); }
         let pendencias = lerPendencias();
@@ -539,11 +927,8 @@
         // ==================================================
         const CHAVE_ENTREGAS = PREFIXO + "entregas";
         function lerEntregas() {
-            try {
-                const raw = localStorage.getItem(CHAVE_ENTREGAS);
-                const arr = raw ? JSON.parse(raw) : [];
-                return Array.isArray(arr) ? arr : [];
-            } catch { return []; }
+            try { const r = localStorage.getItem(CHAVE_ENTREGAS); const a = r ? JSON.parse(r) : []; return Array.isArray(a) ? a : []; }
+            catch { return []; }
         }
         function salvarEntregas(arr) { localStorage.setItem(CHAVE_ENTREGAS, JSON.stringify(arr)); }
         let entregas = lerEntregas();
@@ -551,12 +936,8 @@
         const entregasAbertas = {};
 
         function proximoNomeEntrega() {
-            const numeros = entregas
-                .map(e => (e.nome || "").match(/^Corte (\d+)$/))
-                .filter(Boolean)
-                .map(m => Number(m[1]));
-            const prox = numeros.length ? Math.max(...numeros) + 1 : 1;
-            return `Corte ${prox}`;
+            const nums = entregas.map(e => (e.nome || "").match(/^Corte (\d+)$/)).filter(Boolean).map(m => Number(m[1]));
+            return `Corte ${nums.length ? Math.max(...nums) + 1 : 1}`;
         }
 
         function renderEntregas() {
@@ -567,12 +948,7 @@
 
             listaEntregas.innerHTML = entregas.map((e, i) => {
                 const aberta = entregasAbertas[e.id] !== false;
-                const statusLabel = {
-                    em_andamento: "em ajuste",
-                    enviada: "enviada",
-                    aprovada: "aprovada",
-                }[e.status] || e.status;
-
+                const statusLabel = { em_andamento: "em ajuste", enviada: "enviada", aprovada: "aprovada" }[e.status] || e.status;
                 const mostrarAprovar = e.status === "enviada" && i === entregas.length - 1;
                 const mostrarEnviar = e.status === "em_andamento";
 
@@ -614,32 +990,27 @@
                     renderEntregas();
                 });
             });
-
             listaEntregas.querySelectorAll(".entrega-item").forEach(el => {
                 const card = el.closest(".entrega-card");
                 const entId = card.dataset.id;
                 const idx = Number(el.dataset.idx);
                 const entrega = entregas.find(x => x.id === entId);
                 if (!entrega) return;
-
                 el.querySelector('input[type="checkbox"]').addEventListener("change", (ev) => {
                     entrega.itens[idx].feito = ev.target.checked;
                     salvarEntregas(entregas);
                     renderEntregas();
                 });
-
                 el.querySelector(".entrega-item-texto").addEventListener("input", (ev) => {
                     entrega.itens[idx].texto = ev.target.value;
                     salvarEntregas(entregas);
                 });
-
                 el.querySelector(".entrega-item-rm").addEventListener("click", () => {
                     entrega.itens.splice(idx, 1);
                     salvarEntregas(entregas);
                     renderEntregas();
                 });
             });
-
             listaEntregas.querySelectorAll("[data-add-item]").forEach(btn => {
                 btn.addEventListener("click", () => {
                     const id = btn.dataset.addItem;
@@ -653,7 +1024,6 @@
                     if (inputs.length) inputs[inputs.length - 1].focus();
                 });
             });
-
             listaEntregas.querySelectorAll("[data-enviar]").forEach(btn => {
                 btn.addEventListener("click", () => {
                     const id = btn.dataset.enviar;
@@ -669,7 +1039,6 @@
                     renderEntregas();
                 });
             });
-
             listaEntregas.querySelectorAll("[data-aprovar]").forEach(btn => {
                 btn.addEventListener("click", () => {
                     const id = btn.dataset.aprovar;
@@ -692,10 +1061,8 @@
                 id: uid("ent"),
                 nome: proximoNomeEntrega(),
                 criado_em: Date.now(),
-                enviada_em: null,
-                aprovada_em: null,
-                status: "em_andamento",
-                itens: [],
+                enviada_em: null, aprovada_em: null,
+                status: "em_andamento", itens: [],
             });
             salvarEntregas(entregas);
             if (statusAtual !== "em_corte") {
@@ -706,19 +1073,15 @@
             }
             renderEntregas();
         });
-
         renderEntregas();
 
         // ==================================================
-        // TAREFAS GERAIS (sem frentes)
+        // TAREFAS GERAIS
         // ==================================================
         const CHAVE_TAREFAS = PREFIXO + "tarefas_gerais";
         function lerTarefas() {
-            try {
-                const raw = localStorage.getItem(CHAVE_TAREFAS);
-                const arr = raw ? JSON.parse(raw) : [];
-                return Array.isArray(arr) ? arr : [];
-            } catch { return []; }
+            try { const r = localStorage.getItem(CHAVE_TAREFAS); const a = r ? JSON.parse(r) : []; return Array.isArray(a) ? a : []; }
+            catch { return []; }
         }
         function salvarTarefas() { localStorage.setItem(CHAVE_TAREFAS, JSON.stringify(tarefas)); }
         let tarefas = lerTarefas();
@@ -728,22 +1091,18 @@
 
         function renderTarefas() {
             tarefas.sort((a, b) => (ORDEM_PRIO[a.prioridade] ?? 1) - (ORDEM_PRIO[b.prioridade] ?? 1));
-
             if (!tarefas.length) {
                 listaTarefas.innerHTML = `<div class="vazio-tarefas">Nenhuma tarefa geral.</div>`;
                 contador.textContent = "";
                 return;
             }
-
             listaTarefas.innerHTML = "";
             tarefas.forEach((t, i) => {
                 const wrap = document.createElement("div");
                 wrap.style.marginBottom = "8px";
-
                 const linha = document.createElement("div");
                 const classePrio = t.prioridade === "alta" ? " prio-alta" : "";
                 linha.className = "tarefa-linha" + (t.concluida ? " concluida" : "") + classePrio;
-
                 const prioGrupo = document.createElement("div");
                 prioGrupo.className = "prio-grupo";
                 ["alta", "media", "baixa"].forEach(p => {
@@ -751,16 +1110,10 @@
                     btn.type = "button";
                     btn.className = "prio-btn" + (t.prioridade === p ? " ativo" : "");
                     btn.dataset.prio = p;
-                    btn.title = p.charAt(0).toUpperCase() + p.slice(1);
-                    btn.addEventListener("click", () => {
-                        t.prioridade = p;
-                        salvarTarefas();
-                        renderTarefas();
-                    });
+                    btn.addEventListener("click", () => { t.prioridade = p; salvarTarefas(); renderTarefas(); });
                     prioGrupo.appendChild(btn);
                 });
                 linha.appendChild(prioGrupo);
-
                 const input = document.createElement("input");
                 input.type = "text";
                 input.className = "tarefa-input";
@@ -768,75 +1121,24 @@
                 input.placeholder = "O que fazer?";
                 input.addEventListener("input", () => { t.texto = input.value; salvarTarefas(); });
                 linha.appendChild(input);
-
                 const check = document.createElement("input");
                 check.type = "checkbox";
                 check.className = "tarefa-check";
                 check.checked = !!t.concluida;
-                check.addEventListener("change", () => {
-                    t.concluida = check.checked;
-                    salvarTarefas();
-                    renderTarefas();
-                });
+                check.addEventListener("change", () => { t.concluida = check.checked; salvarTarefas(); renderTarefas(); });
                 linha.appendChild(check);
-
                 const btnRem = document.createElement("button");
                 btnRem.type = "button";
                 btnRem.className = "tarefa-remover";
                 btnRem.textContent = "×";
-                btnRem.title = "Remover";
-                btnRem.addEventListener("click", () => {
-                    tarefas.splice(i, 1);
-                    salvarTarefas();
-                    renderTarefas();
-                });
+                btnRem.addEventListener("click", () => { tarefas.splice(i, 1); salvarTarefas(); renderTarefas(); });
                 linha.appendChild(btnRem);
-
                 wrap.appendChild(linha);
-
-                const rodape = document.createElement("div");
-                rodape.className = "tarefa-rodape";
-
-                if (t.tempo_foco_min > 0) {
-                    const min = Number(t.tempo_foco_min);
-                    let txt;
-                    if (min < 60) txt = `${min} min`;
-                    else {
-                        const h = Math.floor(min / 60);
-                        const m = min % 60;
-                        txt = m > 0 ? `${h}h ${m}min` : `${h}h`;
-                    }
-                    const badge = document.createElement("span");
-                    badge.className = "tarefa-tempo";
-                    badge.textContent = `⏱️ ${txt} em foco`;
-                    rodape.appendChild(badge);
-                }
-
-                const btnFocar = document.createElement("button");
-                btnFocar.type = "button";
-                btnFocar.className = "btn-focar-tarefa";
-                btnFocar.textContent = "🎯 Focar";
-                btnFocar.addEventListener("click", (ev) => {
-                    ev.stopPropagation();
-                    const txt = (t.texto || "").trim();
-                    if (!txt) return alert("Escreve o texto da tarefa primeiro.");
-                    const params = new URLSearchParams({
-                        origem: "trabalho",
-                        tarefa: txt,
-                        data: dataAtual,
-                    });
-                    window.location.href = `../foco/foco.html?${params.toString()}`;
-                });
-                rodape.appendChild(btnFocar);
-
-                wrap.appendChild(rodape);
                 listaTarefas.appendChild(wrap);
             });
-
             const feitas = tarefas.filter(t => t.concluida).length;
             contador.textContent = `${feitas}/${tarefas.length} concluídas`;
         }
-
         document.getElementById("btnAddTarefa").addEventListener("click", () => {
             if (tarefas.length >= 5) return alert("Máximo de 5 tarefas.");
             tarefas.push({ texto: "", prioridade: "media", concluida: false, tempo_foco_min: 0, sessoes_foco: 0 });
@@ -845,7 +1147,6 @@
             const inputs = listaTarefas.querySelectorAll(".tarefa-input");
             if (inputs.length) inputs[inputs.length - 1].focus();
         });
-
         renderTarefas();
 
         // ==================================================
@@ -854,26 +1155,16 @@
         const CHAVE_NOTAS = PREFIXO + "notas";
         const notasEl = document.getElementById("notasProjeto");
         notasEl.value = localStorage.getItem(CHAVE_NOTAS) || "";
-        notasEl.addEventListener("input", () => {
-            localStorage.setItem(CHAVE_NOTAS, notasEl.value);
-        });
+        notasEl.addEventListener("input", () => { localStorage.setItem(CHAVE_NOTAS, notasEl.value); });
 
         // ==================================================
-        // FOCAR NO JOB
+        // FOCAR NO JOB + RETORNO
         // ==================================================
         document.getElementById("btnFocarJob").addEventListener("click", () => {
             const nome = (projeto.nome || "").trim() || "(projeto sem nome)";
-            const params = new URLSearchParams({
-                origem: "trabalho",
-                tarefa: `🎬 ${nome}`,
-                data: dataAtual,
-            });
+            const params = new URLSearchParams({ origem: "trabalho", tarefa: `🎬 ${nome}`, data: dataAtual });
             window.location.href = `../foco/foco.html?${params.toString()}`;
         });
-
-        // ==================================================
-        // RETORNO DO FOCO (aplica tempo no projeto)
-        // ==================================================
         (function aplicarRetornoFocoEdicao() {
             const prefixo = "estudo_trabalho_foco_retorno_";
             const alvo = `🎬 ${(projeto.nome || "").trim() || "(projeto sem nome)"}`;
@@ -886,9 +1177,545 @@
                 projeto.tempo_foco_min = (Number(projeto.tempo_foco_min) || 0) + Number(p.tempo_real_min || 0);
                 salvarProjeto(projeto);
                 localStorage.removeItem(k);
-                console.log("[foco→edicao] retorno aplicado:", p.tempo_real_min, "min");
             }
         })();
+
+        // ==================================================
+        // SALA DE REFERÊNCIA
+        // ==================================================
+        const CHAVE_REFS = "edicao_refs_salvas";
+        const TIPOS_REF = [
+            { id: "reels",         label: "🎬 Reels",         dur: "1min"  },
+            { id: "tiktok",        label: "📱 TikTok",        dur: "30s"   },
+            { id: "vlog",          label: "📹 Vlog",          dur: "10min" },
+            { id: "evento",        label: "🎉 Evento",        dur: "5min"  },
+            { id: "institucional", label: "🏢 Institucional", dur: "3min"  },
+            { id: "explicativo",   label: "📚 Explicativo",   dur: "8min"  },
+        ];
+        const QUER_VER = ["corte","cor","transição","estrutura","thumbnail","motion","trilha"];
+
+        let tiposAtivos = new Set(["reels"]);
+        let querVerAtivo = new Set();
+
+        function lerRefs() {
+            try { const r = localStorage.getItem(CHAVE_REFS); const a = r ? JSON.parse(r) : []; return Array.isArray(a) ? a : []; }
+            catch { return []; }
+        }
+        function salvarRefs(arr) { localStorage.setItem(CHAVE_REFS, JSON.stringify(arr)); }
+        let refsSalvas = lerRefs();
+
+        function renderTiposRef() {
+            const wrap = document.getElementById("refTipos");
+            wrap.innerHTML = TIPOS_REF.map(t => `
+                <div class="ref-tipo-chip ${tiposAtivos.has(t.id) ? "ativo" : ""}" data-tipo="${t.id}">
+                    ${t.label} <span class="dur-exemplo">ex.: ${t.dur}</span>
+                </div>
+            `).join("");
+            wrap.querySelectorAll(".ref-tipo-chip").forEach(chip => {
+                chip.addEventListener("click", () => {
+                    const id = chip.dataset.tipo;
+                    if (tiposAtivos.has(id)) tiposAtivos.delete(id);
+                    else tiposAtivos.add(id);
+                    renderTiposRef();
+                    const durInput = document.getElementById("refDuracaoCustom");
+                    const primeiro = [...tiposAtivos][0];
+                    if (primeiro && !durInput.value.trim()) {
+                        const t = TIPOS_REF.find(x => x.id === primeiro);
+                        if (t) durInput.placeholder = `Ex.: ${t.dur}, 5-10min, qualquer`;
+                    }
+                });
+            });
+        }
+        renderTiposRef();
+
+        function renderQuerVer() {
+            const wrap = document.getElementById("refQuerVer");
+            wrap.innerHTML = QUER_VER.map(q => `
+                <div class="ref-tipo-chip ${querVerAtivo.has(q) ? "ativo" : ""}" data-q="${q}">
+                    ${q}
+                </div>
+            `).join("");
+            wrap.querySelectorAll(".ref-tipo-chip").forEach(chip => {
+                chip.addEventListener("click", () => {
+                    const q = chip.dataset.q;
+                    if (querVerAtivo.has(q)) querVerAtivo.delete(q);
+                    else querVerAtivo.add(q);
+                    renderQuerVer();
+                });
+            });
+        }
+        renderQuerVer();
+
+        function tempoParaSegundos(txt) {
+            if (!txt) return 0;
+            const s = String(txt).toLowerCase().trim();
+            const m = s.match(/^(\d+)\s*(s|min|m|h)?$/);
+            if (!m) return 0;
+            const n = Number(m[1]);
+            const u = m[2] || "min";
+            if (u === "s") return n;
+            if (u === "h") return n * 3600;
+            return n * 60;
+        }
+
+        async function buscarVideosRef(query) {
+            const ordem = document.getElementById("refOrdem").value;
+            const periodo = document.getElementById("refPeriodo").value;
+
+            let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=8&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}&regionCode=BR&relevanceLanguage=pt&order=${ordem}`;
+            if (periodo !== "any") {
+                const dias = { "mes": 30, "ano": 365 }[periodo] || 0;
+                if (dias) {
+                    const desde = new Date(Date.now() - dias * 86400000);
+                    url += `&publishedAfter=${desde.toISOString()}`;
+                }
+            }
+            const r = await fetch(url);
+            if (!r.ok) throw new Error("YouTube API falhou");
+            const j = await r.json();
+            const items = j.items || [];
+            if (!items.length) return [];
+
+            const ids = items.map(x => x.id.videoId).join(",");
+            let detalhes = {};
+            try {
+                const r2 = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails,statistics&id=${ids}&key=${YOUTUBE_API_KEY}`);
+                const j2 = await r2.json();
+                (j2.items || []).forEach(v => {
+                    detalhes[v.id] = {
+                        duracao: v.contentDetails?.duration,
+                        views: Number(v.statistics?.viewCount || 0),
+                    };
+                });
+            } catch {}
+
+            function isoParaSeg(iso) {
+                if (!iso) return 0;
+                const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+                if (!m) return 0;
+                return (Number(m[1])||0)*3600 + (Number(m[2])||0)*60 + (Number(m[3])||0);
+            }
+            function fmtViews(n) {
+                if (n >= 1e6) return (n/1e6).toFixed(1).replace(".", ",") + " mi";
+                if (n >= 1e3) return Math.floor(n/1e3) + " mil";
+                return String(n);
+            }
+            function fmtDur(seg) {
+                seg = Number(seg) || 0;
+                if (!seg) return "";
+                const m = Math.floor(seg / 60);
+                const s = Math.floor(seg % 60);
+                return `${m}:${String(s).padStart(2,"0")}`;
+            }
+
+            return items.map(it => {
+                const d = detalhes[it.id.videoId] || {};
+                const seg = d.duracao ? isoParaSeg(d.duracao) : 0;
+                return {
+                    vid: it.id.videoId,
+                    titulo: it.snippet.title,
+                    canal: it.snippet.channelTitle,
+                    thumb: it.snippet.thumbnails?.medium?.url || "",
+                    durSeg: seg,
+                    dur: seg ? fmtDur(seg) : "",
+                    views: d.views || 0,
+                    viewsTxt: fmtViews(d.views || 0),
+                };
+            });
+        }
+
+        function renderResultadosRef(lista, query) {
+            const box = document.getElementById("refResultados");
+            if (!lista.length) {
+                box.innerHTML = `<div style="padding:16px;text-align:center;color:#777;font-size:13px;">Nada encontrado. Tente outra busca.</div>`;
+                return;
+            }
+            box.innerHTML = lista.map(v => {
+                const salvo = refsSalvas.some(r => r.vid === v.vid);
+                return `
+                    <div class="ref-card" data-vid="${escHtml(v.vid)}" data-vtitulo="${escHtml(v.titulo)}" data-vcanal="${escHtml(v.canal)}" data-vthumb="${escHtml(v.thumb)}" data-vdur="${escHtml(v.dur)}" data-vseg="${v.durSeg}">
+                        <div class="ref-card-thumb">
+                            <img src="${escHtml(v.thumb)}" alt="">
+                            ${v.dur ? `<span class="ref-card-dur">${escHtml(v.dur)}</span>` : ""}
+                        </div>
+                        <div class="ref-card-info">
+                            <div class="ref-card-titulo">${escHtml(v.titulo)}</div>
+                            <div class="ref-card-meta">${escHtml(v.canal)} · ${v.viewsTxt} views</div>
+                        </div>
+                        <button class="ref-card-salvar ${salvo ? "salvo" : ""}" data-salvar="${escHtml(v.vid)}" title="Salvar">${salvo ? "❤️" : "🤍"}</button>
+                    </div>
+                `;
+            }).join("");
+
+            box.querySelectorAll(".ref-card").forEach(card => {
+                card.addEventListener("click", (ev) => {
+                    if (ev.target.closest("[data-salvar]")) return;
+                    const vid = card.dataset.vid;
+                    window.open(`https://www.youtube.com/watch?v=${vid}`, "_blank", "noopener");
+                });
+            });
+            box.querySelectorAll("[data-salvar]").forEach(btn => {
+                btn.addEventListener("click", (ev) => {
+                    ev.stopPropagation();
+                    const vid = btn.dataset.salvar;
+                    const card = btn.closest(".ref-card");
+                    const jaTem = refsSalvas.find(r => r.vid === vid);
+                    if (jaTem) {
+                        refsSalvas = refsSalvas.filter(r => r.vid !== vid);
+                        btn.classList.remove("salvo");
+                        btn.textContent = "🤍";
+                        toast("Removida");
+                    } else {
+                        refsSalvas.push({
+                            vid,
+                            titulo: card.dataset.vtitulo,
+                            canal: card.dataset.vcanal,
+                            thumb: card.dataset.vthumb,
+                            dur: card.dataset.vdur,
+                            durSeg: Number(card.dataset.vseg) || 0,
+                            tags: [...tiposAtivos, ...querVerAtivo],
+                            query,
+                            salvo_em: Date.now(),
+                        });
+                        btn.classList.add("salvo");
+                        btn.textContent = "❤️";
+                        toast("Salva");
+                    }
+                    salvarRefs(refsSalvas);
+                    renderRefsSalvas();
+                });
+            });
+        }
+
+        function renderRefsSalvas() {
+            const box = document.getElementById("refSalvasLista");
+            if (!refsSalvas.length) {
+                box.innerHTML = `<div style="padding:12px;text-align:center;color:#666;font-size:12px;">Nenhuma referência salva.</div>`;
+                return;
+            }
+            box.innerHTML = refsSalvas.slice().reverse().map(r => `
+                <div class="ref-salva-item">
+                    <div class="ref-salva-titulo" title="${escHtml(r.titulo)}">
+                        <a href="https://www.youtube.com/watch?v=${escHtml(r.vid)}" target="_blank" rel="noopener" style="color:#dfe8ff;text-decoration:none;">${escHtml(r.titulo)}</a>
+                    </div>
+                    <div class="ref-salva-tags">
+                        ${(r.tags || []).slice(0, 3).map(t => `<span class="ref-salva-tag">${escHtml(t)}</span>`).join("")}
+                    </div>
+                    <button class="ref-salva-rm" data-rm="${escHtml(r.vid)}" title="Remover">×</button>
+                </div>
+            `).join("");
+            box.querySelectorAll("[data-rm]").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    refsSalvas = refsSalvas.filter(x => x.vid !== btn.dataset.rm);
+                    salvarRefs(refsSalvas);
+                    renderRefsSalvas();
+                });
+            });
+        }
+
+        async function executarBuscaRef() {
+            const base = (document.getElementById("refBusca").value || "").trim();
+            if (!base && !tiposAtivos.size && !querVerAtivo.size) {
+                return alert("Digite algo, ou escolha tipo e o que quer ver.");
+            }
+            const partes = [];
+            if (base) partes.push(base);
+            tiposAtivos.forEach(t => {
+                const info = TIPOS_REF.find(x => x.id === t);
+                if (info) partes.push(info.id);
+            });
+            querVerAtivo.forEach(q => partes.push(q));
+            const query = partes.join(" ") || "edição de vídeo";
+
+            const box = document.getElementById("refResultados");
+            box.innerHTML = `<div style="padding:16px;text-align:center;color:#888;font-size:13px;">Buscando…</div>`;
+            try {
+                const lista = await buscarVideosRef(query);
+                renderResultadosRef(lista, query);
+            } catch (e) {
+                box.innerHTML = `<div style="padding:16px;text-align:center;color:#d45a5a;font-size:13px;">Erro ao buscar. Tente de novo.</div>`;
+            }
+        }
+        document.getElementById("refBtnBuscar").addEventListener("click", executarBuscaRef);
+        document.getElementById("refBusca").addEventListener("keydown", (e) => {
+            if (e.key === "Enter") executarBuscaRef();
+        });
+        renderRefsSalvas();
+
+        // ==================================================
+        // BANCO DE SOLUÇÕES (MACETES)
+        // ==================================================
+        const CHAVE_MACETES = "edicao_macetes";
+        function lerMacetes() {
+            try { const r = localStorage.getItem(CHAVE_MACETES); const a = r ? JSON.parse(r) : []; return Array.isArray(a) ? a : []; }
+            catch { return []; }
+        }
+        function salvarMacetes(arr) { localStorage.setItem(CHAVE_MACETES, JSON.stringify(arr)); }
+        let macetes = lerMacetes();
+
+        function renderMacetes() {
+            const box = document.getElementById("maceteLista");
+            if (!macetes.length) {
+                box.innerHTML = `<div style="padding:16px;text-align:center;color:#666;font-size:12px;">Nenhum macete salvo ainda.</div>`;
+                return;
+            }
+            box.innerHTML = macetes.slice().reverse().map(m => `
+                <div class="macete-card">
+                    <div class="macete-titulo">${escHtml(m.titulo)}</div>
+                    ${m.problema ? `<div class="macete-problema">🎯 ${escHtml(m.problema)}</div>` : ""}
+                    ${m.solucao ? `<div class="macete-solucao">${escHtml(m.solucao)}</div>` : ""}
+                    <div class="macete-rodape">
+                        ${(m.tags || []).map(t => `<span class="tag">${escHtml(t)}</span>`).join("")}
+                        <button class="macete-rm" data-rm="${escHtml(m.id)}" title="Remover">×</button>
+                    </div>
+                </div>
+            `).join("");
+            box.querySelectorAll("[data-rm]").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    macetes = macetes.filter(x => x.id !== btn.dataset.rm);
+                    salvarMacetes(macetes);
+                    renderMacetes();
+                    renderMacetesSugeridos();
+                });
+            });
+        }
+
+        function renderMacetesSugeridos() {
+            const box = document.getElementById("maceteSugeridos");
+            // pega tags "recentes" — tipo de vídeo ativo + o que quer ver
+            const tagsAtivas = new Set([...tiposAtivos, ...querVerAtivo]);
+            if (!tagsAtivas.size) { box.innerHTML = ""; return; }
+
+            const matches = macetes.filter(m =>
+                (m.tags || []).some(t => tagsAtivas.has(t))
+            ).slice(-3);
+
+            if (!matches.length) { box.innerHTML = ""; return; }
+
+            box.innerHTML = `
+                <div class="macete-sugeridos">
+                    💡 <strong>Macetes que combinam com o que você tá vendo:</strong>
+                    ${matches.map(m => `<div style="margin-top:6px;">• ${escHtml(m.titulo)}</div>`).join("")}
+                </div>
+            `;
+        }
+
+        document.getElementById("maceteSalvar").addEventListener("click", () => {
+            const titulo = (document.getElementById("maceteTitulo").value || "").trim();
+            if (!titulo) return alert("Dá um título.");
+            const problema = (document.getElementById("maceteProblema").value || "").trim();
+            const solucao = (document.getElementById("maceteSolucao").value || "").trim();
+            const tagsRaw = (document.getElementById("maceteTags").value || "").trim();
+            const tags = tagsRaw ? tagsRaw.split(",").map(t => t.trim().toLowerCase()).filter(Boolean) : [];
+            macetes.push({ id: uid("mac"), titulo, problema, solucao, tags, criado_em: Date.now() });
+            salvarMacetes(macetes);
+            document.getElementById("maceteTitulo").value = "";
+            document.getElementById("maceteProblema").value = "";
+            document.getElementById("maceteSolucao").value = "";
+            document.getElementById("maceteTags").value = "";
+            renderMacetes();
+            renderMacetesSugeridos();
+            toast("Macete salvo");
+        });
+        renderMacetes();
+        renderMacetesSugeridos();
+
+        // ==================================================
+        // SUGESTOR DE PRÓXIMA AÇÃO
+        // ==================================================
+        const CHAVE_REJ_SUG = PREFIXO + "sugestoes_rejeitadas";
+
+        function horaInferida() {
+            const h = new Date().getHours();
+            if (h >= 6 && h < 12)  return { energia: "alta",  tempo: "1h"    };
+            if (h >= 12 && h < 18) return { energia: "media", tempo: "30min" };
+            return { energia: "baixa", tempo: "15min" };
+        }
+
+        function lerRejeitadasSug() {
+            try {
+                const r = localStorage.getItem(CHAVE_REJ_SUG);
+                const obj = r ? JSON.parse(r) : {};
+                if (obj.data !== dataAtual) return { data: dataAtual, ids: {} };
+                return obj;
+            } catch { return { data: dataAtual, ids: {} }; }
+        }
+        function salvarRejeitadasSug(o) { localStorage.setItem(CHAVE_REJ_SUG, JSON.stringify(o)); }
+
+        function classificarTexto(texto) {
+            const t = (texto || "").toLowerCase();
+            if (/(export|render|cor\b|color|organiz|salv|backup)/.test(t)) return "mecanico";
+            if (/(corte|montar|criar|escrev|roteir|trilha|motion|legenda|thumbnail)/.test(t)) return "criativo";
+            if (/(responder|mandar|avisar|checar|enviar|confirmar|whats)/.test(t)) return "rapido";
+            return "generico";
+        }
+
+        function montarCandidatos() {
+            const lista = [];
+            pendencias.filter(p => !p.concluida && (p.texto || "").trim()).forEach(p => {
+                lista.push({ fonte: "pendencia", id: p.id, texto: p.texto });
+            });
+            const ultimaEntrega = entregas.filter(e => e.status === "em_andamento").slice(-1)[0];
+            if (ultimaEntrega) {
+                (ultimaEntrega.itens || []).filter(it => !it.feito && (it.texto || "").trim()).forEach(it => {
+                    lista.push({ fonte: "entrega", id: it.id, texto: it.texto, ctx: ultimaEntrega.nome });
+                });
+            }
+            tarefas.filter(t => !t.concluida && (t.texto || "").trim()).forEach(t => {
+                lista.push({ fonte: "tarefa", id: t.texto, texto: t.texto });
+            });
+            return lista;
+        }
+
+        function pontuarCandidato(c, energia, tempo) {
+            let p = 0;
+            const classe = classificarTexto(c.texto);
+
+            const mapa = {
+                alta:  { "15min": ["rapido","generico"], "30min": ["generico","criativo"], "1h": ["criativo"], "2h+": ["criativo"] },
+                media: { "15min": ["rapido"], "30min": ["mecanico","generico","rapido"], "1h": ["criativo","mecanico"], "2h+": ["criativo","mecanico"] },
+                baixa: { "15min": ["rapido","mecanico"], "30min": ["mecanico"], "1h": ["mecanico"], "2h+": ["mecanico","generico"] },
+            };
+
+            const compativeis = (mapa[energia] && mapa[energia][tempo]) || [];
+            if (compativeis.includes(classe)) p += 10;
+            if (c.fonte === "pendencia") p += 5;
+            if (c.fonte === "entrega")   p += 3;
+            if (c.texto.length < 40) p += 1;
+            return p;
+        }
+
+        function sugerirAgora(energia, tempo) {
+            const rej = lerRejeitadasSug();
+            const candidatos = montarCandidatos().filter(c => !rej.ids[c.id]);
+            if (!candidatos.length) return null;
+            candidatos.forEach(c => { c._score = pontuarCandidato(c, energia, tempo); c._classe = classificarTexto(c.texto); });
+            candidatos.sort((a, b) => b._score - a._score);
+            return candidatos[0];
+        }
+
+        function montarPainelSugestor() {
+            if (document.getElementById("painelOverlay")) return;
+            const inf = horaInferida();
+
+            const overlay = document.createElement("div");
+            overlay.className = "painel-overlay";
+            overlay.id = "painelOverlay";
+            overlay.innerHTML = `
+                <div class="painel-sugestor">
+                    <div class="painel-sugestor-cabecalho">
+                        <span class="painel-sugestor-titulo">🧭 Sugerir próxima ação</span>
+                        <button class="painel-sugestor-fechar" id="painelFechar">×</button>
+                    </div>
+
+                    <label class="painel-rotulo">Energia agora</label>
+                    <div class="painel-chips" id="painelEnergia">
+                        <div class="painel-chip ${inf.energia === "alta" ? "ativo" : ""}"  data-v="alta">🔋 Alta</div>
+                        <div class="painel-chip ${inf.energia === "media" ? "ativo" : ""}" data-v="media">🟡 Média</div>
+                        <div class="painel-chip ${inf.energia === "baixa" ? "ativo" : ""}" data-v="baixa">🪫 Baixa</div>
+                    </div>
+
+                    <label class="painel-rotulo">Tempo disponível</label>
+                    <div class="painel-chips" id="painelTempo">
+                        <div class="painel-chip ${inf.tempo === "15min" ? "ativo" : ""}" data-v="15min">15 min</div>
+                        <div class="painel-chip ${inf.tempo === "30min" ? "ativo" : ""}" data-v="30min">30 min</div>
+                        <div class="painel-chip ${inf.tempo === "1h"    ? "ativo" : ""}" data-v="1h">1h</div>
+                        <div class="painel-chip ${inf.tempo === "2h+"   ? "ativo" : ""}" data-v="2h+">2h+</div>
+                    </div>
+
+                    <button class="painel-btn-confirmar" id="painelConfirmar">Sugerir</button>
+
+                    <div id="painelResultado"></div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            // selecionar chips (single)
+            overlay.querySelectorAll("#painelEnergia .painel-chip").forEach(c => {
+                c.addEventListener("click", () => {
+                    overlay.querySelectorAll("#painelEnergia .painel-chip").forEach(x => x.classList.remove("ativo"));
+                    c.classList.add("ativo");
+                });
+            });
+            overlay.querySelectorAll("#painelTempo .painel-chip").forEach(c => {
+                c.addEventListener("click", () => {
+                    overlay.querySelectorAll("#painelTempo .painel-chip").forEach(x => x.classList.remove("ativo"));
+                    c.classList.add("ativo");
+                });
+            });
+
+            overlay.querySelector("#painelFechar").addEventListener("click", () => overlay.remove());
+            overlay.addEventListener("click", (ev) => { if (ev.target === overlay) overlay.remove(); });
+
+            overlay.querySelector("#painelConfirmar").addEventListener("click", () => {
+                const energia = overlay.querySelector("#painelEnergia .painel-chip.ativo")?.dataset.v;
+                const tempo = overlay.querySelector("#painelTempo .painel-chip.ativo")?.dataset.v;
+                if (!energia || !tempo) return;
+
+                const s = sugerirAgora(energia, tempo);
+                const box = overlay.querySelector("#painelResultado");
+                if (!s) {
+                    box.innerHTML = `<div class="sugestao-vazio">Sem candidatos. Adicione pendências, tarefas ou itens de entrega.</div>`;
+                    return;
+                }
+                const labelFonte = { pendencia: "Pendência do job", entrega: "Item de entrega", tarefa: "Tarefa geral" }[s.fonte] || "";
+                const labelClasse = { criativo: "criativo", mecanico: "mecânico", rapido: "rápido", generico: "geral" }[s._classe] || "";
+                box.innerHTML = `
+                    <div class="sugestao-resultado">
+                        <div class="sugestao-resultado-rotulo">Sugestão</div>
+                        <div class="sugestao-resultado-texto">${escHtml(s.texto)}${s.ctx ? ` <span style="color:#888;font-size:12px;">(${escHtml(s.ctx)})</span>` : ""}</div>
+                        <div class="sugestao-resultado-motivo">${labelFonte} · ${labelClasse} · combina com energia ${energia} em ${tempo}</div>
+                        <div class="sugestao-resultado-acoes">
+                            <button class="btn-sugestao tirar" data-acao="tirar">Tirar</button>
+                            <button class="btn-sugestao aceitar" data-acao="aceitar">Aceitar</button>
+                        </div>
+                    </div>
+                `;
+                box.querySelector('[data-acao="tirar"]').addEventListener("click", () => {
+                    const rej = lerRejeitadasSug();
+                    rej.ids[s.id] = true;
+                    salvarRejeitadasSug(rej);
+                    box.innerHTML = `<div class="sugestao-vazio">Ok, tiro essa. Clique em Sugerir de novo.</div>`;
+                });
+                box.querySelector('[data-acao="aceitar"]').addEventListener("click", () => {
+                    aceitarSugestao(s);
+                    overlay.remove();
+                });
+            });
+        }
+
+        function aceitarSugestao(s) {
+            // Se for pendência do job, move pra 1ª posição → vira "Agora"
+            if (s.fonte === "pendencia") {
+                const idx = pendencias.findIndex(p => p.id === s.id);
+                if (idx > 0) {
+                    const [item] = pendencias.splice(idx, 1);
+                    pendencias.unshift(item);
+                    salvarPendencias(pendencias);
+                    renderPendencias();
+                }
+                toast("▶ Agora: " + s.texto);
+                return;
+            }
+            // Se for entrega ou tarefa, cria pendência "espelho" no topo
+            pendencias.unshift({
+                id: uid("pend"),
+                texto: s.texto,
+                concluida: false,
+                criado_em: Date.now(),
+                veio_de: s.fonte,
+            });
+            salvarPendencias(pendencias);
+            renderPendencias();
+            toast("▶ Agora: " + s.texto);
+        }
+
+        document.getElementById("btnSugerir").addEventListener("click", montarPainelSugestor);
+
+        // ==================================================
+        // FIM
+        // ==================================================
+        console.log("[edicao] página carregada. Aba:", abaAtual);
     </script>
 
 </body>
