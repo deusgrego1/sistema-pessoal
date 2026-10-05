@@ -634,7 +634,7 @@
                         <label class="campo-label">Duração (deixe em branco pra usar a do tipo)</label>
                         <input type="text" id="refDuracaoCustom" placeholder="Ex.: 30s, 1min, 5-10min, qualquer">
 
-                        <div class="ref-filtros" style="margin-top:12px;">
+                                                <div class="ref-filtros" style="margin-top:12px;">
                             <div>
                                 <label class="campo-label" style="margin-top:0;">Ordenar por</label>
                                 <select id="refOrdem">
@@ -652,8 +652,22 @@
                                     <option value="ano">Último ano</option>
                                 </select>
                             </div>
+                            <div>
+                                <label class="campo-label" style="margin-top:0;">Idioma</label>
+                                <select id="refIdioma">
+                                    <option value="pt">🇧🇷 Português</option>
+                                    <option value="en">🇺🇸 Inglês</option>
+                                    <option value="es">🇪🇸 Espanhol</option>
+                                    <option value="any">Qualquer</option>
+                                </select>
+                            </div>
                         </div>
 
+                        <label class="checkbox-legenda" style="margin-top:8px;">
+                            <input type="checkbox" id="refComLegenda">
+                            <span>📝 Só vídeos com legenda</span>
+                        </label>
+                        
                         <div class="ref-resultados" id="refResultados"></div>
                     </div>
                 </div>
@@ -1260,8 +1274,21 @@
         async function buscarVideosRef(query) {
             const ordem = document.getElementById("refOrdem").value;
             const periodo = document.getElementById("refPeriodo").value;
+            const idioma = document.getElementById("refIdioma").value;
+            const comLegenda = document.getElementById("refComLegenda").checked;
 
-            let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=8&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}&regionCode=BR&relevanceLanguage=pt&order=${ordem}`;
+            let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=8&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}&regionCode=BR&order=${ordem}`;
+
+            // Idioma: só manda se não for "any"
+            if (idioma !== "any") {
+                url += `&relevanceLanguage=${idioma}`;
+            }
+
+            // Legenda: só vídeos com legenda
+            if (comLegenda) {
+                url += `&videoCaption=closedCaption`;
+            }
+
             if (periodo !== "any") {
                 const dias = { "mes": 30, "ano": 365 }[periodo] || 0;
                 if (dias) {
