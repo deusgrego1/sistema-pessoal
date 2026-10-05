@@ -105,10 +105,19 @@
         }
         .entrega-item input[type="checkbox"] { cursor:pointer;flex-shrink:0; }
         .entrega-item-texto {
-            flex:1;background:transparent;border:none;padding:3px 0;
-            font-size:13px;color:#e0e0e0;outline:none;font-family:inherit;min-width:0;
+            flex:1;
+            background:#17171a;
+            border:1px solid #2a2a30;
+            padding:6px 10px;
+            font-size:13px;
+            color:#eaeaea;
+            outline:none;
+            font-family:inherit;
+            border-radius:6px;
+            min-width:0;
         }
-        .entrega-item-texto::placeholder { color: #555; }
+        .entrega-item-texto::placeholder { color: #666; }
+        .entrega-item-texto:focus { border-color: #55555c; background:#1c1c20; }
         .entrega-item.feito .entrega-item-texto {
             text-decoration:line-through;color:#777;
         }
@@ -317,8 +326,7 @@
 
         <a href="index.html" class="back-button">← Voltar para Planejamento</a>
     </main>
-
-    <script src="../../js/storage.js"></script>
+        <script src="../../js/storage.js"></script>
     <script src="../../js/app.js"></script>
     <script>
         // ==================================================
@@ -516,7 +524,7 @@
         function salvarEntregas(arr) { localStorage.setItem(CHAVE_ENTREGAS, JSON.stringify(arr)); }
         let entregas = lerEntregas();
         const listaEntregas = document.getElementById("listaEntregas");
-        const entregasAbertas = {}; // controle de expand/collapse por id
+        const entregasAbertas = {};
 
         function proximoNomeEntrega() {
             const numeros = entregas
@@ -533,10 +541,8 @@
                 return;
             }
 
-            const ultima = entregas[entregas.length - 1];
-
             listaEntregas.innerHTML = entregas.map((e, i) => {
-                const aberta = entregasAbertas[e.id] !== false; // default aberto
+                const aberta = entregasAbertas[e.id] !== false;
                 const statusLabel = {
                     em_andamento: "em ajuste",
                     enviada: "enviada",
@@ -577,7 +583,6 @@
                 `;
             }).join("");
 
-            // handlers
             listaEntregas.querySelectorAll("[data-toggle]").forEach(el => {
                 el.addEventListener("click", () => {
                     const id = el.dataset.toggle;
@@ -620,7 +625,6 @@
                     entrega.itens.push({ id: uid("it"), texto: "", feito: false });
                     salvarEntregas(entregas);
                     renderEntregas();
-                    // foca no último input do card
                     const inputs = listaEntregas.querySelectorAll(`.entrega-card[data-id="${id}"] .entrega-item-texto`);
                     if (inputs.length) inputs[inputs.length - 1].focus();
                 });
@@ -634,8 +638,6 @@
                     entrega.status = "enviada";
                     entrega.enviada_em = dataAtual;
                     salvarEntregas(entregas);
-
-                    // status do projeto vira "aguardando"
                     statusAtual = "aguardando";
                     projeto.status = "aguardando";
                     salvarProjeto(projeto);
@@ -652,7 +654,6 @@
                     entrega.status = "aprovada";
                     entrega.aprovada_em = dataAtual;
                     salvarEntregas(entregas);
-
                     statusAtual = "entregue";
                     projeto.status = "entregue";
                     salvarProjeto(projeto);
@@ -719,7 +720,6 @@
                 const classePrio = t.prioridade === "alta" ? " prio-alta" : "";
                 linha.className = "tarefa-linha" + (t.concluida ? " concluida" : "") + classePrio;
 
-                // prioridade
                 const prioGrupo = document.createElement("div");
                 prioGrupo.className = "prio-grupo";
                 ["alta", "media", "baixa"].forEach(p => {
