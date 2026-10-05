@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edição</title>
+
+    <link rel="stylesheet" href="../../css/style.css">
+
+    <style>
+        .campo-label {
+            display: block;
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 14px 0 8px;
+        }
+
+        .chip {
+            padding: 7px 13px;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid #333338;
+            background: #1a1a1e;
+            color: #bbb;
+            border-radius: 16px;
+            transition: 0.15s;
+            user-select: none;
+        }
+        .chip:hover { background: #222228; color: #e0e0e0; }
+        .chip.selecionado {
+            background: #2e2e33; border-color: #666; color: #fff; font-weight: 600;
+        }
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+        /* Status de edição */
+        .chip.status-recebendo.selecionado { background:#2e1f33; border-color:#8a5ad4; color:#c9a8e8; }
+        .chip.status-em-corte.selecionado  { background:#1f3320; border-color:#4caf50; color:#a5d6a7; }
+        .chip.status-aguardando.selecionado{ background:#332e1a; border-color:#c9a44a; color:#e0d48a; }
+        .chip.status-entregue.selecionado  { background:#1a2233; border-color:#5a8ad4; color:#a8c4e8; }
+
+        .status-linha { display: flex; flex-wrap: wrap; gap: 6px; }
+
+        .checkbox-legenda {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 12px; color: #aaa; cursor: pointer;
+            padding: 6px 10px; border: 1px solid #333338;
+            border-radius: 16px; user-select: none;
+        }
+        .checkbox-legenda:hover { color: #ddd; }
+        .checkbox-legenda input { margin: 0; }
+
+        /* Agora derivado */
+        .agora-box {
+            padding: 12px 14px;
+            background: #172017;
+            border: 1px solid #2e5a2e;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 6px;
+        }
+        .agora-rotulo {
+            font-size: 10px;
+            color: #4caf50;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .agora-texto {
+            font-size: 14px;
+            color: #e0e0e0;
+            flex: 1;
+        }
+        .agora-texto.vazio { color: #666; font-style: italic; }
+
+        .btn-focar-job {
+            width: 100%;
+            padding: 12px 18px;
+            font-size: 14px;
+            background: #172017;
+            border: 1px solid #2e5a2e;
+            color: #a5d6a7;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.15s;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+        .btn-focar-job:hover { background: #223a22; border-color: #4caf50; }
+
+        .placeholder-card {
+            padding: 20px;
+            background: #17171a;
+            border: 1px dashed #333338;
+            border-radius: 10px;
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header class="header">
+            <p class="eyebrow">PLANEJAMENTO · EDIÇÃO</p>
+            <h1>🎬 Edição</h1>
+            <p class="subtitle">
+                Prepare o job antes de abrir a timeline.
+            </p>
+        </header>
+
+        <section class="modules">
+
+            <!-- CARD PROJETO -->
+            <div class="module-card" style="align-items: flex-start;">
+                <span class="icon">🎬</span>
+                <div style="width: 100%;">
+                    <h2>Projeto</h2>
+
+                    <div class="linha-dupla" style="display:flex;gap:10px;">
+                        <div style="flex:2;">
+                            <label class="campo-label">Nome do projeto</label>
+                            <input type="text" id="projNome" placeholder="Ex.: Reels lançamento">
+                        </div>
+                        <div style="flex:1;">
+                            <label class="campo-label">Pra quem</label>
+                            <input type="text" id="projCliente" placeholder="App X / eu mesmo">
+                        </div>
+                    </div>
+
+                    <label class="campo-label">Prazo</label>
+                    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                        <input type="date" id="projPrazo" style="flex:1;min-width:160px;">
+                        <label class="checkbox-legenda">
+                            <input type="checkbox" id="projSemPrazo">
+                            <span>sem prazo</span>
+                        </label>
+                    </div>
+
+                    <label class="campo-label">Status</label>
+                    <div class="chips status-linha" id="chipsStatus">
+                        <div class="chip status-recebendo" data-status="recebendo_material">📥 Recebendo material</div>
+                        <div class="chip status-em-corte"  data-status="em_corte">✂️ Em corte</div>
+                        <div class="chip status-aguardando" data-status="aguardando">⏳ Aguardando</div>
+                        <div class="chip status-entregue"  data-status="entregue">✅ Entregue</div>
+                    </div>
+
+                    <label class="campo-label">📁 Pasta do projeto</label>
+                    <input type="text" id="projPasta" placeholder="https://drive.google.com/...">
+
+                    <label class="campo-label">▶ Agora</label>
+                    <div class="agora-box" id="agoraBox">
+                        <span class="agora-rotulo">Agora</span>
+                        <span class="agora-texto vazio" id="agoraTexto">Nada pendente ainda.</span>
+                    </div>
+
+                    <button type="button" class="btn-focar-job" id="btnFocarJob">▶ Focar no job</button>
+                </div>
+            </div>
+
+            <!-- Placeholder: Pendências do job -->
+            <div class="placeholder-card">
+                📋 <strong>Pendências do job</strong> — chega em D.2
+            </div>
+
+            <!-- Placeholder: Entregas -->
+            <div class="placeholder-card">
+                📦 <strong>Entregas</strong> — chega em D.3
+            </div>
+
+            <!-- Placeholder: Tarefas gerais -->
+            <div class="placeholder-card">
+                📋 <strong>Tarefas gerais</strong> — chega em D.3
+            </div>
+
+            <!-- Placeholder: Notas -->
+            <div class="placeholder-card">
+                📝 <strong>Notas</strong> — chega em D.3
+            </div>
+
+        </section>
+
+        <a href="index.html" class="back-button">
+            ← Voltar para Planejamento
+        </a>
+
+    </main>
+
+    <script src="../../js/storage.js"></script>
+    <script src="../../js/app.js"></script>
+    <script>
+        // ==================================================
+        // DATA + PREFIXO
+        // ==================================================
+
+        const hoje = new Date();
+        const anoHoje = hoje.getFullYear();
+        const mesHoje = String(hoje.getMonth() + 1).padStart(2, "0");
+        const diaHoje = String(hoje.getDate()).padStart(2, "0");
+        const dataHoje = `${anoHoje}-${mesHoje}-${diaHoje}`;
+
+        const paramsURL = new URLSearchParams(window.location.search);
+        const dataParam = paramsURL.get("data");
+        const dataAtual =
+            (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam))
+                ? dataParam
+                : dataHoje;
+
+        const PREFIXO = `planejamento_${dataAtual}_trabalho_edicao_`;
+
+
+        // ==================================================
+        // BARRA DE DATAS
+        // ==================================================
+
+        (function () {
+            const container = document.querySelector("main.container");
+            const header = container.querySelector(".header");
+
+            const [a, m, d] = dataAtual.split("-").map(Number);
+            const dataObj = new Date(a, m - 1, d);
+
+            const fmtISO = (dt) => {
+                const yy = dt.getFullYear();
+                const mm = String(dt.getMonth() + 1).padStart(2, "0");
+                const dd = String(dt.getDate()).padStart(2, "0");
+                return `${yy}-${mm}-${dd}`;
+            };
+
+            const anterior = new Date(dataObj); anterior.setDate(anterior.getDate() - 1);
+            const seguinte = new Date(dataObj); seguinte.setDate(seguinte.getDate() + 1);
+
+            const fmtBR = (iso) => { const [y, mo, dy] = iso.split("-"); return `${dy}/${mo}/${y}`; };
+            const label = (iso) => iso === dataHoje ? "Hoje" : fmtBR(iso);
+            const baseURL = window.location.pathname;
+            const urlComData = (iso) => iso === dataHoje ? baseURL : `${baseURL}?data=${iso}`;
+
+            const barra = document.createElement("div");
+            barra.style.cssText = `
+                display:flex; align-items:center; justify-content:space-between; gap:8px;
+                margin-bottom:18px; padding:10px 12px; border:1px solid #252529;
+                border-radius:10px; background:#17171a; font-size:14px;
+            `;
+            const linkStyle = "text-decoration:none; color:#e0e0e0; padding:6px 10px; border-radius:6px;";
+
+            barra.innerHTML = `
+                <a href="${urlComData(fmtISO(anterior))}" style="${linkStyle}">← ${label(fmtISO(anterior))}</a>
+                <div style="text-align:center;">
+                    <div style="font-weight:600; color:#f5f5f5;">${label(dataAtual)}</div>
+                    ${dataAtual !== dataHoje
+                        ? `<a href="${baseURL}" style="font-size:11px; color:#c98a8a; text-decoration:none;">voltar para hoje</a>`
+                        : ""}
+                </div>
+                <a href="${urlComData(fmtISO(seguinte))}" style="${linkStyle}">${label(fmtISO(seguinte))} →</a>
+            `;
+            container.insertBefore(barra, header);
+        })();
+
+
+        // ==================================================
+        // PROJETO — storage
+        // ==================================================
+        const CHAVE_PROJETO = PREFIXO + "projeto";
+
+        function lerProjeto() {
+            try {
+                const raw = localStorage.getItem(CHAVE_PROJETO);
+                return raw ? JSON.parse(raw) : {};
+            } catch { return {}; }
+        }
+        function salvarProjeto(p) {
+            localStorage.setItem(CHAVE_PROJETO, JSON.stringify(p));
+        }
+
+        let projeto = lerProjeto();
+
+        // Campos texto
+        const camposProj = [
+            { id: "projNome",    campo: "nome" },
+            { id: "projCliente", campo: "cliente" },
+            { id: "projPasta",   campo: "pasta" },
+        ];
+
+        camposProj.forEach(({ id, campo }) => {
+            const el = document.getElementById(id);
+            el.value = projeto[campo] || "";
+            el.addEventListener("input", () => {
+                projeto[campo] = el.value;
+                salvarProjeto(projeto);
+            });
+        });
+
+        // Prazo
+        const elPrazo = document.getElementById("projPrazo");
+        const elSemPrazo = document.getElementById("projSemPrazo");
+        elPrazo.value = projeto.prazo || "";
+        elSemPrazo.checked = !!projeto.semPrazo;
+
+        elPrazo.addEventListener("input", () => {
+            projeto.prazo = elPrazo.value;
+            salvarProjeto(projeto);
+        });
+        elSemPrazo.addEventListener("change", () => {
+            projeto.semPrazo = elSemPrazo.checked;
+            if (elSemPrazo.checked) {
+                elPrazo.disabled = true;
+                elPrazo.style.opacity = "0.4";
+            } else {
+                elPrazo.disabled = false;
+                elPrazo.style.opacity = "1";
+            }
+            salvarProjeto(projeto);
+        });
+        if (elSemPrazo.checked) {
+            elPrazo.disabled = true;
+            elPrazo.style.opacity = "0.4";
+        }
+
+        // Status
+        const elChipsStatus = document.getElementById("chipsStatus");
+        let statusAtual = projeto.status || "recebendo_material";
+        if (!projeto.status) {
+            projeto.status = statusAtual;
+            salvarProjeto(projeto);
+        }
+
+        function renderStatus() {
+            elChipsStatus.querySelectorAll(".chip").forEach(chip => {
+                chip.classList.toggle("selecionado", chip.dataset.status === statusAtual);
+            });
+        }
+        renderStatus();
+
+        elChipsStatus.querySelectorAll(".chip").forEach(chip => {
+            chip.addEventListener("click", () => {
+                const novo = chip.dataset.status;
+                if (statusAtual === novo) return;
+                statusAtual = novo;
+                projeto.status = novo;
+                salvarProjeto(projeto);
+                renderStatus();
+            });
+        });
+
+        // Agora — derivado (por enquanto só mostra vazio, D.2 preenche)
+        const agoraTexto = document.getElementById("agoraTexto");
+        function atualizarAgora() {
+            // TODO D.2: usar 1ª pendência aberta
+            agoraTexto.textContent = "Nada pendente ainda.";
+            agoraTexto.classList.add("vazio");
+        }
+        atualizarAgora();
+
+        // Focar no job — placeholder (D.3 liga de verdade)
+        document.getElementById("btnFocarJob").addEventListener("click", () => {
+            alert("⏳ O botão Focar será ligado na parte D.3.");
+        });
+    </script>
+
+</body>
+</html>
