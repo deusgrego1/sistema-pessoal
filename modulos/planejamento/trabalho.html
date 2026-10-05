@@ -486,6 +486,62 @@
             border-color: #2e5a2e;
             color: #a5d6a7;
         }
+
+        /* Fechamento do dia */
+        .fechar-dia-wrap {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 12px;
+        }
+        .btn-fechar-dia {
+            padding: 8px 16px;
+            font-size: 12px;
+            background: #1a2233;
+            border: 1px solid #2c3a55;
+            color: #a8c4e8;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.15s;
+        }
+        .btn-fechar-dia:hover {
+            background: #232f4a;
+            border-color: #4a5c85;
+            color: #dfe8ff;
+        }
+        .btn-fechar-dia.fechado {
+            background: #172017;
+            border-color: #2e5a2e;
+            color: #a5d6a7;
+        }
+
+        /* Badge de carry-over */
+        .badge-carryover {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: #332e1a;
+            border: 1px solid #c9a44a;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: #e0d48a;
+        }
+        .badge-carryover-txt { flex: 1; }
+        .btn-carryover {
+            padding: 5px 12px;
+            font-size: 11px;
+            background: #1a1a1e;
+            border: 1px solid #c9a44a;
+            color: #e0d48a;
+            border-radius: 14px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.15s;
+            font-weight: 600;
+        }
+        .btn-carryover:hover { background: #2a2418; }
     </style>
 </head>
 
@@ -573,6 +629,8 @@
                         No máximo 5. Menos é mais.
                     </p>
 
+                    <div id="carryoverBox"></div>
+
                     <div id="templatesBox"></div>
 
                     <div id="listaTarefas"></div>
@@ -580,6 +638,10 @@
                         ＋ Adicionar tarefa
                     </button>
                     <div class="contador-tarefas" id="contadorTarefas"></div>
+
+                    <div class="fechar-dia-wrap">
+                        <button type="button" class="btn-fechar-dia" id="btnFecharDia">🌙 Fechar o dia</button>
+                    </div>
                 </div>
             </div>
 
@@ -1076,7 +1138,6 @@
 
         function renderTarefas() {
 
-            // ordena: alta primeiro, depois media, depois baixa
             tarefas.sort((a, b) => {
                 const pa = ORDEM_PRIO[a.prioridade] ?? 1;
                 const pb = ORDEM_PRIO[b.prioridade] ?? 1;
@@ -1205,7 +1266,6 @@
                         sub.appendChild(chip);
                     });
 
-                    // botão "Estuda antes" se tem alguma frente com alerta
                     const precisaEstudar = frentes.some(fx => {
                         const g = calcularGapDaFrente(fx.skillId, fx.frenteId);
                         return g !== null && g > 50;
@@ -1382,7 +1442,6 @@
             if (inputs.length) inputs[inputs.length - 1].focus();
         }
 
-        // ---------- Salvar template a partir de uma tarefa ----------
         function salvarTarefaComoTemplate(idx) {
             const t = tarefas[idx];
             if (!t || !t.frentes_exigidas || !t.frentes_exigidas.length) {
@@ -1679,6 +1738,203 @@
                 });
             }, 500);
         }
+
+
+        // ==================================================
+        // CICLO DE PENDÊNCIAS — fechamento + carry-over  (C)
+        // ==================================================
+        const chaveDiaFechado = PREFIXO + "dia_fechado";
+
+        function proximaData(iso) {
+            const [a, m, d] = iso.split("-").map(Number);
+            const dt = new Date(a, m - 1, d);
+            dt.setDate(dt.getDate() + 1);
+            const yy = dt.getFullYear();
+            const mm = String(dt.getMonth() + 1).padStart(2, "0");
+            const dd = String(dt.getDate()).padStart(2, "0");
+            return `${yy}-${mm}-${dd}`;
+        }
+
+        function dataAnterior(iso) {
+            const [a, m, d] = iso.split("-").map(Number);
+            const dt = new Date(a, m - 1, d);
+            dt.setDate(dt.getDate() - 1);
+            const yy = dt.getFullYear();
+            const mm = String(dt.getMonth() + 1).padStart(2, "0");
+            const dd = String(dt.getDate()).padStart(2, "0");
+            return `${yy}-${mm}-${dd}`;
+        }
+
+        function atualizarBtnFecharDia() {
+            const btn = document.getElementById("btnFecharDia");
+            if (!btn) return;
+            const fechado = localStorage.getItem(chaveDiaFechado) === "1";
+            btn.textContent = fechado ? "✅ Dia fechado" : "🌙 Fechar o dia";
+            btn.classList.toggle("fechado", fechado);
+        }
+
+        function fecharODia() {
+            const jaFechado = localStorage.getItem(chaveDiaFechado) === "1";
+            if (jaFechado) {
+                if (!confirm("O dia já foi fechado. Reabrir e fechar de novo?")) return;
+                localStorage.removeItem(chaveDiaFechado);
+            }
+
+            const concluidas = tarefas.filter(t => t.concluida).length;
+            const pendentes = tarefas.filter(t => !t.concluida && (t.texto || "").trim());
+
+            if (!pendentes.length) {
+                localStorage.setItem(chaveDiaFechado, "1");
+                localStorage.setItem(PREFIXO + "fechado_em", new Date().toISOString());
+                atualizarBtnFecharDia();
+                alert(`🎉 Dia fechado!\n\n${concluidas} concluída(s), nada pendente.`);
+                return;
+            }
+
+            if (!confirm(
+                `Fechar o dia?\n\n` +
+                `${concluidas} concluída(s)\n` +
+                `${pendentes.length} pendente(s)\n\n` +
+                `Vou perguntar o que fazer com cada pendente.`
+            )) return;
+
+            const amanha = proximaData(dataAtual);
+            const chaveAmanha = `planejamento_${amanha}_trabalho_tarefas`;
+            let tarefasAmanha = [];
+            try {
+                const raw = localStorage.getItem(chaveAmanha);
+                tarefasAmanha = raw ? JSON.parse(raw) : [];
+            } catch { tarefasAmanha = []; }
+
+            let levadas = 0;
+            let abandonadas = 0;
+
+            pendentes.forEach(t => {
+                const txt = (t.texto || "").trim();
+                const levar = confirm(`Levar pra amanhã?\n\n"${txt}"`);
+                if (levar) {
+                    if (tarefasAmanha.length < 5) {
+                        tarefasAmanha.push({
+                            texto: txt,
+                            prioridade: t.prioridade || "media",
+                            concluida: false,
+                            frentes_exigidas: JSON.parse(JSON.stringify(t.frentes_exigidas || [])),
+                            carry_over: true,
+                            veio_de: dataAtual,
+                            tempo_foco_min: 0,
+                            sessoes_foco: 0,
+                        });
+                        t.levada_para = amanha;
+                        levadas++;
+                    } else {
+                        t.levada_para = null;
+                        abandonadas++;
+                    }
+                } else {
+                    t.levada_para = null;
+                    abandonadas++;
+                }
+            });
+
+            localStorage.setItem(chaveAmanha, JSON.stringify(tarefasAmanha));
+            salvarTarefas();
+            localStorage.setItem(chaveDiaFechado, "1");
+            localStorage.setItem(PREFIXO + "fechado_em", new Date().toISOString());
+
+            atualizarBtnFecharDia();
+            renderTarefas();
+
+            let msg = `✅ Dia fechado.\n\n`;
+            msg += `${levadas} tarefa(s) levada(s) pra amanhã.`;
+            if (abandonadas) msg += `\n${abandonadas} ficou(aram) no histórico do dia.`;
+            if (abandonadas && tarefasAmanha.length >= 5) {
+                msg += `\n\n⚠️ O dia de amanhã já tá com 5 tarefas — algumas não couberam.`;
+            }
+            alert(msg);
+        }
+
+        function verificarCarryOver() {
+            const box = document.getElementById("carryoverBox");
+            if (!box) return;
+
+            const ontem = dataAnterior(dataAtual);
+            const chaveOntemFechado = `planejamento_${ontem}_trabalho_dia_fechado`;
+
+            if (localStorage.getItem(chaveOntemFechado) === "1") {
+                box.innerHTML = "";
+                return;
+            }
+
+            const chaveOntem = `planejamento_${ontem}_trabalho_tarefas`;
+            let tarefasOntem = [];
+            try {
+                const raw = localStorage.getItem(chaveOntem);
+                tarefasOntem = raw ? JSON.parse(raw) : [];
+            } catch { tarefasOntem = []; }
+
+            const pendentes = tarefasOntem.filter(t =>
+                !t.concluida &&
+                (t.texto || "").trim() &&
+                !t.levada_para
+            );
+
+            if (!pendentes.length) {
+                box.innerHTML = "";
+                return;
+            }
+
+            box.innerHTML = `
+                <div class="badge-carryover">
+                    <span class="badge-carryover-txt">
+                        ⚠️ <strong>${pendentes.length}</strong> tarefa${pendentes.length > 1 ? "s" : ""} de ontem não fechou.
+                    </span>
+                    <button type="button" class="btn-carryover" id="btnTrazerPendentes">Trazer</button>
+                </div>
+            `;
+
+            box.querySelector("#btnTrazerPendentes").addEventListener("click", () => {
+                let adicionadas = 0;
+                let ignoradas = 0;
+                pendentes.forEach(t => {
+                    if (tarefas.length >= 5) {
+                        ignoradas++;
+                        return;
+                    }
+                    const txt = (t.texto || "").trim();
+                    if (tarefas.some(x => (x.texto || "").trim().toLowerCase() === txt.toLowerCase())) {
+                        ignoradas++;
+                        return;
+                    }
+                    tarefas.push({
+                        texto: txt,
+                        prioridade: t.prioridade || "media",
+                        concluida: false,
+                        frentes_exigidas: JSON.parse(JSON.stringify(t.frentes_exigidas || [])),
+                        carry_over: true,
+                        veio_de: ontem,
+                        tempo_foco_min: 0,
+                        sessoes_foco: 0,
+                    });
+                    t.levada_para = dataAtual;
+                    adicionadas++;
+                });
+
+                localStorage.setItem(chaveOntem, JSON.stringify(tarefasOntem));
+                salvarTarefas();
+                renderTarefas();
+                verificarCarryOver();
+
+                let msg = `✅ ${adicionadas} tarefa(s) trazida(s).`;
+                if (ignoradas) msg += `\n${ignoradas} ignorada(s) (duplicada ou lista cheia).`;
+                alert(msg);
+            });
+        }
+
+        const btnFecharDia = document.getElementById("btnFecharDia");
+        if (btnFecharDia) btnFecharDia.addEventListener("click", fecharODia);
+
+        atualizarBtnFecharDia();
+        verificarCarryOver();
     </script>
 
 </body>
