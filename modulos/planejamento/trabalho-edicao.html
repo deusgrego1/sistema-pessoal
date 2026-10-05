@@ -3,110 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Edição</title>
-
     <link rel="stylesheet" href="../../css/style.css">
-
     <style>
         .campo-label {
-            display: block;
-            font-size: 11px;
-            color: #888;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin: 14px 0 8px;
+            display: block; font-size: 11px; color: #888;
+            letter-spacing: 1px; text-transform: uppercase; margin: 14px 0 8px;
         }
-
         .chip {
-            padding: 7px 13px;
-            font-size: 12px;
-            cursor: pointer;
-            border: 1px solid #333338;
-            background: #1a1a1e;
-            color: #bbb;
-            border-radius: 16px;
-            transition: 0.15s;
-            user-select: none;
+            padding: 7px 13px; font-size: 12px; cursor: pointer;
+            border: 1px solid #333338; background: #1a1a1e; color: #bbb;
+            border-radius: 16px; transition: 0.15s; user-select: none;
         }
         .chip:hover { background: #222228; color: #e0e0e0; }
-        .chip.selecionado {
-            background: #2e2e33; border-color: #666; color: #fff; font-weight: 600;
-        }
+        .chip.selecionado { background:#2e2e33;border-color:#666;color:#fff;font-weight:600; }
         .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-
-        /* Status de edição */
-        .chip.status-recebendo.selecionado { background:#2e1f33; border-color:#8a5ad4; color:#c9a8e8; }
-        .chip.status-em-corte.selecionado  { background:#1f3320; border-color:#4caf50; color:#a5d6a7; }
-        .chip.status-aguardando.selecionado{ background:#332e1a; border-color:#c9a44a; color:#e0d48a; }
-        .chip.status-entregue.selecionado  { background:#1a2233; border-color:#5a8ad4; color:#a8c4e8; }
-
+        .chip.status-recebendo.selecionado { background:#2e1f33;border-color:#8a5ad4;color:#c9a8e8; }
+        .chip.status-em-corte.selecionado  { background:#1f3320;border-color:#4caf50;color:#a5d6a7; }
+        .chip.status-aguardando.selecionado{ background:#332e1a;border-color:#c9a44a;color:#e0d48a; }
+        .chip.status-entregue.selecionado  { background:#1a2233;border-color:#5a8ad4;color:#a8c4e8; }
         .status-linha { display: flex; flex-wrap: wrap; gap: 6px; }
-
         .checkbox-legenda {
-            display: inline-flex; align-items: center; gap: 6px;
-            font-size: 12px; color: #aaa; cursor: pointer;
-            padding: 6px 10px; border: 1px solid #333338;
-            border-radius: 16px; user-select: none;
+            display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#aaa;
+            cursor:pointer;padding:6px 10px;border:1px solid #333338;
+            border-radius:16px;user-select:none;
         }
         .checkbox-legenda:hover { color: #ddd; }
         .checkbox-legenda input { margin: 0; }
-
-        /* Agora derivado */
         .agora-box {
-            padding: 12px 14px;
-            background: #172017;
-            border: 1px solid #2e5a2e;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 6px;
+            padding:12px 14px;background:#172017;border:1px solid #2e5a2e;
+            border-radius:10px;display:flex;align-items:center;gap:10px;margin-top:6px;
         }
         .agora-rotulo {
-            font-size: 10px;
-            color: #4caf50;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-weight: 600;
-            flex-shrink: 0;
+            font-size:10px;color:#4caf50;text-transform:uppercase;
+            letter-spacing:1.5px;font-weight:600;flex-shrink:0;
         }
-        .agora-texto {
-            font-size: 14px;
-            color: #e0e0e0;
-            flex: 1;
-        }
-        .agora-texto.vazio { color: #666; font-style: italic; }
-
+        .agora-texto { font-size:14px;color:#e0e0e0;flex:1; }
+        .agora-texto.vazio { color:#666;font-style:italic; }
         .btn-focar-job {
-            width: 100%;
-            padding: 12px 18px;
-            font-size: 14px;
-            background: #172017;
-            border: 1px solid #2e5a2e;
-            color: #a5d6a7;
-            border-radius: 10px;
-            cursor: pointer;
-            font-family: inherit;
-            transition: 0.15s;
-            font-weight: 600;
-            margin-top: 12px;
+            width:100%;padding:12px 18px;font-size:14px;
+            background:#172017;border:1px solid #2e5a2e;color:#a5d6a7;
+            border-radius:10px;cursor:pointer;font-family:inherit;
+            transition:0.15s;font-weight:600;margin-top:12px;
         }
-        .btn-focar-job:hover { background: #223a22; border-color: #4caf50; }
+        .btn-focar-job:hover { background:#223a22;border-color:#4caf50; }
+        .pendencia-item {
+            display:flex;align-items:center;gap:10px;padding:10px 12px;
+            background:#1c1c20;border:1px solid #252529;border-radius:10px;margin-bottom:6px;
+        }
+        .pendencia-item.concluida { opacity: 0.5; }
+        .pendencia-item.agora { border-color:#4caf50;background:#172017; }
+        .pendencia-check { width:18px;height:18px;cursor:pointer;flex-shrink:0; }
+        .pendencia-input {
+            flex:1;background:transparent;border:none;padding:4px 0;
+            font-size:14px;color:#e0e0e0;outline:none;font-family:inherit;min-width:0;
+        }
+        .pendencia-input::placeholder { color: #555; }
+        .pendencia-item.concluida .pendencia-input { text-decoration:line-through;color:#777; }
+        .pendencia-rm, .entrega-item-rm {
+            background:none;border:none;color:#666;font-size:16px;
+            cursor:pointer;padding:0 4px;flex-shrink:0;
+        }
+        .pendencia-rm:hover, .entrega-item-rm:hover { color: #d45a5a; }
+        .btn-add-pendencia, .btn-add-item {
+            width:100%;padding:8px;font-size:12px;cursor:pointer;
+            border:1px dashed #444;background:transparent;color:#888;
+            border-radius:8px;transition:0.15s;font-family:inherit;margin-top:4px;
+        }
+        .btn-add-pendencia:hover, .btn-add-item:hover {
+            border-color:#666;color:#ccc;background:#1a1a1e;
+        }
+        .vazio-pendencias, .vazio-entregas, .vazio-tarefas {
+            padding:12px;font-size:12px;color:#666;text-align:center;
+        }
 
-        .placeholder-card {
-            padding: 20px;
-            background: #17171a;
-            border: 1px dashed #333338;
-            border-radius: 10px;
-            text-align: center;
-            color: #666;
-            font-size: 13px;
-            margin-top: 16px;
+        /* ENTREGAS */
+        .entrega-card {
+            background:#1c1c20;border:1px solid #2a2a30;border-radius:10px;
+            margin-bottom:10px;overflow:hidden;
         }
+        .entrega-card.enviada { border-color:#c9a44a; }
+        .entrega-card.aprovada { border-color:#4caf50;opacity:0.7; }
+        .entrega-cabecalho {
+            padding:12px 14px;display:flex;align-items:center;
+            gap:10px;cursor:pointer;transition:0.15s;
+        }
+        .entrega-cabecalho:hover { background:#22222a; }
+        .entrega-titulo { font-size:14px;color:#eaeaea;font-weight:600;flex:1; }
+        .entrega-status {
+            font-size:11px;padding:3px 10px;border-radius:10px;
+            text-transform:uppercase;letter-spacing:0.5px;font-weight:600;
+        }
+        .entrega-status.em_andamento { background:#1f3320;color:#a5d6a7; }
+        .entrega-status.enviada { background:#332e1a;color:#e0d48a; }
+        .entrega-status.aprovada { background:#1a2233;color:#a8c4e8; }
+        .entrega-corpo {
+            padding:12px 14px;border-top:1px solid #252529;background:#17171b;
+        }
+        .entrega-item {
+            display:flex;align-items:center;gap:8px;padding:6px 0;
+        }
+        .entrega-item input[type="checkbox"] { cursor:pointer;flex-shrink:0; }
+        .entrega-item-texto {
+            flex:1;background:transparent;border:none;padding:3px 0;
+            font-size:13px;color:#e0e0e0;outline:none;font-family:inherit;min-width:0;
+        }
+        .entrega-item-texto::placeholder { color: #555; }
+        .entrega-item.feito .entrega-item-texto {
+            text-decoration:line-through;color:#777;
+        }
+        .entrega-acoes {
+            display:flex;gap:8px;justify-content:flex-end;margin-top:10px;
+            padding-top:10px;border-top:1px solid #252529;
+        }
+        .btn-entrega {
+            padding:6px 14px;font-size:12px;border-radius:14px;
+            cursor:pointer;font-family:inherit;transition:0.15s;font-weight:600;
+        }
+        .btn-entrega.enviar {
+            background:#1a2233;border:1px solid #2c3a55;color:#a8c4e8;
+        }
+        .btn-entrega.enviar:hover { background:#232f4a;border-color:#4a5c85;color:#dfe8ff; }
+        .btn-entrega.aprovar {
+            background:#172017;border:1px solid #2e5a2e;color:#a5d6a7;
+        }
+        .btn-entrega.aprovar:hover { background:#223a22;border-color:#4caf50; }
+        .btn-add-entrega {
+            width:100%;padding:10px;font-size:13px;cursor:pointer;
+            border:1px dashed #444;background:transparent;color:#999;
+            border-radius:10px;transition:0.15s;font-family:inherit;
+        }
+        .btn-add-entrega:hover { border-color:#666;color:#ccc;background:#1a1a1e; }
+        .entrega-sub {
+            font-size:11px;color:#777;margin-top:4px;
+        }
+
+        /* TAREFAS GERAIS */
+        .tarefa-linha {
+            display:flex;align-items:center;gap:8px;padding:10px 12px;
+            background:#1c1c20;border:1px solid #252529;border-radius:10px;margin-bottom:8px;
+        }
+        .tarefa-linha.concluida { opacity: 0.5; }
+        .tarefa-linha.prio-alta {
+            border-color:#d45a5a;
+            background:linear-gradient(90deg,#2a1a1a 0%,#1c1c20 30%);
+        }
+        .tarefa-linha.prio-alta::before {
+            content:"▲";color:#d45a5a;font-size:10px;margin-right:4px;flex-shrink:0;
+        }
+        .prio-grupo { display:flex;gap:3px;flex-shrink:0; }
+        .prio-btn {
+            width:18px;height:18px;border-radius:50%;border:1px solid #333;
+            background:#1a1a1e;cursor:pointer;transition:0.15s;padding:0;
+        }
+        .prio-btn[data-prio="alta"].ativo, .prio-btn[data-prio="alta"]:hover { background:#d45a5a;border-color:#d45a5a; }
+        .prio-btn[data-prio="media"].ativo,.prio-btn[data-prio="media"]:hover { background:#c9a44a;border-color:#c9a44a; }
+        .prio-btn[data-prio="baixa"].ativo,.prio-btn[data-prio="baixa"]:hover { background:#4caf50;border-color:#4caf50; }
+        .tarefa-input {
+            flex:1;background:transparent!important;border:none!important;
+            padding:4px 0!important;font-size:14px;color:#e0e0e0;outline:none;font-family:inherit;
+        }
+        .tarefa-input::placeholder { color: #555; }
+        .tarefa-check { width:20px;height:20px;cursor:pointer;flex-shrink:0; }
+        .tarefa-remover {
+            background:none;border:none;color:#a33;font-size:18px;
+            cursor:pointer;padding:0 4px;flex-shrink:0;
+        }
+        .tarefa-remover:hover { color: #e55; }
+        .btn-adicionar-tarefa {
+            width:100%;padding:10px;font-size:13px;cursor:pointer;
+            border:1px dashed #444;background:transparent;color:#999;
+            border-radius:10px;transition:0.15s;font-family:inherit;
+        }
+        .btn-adicionar-tarefa:hover { border-color:#666;color:#ccc;background:#1a1a1e; }
+        .contador-tarefas { color:#888;font-size:12px;text-align:right;margin-top:8px; }
+        .tarefa-rodape {
+            display:flex;align-items:center;gap:8px;margin:4px 0 0 30px;
+        }
+        .tarefa-tempo {
+            display:inline-flex;align-items:center;gap:6px;font-size:11px;
+            color:#a8c4e8;background:#1a2233;border:1px solid #2c3a55;
+            border-radius:14px;padding:3px 10px;font-variant-numeric:tabular-nums;
+        }
+        .btn-focar-tarefa {
+            padding:3px 12px;font-size:11px;background:#17171a;
+            border:1px solid #333338;color:#a5d6a7;border-radius:14px;
+            cursor:pointer;font-family:inherit;transition:0.15s;font-weight:600;
+        }
+        .btn-focar-tarefa:hover { background:#172017;border-color:#2e5a2e; }
+
+        /* NOTAS */
+        .notas-area {
+            width:100%;min-height:100px;padding:12px;
+            background:#17171a;border:1px solid #2a2a30;border-radius:10px;
+            color:#eaeaea;font-family:inherit;font-size:13px;
+            outline:none;resize:vertical;
+        }
+        .notas-area:focus { border-color:#55555c; }
     </style>
 </head>
-
 <body>
 
     <main class="container">
@@ -114,9 +209,7 @@
         <header class="header">
             <p class="eyebrow">PLANEJAMENTO · EDIÇÃO</p>
             <h1>🎬 Edição</h1>
-            <p class="subtitle">
-                Prepare o job antes de abrir a timeline.
-            </p>
+            <p class="subtitle">Prepare o job antes de abrir a timeline.</p>
         </header>
 
         <section class="modules">
@@ -127,7 +220,7 @@
                 <div style="width: 100%;">
                     <h2>Projeto</h2>
 
-                    <div class="linha-dupla" style="display:flex;gap:10px;">
+                    <div style="display:flex;gap:10px;">
                         <div style="flex:2;">
                             <label class="campo-label">Nome do projeto</label>
                             <input type="text" id="projNome" placeholder="Ex.: Reels lançamento">
@@ -168,32 +261,61 @@
                 </div>
             </div>
 
-            <!-- Placeholder: Pendências do job -->
-            <div class="placeholder-card">
-                📋 <strong>Pendências do job</strong> — chega em D.2
+            <!-- PENDÊNCIAS DO JOB -->
+            <div class="module-card" style="align-items: flex-start;">
+                <span class="icon">📋</span>
+                <div style="width: 100%;">
+                    <h2>Pendências do job</h2>
+                    <p style="color:#888;font-size:13px;margin:6px 0 12px;">
+                        Lista livre — sem ordem, marca o que quiser.
+                    </p>
+                    <div id="listaPendencias"></div>
+                    <button type="button" class="btn-add-pendencia" id="btnAddPendencia">＋ Adicionar pendência</button>
+                </div>
             </div>
 
-            <!-- Placeholder: Entregas -->
-            <div class="placeholder-card">
-                📦 <strong>Entregas</strong> — chega em D.3
+            <!-- ENTREGAS -->
+            <div class="module-card" style="align-items: flex-start;">
+                <span class="icon">📦</span>
+                <div style="width: 100%;">
+                    <h2>Entregas</h2>
+                    <p style="color:#888;font-size:13px;margin:6px 0 12px;">
+                        Cada envio vira uma entrega. O feedback do cliente vira itens dentro dela.
+                    </p>
+                    <div id="listaEntregas"></div>
+                    <button type="button" class="btn-add-entrega" id="btnAddEntrega">＋ Nova entrega</button>
+                </div>
             </div>
 
-            <!-- Placeholder: Tarefas gerais -->
-            <div class="placeholder-card">
-                📋 <strong>Tarefas gerais</strong> — chega em D.3
+            <!-- TAREFAS GERAIS -->
+            <div class="module-card" style="align-items: flex-start;">
+                <span class="icon">📋</span>
+                <div style="width: 100%;">
+                    <h2>Tarefas gerais</h2>
+                    <p style="color:#888;font-size:13px;margin:6px 0 12px;">
+                        O que não é do job. Máx 5.
+                    </p>
+                    <div id="listaTarefas"></div>
+                    <button type="button" class="btn-adicionar-tarefa" id="btnAddTarefa">＋ Adicionar tarefa</button>
+                    <div class="contador-tarefas" id="contadorTarefas"></div>
+                </div>
             </div>
 
-            <!-- Placeholder: Notas -->
-            <div class="placeholder-card">
-                📝 <strong>Notas</strong> — chega em D.3
+            <!-- NOTAS -->
+            <div class="module-card" style="align-items: flex-start;">
+                <span class="icon">📝</span>
+                <div style="width: 100%;">
+                    <h2>Notas do projeto</h2>
+                    <p style="color:#888;font-size:13px;margin:6px 0 12px;">
+                        Códigos, macetes, links soltos.
+                    </p>
+                    <textarea class="notas-area" id="notasProjeto" placeholder="Opcional."></textarea>
+                </div>
             </div>
 
         </section>
 
-        <a href="index.html" class="back-button">
-            ← Voltar para Planejamento
-        </a>
-
+        <a href="index.html" class="back-button">← Voltar para Planejamento</a>
     </main>
 
     <script src="../../js/storage.js"></script>
@@ -202,96 +324,70 @@
         // ==================================================
         // DATA + PREFIXO
         // ==================================================
-
         const hoje = new Date();
-        const anoHoje = hoje.getFullYear();
-        const mesHoje = String(hoje.getMonth() + 1).padStart(2, "0");
-        const diaHoje = String(hoje.getDate()).padStart(2, "0");
-        const dataHoje = `${anoHoje}-${mesHoje}-${diaHoje}`;
-
+        const dataHoje = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,"0")}-${String(hoje.getDate()).padStart(2,"0")}`;
         const paramsURL = new URLSearchParams(window.location.search);
         const dataParam = paramsURL.get("data");
-        const dataAtual =
-            (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam))
-                ? dataParam
-                : dataHoje;
-
+        const dataAtual = (dataParam && /^\d{4}-\d{2}-\d{2}$/.test(dataParam)) ? dataParam : dataHoje;
         const PREFIXO = `planejamento_${dataAtual}_trabalho_edicao_`;
 
+        function uid(p) {
+            return `${p}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`;
+        }
+        function escHtml(s) {
+            return String(s ?? "").replace(/[&<>"']/g, c => ({
+                "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+            }[c]));
+        }
+        function fmtBR(iso) {
+            if (!iso) return "";
+            const [y, m, d] = iso.split("-");
+            return `${d}/${m}/${y}`;
+        }
 
         // ==================================================
         // BARRA DE DATAS
         // ==================================================
-
-        (function () {
+        (function(){
             const container = document.querySelector("main.container");
             const header = container.querySelector(".header");
-
             const [a, m, d] = dataAtual.split("-").map(Number);
             const dataObj = new Date(a, m - 1, d);
-
-            const fmtISO = (dt) => {
-                const yy = dt.getFullYear();
-                const mm = String(dt.getMonth() + 1).padStart(2, "0");
-                const dd = String(dt.getDate()).padStart(2, "0");
-                return `${yy}-${mm}-${dd}`;
-            };
-
+            const fmtISO = (dt) => `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`;
             const anterior = new Date(dataObj); anterior.setDate(anterior.getDate() - 1);
             const seguinte = new Date(dataObj); seguinte.setDate(seguinte.getDate() + 1);
-
-            const fmtBR = (iso) => { const [y, mo, dy] = iso.split("-"); return `${dy}/${mo}/${y}`; };
             const label = (iso) => iso === dataHoje ? "Hoje" : fmtBR(iso);
             const baseURL = window.location.pathname;
             const urlComData = (iso) => iso === dataHoje ? baseURL : `${baseURL}?data=${iso}`;
-
             const barra = document.createElement("div");
-            barra.style.cssText = `
-                display:flex; align-items:center; justify-content:space-between; gap:8px;
-                margin-bottom:18px; padding:10px 12px; border:1px solid #252529;
-                border-radius:10px; background:#17171a; font-size:14px;
-            `;
-            const linkStyle = "text-decoration:none; color:#e0e0e0; padding:6px 10px; border-radius:6px;";
-
+            barra.style.cssText = `display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:18px;padding:10px 12px;border:1px solid #252529;border-radius:10px;background:#17171a;font-size:14px;`;
+            const linkStyle = "text-decoration:none;color:#e0e0e0;padding:6px 10px;border-radius:6px;";
             barra.innerHTML = `
                 <a href="${urlComData(fmtISO(anterior))}" style="${linkStyle}">← ${label(fmtISO(anterior))}</a>
                 <div style="text-align:center;">
-                    <div style="font-weight:600; color:#f5f5f5;">${label(dataAtual)}</div>
-                    ${dataAtual !== dataHoje
-                        ? `<a href="${baseURL}" style="font-size:11px; color:#c98a8a; text-decoration:none;">voltar para hoje</a>`
-                        : ""}
+                    <div style="font-weight:600;color:#f5f5f5;">${label(dataAtual)}</div>
+                    ${dataAtual !== dataHoje ? `<a href="${baseURL}" style="font-size:11px;color:#c98a8a;text-decoration:none;">voltar para hoje</a>` : ""}
                 </div>
                 <a href="${urlComData(fmtISO(seguinte))}" style="${linkStyle}">${label(fmtISO(seguinte))} →</a>
             `;
             container.insertBefore(barra, header);
         })();
 
-
         // ==================================================
-        // PROJETO — storage
+        // PROJETO
         // ==================================================
         const CHAVE_PROJETO = PREFIXO + "projeto";
-
         function lerProjeto() {
-            try {
-                const raw = localStorage.getItem(CHAVE_PROJETO);
-                return raw ? JSON.parse(raw) : {};
-            } catch { return {}; }
+            try { return JSON.parse(localStorage.getItem(CHAVE_PROJETO)) || {}; }
+            catch { return {}; }
         }
         function salvarProjeto(p) {
             localStorage.setItem(CHAVE_PROJETO, JSON.stringify(p));
         }
-
         let projeto = lerProjeto();
 
-        // Campos texto
-        const camposProj = [
-            { id: "projNome",    campo: "nome" },
-            { id: "projCliente", campo: "cliente" },
-            { id: "projPasta",   campo: "pasta" },
-        ];
-
-        camposProj.forEach(({ id, campo }) => {
+        ["nome:projNome","cliente:projCliente","pasta:projPasta"].forEach(par => {
+            const [campo, id] = par.split(":");
             const el = document.getElementById(id);
             el.value = projeto[campo] || "";
             el.addEventListener("input", () => {
@@ -300,71 +396,475 @@
             });
         });
 
-        // Prazo
         const elPrazo = document.getElementById("projPrazo");
         const elSemPrazo = document.getElementById("projSemPrazo");
         elPrazo.value = projeto.prazo || "";
         elSemPrazo.checked = !!projeto.semPrazo;
-
-        elPrazo.addEventListener("input", () => {
-            projeto.prazo = elPrazo.value;
-            salvarProjeto(projeto);
-        });
+        if (elSemPrazo.checked) { elPrazo.disabled = true; elPrazo.style.opacity = "0.4"; }
+        elPrazo.addEventListener("input", () => { projeto.prazo = elPrazo.value; salvarProjeto(projeto); });
         elSemPrazo.addEventListener("change", () => {
             projeto.semPrazo = elSemPrazo.checked;
-            if (elSemPrazo.checked) {
-                elPrazo.disabled = true;
-                elPrazo.style.opacity = "0.4";
-            } else {
-                elPrazo.disabled = false;
-                elPrazo.style.opacity = "1";
-            }
+            elPrazo.disabled = elSemPrazo.checked;
+            elPrazo.style.opacity = elSemPrazo.checked ? "0.4" : "1";
             salvarProjeto(projeto);
         });
-        if (elSemPrazo.checked) {
-            elPrazo.disabled = true;
-            elPrazo.style.opacity = "0.4";
-        }
 
-        // Status
         const elChipsStatus = document.getElementById("chipsStatus");
         let statusAtual = projeto.status || "recebendo_material";
-        if (!projeto.status) {
-            projeto.status = statusAtual;
-            salvarProjeto(projeto);
-        }
-
+        if (!projeto.status) { projeto.status = statusAtual; salvarProjeto(projeto); }
         function renderStatus() {
-            elChipsStatus.querySelectorAll(".chip").forEach(chip => {
-                chip.classList.toggle("selecionado", chip.dataset.status === statusAtual);
+            elChipsStatus.querySelectorAll(".chip").forEach(c => {
+                c.classList.toggle("selecionado", c.dataset.status === statusAtual);
             });
         }
         renderStatus();
-
         elChipsStatus.querySelectorAll(".chip").forEach(chip => {
             chip.addEventListener("click", () => {
-                const novo = chip.dataset.status;
-                if (statusAtual === novo) return;
-                statusAtual = novo;
-                projeto.status = novo;
+                if (statusAtual === chip.dataset.status) return;
+                statusAtual = chip.dataset.status;
+                projeto.status = statusAtual;
                 salvarProjeto(projeto);
                 renderStatus();
             });
         });
 
-        // Agora — derivado (por enquanto só mostra vazio, D.2 preenche)
-        const agoraTexto = document.getElementById("agoraTexto");
-        function atualizarAgora() {
-            // TODO D.2: usar 1ª pendência aberta
-            agoraTexto.textContent = "Nada pendente ainda.";
-            agoraTexto.classList.add("vazio");
+        // ==================================================
+        // PENDÊNCIAS DO JOB
+        // ==================================================
+        const CHAVE_PEND = PREFIXO + "pendencias_job";
+        function lerPendencias() {
+            try {
+                const raw = localStorage.getItem(CHAVE_PEND);
+                const arr = raw ? JSON.parse(raw) : [];
+                return Array.isArray(arr) ? arr : [];
+            } catch { return []; }
         }
-        atualizarAgora();
+        function salvarPendencias(arr) { localStorage.setItem(CHAVE_PEND, JSON.stringify(arr)); }
+        let pendencias = lerPendencias();
+        const listaPendencias = document.getElementById("listaPendencias");
+        const agoraTexto = document.getElementById("agoraTexto");
 
-        // Focar no job — placeholder (D.3 liga de verdade)
-        document.getElementById("btnFocarJob").addEventListener("click", () => {
-            alert("⏳ O botão Focar será ligado na parte D.3.");
+        function atualizarAgora() {
+            const abertas = pendencias.filter(p => !p.concluida && (p.texto || "").trim());
+            if (!abertas.length) {
+                agoraTexto.textContent = "Nada pendente ainda.";
+                agoraTexto.classList.add("vazio");
+                listaPendencias.querySelectorAll(".pendencia-item").forEach(el => el.classList.remove("agora"));
+                return;
+            }
+            const agoraId = abertas[0].id;
+            listaPendencias.querySelectorAll(".pendencia-item").forEach(el => {
+                el.classList.toggle("agora", el.dataset.id === agoraId);
+            });
+            agoraTexto.textContent = abertas[0].texto;
+            agoraTexto.classList.remove("vazio");
+        }
+
+        function renderPendencias() {
+            if (!pendencias.length) {
+                listaPendencias.innerHTML = `<div class="vazio-pendencias">Nenhuma pendência ainda.</div>`;
+                atualizarAgora();
+                return;
+            }
+            listaPendencias.innerHTML = pendencias.map((p, i) => `
+                <div class="pendencia-item ${p.concluida ? "concluida" : ""}" data-id="${escHtml(p.id)}" data-idx="${i}">
+                    <input type="checkbox" class="pendencia-check" ${p.concluida ? "checked" : ""}>
+                    <input type="text" class="pendencia-input" value="${escHtml(p.texto || "")}" placeholder="O que falta no job?">
+                    <button type="button" class="pendencia-rm" title="Remover">×</button>
+                </div>
+            `).join("");
+            listaPendencias.querySelectorAll(".pendencia-item").forEach(el => {
+                const idx = Number(el.dataset.idx);
+                el.querySelector(".pendencia-check").addEventListener("change", (ev) => {
+                    pendencias[idx].concluida = ev.target.checked;
+                    salvarPendencias(pendencias);
+                    renderPendencias();
+                });
+                el.querySelector(".pendencia-input").addEventListener("input", (ev) => {
+                    pendencias[idx].texto = ev.target.value;
+                    salvarPendencias(pendencias);
+                    atualizarAgora();
+                });
+                el.querySelector(".pendencia-rm").addEventListener("click", () => {
+                    pendencias.splice(idx, 1);
+                    salvarPendencias(pendencias);
+                    renderPendencias();
+                });
+            });
+            atualizarAgora();
+        }
+        document.getElementById("btnAddPendencia").addEventListener("click", () => {
+            pendencias.push({ id: uid("pend"), texto: "", concluida: false, criado_em: Date.now() });
+            salvarPendencias(pendencias);
+            renderPendencias();
+            const inputs = listaPendencias.querySelectorAll(".pendencia-input");
+            if (inputs.length) inputs[inputs.length - 1].focus();
         });
+        renderPendencias();
+
+        // ==================================================
+        // ENTREGAS
+        // ==================================================
+        const CHAVE_ENTREGAS = PREFIXO + "entregas";
+        function lerEntregas() {
+            try {
+                const raw = localStorage.getItem(CHAVE_ENTREGAS);
+                const arr = raw ? JSON.parse(raw) : [];
+                return Array.isArray(arr) ? arr : [];
+            } catch { return []; }
+        }
+        function salvarEntregas(arr) { localStorage.setItem(CHAVE_ENTREGAS, JSON.stringify(arr)); }
+        let entregas = lerEntregas();
+        const listaEntregas = document.getElementById("listaEntregas");
+        const entregasAbertas = {}; // controle de expand/collapse por id
+
+        function proximoNomeEntrega() {
+            const numeros = entregas
+                .map(e => (e.nome || "").match(/^Corte (\d+)$/))
+                .filter(Boolean)
+                .map(m => Number(m[1]));
+            const prox = numeros.length ? Math.max(...numeros) + 1 : 1;
+            return `Corte ${prox}`;
+        }
+
+        function renderEntregas() {
+            if (!entregas.length) {
+                listaEntregas.innerHTML = `<div class="vazio-entregas">Nenhuma entrega ainda. Clique em "+ Nova entrega" pra começar o Corte 1.</div>`;
+                return;
+            }
+
+            const ultima = entregas[entregas.length - 1];
+
+            listaEntregas.innerHTML = entregas.map((e, i) => {
+                const aberta = entregasAbertas[e.id] !== false; // default aberto
+                const statusLabel = {
+                    em_andamento: "em ajuste",
+                    enviada: "enviada",
+                    aprovada: "aprovada",
+                }[e.status] || e.status;
+
+                const mostrarAprovar = e.status === "enviada" && i === entregas.length - 1;
+                const mostrarEnviar = e.status === "em_andamento";
+
+                return `
+                    <div class="entrega-card ${e.status === "enviada" ? "enviada" : ""} ${e.status === "aprovada" ? "aprovada" : ""}" data-id="${escHtml(e.id)}">
+                        <div class="entrega-cabecalho" data-toggle="${escHtml(e.id)}">
+                            <span style="font-size:14px;">${aberta ? "▾" : "▸"}</span>
+                            <span class="entrega-titulo">${escHtml(e.nome)}</span>
+                            <span class="entrega-status ${e.status}">${statusLabel}</span>
+                        </div>
+                        ${aberta ? `
+                            <div class="entrega-corpo">
+                                ${e.enviada_em ? `<div class="entrega-sub">📤 enviada em ${fmtBR(e.enviada_em)}</div>` : ""}
+                                ${e.aprovada_em ? `<div class="entrega-sub">✅ aprovada em ${fmtBR(e.aprovada_em)}</div>` : ""}
+                                ${(e.itens || []).map((it, j) => `
+                                    <div class="entrega-item ${it.feito ? "feito" : ""}" data-idx="${j}">
+                                        <input type="checkbox" ${it.feito ? "checked" : ""}>
+                                        <input type="text" class="entrega-item-texto" value="${escHtml(it.texto || "")}" placeholder="Item do feedback">
+                                        <button type="button" class="entrega-item-rm" title="Remover">×</button>
+                                    </div>
+                                `).join("")}
+                                ${e.status !== "aprovada" ? `<button type="button" class="btn-add-item" data-add-item="${escHtml(e.id)}">＋ Adicionar item</button>` : ""}
+                                ${mostrarEnviar || mostrarAprovar ? `
+                                    <div class="entrega-acoes">
+                                        ${mostrarEnviar ? `<button class="btn-entrega enviar" data-enviar="${escHtml(e.id)}">📤 Enviar ${escHtml(e.nome)}</button>` : ""}
+                                        ${mostrarAprovar ? `<button class="btn-entrega aprovar" data-aprovar="${escHtml(e.id)}">✔ Aprovar</button>` : ""}
+                                    </div>
+                                ` : ""}
+                            </div>
+                        ` : ""}
+                    </div>
+                `;
+            }).join("");
+
+            // handlers
+            listaEntregas.querySelectorAll("[data-toggle]").forEach(el => {
+                el.addEventListener("click", () => {
+                    const id = el.dataset.toggle;
+                    entregasAbertas[id] = entregasAbertas[id] === false ? true : false;
+                    renderEntregas();
+                });
+            });
+
+            listaEntregas.querySelectorAll(".entrega-item").forEach(el => {
+                const card = el.closest(".entrega-card");
+                const entId = card.dataset.id;
+                const idx = Number(el.dataset.idx);
+                const entrega = entregas.find(x => x.id === entId);
+                if (!entrega) return;
+
+                el.querySelector('input[type="checkbox"]').addEventListener("change", (ev) => {
+                    entrega.itens[idx].feito = ev.target.checked;
+                    salvarEntregas(entregas);
+                    renderEntregas();
+                });
+
+                el.querySelector(".entrega-item-texto").addEventListener("input", (ev) => {
+                    entrega.itens[idx].texto = ev.target.value;
+                    salvarEntregas(entregas);
+                });
+
+                el.querySelector(".entrega-item-rm").addEventListener("click", () => {
+                    entrega.itens.splice(idx, 1);
+                    salvarEntregas(entregas);
+                    renderEntregas();
+                });
+            });
+
+            listaEntregas.querySelectorAll("[data-add-item]").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const id = btn.dataset.addItem;
+                    const entrega = entregas.find(x => x.id === id);
+                    if (!entrega) return;
+                    entrega.itens = entrega.itens || [];
+                    entrega.itens.push({ id: uid("it"), texto: "", feito: false });
+                    salvarEntregas(entregas);
+                    renderEntregas();
+                    // foca no último input do card
+                    const inputs = listaEntregas.querySelectorAll(`.entrega-card[data-id="${id}"] .entrega-item-texto`);
+                    if (inputs.length) inputs[inputs.length - 1].focus();
+                });
+            });
+
+            listaEntregas.querySelectorAll("[data-enviar]").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const id = btn.dataset.enviar;
+                    const entrega = entregas.find(x => x.id === id);
+                    if (!entrega) return;
+                    entrega.status = "enviada";
+                    entrega.enviada_em = dataAtual;
+                    salvarEntregas(entregas);
+
+                    // status do projeto vira "aguardando"
+                    statusAtual = "aguardando";
+                    projeto.status = "aguardando";
+                    salvarProjeto(projeto);
+                    renderStatus();
+                    renderEntregas();
+                });
+            });
+
+            listaEntregas.querySelectorAll("[data-aprovar]").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const id = btn.dataset.aprovar;
+                    const entrega = entregas.find(x => x.id === id);
+                    if (!entrega) return;
+                    entrega.status = "aprovada";
+                    entrega.aprovada_em = dataAtual;
+                    salvarEntregas(entregas);
+
+                    statusAtual = "entregue";
+                    projeto.status = "entregue";
+                    salvarProjeto(projeto);
+                    renderStatus();
+                    renderEntregas();
+                });
+            });
+        }
+
+        document.getElementById("btnAddEntrega").addEventListener("click", () => {
+            entregas.push({
+                id: uid("ent"),
+                nome: proximoNomeEntrega(),
+                criado_em: Date.now(),
+                enviada_em: null,
+                aprovada_em: null,
+                status: "em_andamento",
+                itens: [],
+            });
+            salvarEntregas(entregas);
+            if (statusAtual !== "em_corte") {
+                statusAtual = "em_corte";
+                projeto.status = "em_corte";
+                salvarProjeto(projeto);
+                renderStatus();
+            }
+            renderEntregas();
+        });
+
+        renderEntregas();
+
+        // ==================================================
+        // TAREFAS GERAIS (sem frentes)
+        // ==================================================
+        const CHAVE_TAREFAS = PREFIXO + "tarefas_gerais";
+        function lerTarefas() {
+            try {
+                const raw = localStorage.getItem(CHAVE_TAREFAS);
+                const arr = raw ? JSON.parse(raw) : [];
+                return Array.isArray(arr) ? arr : [];
+            } catch { return []; }
+        }
+        function salvarTarefas() { localStorage.setItem(CHAVE_TAREFAS, JSON.stringify(tarefas)); }
+        let tarefas = lerTarefas();
+        const listaTarefas = document.getElementById("listaTarefas");
+        const contador = document.getElementById("contadorTarefas");
+        const ORDEM_PRIO = { alta: 0, media: 1, baixa: 2 };
+
+        function renderTarefas() {
+            tarefas.sort((a, b) => (ORDEM_PRIO[a.prioridade] ?? 1) - (ORDEM_PRIO[b.prioridade] ?? 1));
+
+            if (!tarefas.length) {
+                listaTarefas.innerHTML = `<div class="vazio-tarefas">Nenhuma tarefa geral.</div>`;
+                contador.textContent = "";
+                return;
+            }
+
+            listaTarefas.innerHTML = "";
+            tarefas.forEach((t, i) => {
+                const wrap = document.createElement("div");
+                wrap.style.marginBottom = "8px";
+
+                const linha = document.createElement("div");
+                const classePrio = t.prioridade === "alta" ? " prio-alta" : "";
+                linha.className = "tarefa-linha" + (t.concluida ? " concluida" : "") + classePrio;
+
+                // prioridade
+                const prioGrupo = document.createElement("div");
+                prioGrupo.className = "prio-grupo";
+                ["alta", "media", "baixa"].forEach(p => {
+                    const btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.className = "prio-btn" + (t.prioridade === p ? " ativo" : "");
+                    btn.dataset.prio = p;
+                    btn.title = p.charAt(0).toUpperCase() + p.slice(1);
+                    btn.addEventListener("click", () => {
+                        t.prioridade = p;
+                        salvarTarefas();
+                        renderTarefas();
+                    });
+                    prioGrupo.appendChild(btn);
+                });
+                linha.appendChild(prioGrupo);
+
+                const input = document.createElement("input");
+                input.type = "text";
+                input.className = "tarefa-input";
+                input.value = t.texto || "";
+                input.placeholder = "O que fazer?";
+                input.addEventListener("input", () => { t.texto = input.value; salvarTarefas(); });
+                linha.appendChild(input);
+
+                const check = document.createElement("input");
+                check.type = "checkbox";
+                check.className = "tarefa-check";
+                check.checked = !!t.concluida;
+                check.addEventListener("change", () => {
+                    t.concluida = check.checked;
+                    salvarTarefas();
+                    renderTarefas();
+                });
+                linha.appendChild(check);
+
+                const btnRem = document.createElement("button");
+                btnRem.type = "button";
+                btnRem.className = "tarefa-remover";
+                btnRem.textContent = "×";
+                btnRem.title = "Remover";
+                btnRem.addEventListener("click", () => {
+                    tarefas.splice(i, 1);
+                    salvarTarefas();
+                    renderTarefas();
+                });
+                linha.appendChild(btnRem);
+
+                wrap.appendChild(linha);
+
+                const rodape = document.createElement("div");
+                rodape.className = "tarefa-rodape";
+
+                if (t.tempo_foco_min > 0) {
+                    const min = Number(t.tempo_foco_min);
+                    let txt;
+                    if (min < 60) txt = `${min} min`;
+                    else {
+                        const h = Math.floor(min / 60);
+                        const m = min % 60;
+                        txt = m > 0 ? `${h}h ${m}min` : `${h}h`;
+                    }
+                    const badge = document.createElement("span");
+                    badge.className = "tarefa-tempo";
+                    badge.textContent = `⏱️ ${txt} em foco`;
+                    rodape.appendChild(badge);
+                }
+
+                const btnFocar = document.createElement("button");
+                btnFocar.type = "button";
+                btnFocar.className = "btn-focar-tarefa";
+                btnFocar.textContent = "🎯 Focar";
+                btnFocar.addEventListener("click", (ev) => {
+                    ev.stopPropagation();
+                    const txt = (t.texto || "").trim();
+                    if (!txt) return alert("Escreve o texto da tarefa primeiro.");
+                    const params = new URLSearchParams({
+                        origem: "trabalho",
+                        tarefa: txt,
+                        data: dataAtual,
+                    });
+                    window.location.href = `../foco/foco.html?${params.toString()}`;
+                });
+                rodape.appendChild(btnFocar);
+
+                wrap.appendChild(rodape);
+                listaTarefas.appendChild(wrap);
+            });
+
+            const feitas = tarefas.filter(t => t.concluida).length;
+            contador.textContent = `${feitas}/${tarefas.length} concluídas`;
+        }
+
+        document.getElementById("btnAddTarefa").addEventListener("click", () => {
+            if (tarefas.length >= 5) return alert("Máximo de 5 tarefas.");
+            tarefas.push({ texto: "", prioridade: "media", concluida: false, tempo_foco_min: 0, sessoes_foco: 0 });
+            salvarTarefas();
+            renderTarefas();
+            const inputs = listaTarefas.querySelectorAll(".tarefa-input");
+            if (inputs.length) inputs[inputs.length - 1].focus();
+        });
+
+        renderTarefas();
+
+        // ==================================================
+        // NOTAS
+        // ==================================================
+        const CHAVE_NOTAS = PREFIXO + "notas";
+        const notasEl = document.getElementById("notasProjeto");
+        notasEl.value = localStorage.getItem(CHAVE_NOTAS) || "";
+        notasEl.addEventListener("input", () => {
+            localStorage.setItem(CHAVE_NOTAS, notasEl.value);
+        });
+
+        // ==================================================
+        // FOCAR NO JOB
+        // ==================================================
+        document.getElementById("btnFocarJob").addEventListener("click", () => {
+            const nome = (projeto.nome || "").trim() || "(projeto sem nome)";
+            const params = new URLSearchParams({
+                origem: "trabalho",
+                tarefa: `🎬 ${nome}`,
+                data: dataAtual,
+            });
+            window.location.href = `../foco/foco.html?${params.toString()}`;
+        });
+
+        // ==================================================
+        // RETORNO DO FOCO (aplica tempo no projeto)
+        // ==================================================
+        (function aplicarRetornoFocoEdicao() {
+            const prefixo = "estudo_trabalho_foco_retorno_";
+            const alvo = `🎬 ${(projeto.nome || "").trim() || "(projeto sem nome)"}`;
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (!k || !k.startsWith(prefixo)) continue;
+                let p = null;
+                try { p = JSON.parse(localStorage.getItem(k)); } catch {}
+                if (!p || p.tarefaTexto !== alvo) continue;
+                projeto.tempo_foco_min = (Number(projeto.tempo_foco_min) || 0) + Number(p.tempo_real_min || 0);
+                salvarProjeto(projeto);
+                localStorage.removeItem(k);
+                console.log("[foco→edicao] retorno aplicado:", p.tempo_real_min, "min");
+            }
+        })();
     </script>
 
 </body>
